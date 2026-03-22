@@ -4527,6 +4527,10 @@
                 <div class="login-switch">
                     Não tem conta? <button onclick="Auth.showCadastro()">Cadastrar-se</button>
                 </div>
+                <div id="login-db-error" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(184,48,48,0.08);border-radius:10px;font-size:0.82rem;color:#B83030;line-height:1.5;"></div>
+                <button id="login-reset-btn" onclick="Auth.resetarBanco()" style="display:none;margin-top:10px;width:100%;background:rgba(184,48,48,0.08);border:1px solid rgba(184,48,48,0.2);border-radius:10px;padding:10px;font-size:0.82rem;color:#B83030;cursor:pointer;font-weight:600;">
+                    <i class="fas fa-redo"></i> Recriar banco de dados
+                </button>
             </div>
 
             <!-- PAINEL CADASTRO -->
@@ -7551,7 +7555,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
         // CÓDIGO JAVASCRIPT COMPLETO (com as melhorias: contador de contatos e alerta de cliente parado)
         const DB = {
             name: 'ImobiProDB',
-            version: 21, // v21: store usuarios para login
+            version: 22, // v22: garante store usuarios em todos os browsers
             db: null,
             
             init: function() {
@@ -7560,24 +7564,35 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     
                     request.onerror = (event) => {
                         console.error('Erro ao abrir IndexedDB:', event);
-                        reject(event);
+                        // Tenta sem versão específica como fallback
+                        try {
+                            const fb = indexedDB.open(this.name);
+                            fb.onsuccess = (e) => { this.db = e.target.result; resolve(); };
+                            fb.onerror   = () => reject(event);
+                        } catch(e2) { reject(event); }
                     };
                     
                     request.onsuccess = (event) => {
                         this.db = event.target.result;
-                        console.log('IndexedDB aberto com sucesso');
+                        console.log('IndexedDB aberto com sucesso, versão:', this.db.version);
                         resolve();
                     };
                     
                     request.onupgradeneeded = (event) => {
                         const db = event.target.result;
                         const oldVersion = event.oldVersion;
-                        
-                        console.log(`Atualizando banco de dados da versão ${oldVersion} para ${this.version}`);
-                        
+                        console.log(`Upgrade DB: v${oldVersion} → v${this.version}`);
+                        // createObjectStores é síncrono (IDB não suporta await no onupgradeneeded)
                         this.createObjectStores(db);
-                        
-                        this.migrateDatabase(db, oldVersion);
+                        // migrateDatabase é async — não pode ser chamada aqui; é chamada após onsuccess
+                    };
+
+                    request.onsuccess = (event) => {
+                        this.db = event.target.result;
+                        console.log('IndexedDB pronto, versão:', this.db.version);
+                        // Executa migrações de dados após o banco estar aberto
+                        this.migrateDatabase(this.db, event.target.result.version - 1).catch(e => console.warn('migrate:', e));
+                        resolve();
                     };
                 });
             },
@@ -24330,21 +24345,42 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             // ── Inicialização ──────────────────────────────────────────────
             async function init() {
                 // Garante que DB está pronto
-                if (!DB.db) { try { await DB.init(); } catch(e) {} }
+                if (!DB.db) {
+                    try { await DB.init(); }
+                    catch(e) {
+                        console.error('Auth.init: DB falhou:', e);
+                        loadLoginBg();
+                        showLogin();
+                        // Mostra botão de recuperação
+                        const dbErrEl  = document.getElementById('login-db-error');
+                        const resetBtn = document.getElementById('login-reset-btn');
+                        if (dbErrEl)  { dbErrEl.textContent = 'Erro ao abrir banco: ' + String(e); dbErrEl.style.display = 'block'; }
+                        if (resetBtn) resetBtn.style.display = 'block';
+                        return;
+                    }
+                }
 
+                // Verifica sessão existente
                 const session = getSession();
                 if (session) {
                     try {
-                        const u = await DB.get('usuarios', session.id);
-                        if (u) { showApp(session); return; }  // showApp already starts idle monitor
+                        if (DB.db.objectStoreNames.contains('usuarios')) {
+                            const u = await DB.get('usuarios', session.id);
+                            if (u) { showApp(session); return; }
+                        }
                     } catch(e) { console.warn('Auth.init session check failed:', e); }
                 }
 
-                // Se não há nenhum usuário cadastrado, vai direto para cadastro
+                // Se não há store de usuários ou nenhum usuário, vai para cadastro
                 try {
+                    if (!DB.db.objectStoreNames.contains('usuarios')) {
+                        loadLoginBg(); showLogin(); showCadastro(); return;
+                    }
                     const todos = await DB.getAll('usuarios');
                     if (todos.length === 0) { loadLoginBg(); showLogin(); showCadastro(); return; }
-                } catch(e) {}
+                } catch(e) {
+                    console.warn('Auth.init getAll usuarios falhou:', e);
+                }
 
                 loadLoginBg();
                 showLogin();
@@ -24407,30 +24443,53 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             // ── Login ──────────────────────────────────────────────────────
             async function login() {
                 clearMsg('login-error');
+                const dbErrEl  = document.getElementById('login-db-error');
+                const resetBtn = document.getElementById('login-reset-btn');
+                if (dbErrEl)  dbErrEl.style.display  = 'none';
+                if (resetBtn) resetBtn.style.display = 'none';
+
                 const username = (document.getElementById('login-username').value || '').trim().toLowerCase();
                 const password = document.getElementById('login-password').value || '';
 
                 if (!username || !password) { showError('login-error', 'Preencha usuário e senha.'); return; }
 
                 const btn = document.querySelector('#login-panel .login-btn');
-                if (btn) btn.disabled = true;
+                if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Entrando...'; }
 
                 try {
-                    if (!DB.db) await DB.init();
+                    // Garante DB inicializado
+                    if (!DB.db) {
+                        try { await DB.init(); }
+                        catch(dbErr) {
+                            const msg = 'Erro ao abrir o banco de dados local. Tente recarregar a página. Se persistir, use "Recriar banco de dados" abaixo.';
+                            showError('login-error', msg);
+                            if (dbErrEl)  { dbErrEl.textContent = String(dbErr); dbErrEl.style.display = 'block'; }
+                            if (resetBtn) resetBtn.style.display = 'block';
+                            return;
+                        }
+                    }
+
+                    // Verifica se a store 'usuarios' existe (pode faltar em bancos antigos)
+                    if (!DB.db.objectStoreNames.contains('usuarios')) {
+                        if (dbErrEl)  { dbErrEl.textContent = 'Store de usuários não encontrada no banco. Use "Recriar banco" para corrigir.'; dbErrEl.style.display = 'block'; }
+                        if (resetBtn) resetBtn.style.display = 'block';
+                        showError('login-error', 'Banco de dados desatualizado. Clique em "Recriar banco de dados" abaixo.');
+                        return;
+                    }
 
                     let todos = [];
                     try { todos = await DB.getAll('usuarios'); } catch(e) { todos = []; }
 
                     if (todos.length === 0) {
-                        showError('login-error', 'Nenhum usuário cadastrado. Crie uma conta primeiro.');
+                        showError('login-error', 'Nenhum usuário cadastrado. Clique em "Cadastrar-se" para criar sua conta.');
                         return;
                     }
 
                     const user = todos.find(u => u.username.toLowerCase() === username);
-                    if (!user) { showError('login-error', 'Usuário não encontrado.'); return; }
+                    if (!user) { showError('login-error', 'Usuário não encontrado. Verifique o nome de usuário.'); return; }
 
                     const hash = await hashPassword(password);
-                    if (hash !== user.passwordHash) { showError('login-error', 'Senha incorreta.'); return; }
+                    if (hash !== user.passwordHash) { showError('login-error', 'Senha incorreta. Tente novamente.'); return; }
 
                     setSession(user);
                     showApp(user);
@@ -24438,9 +24497,12 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
 
                 } catch(e) {
                     console.error('Erro login:', e);
-                    showError('login-error', 'Erro ao fazer login: ' + (e.message || e));
+                    const msg = 'Erro inesperado: ' + (e.message || String(e));
+                    showError('login-error', msg);
+                    if (dbErrEl)  { dbErrEl.textContent = String(e); dbErrEl.style.display = 'block'; }
+                    if (resetBtn) resetBtn.style.display = 'block';
                 } finally {
-                    if (btn) btn.disabled = false;
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt" style="margin-right:8px"></i>Entrar'; }
                 }
             }
 
@@ -24764,7 +24826,34 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 showLogin();
             }
 
-            return { init, login, cadastrar, logout, showLogin, showLoginPanel, showCadastro, toggleEye, openUserMenu, closeUserMenu, deletarUsuario, novoUsuarioAdmin, alterarSenha, applyLoginBg, idleContinue, idleLogout };
+            // ── Reseta banco de dados (apenas stores de usuário) ─────────
+            async function resetarBanco() {
+                if (!confirm(
+                    '⚠️ ATENÇÃO\n\n' +
+                    'Isso vai apagar APENAS os dados de login (usuários).\n' +
+                    'Seus clientes, imóveis e visitas serão mantidos.\n\n' +
+                    'Deseja continuar?'
+                )) return;
+
+                try {
+                    // Deleta o banco inteiro e recria
+                    await new Promise((res, rej) => {
+                        const req = indexedDB.deleteDatabase('ImobiProDB');
+                        req.onsuccess = () => res();
+                        req.onerror   = () => rej(new Error('Falha ao deletar banco'));
+                        req.onblocked = () => {
+                            alert('Feche outras abas do ImobiPro e tente novamente.');
+                            rej(new Error('blocked'));
+                        };
+                    });
+                    alert('✅ Banco resetado! A página será recarregada.\nCrie uma nova conta ao abrir o sistema.');
+                    location.reload();
+                } catch(e) {
+                    alert('Erro ao resetar: ' + (e.message || e));
+                }
+            }
+
+            return { init, login, cadastrar, logout, showLogin, showLoginPanel, showCadastro, toggleEye, openUserMenu, closeUserMenu, deletarUsuario, novoUsuarioAdmin, alterarSenha, applyLoginBg, idleContinue, idleLogout, resetarBanco };
         })();
 
         window.Auth = Auth;
