@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#4A574A">
+    <meta name="theme-color" content="#2E4A31">
+    <!-- PWA / Add to Home Screen -->
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ImobiPro">
+    <meta name="application-name" content="ImobiPro">
     <title>ImobiPro - Gestão Imobiliária</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -9369,22 +9373,42 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             },
 
             openWhatsApp: function(url) {
-                // Converte api.whatsapp.com/send para wa.me (melhor compatibilidade mobile)
+                // ── Normaliza sempre para wa.me ───────────────────────────────
                 url = url.replace('https://api.whatsapp.com/send?phone=', 'https://wa.me/');
-                url = url.replace('&text=', '?text=');
+                url = url.replace(/([^?])&text=/, '$1?text=');
 
-                // Em mobile, window.open pode ser bloqueado se não for chamado
-                // diretamente por um evento de usuário. Por isso usamos location.href
-                // como fallback seguro para iOS/Android.
-                const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-                if (isMobile) {
+                const isIOS        = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+                const isAndroid    = /Android/i.test(navigator.userAgent);
+                const isMobile     = isIOS || isAndroid;
+                // Detecta PWA standalone (adicionado à tela de início)
+                const isStandalone = window.navigator.standalone === true
+                                  || window.matchMedia('(display-mode: standalone)').matches;
+
+                if (isIOS && isStandalone) {
+                    // iOS PWA: deep link whatsapp:// abre o app diretamente
+                    // sem sair do contexto standalone
+                    const waMatch = url.match(/wa\.me\/([^?]+)(\?text=(.+))?/);
+                    if (waMatch) {
+                        const phone    = waMatch[1];
+                        const text     = waMatch[3] || '';
+                        const deepLink = text
+                            ? 'whatsapp://send?phone=' + phone + '&text=' + text
+                            : 'whatsapp://send?phone=' + phone;
+                        const a = document.createElement('a');
+                        a.href = deepLink;
+                        a.click();
+                        // Fallback caso WhatsApp não esteja instalado
+                        setTimeout(function() { window.open(url, '_blank'); }, 800);
+                    } else {
+                        window.open(url, '_blank');
+                    }
+                } else if (isMobile) {
+                    // Android e iOS no Safari normal
                     window.location.href = url;
                 } else {
+                    // Desktop
                     const win = window.open(url, '_blank', 'noopener,noreferrer');
-                    if (!win) {
-                        // Fallback se popup blocker estiver ativo
-                        window.location.href = url;
-                    }
+                    if (!win) window.location.href = url;
                 }
             },
 
@@ -17455,17 +17479,15 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     Utils.openWhatsApp(whatsappUrl);
                 },
 
-                verificarTempoEtapa: async function(cliente) {
+                verificarTempoEtapa: function(cliente) {
+                    // SÍNCRONO: usa confirm() nativo — não pode ser async
+                    // pois precisamos chamar abrirWhatsAppComScript dentro
+                    // do mesmo evento de toque (iOS PWA bloqueia após await)
                     if (!cliente || !cliente.dataEntradaFunil) return true;
-                    
                     const dias = Utils.calculateDaysInStage(cliente.dataEntradaFunil);
                     if (dias > 30) {
                         const mensagem = `⚠️ Cliente ${cliente.nome} está na etapa "${Utils.getEtapaFunilText(cliente.etapaFunil)}" há mais de 30 dias.\n\nConsidere mudar a estratégia ou arquivar o cliente antes de um novo contato.\n\nDeseja continuar com o envio da mensagem?`;
-                        if (confirm(mensagem)) {
-                            return true;
-                        } else {
-                            return false;
-                        }
+                        return confirm(mensagem);
                     }
                     return true;
                 },
@@ -17535,35 +17557,30 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`
                 },
 
                 confirmOpenCliente: (clienteId) => {
+                    // ── Totalmente síncrono: sem .then() nem await
+                    // para preservar o contexto de toque no iOS PWA ──────────
                     UI.currentWhatsappClienteId = clienteId;
-
                     const cliente = UI.data.clientes.find(c => c.id === clienteId);
                     if (!cliente) return;
-
-                    App.whatsapp.verificarTempoEtapa(cliente).then(continuar => {
-                        if (!continuar) { Utils.toast('Contato cancelado.'); return; }
-                        App.whatsapp.abrirWhatsAppComScript(clienteId);
-                    });
+                    const continuar = App.whatsapp.verificarTempoEtapa(cliente);
+                    if (!continuar) { Utils.toast('Contato cancelado.'); return; }
+                    App.whatsapp.abrirWhatsAppComScript(clienteId);
                 },
 
                 // Núcleo: incrementa contador e abre WhatsApp com mensagem baseada no nº de contatos
-                abrirWhatsAppComScript: async (clienteId) => {
+                abrirWhatsAppComScript: (clienteId) => {
+                    // ── IMPORTANTE: esta função NÃO pode ser async nem usar await
+                    // antes de abrir o WhatsApp. O iOS PWA bloqueia window.open / deep links
+                    // se chamados após qualquer operação assíncrona (o contexto de toque
+                    // é encerrado). Abrimos o WhatsApp PRIMEIRO (síncrono), depois
+                    // salvamos o contador em background.
                     const cliente = UI.data.clientes.find(c => c.id === clienteId);
                     if (!cliente) return;
 
-                    // Determina o próximo número de contato (antes de incrementar)
                     const proximoContato = (cliente.contatos || 0) + 1;
+                    const primeiroNome   = (cliente.nome || 'Cliente').split(' ')[0];
+                    const phoneNumber    = Utils.formatPhoneForWhatsApp(cliente.telefone);
 
-                    // Incrementa e salva
-                    cliente.contatos = proximoContato;
-                    await DB.put('clientes', cliente);
-                    UI.data.clientes = await Storage.getClientes();
-
-                    const primeiroNome = cliente.nome.split(' ')[0];
-                    const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
-
-                    // Seleciona mensagem pelo número do contato (1, 2 ou 3)
-                    // Fora desse intervalo → abre WhatsApp sem mensagem
                     let mensagem = '';
                     if (proximoContato === 1) {
                         mensagem =
@@ -17590,27 +17607,35 @@ Mas antes de encerrar, gostaria de saber: posso continuar te enviando oportunida
 
 Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     }
-                    // proximoContato > 3 → mensagem permanece '' → WhatsApp abre sem texto
 
                     const encodedMessage = mensagem ? encodeURIComponent(mensagem) : '';
                     const url = encodedMessage
                         ? `https://wa.me/${phoneNumber}?text=${encodedMessage}`
                         : `https://wa.me/${phoneNumber}`;
 
+                    // ── 1. Abre WhatsApp AGORA (síncrono, dentro do evento de toque) ──
                     Utils.openWhatsApp(url);
-                    UI.closeModals();
-                    UI.renderClientes();
-                    UI.renderFunil();
+
+                    // ── 2. Salva contador em background (não bloqueia o toque) ──────
+                    cliente.contatos = proximoContato;
+                    DB.put('clientes', cliente).then(() => {
+                        Storage.getClientes().then(lista => {
+                            UI.data.clientes = lista;
+                            UI.closeModals();
+                            UI.renderClientes();
+                            UI.renderFunil();
+                        });
+                    });
                 },
 
-                openConversaSimplesCliente: async () => {
+                openConversaSimplesCliente: () => {
                     if (!UI.currentWhatsappClienteId) { UI.closeModals(); return; }
-                    await App.whatsapp.abrirWhatsAppComScript(UI.currentWhatsappClienteId);
+                    App.whatsapp.abrirWhatsAppComScript(UI.currentWhatsappClienteId);
                 },
 
-                openMensagemPersonalizadaCliente: async () => {
+                openMensagemPersonalizadaCliente: () => {
                     if (!UI.currentWhatsappClienteId) { UI.closeModals(); return; }
-                    await App.whatsapp.abrirWhatsAppComScript(UI.currentWhatsappClienteId);
+                    App.whatsapp.abrirWhatsAppComScript(UI.currentWhatsappClienteId);
                 },
 
                 confirmOpenImovel: (imovelId) => {
@@ -24630,16 +24655,28 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
 
         window.Auth = Auth;
 
-        // ── wppOpen: abre WhatsApp com compatibilidade total mobile ──────
-        // Substitui window.open direto nos templates inline (iOS/Android bloqueiam
-        // window.open fora de eventos diretos do usuário).
+        // ── wppOpen: abre WhatsApp com compatibilidade total mobile/PWA ──
+        // Usado nos onclick inline dos templates. Delega para Utils.openWhatsApp
+        // que já tem toda a lógica de iOS PWA deep link + Android + Desktop.
         window.wppOpen = function(url) {
-            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-            if (isMobile) {
-                window.location.href = url;
+            if (window.Utils && Utils.openWhatsApp) {
+                Utils.openWhatsApp(url);
             } else {
-                const win = window.open(url, '_blank', 'noopener,noreferrer');
-                if (!win) window.location.href = url;
+                // Fallback mínimo antes de Utils estar disponível
+                const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+                const isStandalone = window.navigator.standalone === true
+                                  || window.matchMedia('(display-mode: standalone)').matches;
+                if (isIOS && isStandalone) {
+                    var m = url.match(/wa\.me\/([^?]+)(\?text=(.+))?/);
+                    if (m) {
+                        var dl = m[3] ? 'whatsapp://send?phone=' + m[1] + '&text=' + m[3]
+                                      : 'whatsapp://send?phone=' + m[1];
+                        var a = document.createElement('a'); a.href = dl; a.click();
+                        setTimeout(function(){ window.open(url, '_blank'); }, 800);
+                        return;
+                    }
+                }
+                window.location.href = url;
             }
         };
 
