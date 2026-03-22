@@ -3900,6 +3900,318 @@
         body.dark-mode .sim-alert.age  { background:rgba(68,84,71,0.2); color:#9dbfa0; }
         body.dark-mode .sim-alert.dep  { background:rgba(196,114,74,0.15); color:#d98a62; }
 
+        /* ===== MODAL DE INATIVIDADE ===== */
+        #idle-warning-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99000;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        #idle-warning-overlay.show { display: flex; }
+        #idle-warning-box {
+            background: #fff;
+            border-radius: 22px;
+            padding: 32px 28px 28px;
+            max-width: 340px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+            animation: idlePop 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        body.dark-mode #idle-warning-box {
+            background: #1e2e20;
+            color: #e0e0e0;
+        }
+        @keyframes idlePop {
+            from { opacity:0; transform: scale(0.88) translateY(16px); }
+            to   { opacity:1; transform: scale(1) translateY(0); }
+        }
+        #idle-warning-box .idle-icon {
+            width: 60px; height: 60px;
+            background: rgba(184,112,32,0.12);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 1.6rem;
+        }
+        #idle-warning-box h3 {
+            font-size: 1.15rem; font-weight: 800;
+            color: var(--dark); margin-bottom: 8px;
+        }
+        body.dark-mode #idle-warning-box h3 { color: #e0e0e0; }
+        #idle-warning-box p {
+            font-size: 0.88rem; color: var(--text-secondary);
+            margin-bottom: 20px; line-height: 1.5;
+        }
+        #idle-countdown-ring {
+            position: relative;
+            width: 56px; height: 56px;
+            margin: 0 auto 20px;
+        }
+        #idle-countdown-ring svg { transform: rotate(-90deg); }
+        #idle-countdown-ring .ring-bg { fill: none; stroke: var(--border); stroke-width: 4; }
+        #idle-countdown-ring .ring-fg { fill: none; stroke: var(--warning); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.9s linear; }
+        #idle-countdown-num {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; font-weight: 900; color: var(--warning);
+        }
+        .idle-btn-row { display: flex; gap: 10px; }
+        .idle-btn-continue {
+            flex: 1;
+            background: var(--primary);
+            color: white; border: none;
+            border-radius: 12px; padding: 13px;
+            font-size: 0.95rem; font-weight: 800;
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            transition: opacity 0.15s;
+        }
+        .idle-btn-continue:active { opacity: 0.85; }
+        .idle-btn-exit {
+            flex: 1;
+            background: rgba(184,48,48,0.1);
+            color: var(--danger); border: 1px solid rgba(184,48,48,0.2);
+            border-radius: 12px; padding: 13px;
+            font-size: 0.95rem; font-weight: 800;
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            transition: background 0.15s;
+        }
+        .idle-btn-exit:active { background: rgba(184,48,48,0.2); }
+
+
+        /* ===== TELA DE LOGIN ===== */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
+            background: linear-gradient(150deg, #1A2B1C 0%, #2E4A31 60%, #3D6142 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 24px;
+            overflow: hidden;
+        }
+        #login-screen.hidden { display: none; }
+        /* Camada de imagem de fundo do login */
+        #login-bg-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+        /* Overlay escuro para garantir legibilidade */
+        #login-bg-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(150deg, rgba(26,43,28,0.72) 0%, rgba(46,74,49,0.65) 60%, rgba(61,97,66,0.70) 100%);
+            pointer-events: none;
+        }
+        /* Conteúdo do login acima das camadas */
+        #login-screen .login-logo,
+        #login-screen .login-card {
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        .login-logo .logo-icon {
+            width: 72px; height: 72px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 22px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 14px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+        .login-logo h1 {
+            font-size: 1.9rem; font-weight: 900;
+            color: #fff; letter-spacing: -1px;
+        }
+        .login-logo h1 span { color: #C4724A; }
+        .login-logo p {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem; margin-top: 4px;
+        }
+        .login-card {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px;
+            padding: 32px 28px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+        }
+        .login-card h2 {
+            font-size: 1.25rem; font-weight: 800;
+            color: #fff; margin-bottom: 6px;
+        }
+        .login-card .login-subtitle {
+            font-size: 0.82rem; color: rgba(255,255,255,0.45);
+            margin-bottom: 24px;
+        }
+        .login-field { margin-bottom: 16px; }
+        .login-field label {
+            display: block;
+            font-size: 0.78rem; font-weight: 700;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 6px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .login-field .input-wrap { position: relative; }
+        .login-field .input-wrap i {
+            position: absolute; left: 14px; top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.35);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        .login-field .input-wrap .eye-btn {
+            position: absolute; right: 12px; top: 50%;
+            transform: translateY(-50%);
+            background: none; border: none; cursor: pointer;
+            color: rgba(255,255,255,0.35); padding: 4px;
+            font-size: 0.9rem;
+        }
+        .login-field input {
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 13px 14px 13px 40px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+            -webkit-appearance: none;
+        }
+        .login-field input::placeholder { color: rgba(255,255,255,0.25); }
+        .login-field input:focus {
+            border-color: rgba(196,114,74,0.7);
+            background: rgba(255,255,255,0.12);
+        }
+        .login-field input.has-eye { padding-right: 44px; }
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #C4724A, #D98A62);
+            color: #fff;
+            border: none;
+            border-radius: 13px;
+            padding: 15px;
+            font-size: 1rem; font-weight: 800;
+            cursor: pointer;
+            margin-top: 8px;
+            box-shadow: 0 6px 20px rgba(196,114,74,0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.2px;
+        }
+        .login-btn:active { transform: scale(0.97); }
+        .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .login-switch {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.45);
+        }
+        .login-switch button {
+            background: none; border: none;
+            color: #C4724A; font-weight: 700;
+            cursor: pointer; font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            text-decoration: underline;
+        }
+        .login-error {
+            background: rgba(184,48,48,0.25);
+            border: 1px solid rgba(184,48,48,0.4);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #ffaaaa;
+            font-size: 0.83rem;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .login-error.show { display: block; }
+        .login-success {
+            background: rgba(46,125,66,0.25);
+            border: 1px solid rgba(46,125,66,0.4);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #aaffbb;
+            font-size: 0.83rem;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .login-success.show { display: block; }
+        .user-badge {
+            display: flex; align-items: center; gap: 7px;
+            background: rgba(46,74,49,0.10);
+            border: 1px solid rgba(46,74,49,0.15);
+            border-radius: 20px;
+            padding: 4px 10px 4px 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .user-badge:active { background: rgba(46,74,49,0.22); }
+        .user-badge .user-avatar {
+            width: 26px; height: 26px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 0.68rem; font-weight: 800;
+        }
+        .user-badge .user-name {
+            font-size: 0.77rem; font-weight: 700;
+            color: var(--dark); max-width: 80px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .usuario-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px;
+            background: var(--light);
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .usuario-item .u-avatar {
+            width: 38px; height: 38px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 0.9rem; font-weight: 800;
+            flex-shrink: 0;
+        }
+        .usuario-item .u-info { flex: 1; }
+        .usuario-item .u-name { font-weight: 700; font-size: 0.95rem; }
+        .usuario-item .u-role {
+            font-size: 0.72rem; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .usuario-item .u-actions { display: flex; gap: 6px; }
+        .u-del-btn {
+            background: rgba(184,48,48,0.1);
+            border: none; border-radius: 8px;
+            color: var(--danger); padding: 7px 10px;
+            cursor: pointer; font-size: 0.85rem;
+        }
+
     </style>
 
 <style>
@@ -4121,6 +4433,92 @@
 </script>
 </head>
 <body>
+    
+    <!-- ===== TELA DE LOGIN ===== -->
+    <div id="login-screen">
+        <div id="login-bg-layer"></div>
+        <div id="login-bg-overlay"></div>
+        <div class="login-logo">
+            <div class="logo-icon"><i class="fas fa-home"></i></div>
+            <h1>Imobi<span>Pro</span></h1>
+            <p>Gestão Imobiliária Profissional</p>
+        </div>
+
+        <div class="login-card">
+            <!-- PAINEL LOGIN -->
+            <div id="login-panel">
+                <h2>Bem-vindo de volta</h2>
+                <p class="login-subtitle">Faça login para acessar o sistema</p>
+                <div class="login-error" id="login-error"></div>
+                <div class="login-field">
+                    <label>Usuário</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="login-username" placeholder="Seu nome de usuário" autocomplete="username" autocapitalize="none">
+                    </div>
+                </div>
+                <div class="login-field">
+                    <label>Senha</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="login-password" class="has-eye" placeholder="Sua senha" autocomplete="current-password" onkeydown="if(event.key==='Enter') Auth.login()">
+                        <button class="eye-btn" type="button" onclick="Auth.toggleEye('login-password', this)"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <button class="login-btn" onclick="Auth.login()">
+                    <i class="fas fa-sign-in-alt" style="margin-right:8px"></i>Entrar
+                </button>
+                <div class="login-switch">
+                    Não tem conta? <button onclick="Auth.showCadastro()">Cadastrar-se</button>
+                </div>
+            </div>
+
+            <!-- PAINEL CADASTRO -->
+            <div id="cadastro-panel" style="display:none">
+                <h2>Criar conta</h2>
+                <p class="login-subtitle">Preencha os dados para se cadastrar</p>
+                <div class="login-error" id="cadastro-error"></div>
+                <div class="login-success" id="cadastro-success"></div>
+                <div class="login-field">
+                    <label>Nome completo</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="cad-nome" placeholder="Seu nome">
+                    </div>
+                </div>
+                <div class="login-field">
+                    <label>Usuário</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="cad-username" placeholder="Crie um nome de usuário" autocapitalize="none">
+                    </div>
+                </div>
+                <div class="login-field">
+                    <label>Senha</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="cad-senha" class="has-eye" placeholder="Mínimo 6 caracteres">
+                        <button class="eye-btn" type="button" onclick="Auth.toggleEye('cad-senha', this)"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <div class="login-field">
+                    <label>Confirmar senha</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="cad-confirma" class="has-eye" placeholder="Repita a senha" onkeydown="if(event.key==='Enter') Auth.cadastrar()">
+                        <button class="eye-btn" type="button" onclick="Auth.toggleEye('cad-confirma', this)"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <button class="login-btn" onclick="Auth.cadastrar()">
+                    <i class="fas fa-user-plus" style="margin-right:8px"></i>Criar conta
+                </button>
+                <div class="login-switch">
+                    Já tem conta? <button onclick="Auth.showLogin()">Fazer login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="loading" class="loading">
         <i class="fas fa-spinner"></i> Inicializando sistema...
     </div>
@@ -4132,6 +4530,10 @@
                 <span>Imobi</span>Pro
             </div>
             <div class="header-actions">
+                <div class="user-badge" onclick="Auth.openUserMenu()" id="user-badge-header" style="display:none">
+                    <div class="user-avatar" id="user-badge-avatar">?</div>
+                    <span class="user-name" id="user-badge-name">Usuário</span>
+                </div>
                 <button class="icon-btn" id="dark-mode-btn" onclick="UI.toggleDarkMode()" title="Alternar tema"><i class="fas fa-moon"></i></button>
                 <button class="icon-btn" onclick="UI.openSettings()"><i class="fas fa-cog"></i></button>
             </div>
@@ -6605,6 +7007,37 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <small style="color: var(--secondary);">A imagem é aplicada como camada transparente — cards, botões e textos mantêm qualidade total.</small>
                 </div>
 
+                <!-- FUNDO DA TELA DE LOGIN -->
+                <div class="form-group">
+                    <label class="form-label" style="display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-sign-in-alt" style="color:var(--accent)"></i> Imagem de Fundo — Tela de Login
+                    </label>
+                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                        <button type="button" class="btn-sm btn-light" onclick="document.getElementById('s-login-bg-input').click()">
+                            <i class="fas fa-image"></i> Selecionar imagem
+                        </button>
+                        <button type="button" class="btn-sm btn-light" onclick="App.settings.removeLoginBg()" id="btn-remove-login-bg" style="display:none;">
+                            <i class="fas fa-trash"></i> Remover
+                        </button>
+                    </div>
+                    <input type="file" id="s-login-bg-input" accept="image/*" style="display:none;" onchange="App.settings.handleLoginBgUpload(this)">
+                    <div id="s-login-bg-preview" style="margin-top:10px;width:100%;height:120px;background-size:cover;background-position:center;border-radius:8px;border:1px solid var(--border);position:relative;overflow:hidden;">
+                        <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(26,43,28,0.7) 0%,rgba(46,74,49,0.6) 100%);display:flex;align-items:center;justify-content:center;" id="s-login-bg-overlay-demo">
+                            <span style="color:white;font-size:0.8rem;font-weight:700;opacity:0.7">Pré-visualização do login</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="s-login-bg-image" value="">
+                    <div style="margin-top:10px;">
+                        <label style="font-size:0.82rem;font-weight:600;color:var(--dark);display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            Opacidade da imagem: <span id="s-login-bg-opacity-label" style="color:var(--accent);font-weight:700;">40%</span>
+                        </label>
+                        <input type="range" id="s-login-bg-opacity" min="10" max="100" value="40" step="5"
+                            style="width:100%;accent-color:var(--accent);height:6px;"
+                            oninput="document.getElementById('s-login-bg-opacity-label').textContent=this.value+'%'; Auth.applyLoginBg(document.getElementById('s-login-bg-image').value, this.value/100);">
+                    </div>
+                    <small style="color:var(--secondary);">Esta imagem aparece apenas na tela de login do sistema.</small>
+                </div>
+
                 <hr style="border: 0; border-top: 1px solid var(--border); margin: 16px 0;">
                 <div class="section-title" style="font-size: 1rem; margin-bottom: 10px;">Backup Geral</div>
                 <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
@@ -7080,7 +7513,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
         // CÓDIGO JAVASCRIPT COMPLETO (com as melhorias: contador de contatos e alerta de cliente parado)
         const DB = {
             name: 'ImobiProDB',
-            version: 20, // v20: store notas + pdf_progress
+            version: 21, // v21: store usuarios para login
             db: null,
             
             init: function() {
@@ -7173,6 +7606,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 // Progresso de leitura de PDFs
                 if (!db.objectStoreNames.contains('pdf_progress')) {
                     db.createObjectStore('pdf_progress', { keyPath: 'id' });
+                }
+                // Usuários do sistema
+                if (!db.objectStoreNames.contains('usuarios')) {
+                    const usuariosStore = db.createObjectStore('usuarios', { keyPath: 'id' });
+                    usuariosStore.createIndex('username', 'username', { unique: false });
                 }
             },
             
@@ -9229,7 +9667,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     refCounter: 0,
                     taxaJuros: 8.5,
                     msgPadrao: '{nome}, tudo bem? Me chamo [Seu Nome] e sou corretor da [Imobiliária]. Gostaria de saber se ainda tem interesse em adquirir um imóvel. Fico à disposição! 🏡',
-                    backgroundImage: ''
+                    backgroundImage: '',
+                    loginBgImage: '',
+                    loginBgOpacity: 40
                 };
             },
             
@@ -9337,6 +9777,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     UI.renderFunil();
                     UI.verificarLancamentos();
                     
+                    // Inicia autenticação
+                    await Auth.init();
+                    
                     console.log('Sistema inicializado com sucesso');
                     
                 } catch (error) {
@@ -9345,6 +9788,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('app').style.display = 'flex';
+                    await Auth.init();
                 }
             },
             
@@ -13297,6 +13741,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             
             closeModals: () => {
                 document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
+                // fecha sheet de usuarios também
+                const su = document.getElementById('sheet-usuarios');
+                if (su) su.style.transform = '';
             },
 
             openNewCliente: (fromVisita = false) => {
@@ -13588,6 +14035,17 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 } else {
                     document.getElementById('s-bg-preview').style.backgroundImage = '';
                     document.getElementById('btn-remove-bg').style.display = 'none';
+                }
+                // Login background
+                document.getElementById('s-login-bg-image').value = s.loginBgImage || '';
+                if (s.loginBgImage) {
+                    document.getElementById('s-login-bg-preview').style.backgroundImage = `url('${s.loginBgImage}')`;
+                    const loginOpSlider = document.getElementById('s-login-bg-opacity');
+                    if (loginOpSlider) { loginOpSlider.value = s.loginBgOpacity || 40; document.getElementById('s-login-bg-opacity-label').textContent = (s.loginBgOpacity || 40) + '%'; }
+                    document.getElementById('btn-remove-login-bg').style.display = 'inline-block';
+                } else {
+                    document.getElementById('s-login-bg-preview').style.backgroundImage = '';
+                    document.getElementById('btn-remove-login-bg').style.display = 'none';
                 }
                 
                 UI.openModal('settings');
@@ -17211,13 +17669,16 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                         refCounter: UI.data.settings?.refCounter || 0,
                         msgPadrao: document.getElementById('s-msg-padrao').value,
                         backgroundImage: document.getElementById('s-background-image').value,
-                        bgOpacity: parseInt(document.getElementById('s-bg-opacity')?.value || '18')
+                        bgOpacity: parseInt(document.getElementById('s-bg-opacity')?.value || '18'),
+                        loginBgImage: document.getElementById('s-login-bg-image').value,
+                        loginBgOpacity: parseInt(document.getElementById('s-login-bg-opacity')?.value || '40')
                     };
                     
                     await DB.put('settings', settings);
                     
                     UI.data.settings = settings;
                     UI.applyBackground();
+                    Auth.applyLoginBg(settings.loginBgImage || '', (settings.loginBgOpacity || 40) / 100);
                     
                     Utils.toast('Configurações salvas!');
                     
@@ -17250,6 +17711,31 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     document.getElementById('btn-remove-bg').style.display = 'none';
                     document.body.style.setProperty('--bg-image', 'none');
                     document.body.classList.remove('has-bg-image');
+                },
+
+                handleLoginBgUpload: async function(input) {
+                    const file = input.files[0];
+                    if (!file) return;
+                    try {
+                        const base64 = await Utils.readImage(file);
+                        const compressed = await Utils.compressImage(base64, 0.85, 1920);
+                        document.getElementById('s-login-bg-image').value = compressed;
+                        document.getElementById('s-login-bg-preview').style.backgroundImage = `url('${compressed}')`;
+                        document.getElementById('btn-remove-login-bg').style.display = 'inline-block';
+                        const op = parseInt(document.getElementById('s-login-bg-opacity')?.value || '40') / 100;
+                        Auth.applyLoginBg(compressed, op);
+                    } catch(e) {
+                        console.error(e);
+                        Utils.toast('Erro ao carregar imagem', 'error');
+                    }
+                    input.value = '';
+                },
+
+                removeLoginBg: function() {
+                    document.getElementById('s-login-bg-image').value = '';
+                    document.getElementById('s-login-bg-preview').style.backgroundImage = '';
+                    document.getElementById('btn-remove-login-bg').style.display = 'none';
+                    Auth.applyLoginBg('', 0);
                 }
             },
             
@@ -23638,6 +24124,538 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             return { init, switchTab, setDep, nascUpdate, prazoUpdate, entrUpdate, entrPct, entrVal, calcSimular, calcRenda, calcImovel, gerarPDF, prefillFromCliente };
         })();
 
+        // ===== AUTH MODULE =====
+        const Auth = (() => {
+            const SESSION_KEY = 'imobipro_session';
+
+            // ── Hash simples (sem crypto externo) ──────────────────────────
+            async function hashPassword(password) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(password + 'imobipro_salt_2025');
+                const hash = await crypto.subtle.digest('SHA-256', data);
+                return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+
+            function getSession() {
+                try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); } catch(e) { return null; }
+            }
+            function setSession(user) {
+                sessionStorage.setItem(SESSION_KEY, JSON.stringify({ id: user.id, username: user.username, nome: user.nome, role: user.role }));
+            }
+            function clearSession() {
+                sessionStorage.removeItem(SESSION_KEY);
+            }
+
+            // ── Inicialização ──────────────────────────────────────────────
+            async function init() {
+                // Garante que DB está pronto
+                if (!DB.db) { try { await DB.init(); } catch(e) {} }
+
+                const session = getSession();
+                if (session) {
+                    try {
+                        const u = await DB.get('usuarios', session.id);
+                        if (u) { showApp(session); return; }  // showApp already starts idle monitor
+                    } catch(e) { console.warn('Auth.init session check failed:', e); }
+                }
+
+                // Se não há nenhum usuário cadastrado, vai direto para cadastro
+                try {
+                    const todos = await DB.getAll('usuarios');
+                    if (todos.length === 0) { loadLoginBg(); showLogin(); showCadastro(); return; }
+                } catch(e) {}
+
+                loadLoginBg();
+                showLogin();
+            }
+
+            function showApp(user) {
+                document.getElementById('login-screen').classList.add('hidden');
+                loadLoginBg();
+                startIdleMonitor();
+                const badge = document.getElementById('user-badge-header');
+                const initial = (user.nome || user.username || '?').charAt(0).toUpperCase();
+                document.getElementById('user-badge-avatar').textContent = initial;
+                document.getElementById('user-badge-name').textContent = user.nome || user.username;
+                badge.style.display = 'flex';
+            }
+
+            function showLogin() {
+                document.getElementById('login-screen').classList.remove('hidden');
+                showLoginPanel();
+            }
+
+            function showLoginPanel() {
+                document.getElementById('login-panel').style.display = 'block';
+                document.getElementById('cadastro-panel').style.display = 'none';
+                clearMsg('login-error');
+            }
+
+            function showCadastro() {
+                document.getElementById('login-panel').style.display = 'none';
+                document.getElementById('cadastro-panel').style.display = 'block';
+                clearMsg('cadastro-error');
+                clearMsg('cadastro-success');
+            }
+
+            function clearMsg(id) {
+                const el = document.getElementById(id);
+                if (el) { el.textContent = ''; el.classList.remove('show'); }
+            }
+            function showError(id, msg) {
+                const el = document.getElementById(id);
+                if (el) { el.textContent = msg; el.classList.add('show'); }
+            }
+            function showSuccess(id, msg) {
+                const el = document.getElementById(id);
+                if (el) { el.textContent = msg; el.classList.add('show'); }
+            }
+
+            function toggleEye(inputId, btn) {
+                const input = document.getElementById(inputId);
+                if (!input) return;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                } else {
+                    input.type = 'password';
+                    btn.innerHTML = '<i class="fas fa-eye"></i>';
+                }
+            }
+
+            // ── Login ──────────────────────────────────────────────────────
+            async function login() {
+                clearMsg('login-error');
+                const username = (document.getElementById('login-username').value || '').trim().toLowerCase();
+                const password = document.getElementById('login-password').value || '';
+
+                if (!username || !password) { showError('login-error', 'Preencha usuário e senha.'); return; }
+
+                const btn = document.querySelector('#login-panel .login-btn');
+                if (btn) btn.disabled = true;
+
+                try {
+                    if (!DB.db) await DB.init();
+
+                    let todos = [];
+                    try { todos = await DB.getAll('usuarios'); } catch(e) { todos = []; }
+
+                    if (todos.length === 0) {
+                        showError('login-error', 'Nenhum usuário cadastrado. Crie uma conta primeiro.');
+                        return;
+                    }
+
+                    const user = todos.find(u => u.username.toLowerCase() === username);
+                    if (!user) { showError('login-error', 'Usuário não encontrado.'); return; }
+
+                    const hash = await hashPassword(password);
+                    if (hash !== user.passwordHash) { showError('login-error', 'Senha incorreta.'); return; }
+
+                    setSession(user);
+                    showApp(user);
+                    document.getElementById('login-password').value = '';
+
+                } catch(e) {
+                    console.error('Erro login:', e);
+                    showError('login-error', 'Erro ao fazer login: ' + (e.message || e));
+                } finally {
+                    if (btn) btn.disabled = false;
+                }
+            }
+
+            // ── Cadastro ───────────────────────────────────────────────────
+            async function cadastrar() {
+                clearMsg('cadastro-error');
+                clearMsg('cadastro-success');
+
+                const nome = (document.getElementById('cad-nome').value || '').trim();
+                const username = (document.getElementById('cad-username').value || '').trim().toLowerCase();
+                const senha = document.getElementById('cad-senha').value || '';
+                const confirma = document.getElementById('cad-confirma').value || '';
+
+                if (!nome) { showError('cadastro-error', 'Informe seu nome.'); return; }
+                if (!username) { showError('cadastro-error', 'Informe um nome de usuário.'); return; }
+                if (username.length < 3) { showError('cadastro-error', 'Usuário deve ter pelo menos 3 caracteres.'); return; }
+                if (!/^[a-z0-9._]+$/.test(username)) { showError('cadastro-error', 'Usuário só pode ter letras, números, ponto e underline.'); return; }
+                if (senha.length < 6) { showError('cadastro-error', 'Senha deve ter pelo menos 6 caracteres.'); return; }
+                if (senha !== confirma) { showError('cadastro-error', 'As senhas não coincidem.'); return; }
+
+                const btn = document.querySelector('#cadastro-panel .login-btn');
+                if (btn) btn.disabled = true;
+
+                try {
+                    // Garante que DB está pronto
+                    if (!DB.db) await DB.init();
+
+                    let todos = [];
+                    try { todos = await DB.getAll('usuarios'); } catch(e) { todos = []; }
+
+                    if (todos.find(u => u.username.toLowerCase() === username)) {
+                        showError('cadastro-error', 'Este nome de usuário já está em uso.'); return;
+                    }
+
+                    const hash = await hashPassword(senha);
+                    const isFirst = todos.length === 0;
+                    const novoUser = {
+                        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                        nome,
+                        username,
+                        passwordHash: hash,
+                        role: isFirst ? 'admin' : 'user',
+                        dataCriacao: new Date().toISOString()
+                    };
+
+                    await DB.put('usuarios', novoUser);
+
+                    showSuccess('cadastro-success', '✅ Conta criada! Entrando...');
+                    ['cad-nome','cad-username','cad-senha','cad-confirma'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+
+                    // Auto-login após cadastro
+                    setTimeout(async () => {
+                        setSession(novoUser);
+                        showApp(novoUser);
+                    }, 1200);
+
+                } catch(e) {
+                    console.error('Erro cadastro:', e);
+                    showError('cadastro-error', 'Erro ao criar conta: ' + (e.message || e));
+                } finally {
+                    if (btn) btn.disabled = false;
+                }
+            }
+
+            // ── Logout ─────────────────────────────────────────────────────
+            function logout() {
+                if (!confirm('Deseja sair do sistema?')) return;
+                stopIdleMonitor();
+                clearSession();
+                closeUserMenu();
+                document.getElementById('user-badge-header').style.display = 'none';
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
+                showLogin();
+            }
+
+            // ── Menu de usuário / Gerenciar ────────────────────────────────
+            async function openUserMenu() {
+                const session = getSession();
+                if (!session) return;
+
+                document.getElementById('modal-user-logado').textContent = session.nome + ' (@' + session.username + ')';
+
+                // Limpa campos de alterar senha
+                ['chg-senha-atual','chg-senha-nova','chg-senha-confirma'].forEach(id => {
+                    const el = document.getElementById(id); if(el) el.value = '';
+                });
+                const chgMsg = document.getElementById('chg-msg');
+                if (chgMsg) { chgMsg.style.display = 'none'; chgMsg.textContent = ''; }
+
+                // Admin: mostrar lista de usuários
+                const adminSection = document.getElementById('admin-section');
+                if (session.role === 'admin') {
+                    adminSection.style.display = 'block';
+                    await renderUsuariosList();
+                } else {
+                    adminSection.style.display = 'none';
+                }
+
+                document.getElementById('overlay-usuarios').classList.add('active');
+                document.getElementById('sheet-usuarios').style.transform = 'translateY(0)';
+            }
+
+            function closeUserMenu() {
+                document.getElementById('overlay-usuarios').classList.remove('active');
+                document.getElementById('sheet-usuarios').style.transform = '';
+            }
+
+            async function renderUsuariosList() {
+                const todos = await DB.getAll('usuarios');
+                const session = getSession();
+                const container = document.getElementById('usuarios-list-modal');
+                if (!container) return;
+
+                if (todos.length === 0) {
+                    container.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;text-align:center;padding:12px">Nenhum usuário cadastrado.</p>';
+                    return;
+                }
+
+                container.innerHTML = todos.map(u => `
+                    <div class="usuario-item">
+                        <div class="u-avatar">${(u.nome||u.username||'?').charAt(0).toUpperCase()}</div>
+                        <div class="u-info">
+                            <div class="u-name">${u.nome}</div>
+                            <div class="u-role">${u.username} · ${u.role === 'admin' ? '👑 Admin' : '👤 Usuário'}</div>
+                        </div>
+                        <div class="u-actions">
+                            ${u.id !== session.id ? `<button class="u-del-btn" onclick="Auth.deletarUsuario('${u.id}')"><i class="fas fa-trash"></i></button>` : '<span style="font-size:0.72rem;color:var(--text-secondary);padding:4px">você</span>'}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            async function deletarUsuario(id) {
+                if (!confirm('Remover este usuário?')) return;
+                await DB.delete('usuarios', id);
+                await renderUsuariosList();
+                if (window.UI && UI.showToast) UI.showToast('Usuário removido.');
+            }
+
+            async function novoUsuarioAdmin() {
+                const nome = prompt('Nome completo do novo usuário:');
+                if (!nome || !nome.trim()) return;
+                const username = prompt('Nome de usuário (letras, números, ponto, underline):');
+                if (!username || !username.trim()) return;
+                if (!/^[a-z0-9._]+$/i.test(username.trim())) { alert('Nome de usuário inválido.'); return; }
+                const senha = prompt('Senha (mínimo 6 caracteres):');
+                if (!senha || senha.length < 6) { alert('Senha muito curta.'); return; }
+
+                try {
+                    const todos = await DB.getAll('usuarios');
+                    if (todos.find(u => u.username.toLowerCase() === username.trim().toLowerCase())) {
+                        alert('Este nome de usuário já está em uso.'); return;
+                    }
+                    const hash = await hashPassword(senha);
+                    const novoUser = {
+                        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                        nome: nome.trim(), username: username.trim().toLowerCase(),
+                        passwordHash: hash, role: 'user',
+                        dataCriacao: new Date().toISOString()
+                    };
+                    await DB.put('usuarios', novoUser);
+                    await renderUsuariosList();
+                    if (window.UI && UI.showToast) UI.showToast('✅ Usuário criado com sucesso!');
+                } catch(e) { alert('Erro ao criar usuário.'); }
+            }
+
+            // ── Alterar senha ──────────────────────────────────────────────
+            async function alterarSenha() {
+                const msgEl = document.getElementById('chg-msg');
+                const showMsg = (txt, ok) => {
+                    msgEl.textContent = txt;
+                    msgEl.style.display = 'block';
+                    msgEl.style.background = ok ? 'rgba(46,125,66,0.15)' : 'rgba(184,48,48,0.15)';
+                    msgEl.style.color = ok ? 'var(--success)' : 'var(--danger)';
+                    msgEl.style.border = ok ? '1px solid rgba(46,125,66,0.3)' : '1px solid rgba(184,48,48,0.3)';
+                    msgEl.style.borderRadius = '9px'; msgEl.style.padding = '9px 12px';
+                };
+
+                const session = getSession();
+                if (!session) return;
+
+                const atual = document.getElementById('chg-senha-atual').value;
+                const nova = document.getElementById('chg-senha-nova').value;
+                const confirma = document.getElementById('chg-senha-confirma').value;
+
+                if (!atual || !nova || !confirma) { showMsg('Preencha todos os campos.', false); return; }
+                if (nova.length < 6) { showMsg('Nova senha deve ter pelo menos 6 caracteres.', false); return; }
+                if (nova !== confirma) { showMsg('As novas senhas não coincidem.', false); return; }
+
+                try {
+                    const user = await DB.get('usuarios', session.id);
+                    if (!user) { showMsg('Usuário não encontrado.', false); return; }
+                    const hashAtual = await hashPassword(atual);
+                    if (hashAtual !== user.passwordHash) { showMsg('Senha atual incorreta.', false); return; }
+                    user.passwordHash = await hashPassword(nova);
+                    await DB.put('usuarios', user);
+                    showMsg('✅ Senha alterada com sucesso!', true);
+                    ['chg-senha-atual','chg-senha-nova','chg-senha-confirma'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+                } catch(e) { showMsg('Erro ao alterar senha.', false); }
+            }
+
+            // ── Carrega bg do login das settings ──────────────────────────────
+            async function loadLoginBg() {
+                try {
+                    const s = await DB.get('settings', 'main');
+                    if (s && s.loginBgImage) {
+                        applyLoginBg(s.loginBgImage, (s.loginBgOpacity || 40) / 100);
+                    }
+                } catch(e) {}
+            }
+
+            // ── Aplica imagem de fundo na tela de login ──────────────────────
+            function applyLoginBg(imgData, opacity) {
+                const layer = document.getElementById('login-bg-layer');
+                const overlay = document.getElementById('login-bg-overlay');
+                if (!layer) return;
+                if (imgData) {
+                    layer.style.backgroundImage = `url('${imgData}')`;
+                    layer.style.opacity = opacity !== undefined ? opacity : 0.4;
+                    if (overlay) overlay.style.display = 'block';
+                } else {
+                    layer.style.backgroundImage = 'none';
+                    layer.style.opacity = 0;
+                    if (overlay) overlay.style.display = 'none';
+                }
+            }
+
+
+            // ══════════════════════════════════════════════════════════════
+            // IDLE TIMER — 1 min sem interação → aviso → 5s → logout auto
+            // ══════════════════════════════════════════════════════════════
+            const IDLE_TIMEOUT  = 60 * 1000;   // 1 minuto
+            const WARN_TIMEOUT  = 5 * 1000;     // 5 segundos para responder
+            const CIRCUMFERENCE = 2 * Math.PI * 24; // raio 24 → ≈ 150.796
+
+            let idleTimer    = null;
+            let warnTimer    = null;
+            let countInterval = null;
+            let warnCount    = 5;
+
+            function resetIdle() {
+                // Só monitora quando há sessão ativa
+                if (!getSession()) return;
+                clearTimeout(idleTimer);
+                idleTimer = setTimeout(showIdleWarning, IDLE_TIMEOUT);
+            }
+
+            function startIdleMonitor() {
+                const events = ['mousemove','mousedown','keydown','touchstart','scroll','click','input'];
+                events.forEach(ev => document.addEventListener(ev, resetIdle, { passive: true }));
+                resetIdle();
+            }
+
+            function stopIdleMonitor() {
+                clearTimeout(idleTimer);
+                clearTimeout(warnTimer);
+                clearInterval(countInterval);
+                idleTimer = warnTimer = countInterval = null;
+            }
+
+            function showIdleWarning() {
+                // Não mostra se o login já está visível
+                if (!getSession()) return;
+                const overlay = document.getElementById('idle-warning-overlay');
+                if (!overlay) return;
+                overlay.classList.add('show');
+
+                // Inicia contagem regressiva
+                warnCount = 5;
+                updateRing(5);
+
+                clearInterval(countInterval);
+                countInterval = setInterval(() => {
+                    warnCount--;
+                    updateRing(warnCount);
+                    if (warnCount <= 0) {
+                        clearInterval(countInterval);
+                        idleLogout();
+                    }
+                }, 1000);
+
+                // Segurança extra: força logout após WARN_TIMEOUT + 200ms
+                clearTimeout(warnTimer);
+                warnTimer = setTimeout(idleLogout, WARN_TIMEOUT + 200);
+            }
+
+            function updateRing(seconds) {
+                const numEl = document.getElementById('idle-countdown-num');
+                const ringEl = document.getElementById('idle-ring-fg');
+                if (numEl) numEl.textContent = Math.max(0, seconds);
+                if (ringEl) {
+                    const progress = seconds / 5; // 5 = total seconds
+                    ringEl.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+                }
+            }
+
+            function hideIdleWarning() {
+                const overlay = document.getElementById('idle-warning-overlay');
+                if (overlay) overlay.classList.remove('show');
+                clearInterval(countInterval);
+                clearTimeout(warnTimer);
+            }
+
+            function idleContinue() {
+                hideIdleWarning();
+                resetIdle();
+            }
+
+            function idleLogout() {
+                hideIdleWarning();
+                stopIdleMonitor();
+                clearSession();
+                const badge = document.getElementById('user-badge-header');
+                if (badge) badge.style.display = 'none';
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
+                // Fecha qualquer modal aberto
+                if (window.UI && UI.closeModals) UI.closeModals();
+                loadLoginBg();
+                showLogin();
+            }
+
+            return { init, login, cadastrar, logout, showLogin, showLoginPanel, showCadastro, toggleEye, openUserMenu, closeUserMenu, deletarUsuario, novoUsuarioAdmin, alterarSenha, applyLoginBg, idleContinue, idleLogout };
+        })();
+
+        window.Auth = Auth;
+
         </script>
+
+    <!-- ===== MODAL GERENCIAR USUÁRIOS ===== -->
+    <div class="modal-overlay" id="overlay-usuarios" onclick="Auth.closeUserMenu()"></div>
+    <div class="modal-sheet" id="sheet-usuarios">
+        <div class="sheet-handle"></div>
+        <h3 class="section-title" style="margin-bottom:4px">
+            <span>Conta &amp; Usuários</span>
+            <button onclick="Auth.logout()" style="background:rgba(184,48,48,0.1);border:none;border-radius:9px;padding:7px 12px;color:var(--danger);font-size:0.8rem;font-weight:700;cursor:pointer;">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        </h3>
+        <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:18px">Conectado como: <strong id="modal-user-logado">—</strong></p>
+        <div style="margin-bottom:20px">
+            <div class="section-title" style="font-size:0.9rem;margin-bottom:10px"><span>Alterar senha</span></div>
+            <div class="form-group" style="margin-bottom:10px">
+                <label class="form-label">Senha atual</label>
+                <input type="password" id="chg-senha-atual" class="form-control" placeholder="Digite a senha atual">
+            </div>
+            <div class="form-group" style="margin-bottom:10px">
+                <label class="form-label">Nova senha</label>
+                <input type="password" id="chg-senha-nova" class="form-control" placeholder="Mínimo 6 caracteres">
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+                <label class="form-label">Confirmar nova senha</label>
+                <input type="password" id="chg-senha-confirma" class="form-control" placeholder="Repita a nova senha">
+            </div>
+            <div id="chg-msg" style="font-size:0.82rem;margin-bottom:10px;display:none;border-radius:9px;padding:9px 12px;"></div>
+            <button class="btn-block" style="background:var(--primary);color:white;border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;font-size:0.9rem;" onclick="Auth.alterarSenha()">
+                <i class="fas fa-key"></i> Alterar senha
+            </button>
+        </div>
+        <div id="admin-section" style="display:none">
+            <div class="section-title" style="font-size:0.9rem;margin-bottom:10px">
+                <span>Usuários cadastrados</span>
+                <button onclick="Auth.novoUsuarioAdmin()" style="background:rgba(46,74,49,0.1);border:none;border-radius:8px;padding:6px 10px;color:var(--primary);font-size:0.78rem;font-weight:700;cursor:pointer;">
+                    <i class="fas fa-plus"></i> Novo
+                </button>
+            </div>
+            <div id="usuarios-list-modal"></div>
+        </div>
+    </div>
+
+
+    <!-- ===== MODAL DE INATIVIDADE ===== -->
+    <div id="idle-warning-overlay">
+        <div id="idle-warning-box">
+            <div class="idle-icon">⏱️</div>
+            <h3>Ainda está aí?</h3>
+            <p>Por segurança, o sistema será encerrado automaticamente por inatividade.</p>
+            <div id="idle-countdown-ring">
+                <svg width="56" height="56" viewBox="0 0 56 56">
+                    <circle class="ring-bg" cx="28" cy="28" r="24"/>
+                    <circle class="ring-fg" id="idle-ring-fg" cx="28" cy="28" r="24"
+                        stroke-dasharray="150.796"
+                        stroke-dashoffset="0"/>
+                </svg>
+                <div id="idle-countdown-num">5</div>
+            </div>
+            <div class="idle-btn-row">
+                <button class="idle-btn-continue" onclick="Auth.idleContinue()">
+                    <i class="fas fa-check"></i> Continuar
+                </button>
+                <button class="idle-btn-exit" onclick="Auth.idleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
