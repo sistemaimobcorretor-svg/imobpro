@@ -9394,42 +9394,48 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             },
 
             openWhatsApp: function(url) {
-                // ── Normaliza sempre para wa.me ───────────────────────────────
+                // ── Normaliza para wa.me ──────────────────────────────────────
                 url = url.replace('https://api.whatsapp.com/send?phone=', 'https://wa.me/');
                 url = url.replace(/([^?])&text=/, '$1?text=');
 
+                // ── NUNCA usa location.href — isso fecha o app ────────────────
+                // Estratégia universal: <a target="_blank"> clicado programaticamente.
+                // Funciona em: Desktop, Android Chrome/Firefox, iOS Safari, iOS PWA.
+                // O <a> é adicionado ao body temporariamente para garantir que o
+                // clique seja tratado como evento de usuário pelo browser.
+                function abrirLink(href) {
+                    const a = document.createElement('a');
+                    a.href = href;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(function() { document.body.removeChild(a); }, 300);
+                }
+
                 const isIOS        = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-                const isAndroid    = /Android/i.test(navigator.userAgent);
-                const isMobile     = isIOS || isAndroid;
-                // Detecta PWA standalone (adicionado à tela de início)
                 const isStandalone = window.navigator.standalone === true
                                   || window.matchMedia('(display-mode: standalone)').matches;
 
                 if (isIOS && isStandalone) {
-                    // iOS PWA: deep link whatsapp:// abre o app diretamente
-                    // sem sair do contexto standalone
+                    // iOS PWA: tenta deep link nativo primeiro (abre WhatsApp.app sem sair)
                     const waMatch = url.match(/wa\.me\/([^?]+)(\?text=(.+))?/);
                     if (waMatch) {
-                        const phone    = waMatch[1];
-                        const text     = waMatch[3] || '';
-                        const deepLink = text
+                        const phone = waMatch[1];
+                        const text  = waMatch[3] || '';
+                        const deep  = text
                             ? 'whatsapp://send?phone=' + phone + '&text=' + text
                             : 'whatsapp://send?phone=' + phone;
-                        const a = document.createElement('a');
-                        a.href = deepLink;
-                        a.click();
-                        // Fallback caso WhatsApp não esteja instalado
-                        setTimeout(function() { window.open(url, '_blank'); }, 800);
+                        abrirLink(deep);
+                        // Fallback: se WhatsApp não instalado, abre wa.me após 800ms
+                        setTimeout(function() { abrirLink(url); }, 800);
                     } else {
-                        window.open(url, '_blank');
+                        abrirLink(url);
                     }
-                } else if (isMobile) {
-                    // Android e iOS no Safari normal
-                    window.location.href = url;
                 } else {
-                    // Desktop
-                    const win = window.open(url, '_blank', 'noopener,noreferrer');
-                    if (!win) window.location.href = url;
+                    // Android, iOS Safari normal, Desktop — abre em nova aba
+                    abrirLink(url);
                 }
             },
 
@@ -24733,20 +24739,64 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             const WARN_TIMEOUT  = 5 * 1000;
             const CIRCUMFERENCE = 2 * Math.PI * 24;
             let idleTimer = null, warnTimer = null, countInterval = null, warnCount = 5;
+            let idlePausedAt = null;   // timestamp de quando o timer foi pausado
+            let idleRemaining = IDLE_TIMEOUT; // tempo restante quando pausado
 
             function resetIdle() {
                 if (!getSession()) return;
                 clearTimeout(idleTimer);
+                idleRemaining = IDLE_TIMEOUT;
+                idlePausedAt  = null;
                 idleTimer = setTimeout(showIdleWarning, IDLE_TIMEOUT);
             }
-            function startIdleMonitor() {
-                const events = ['mousemove','mousedown','keydown','touchstart','scroll','click','input'];
-                events.forEach(ev => document.addEventListener(ev, resetIdle, { passive: true }));
+
+            function pauseIdle() {
+                // Chamado quando o usuário sai da aba/janela
+                // Grava quanto tempo faltava para poder retomar depois
+                if (!idleTimer) return;
+                clearTimeout(idleTimer);
+                idleTimer = null;
+                idlePausedAt = Date.now();
+            }
+
+            function resumeIdle() {
+                // Chamado quando o usuário volta para a aba/janela
+                if (!getSession()) return;
+                // Qualquer atividade na máquina (mesmo fora) conta como "está usando o computador"
+                // Por isso resetamos o timer completo ao retornar
                 resetIdle();
             }
+
+            function startIdleMonitor() {
+                // Eventos dentro do documento
+                const events = ['mousemove','mousedown','keydown','touchstart','scroll','click','input','pointerdown','pointermove'];
+                events.forEach(ev => document.addEventListener(ev, resetIdle, { passive: true }));
+
+                // ── Visibilidade da página ────────────────────────────────────
+                // Quando o usuário muda de aba ou minimiza o navegador:
+                // • pause: congela o timer (não conta o tempo fora)
+                // • resume: reseta o timer completo (estava na máquina, só fora da aba)
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        pauseIdle();
+                    } else {
+                        resumeIdle();
+                    }
+                });
+
+                // ── Foco da janela ────────────────────────────────────────────
+                // Captura alt+tab, clique em outra janela, etc.
+                window.addEventListener('focus', resumeIdle);
+                window.addEventListener('blur',  pauseIdle);
+
+                // ── Início do timer ───────────────────────────────────────────
+                resetIdle();
+            }
+
             function stopIdleMonitor() {
                 clearTimeout(idleTimer); clearTimeout(warnTimer); clearInterval(countInterval);
                 idleTimer = warnTimer = countInterval = null;
+                idlePausedAt = null; idleRemaining = IDLE_TIMEOUT;
             }
             function showIdleWarning() {
                 if (!getSession()) return;
@@ -24796,24 +24846,17 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
         // Usado nos onclick inline dos templates. Delega para Utils.openWhatsApp
         // que já tem toda a lógica de iOS PWA deep link + Android + Desktop.
         window.wppOpen = function(url) {
+            // Delega sempre para Utils.openWhatsApp que nunca usa location.href
             if (window.Utils && Utils.openWhatsApp) {
                 Utils.openWhatsApp(url);
             } else {
-                // Fallback mínimo antes de Utils estar disponível
-                const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-                const isStandalone = window.navigator.standalone === true
-                                  || window.matchMedia('(display-mode: standalone)').matches;
-                if (isIOS && isStandalone) {
-                    var m = url.match(/wa\.me\/([^?]+)(\?text=(.+))?/);
-                    if (m) {
-                        var dl = m[3] ? 'whatsapp://send?phone=' + m[1] + '&text=' + m[3]
-                                      : 'whatsapp://send?phone=' + m[1];
-                        var a = document.createElement('a'); a.href = dl; a.click();
-                        setTimeout(function(){ window.open(url, '_blank'); }, 800);
-                        return;
-                    }
-                }
-                window.location.href = url;
+                // Fallback direto (Utils ainda não carregado)
+                var a = document.createElement('a');
+                a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+                a.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(function(){ document.body.removeChild(a); }, 300);
             }
         };
 
