@@ -9327,7 +9327,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 const message = await Utils.generateWhatsAppMessage(cliente, imovel);
                 const encodedMessage = encodeURIComponent(message);
                 
-                return `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+                return `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
             },
             
             extractVideoId: (url) => {
@@ -9369,13 +9369,23 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             },
 
             openWhatsApp: function(url) {
-                const a = document.createElement('a');
-                a.href = url;
-                a.target = '_blank';
-                a.rel = 'noopener noreferrer';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                // Converte api.whatsapp.com/send para wa.me (melhor compatibilidade mobile)
+                url = url.replace('https://api.whatsapp.com/send?phone=', 'https://wa.me/');
+                url = url.replace('&text=', '?text=');
+
+                // Em mobile, window.open pode ser bloqueado se não for chamado
+                // diretamente por um evento de usuário. Por isso usamos location.href
+                // como fallback seguro para iOS/Android.
+                const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                if (isMobile) {
+                    window.location.href = url;
+                } else {
+                    const win = window.open(url, '_blank', 'noopener,noreferrer');
+                    if (!win) {
+                        // Fallback se popup blocker estiver ativo
+                        window.location.href = url;
+                    }
+                }
             },
 
             // =========================================================
@@ -13349,7 +13359,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 </div>
                                 <div class="lista-item-acoes">
                                     ${c.telefone ? `<button class="btn-acao-mini btn-acao-tel" onclick="window.open('tel:${c.telefone.replace(/\D/g,'')}')"><i class="fas fa-phone"></i> Ligar</button>` : ''}
-                                    ${c.telefone ? `<button class="btn-acao-mini btn-acao-wpp" onclick="window.open('https://wa.me/55${c.telefone.replace(/\D/g,'')}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>` : ''}
+                                    ${c.telefone ? `<button class="btn-acao-mini btn-acao-wpp" onclick="wppOpen('https://wa.me/55${c.telefone.replace(/\D/g,'')}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>` : ''}
                                 </div>
                             </div>`;
                         });
@@ -13451,7 +13461,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         ${c.observacoes ? `<div class="lista-item-motivo">📝 ${c.observacoes.substring(0,70)}${c.observacoes.length>70?'...':''}</div>` : ''}
                         <div class="lista-item-acoes">
                             <button class="btn-acao-mini btn-acao-tel" onclick="window.open('tel:${c.telefone.replace(/\D/g,'')}')"><i class="fas fa-phone"></i> Ligar agora</button>
-                            <button class="btn-acao-mini btn-acao-wpp" onclick="window.open('https://wa.me/55${c.telefone.replace(/\D/g,'')}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                            <button class="btn-acao-mini btn-acao-wpp" onclick="wppOpen('https://wa.me/55${c.telefone.replace(/\D/g,'')}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
                         </div>
                     </div>`;
                 });
@@ -13556,7 +13566,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             💬 <em>${c._script}</em>
                         </div>
                         <div class="lista-item-acoes">
-                            <button class="btn-acao-mini btn-acao-wpp" onclick="window.open('${wppLink}','_blank')"><i class="fab fa-whatsapp"></i> Enviar mensagem</button>
+                            <button class="btn-acao-mini btn-acao-wpp" onclick="wppOpen('${wppLink}')"><i class="fab fa-whatsapp"></i> Enviar mensagem</button>
                             <button class="btn-acao-mini btn-acao-tel" onclick="navigator.clipboard&&navigator.clipboard.writeText(${JSON.stringify(c._script)}).then(()=>Utils.toast('Mensagem copiada!'))"><i class="fas fa-copy"></i> Copiar</button>
                         </div>
                     </div>`;
@@ -14158,7 +14168,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
                         const mensagem = UI.envioMassaMsg.replace(/{nome}/g, cliente.nome.split(' ')[0]);
                         const encodedMsg = encodeURIComponent(mensagem);
-                        const url = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMsg}`;
+                        const url = `https://wa.me/${phoneNumber}?text=${encodedMsg}`;
                         linksList.innerHTML += `<div class="whatsapp-link-item"><a href="${url}" target="_blank">${cliente.nome}</a></div>`;
                     }
                     
@@ -14194,7 +14204,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                 const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
                 const encodedMessage = encodeURIComponent(mensagem);
-                const url = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+                const url = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
                 
                 Utils.openWhatsApp(url);
 
@@ -14301,7 +14311,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                 const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
                 const encodedMessage = encodeURIComponent(mensagem);
-                const url = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+                const url = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
                 Utils.openWhatsApp(url);
             },
 
@@ -14784,7 +14794,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         message += `📞 *Contato:* ${settings.telefone || '(82) 99662-2036'}\n`;
                         message += `🏢 *Imobiliária:* ${settings.imobiliaria || 'Resende'}`;
                         const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
-                        const url = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+                        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
                         Utils.openWhatsApp(url);
                         UI.renderClientes();
                         UI.renderFunil();
@@ -15345,7 +15355,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         return;
                     }
                     if (telefone.length === 11) telefone = '55' + telefone;
-                    window.open(`https://wa.me/${telefone}?text=${encodeURIComponent(msg)}`, '_blank');
+                    Utils.openWhatsApp(`https://wa.me/${telefone}?text=${encodeURIComponent(msg)}`);
                 },
 
                 gerarPDFLoteDocsFromCliente: function(clienteId) {
@@ -15465,7 +15475,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     msg += `\n⚠️ *OBS: Sem consulta ao SPC e SERASA!*\n\nAguardo o envio. Qualquer dúvida, estou à disposição! 😊`;
                     if (!telefone) { navigator.clipboard?.writeText(msg).then(() => Utils.toast('Mensagem copiada!')); return; }
                     if (telefone.length === 11) telefone = '55' + telefone;
-                    window.open(`https://wa.me/${telefone}?text=${encodeURIComponent(msg)}`, '_blank');
+                    Utils.openWhatsApp(`https://wa.me/${telefone}?text=${encodeURIComponent(msg)}`);
                 },
 
                 // ===== DOCUMENTOS POR PROFISSÃO =====
@@ -16005,7 +16015,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         return;
                     }
                     if (telefone.length === 11) telefone = '55' + telefone;
-                    window.open(`https://wa.me/${telefone}?text=${encodeURIComponent(msg)}`, '_blank');
+                    Utils.openWhatsApp(`https://wa.me/${telefone}?text=${encodeURIComponent(msg)}`);
                 },
 
                 gerarPDFProfDocsFromCliente: function(clienteId) {
@@ -17440,7 +17450,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     message += `📋 *CRECI:* ${settings.creci || '5794-AL'}`;
                     
                     const encodedMessage = encodeURIComponent(message);
-                    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+                    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
                     
                     Utils.openWhatsApp(whatsappUrl);
                 },
@@ -17584,8 +17594,8 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
 
                     const encodedMessage = mensagem ? encodeURIComponent(mensagem) : '';
                     const url = encodedMessage
-                        ? `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`
-                        : `https://api.whatsapp.com/send?phone=${phoneNumber}`;
+                        ? `https://wa.me/${phoneNumber}?text=${encodedMessage}`
+                        : `https://wa.me/${phoneNumber}`;
 
                     Utils.openWhatsApp(url);
                     UI.closeModals();
@@ -19201,7 +19211,7 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                                 <div style="font-size:0.72rem;color:var(--text-secondary);">${imovel ? imovel.titulo?.substring(0,28)+'…' : 'Sem imóvel vinculado'}</div>
                             </div>
                             ${diasNaEtapa !== null ? `<div style="font-size:0.7rem;font-weight:700;color:${travado?'var(--danger)':'var(--text-secondary)'};text-align:right;flex-shrink:0;">${diasNaEtapa}d${travado?'<br>⚠️ Parado':''}</div>` : ''}
-                            ${c.telefone ? `<button onclick="window.open('https://wa.me/55${c.telefone.replace(/\D/g,'')}?text=Olá ${encodeURIComponent((c.nome||'').split(' ')[0])}!')" style="background:#25D366;color:white;border:none;border-radius:8px;padding:6px 8px;font-size:0.75rem;cursor:pointer;flex-shrink:0;"><i class="fab fa-whatsapp"></i></button>` : ''}
+                            ${c.telefone ? `<button onclick="wppOpen('https://wa.me/55${c.telefone.replace(/\D/g,'')}?text=Olá ${encodeURIComponent((c.nome||'').split(' ')[0])}!')" style="background:#25D366;color:white;border:none;border-radius:8px;padding:6px 8px;font-size:0.75rem;cursor:pointer;flex-shrink:0;"><i class="fab fa-whatsapp"></i></button>` : ''}
                         </div>`;
                     });
                     if (lista.length > 4) {
@@ -19551,7 +19561,7 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                             <div style="font-size:0.9rem;font-weight:900;color:${urgencia};">${dias}d</div>
                             <div style="font-size:0.65rem;color:var(--text-secondary);">parado</div>
                         </div>
-                        ${c.telefone ? `<button onclick="window.open('https://wa.me/55${c.telefone.replace(/\D/g,'')}?text=Olá ${encodeURIComponent((c.nome||'').split(' ')[0])}! Como está, tudo bem? Preciso te atualizar sobre o processo...')" style="background:var(--danger);color:white;border:none;border-radius:8px;padding:6px 8px;font-size:0.75rem;cursor:pointer;flex-shrink:0;">Contatar</button>` : ''}
+                        ${c.telefone ? `<button onclick="wppOpen('https://wa.me/55${c.telefone.replace(/\D/g,'')}?text=Olá ${encodeURIComponent((c.nome||'').split(' ')[0])}! Como está, tudo bem? Preciso te atualizar sobre o processo...')" style="background:var(--danger);color:white;border:none;border-radius:8px;padding:6px 8px;font-size:0.75rem;cursor:pointer;flex-shrink:0;">Contatar</button>` : ''}
                     </div>`;
                 }).join('') + (travados.length > 6 ? `<div style="text-align:center;font-size:0.75rem;color:var(--text-secondary);padding:4px;">+ ${travados.length-6} clientes travados</div>` : '');
             },
@@ -20720,7 +20730,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                             <div style="font-weight:700;font-size:0.85rem;">${a.cliente.nome||'Cliente'}</div>
                             <div style="font-size:0.78rem;color:var(--text-secondary);">${a.marco.acao.slice(a.marco.acao.indexOf(' ')+1)} — ${a.marco.label} (dia ${a.dias})</div>
                         </div>
-                        ${a.cliente.telefone ? `<button onclick="window.open('https://wa.me/55${a.cliente.telefone.replace(/\D/g,'')}?text=Olá ${encodeURIComponent((a.cliente.nome||'').split(' ')[0])}! Como está?')" style="background:#25D366;color:white;border:none;border-radius:8px;padding:8px;font-size:0.9rem;cursor:pointer;flex-shrink:0;"><i class="fab fa-whatsapp"></i></button>` : ''}
+                        ${a.cliente.telefone ? `<button onclick="wppOpen('https://wa.me/55${a.cliente.telefone.replace(/\D/g,'')}?text=Olá ${encodeURIComponent((a.cliente.nome||'').split(' ')[0])}! Como está?')" style="background:#25D366;color:white;border:none;border-radius:8px;padding:8px;font-size:0.9rem;cursor:pointer;flex-shrink:0;"><i class="fab fa-whatsapp"></i></button>` : ''}
                     </div>`;
                 }).join('');
             },
@@ -20808,7 +20818,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                                 ${diasDesdeVenda !== null ? ` · ${diasDesdeVenda}d atrás` : ''}
                             </div>
                         </div>
-                        ${c.telefone ? `<button onclick="window.open('https://wa.me/55${c.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(waMsgTexto)}')" style="background:#25D366;color:white;border:none;border-radius:8px;padding:8px 10px;font-size:0.8rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;gap:5px;font-weight:600;"><i class="fab fa-whatsapp"></i> WA</button>` : ''}
+                        ${c.telefone ? `<button onclick="wppOpen('https://wa.me/55${c.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(waMsgTexto)}')" style="background:#25D366;color:white;border:none;border-radius:8px;padding:8px 10px;font-size:0.8rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;gap:5px;font-weight:600;"><i class="fab fa-whatsapp"></i> WA</button>` : ''}
                     </div>`;
                 }).join('');
                 if (vendidos.length > 15) {
@@ -24619,6 +24629,19 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
         })();
 
         window.Auth = Auth;
+
+        // ── wppOpen: abre WhatsApp com compatibilidade total mobile ──────
+        // Substitui window.open direto nos templates inline (iOS/Android bloqueiam
+        // window.open fora de eventos diretos do usuário).
+        window.wppOpen = function(url) {
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            if (isMobile) {
+                window.location.href = url;
+            } else {
+                const win = window.open(url, '_blank', 'noopener,noreferrer');
+                if (!win) window.location.href = url;
+            }
+        };
 
         </script>
 
