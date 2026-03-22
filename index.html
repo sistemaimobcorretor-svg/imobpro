@@ -9788,6 +9788,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             envioMassaTotal: 0,
             envioMassaEnviados: 0,
             currentWhatsappClienteId: null,
+            currentWhatsappMsgOverride: null,
             currentPdfImovelId: null,
             calcObraData: null,
             cropData: null,
@@ -10951,7 +10952,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             shareImovel: async function(id) {
                 const i = UI.data.imoveis.find(x => x.id === id);
                 if (!i) return;
-                const settings = await DB.get('settings', 'main') || {};
+                // Usa settings em memória — sem await desnecessário
+                const settings = UI.data.settings || {};
                 const preco = i.precoVenda ? Utils.formatCurrency(i.precoVenda) : (i.precoAluguel ? Utils.formatCurrency(i.precoAluguel) + '/mês' : 'Consulte');
                 let msg = `🏠 *${i.titulo}*\n`;
                 msg += `📍 ${i.endereco}\n`;
@@ -14790,42 +14792,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     UI.renderFunil();
                 },
                 
-                whatsappPersonalizado: async (clienteId) => {
-                    const cliente = UI.data.clientes.find(x => x.id === clienteId);
-                    if(!cliente) return;
-
-                    // Se for aniversário do cliente, usa mensagem especial de parabéns
-                    // independentemente do número de contatos
-                    if (Utils.isBirthdayToday(cliente.dataNascimento)) {
-                        const proximoContato = (cliente.contatos || 0) + 1;
-                        cliente.contatos = proximoContato;
-                        await DB.put('clientes', cliente);
-                        UI.data.clientes = await Storage.getClientes();
-
-                        const settings = await Storage.getSettings();
-                        const hour = new Date().getHours();
-                        let greeting = 'Boa noite';
-                        if (hour >= 5 && hour < 12) greeting = 'Bom dia';
-                        if (hour >= 12 && hour < 18) greeting = 'Boa tarde';
-                        const clienteFirstName = cliente.nome.split(' ')[0];
-                        const idade = Utils.calculateAge(cliente.dataNascimento);
-                        let message = `${greeting}, ${clienteFirstName}! 🎉🎂\n\n`;
-                        message += `Me chamo ${settings.nome || 'Alex Peixoto'} sou do time de vendas da  ${settings.imobiliaria || 'Resende'}.\n`;
-                        message += `Gostaria de parabenizá-lo pelos seus ${idade} anos! 🎊\n\n`;
-                        message += `Desejo muita saúde, felicidade e sucesso! ✨\n`;
-                        message += `Que este novo ano de vida seja repleto de conquistas! 🏆\n\n`;
-                        message += `Fico à disposição para ajudá-lo(a) na realização do sonho da casa própria! 🏠\n\n`;
-                        message += `📞 *Contato:* ${settings.telefone || '(82) 99662-2036'}\n`;
-                        message += `🏢 *Imobiliária:* ${settings.imobiliaria || 'Resende'}`;
-                        const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
-                        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-                        Utils.openWhatsApp(url);
-                        UI.renderClientes();
-                        UI.renderFunil();
-                    } else {
-                        // Fora de aniversário: usa a lógica de scripts por número de contato
-                        await App.whatsapp.abrirWhatsAppComScript(clienteId);
-                    }
+                whatsappPersonalizado: (clienteId) => {
+                    // ── Síncrono total: delega para confirmOpenCliente que mostra
+                    // o modal com script sugerido (aniversário ou follow-up 1/2/3)
+                    App.whatsapp.confirmOpenCliente(clienteId);
                 },
                 
                 email: (clienteId) => {
@@ -17429,11 +17399,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             },
             
             whatsapp: {
-                shareImovel: async (imovelId) => {
+                shareImovel: (imovelId) => {
                     const imovel = UI.data.imoveis.find(x => x.id === imovelId);
                     if (!imovel) return;
                     
-                    const settings = await Storage.getSettings();
+                    // Usa settings já carregados em memória — sem await para não quebrar iOS PWA
+                    const settings = UI.data.settings || {};
                     let message = `*🏠 ${imovel.titulo}*\n\n`;
                     
                     message += `📍 *Endereço:* ${imovel.endereco}\n`;
@@ -17557,14 +17528,80 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`
                 },
 
                 confirmOpenCliente: (clienteId) => {
-                    // ── Totalmente síncrono: sem .then() nem await
-                    // para preservar o contexto de toque no iOS PWA ──────────
+                    // ── Abre o modal de confirmação com o script sugerido ────
+                    // O modal é síncrono — nenhum async aqui.
+                    // O WhatsApp só abre quando o usuário clicar num botão do modal
+                    // (openConversaSimplesCliente / openMensagemPersonalizadaCliente),
+                    // garantindo que o toque do usuário seja o evento direto no iOS PWA.
                     UI.currentWhatsappClienteId = clienteId;
                     const cliente = UI.data.clientes.find(c => c.id === clienteId);
                     if (!cliente) return;
+
                     const continuar = App.whatsapp.verificarTempoEtapa(cliente);
                     if (!continuar) { Utils.toast('Contato cancelado.'); return; }
-                    App.whatsapp.abrirWhatsAppComScript(clienteId);
+
+                    // Preenche o script sugerido no modal
+                    const scriptData = App.whatsapp.getScriptParaProximoContato(cliente);
+                    const isBirthday = Utils.isBirthdayToday(cliente.dataNascimento);
+
+                    const descEl    = document.getElementById('whatsapp-confirm-description');
+                    const scriptBox = document.getElementById('whatsapp-script-sugerido');
+                    const headerEl  = document.getElementById('whatsapp-script-header');
+                    const iconEl    = document.getElementById('whatsapp-script-icon');
+                    const labelEl   = document.getElementById('whatsapp-script-label');
+                    const badgeEl   = document.getElementById('whatsapp-script-badge');
+                    const textoEl   = document.getElementById('whatsapp-script-texto');
+
+                    if (isBirthday) {
+                        // Mensagem de aniversário
+                        const idade = Utils.calculateAge(cliente.dataNascimento);
+                        const primeiroNome = (cliente.nome || '').split(' ')[0];
+                        const settings = UI.data.settings || {};
+                        const hour = new Date().getHours();
+                        let greeting = 'Boa noite';
+                        if (hour >= 5 && hour < 12) greeting = 'Bom dia';
+                        if (hour >= 12 && hour < 18) greeting = 'Boa tarde';
+                        const anivMsg =
+`${greeting}, ${primeiroNome}! 🎉🎂
+
+Me chamo ${settings.nome || 'seu corretor(a)'}, sou do time de vendas da ${settings.imobiliaria || 'nossa imobiliária'}.
+Gostaria de parabenizá-lo(a) pelos seus ${idade} anos! 🎊
+
+Desejo muita saúde, felicidade e sucesso! ✨
+Que este novo ano de vida seja repleto de conquistas! 🏆
+
+Fico à disposição para ajudá-lo(a) na realização do sonho da casa própria! 🏠
+
+📞 Contato: ${settings.telefone || ''}
+🏢 Imobiliária: ${settings.imobiliaria || ''}`;
+                        // Armazena a mensagem de aniversário para ser usada ao clicar
+                        UI.currentWhatsappMsgOverride = anivMsg;
+                        if (descEl) descEl.textContent = `🎂 Hoje é aniversário de ${cliente.nome}!`;
+                        if (headerEl) { headerEl.style.background = 'linear-gradient(90deg,#C4724A,#D98A62)'; headerEl.style.color = 'white'; }
+                        if (iconEl)  iconEl.className = 'fas fa-birthday-cake';
+                        if (labelEl) labelEl.textContent = 'Mensagem de Aniversário';
+                        if (badgeEl) badgeEl.textContent = '🎉';
+                        if (textoEl) textoEl.textContent = anivMsg;
+                        if (scriptBox) scriptBox.style.display = 'block';
+                    } else {
+                        UI.currentWhatsappMsgOverride = null;
+                        const proximoContato = (cliente.contatos || 0) + 1;
+                        if (descEl) descEl.textContent = `Como deseja iniciar a conversa com ${cliente.nome}? (${proximoContato}º contato)`;
+                        if (scriptBox) {
+                            if (scriptData && scriptData.texto) {
+                                if (headerEl) { headerEl.style.background = `linear-gradient(90deg, ${scriptData.cor || 'var(--primary)'}, ${scriptData.cor || 'var(--primary)'}dd)`; headerEl.style.color = 'white'; }
+                                if (iconEl)  iconEl.className = scriptData.icon || 'fas fa-comment-alt';
+                                if (labelEl) labelEl.textContent = scriptData.label || 'Script Sugerido';
+                                if (badgeEl) badgeEl.textContent = scriptData.badge || '';
+                                if (textoEl) textoEl.textContent = scriptData.texto;
+                                scriptBox.style.display = 'block';
+                            } else {
+                                scriptBox.style.display = 'none';
+                            }
+                        }
+                    }
+
+                    UI.openModal('whatsapp-confirm');
                 },
 
                 // Núcleo: incrementa contador e abre WhatsApp com mensagem baseada no nº de contatos
@@ -17629,13 +17666,54 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                 },
 
                 openConversaSimplesCliente: () => {
+                    // "Apenas Conversa" — abre WhatsApp sem mensagem pré-preenchida
                     if (!UI.currentWhatsappClienteId) { UI.closeModals(); return; }
-                    App.whatsapp.abrirWhatsAppComScript(UI.currentWhatsappClienteId);
+                    const cliente = UI.data.clientes.find(c => c.id === UI.currentWhatsappClienteId);
+                    if (!cliente) { UI.closeModals(); return; }
+                    const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
+                    if (!phoneNumber) { Utils.toast('Cliente sem telefone cadastrado', 'error'); return; }
+                    const url = `https://wa.me/${phoneNumber}`;
+                    Utils.openWhatsApp(url);
+                    // Salva contador em background
+                    cliente.contatos = (cliente.contatos || 0) + 1;
+                    UI.currentWhatsappMsgOverride = null;
+                    DB.put('clientes', cliente).then(() => {
+                        Storage.getClientes().then(lista => {
+                            UI.data.clientes = lista;
+                            UI.closeModals();
+                            UI.renderClientes();
+                            UI.renderFunil();
+                        });
+                    });
                 },
 
                 openMensagemPersonalizadaCliente: () => {
+                    // "Mensagem Personalizada" — usa script de follow-up ou aniversário
                     if (!UI.currentWhatsappClienteId) { UI.closeModals(); return; }
-                    App.whatsapp.abrirWhatsAppComScript(UI.currentWhatsappClienteId);
+                    const msgOverride = UI.currentWhatsappMsgOverride;
+                    if (msgOverride) {
+                        // Mensagem de aniversário: já foi gerada no confirmOpenCliente
+                        const cliente = UI.data.clientes.find(c => c.id === UI.currentWhatsappClienteId);
+                        if (!cliente) { UI.closeModals(); return; }
+                        const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
+                        if (!phoneNumber) { Utils.toast('Cliente sem telefone cadastrado', 'error'); return; }
+                        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(msgOverride)}`;
+                        Utils.openWhatsApp(url);
+                        UI.currentWhatsappMsgOverride = null;
+                        // Salva contador em background
+                        cliente.contatos = (cliente.contatos || 0) + 1;
+                        DB.put('clientes', cliente).then(() => {
+                            Storage.getClientes().then(lista => {
+                                UI.data.clientes = lista;
+                                UI.closeModals();
+                                UI.renderClientes();
+                                UI.renderFunil();
+                            });
+                        });
+                    } else {
+                        // Script de follow-up 1, 2 ou 3
+                        App.whatsapp.abrirWhatsAppComScript(UI.currentWhatsappClienteId);
+                    }
                 },
 
                 confirmOpenImovel: (imovelId) => {
