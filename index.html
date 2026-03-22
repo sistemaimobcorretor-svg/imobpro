@@ -6627,6 +6627,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             </div>
             <!-- END SIMULADOR VIEW -->
 
+        </main>
+
         <button class="fab" onclick="UI.openNewImovel()" id="main-fab">
             <i class="fas fa-plus"></i>
         </button>
@@ -8916,16 +8918,16 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const settings = await DB.get('settings', 'main') || {};
 
                     const C = {
-                        verde:      [46, 74, 49],
-                        verdeEsc:   [26, 43, 28],
-                        verdeClaro: [80, 120, 85],
-                        terra:      [196, 114, 74],
-                        cinza:      [110, 110, 110],
-                        cinzaClr:   [220, 222, 215],
-                        cinzaFundo: [247, 248, 245],
+                        verde:      [29, 111, 164],   // --primary
+                        verdeEsc:   [21, 90, 138],    // --primary-dark
+                        verdeClaro: [46, 139, 192],   // --primary-light
+                        terra:      [39, 174, 96],    // --accent (verde esmeralda)
+                        cinza:      [100, 116, 139],  // --text-secondary
+                        cinzaClr:   [226, 232, 240],  // --border
+                        cinzaFundo: [245, 247, 250],  // --bg-base
                         branco:     [255, 255, 255],
-                        dark:       [28, 38, 28],
-                        success:    [46, 125, 66],
+                        dark:       [26, 35, 50],     // --dark
+                        success:    [39, 174, 96],    // --accent
                     };
 
                     const drawDivider = (y) => {
@@ -9278,7 +9280,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const pageWidth = doc.internal.pageSize.getWidth();
                     let yPos = 20;
 
-                    doc.setFillColor(180, 132, 108); // Nova cor acento
+                    doc.setFillColor(21, 90, 138); // --primary-dark
                     doc.rect(0, 0, pageWidth, 25, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFontSize(16);
@@ -9292,7 +9294,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const clientes = UI.data.clientes.filter(c => c.dataCriacao && c.dataCriacao.startsWith(dateStr));
 
                     if (clientes.length === 0) {
-                        doc.setTextColor(51, 51, 51);
+                        doc.setTextColor(26, 35, 50);
                         doc.text("Nenhum atendimento registrado nesta data.", 15, yPos);
                     } else {
                         const bodyData = clientes.map(c => [
@@ -9307,7 +9309,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             head: [["Nome", "Telefone", "Interesse", "Observações"]],
                             body: bodyData,
                             theme: 'grid',
-                            headStyles: { fillColor: [180, 132, 108] },
+                            headStyles: { fillColor: [29, 111, 164] },
                             styles: { fontSize: 9, cellPadding: 3 },
                             columnStyles: {
                                 0: { cellWidth: 40 }, 
@@ -9348,7 +9350,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     
                     const settings = await DB.get('settings', 'main') || {};
                     
-                    doc.setFillColor(74, 87, 74);
+                    doc.setFillColor(21, 90, 138); // --primary-dark
                     doc.rect(0, 0, pageWidth, 25, 'F');
                     
                     doc.setTextColor(255, 255, 255);
@@ -9373,7 +9375,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     yPos = 35;
                     
                     doc.setFontSize(12);
-                    doc.setTextColor(51, 51, 51);
+                    doc.setTextColor(26, 35, 50);
                     doc.text(`Período: ${reportData.periodo}`, margin, yPos);
                     yPos += 8;
                     doc.text(`Total: ${reportData.total} registros`, margin, yPos);
@@ -9381,13 +9383,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     
                     if (reportData.dados && reportData.dados.length > 0) {
                         doc.setFontSize(14);
-                        doc.setTextColor(74, 87, 74);
+                        doc.setTextColor(29, 111, 164);
                         doc.setFont("helvetica", "bold");
                         doc.text("DETALHES", margin, yPos);
                         yPos += 10;
                         
                         doc.setFontSize(10);
-                        doc.setTextColor(51, 51, 51);
+                        doc.setTextColor(26, 35, 50);
                         doc.setFont("helvetica", "normal");
                         
                         const headers = reportData.headers || [];
@@ -9401,7 +9403,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             body: rows,
                             margin: { left: margin, right: margin },
                             styles: { fontSize: 9, cellPadding: 3 },
-                            headStyles: { fillColor: [74, 87, 74] }
+                            headStyles: { fillColor: [29, 111, 164] }
                         });
                         
                         if (doc.lastAutoTable) yPos = doc.lastAutoTable.finalY + 10;
@@ -9415,13 +9417,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         }
                         
                         doc.setFontSize(14);
-                        doc.setTextColor(74, 87, 74);
+                        doc.setTextColor(29, 111, 164);
                         doc.setFont("helvetica", "bold");
                         doc.text("RESUMO ESTATÍSTICO", margin, yPos);
                         yPos += 10;
                         
                         doc.setFontSize(10);
-                        doc.setTextColor(51, 51, 51);
+                        doc.setTextColor(26, 35, 50);
                         
                         for (const [key, value] of Object.entries(reportData.resumo)) {
                             doc.text(`${key}: ${value}`, margin, yPos);
@@ -9467,8 +9469,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     }
                     
                     const C2 = {
-                        verde: [46,74,49], verdeEsc:[26,43,28], terra:[196,114,74],
-                        cinza:[102,102,102], cinzaFundo:[247,248,245], branco:[255,255,255], dark:[30,40,30]
+                        verde: [29,111,164], verdeEsc:[21,90,138], terra:[39,174,96],
+                        cinza:[100,116,139], cinzaFundo:[245,247,250], branco:[255,255,255], dark:[26,35,50]
                     };
 
                     const addPortFooter = (pn, tot, im) => {
@@ -9500,7 +9502,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         doc.text((settings.imobiliaria || 'ImobiPro').toUpperCase(), margin+4, 11);
                         doc.setFontSize(7);
                         doc.setFont('helvetica','normal');
-                        doc.setTextColor(196,220,200);
+                        doc.setTextColor(176, 214, 236);
                         doc.text('PORTFOLIO DE IMOVEIS', margin+4, 17);
                         const refDisp = Utils.formatRefNumber(imovel.refNumber || imovel.id);
                         doc.setTextColor(...C2.branco);
@@ -9511,7 +9513,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         doc.setTextColor(...C2.terra);
                         doc.text(stTxt.toUpperCase(), pageWidth - margin, 17, {align:'right'});
                         const contato = [settings.nome, settings.telefone].filter(Boolean).join(' | ');
-                        doc.setTextColor(180,210,185);
+                        doc.setTextColor(176, 214, 236);
                         doc.setFontSize(7);
                         if (contato) doc.text(contato, margin+4, 25);
 
@@ -9665,7 +9667,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const margin = 15;
                     let yPos = 30;
 
-                    doc.setFillColor(74, 87, 74);
+                    doc.setFillColor(21, 90, 138); // --primary-dark
                     doc.rect(0, 0, pageWidth, 25, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFontSize(20);
@@ -9674,7 +9676,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     doc.setFontSize(9);
                     doc.text(settings.imobiliaria || "ImobiPro", pageWidth/2, 22, { align: "center" });
 
-                    doc.setTextColor(51, 51, 51);
+                    doc.setTextColor(26, 35, 50);
                     doc.setFontSize(16);
                     doc.setFont("helvetica", "bold");
                     doc.text("AUTORIZAÇÃO EXCLUSIVA", margin, yPos);
@@ -9824,7 +9826,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     
                     const finalY = doc.internal.pageSize.getHeight() - 10;
                     doc.setFontSize(8);
-                    doc.setTextColor(102, 102, 102);
+                    doc.setTextColor(100, 116, 139);
                     doc.text(`Gerado por ImobiPro em ${new Date().toLocaleDateString('pt-BR')}`, pageWidth/2, finalY, { align: "center" });
                     
                     doc.save(`Autorizacao_${imovel.titulo.substring(0, 15).replace(/[^a-z0-9]/gi, '_')}.pdf`);
@@ -10163,7 +10165,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const margin = 15;
                     const settings = await DB.get('settings', 'main') || {};
 
-                    doc.setFillColor(74, 87, 74);
+                    doc.setFillColor(21, 90, 138);
                     doc.rect(0, 0, pageWidth, 25, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFontSize(20);
@@ -10174,7 +10176,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                     let yPos = 35;
 
-                    doc.setTextColor(51, 51, 51);
+                    doc.setTextColor(26, 35, 50);
                     doc.setFontSize(14);
                     doc.setFont("helvetica", "bold");
                     doc.text(cliente.nome, margin, yPos);
@@ -10205,13 +10207,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const simulacao = Utils.simulateFinancing(cliente, imovel, taxaJuros);
 
                     doc.setFont("helvetica", "bold");
-                    doc.setTextColor(74, 87, 74);
+                    doc.setTextColor(29, 111, 164);
                     doc.setFontSize(12);
                     doc.text("SIMULAÇÃO DE FINANCIAMENTO (Caixa Econômica)", margin, yPos);
                     yPos += 8;
 
                     doc.setFont("helvetica", "normal");
-                    doc.setTextColor(51, 51, 51);
+                    doc.setTextColor(26, 35, 50);
                     doc.setFontSize(10);
 
                     if (simulacao.error) {
@@ -10250,13 +10252,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                     if (cliente.documentos && cliente.documentos.length > 0) {
                         doc.setFont("helvetica", "bold");
-                        doc.setTextColor(74, 87, 74);
+                        doc.setTextColor(29, 111, 164);
                         doc.setFontSize(12);
                         doc.text("DOCUMENTOS ANEXADOS", margin, yPos);
                         yPos += 8;
 
                         doc.setFont("helvetica", "normal");
-                        doc.setTextColor(51, 51, 51);
+                        doc.setTextColor(26, 35, 50);
                         doc.setFontSize(9);
 
                         cliente.documentos.forEach((docFile, index) => {
@@ -15162,7 +15164,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 const pageWidth = doc.internal.pageSize.getWidth();
                 let y = 20;
 
-                doc.setFillColor(74, 87, 74);
+                doc.setFillColor(21, 90, 138);
                 doc.rect(0, 0, pageWidth, 25, 'F');
                 doc.setTextColor(255, 255, 255);
                 doc.setFontSize(18);
@@ -15170,7 +15172,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 doc.text("Cálculo da Taxa de Evolução de Obra", pageWidth/2, 15, { align: "center" });
 
                 y = 35;
-                doc.setTextColor(51, 51, 51);
+                doc.setTextColor(26, 35, 50);
                 doc.setFontSize(11);
                 doc.setFont("helvetica", "normal");
 
@@ -15190,7 +15192,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(9);
-                doc.setTextColor(102, 102, 102);
+                doc.setTextColor(100, 116, 139);
                 doc.text("Fórmula: (Saldo liberado x juros mensal) + (Saldo liberado x TR) + Seguro + Taxa de adm", 15, y);
                 y += lineHeight;
                 doc.text(`Exemplo: (${Utils.formatCurrency(data.saldoLiberado)} x ${(data.jurosAnual/12).toFixed(4)}%) + (${Utils.formatCurrency(data.saldoLiberado)} x ${data.trMensal}%) + ${Utils.formatCurrency(data.seguro)} + ${Utils.formatCurrency(data.taxaAdmin)} = ${Utils.formatCurrency(data.total)}`, 15, y);
@@ -15774,11 +15776,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
                     const W = 210, H = 297;
-                    const primaryR = 46, primaryG = 74, primaryB = 49;
-                    const accentR = 196, accentG = 114, accentB = 74;
+                    const primaryR = 29, primaryG = 111, primaryB = 164;   // --primary
+                    const accentR = 39, accentG = 174, accentB = 96;       // --accent
 
                     // Background gradient simulation
-                    doc.setFillColor(240, 243, 240);
+                    doc.setFillColor(245, 247, 250);
                     doc.rect(0, 0, W, H, 'F');
 
                     // Header block
@@ -15797,7 +15799,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                     doc.setFontSize(11);
                     doc.setFont('helvetica', 'normal');
-                    doc.setTextColor(200, 220, 200);
+                    doc.setTextColor(176, 214, 236);
                     doc.text('Sistema de Gestão Imobiliária', 22, 36);
 
                     // Title right
@@ -15807,13 +15809,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     doc.text('DOCUMENTAÇÃO NECESSÁRIA', W - 22, 27, { align: 'right' });
                     doc.setFont('helvetica', 'normal');
                     doc.setFontSize(10);
-                    doc.setTextColor(196, 220, 196);
+                    doc.setTextColor(176, 214, 236);
                     doc.text('PARA COMPRA DE LOTE', W - 22, 35, { align: 'right' });
 
                     // Client name
                     doc.setFont('helvetica', 'italic');
                     doc.setFontSize(9);
-                    doc.setTextColor(180, 210, 180);
+                    doc.setTextColor(200, 230, 248);
                     doc.text(`Preparado para: ${nome}`, 22, 50);
 
                     // Date right
@@ -15835,15 +15837,15 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     let y = 92;
                     App.cliente.LOTE_DOCS.forEach((d, i) => {
                         const isDone = checked[d.id];
-                        const bgR = isDone ? 230 : 255;
+                        const bgR = isDone ? 235 : 255;
                         const bgG = isDone ? 245 : 255;
-                        const bgB = isDone ? 230 : 255;
+                        const bgB = isDone ? 255 : 255;
 
                         doc.setFillColor(bgR, bgG, bgB);
                         doc.roundedRect(10, y, W-20, 22, 4, 4, 'F');
 
                         if (isDone) {
-                            doc.setDrawColor(46, 125, 66);
+                            doc.setDrawColor(39, 174, 96);
                             doc.setLineWidth(0.8);
                         } else {
                             doc.setDrawColor(primaryR, primaryG, primaryB);
@@ -15862,25 +15864,25 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         // Label
                         doc.setFont('helvetica', 'bold');
                         doc.setFontSize(11);
-                        doc.setTextColor(isDone ? 46 : primaryR, isDone ? 125 : primaryG, isDone ? 66 : primaryB);
+                        doc.setTextColor(isDone ? 39 : primaryR, isDone ? 174 : primaryG, isDone ? 96 : primaryB);
                         doc.text(d.label, 32, y + 9);
 
                         // Obs
                         doc.setFont('helvetica', 'normal');
                         doc.setFontSize(8);
-                        doc.setTextColor(120, 140, 120);
+                        doc.setTextColor(100, 116, 139);
                         doc.text(d.obs, 32, y + 16);
 
                         // Check mark right
                         if (isDone) {
-                            doc.setFillColor(46, 125, 66);
+                            doc.setFillColor(39, 174, 96);
                             doc.circle(W - 18, y + 11, 5, 'F');
                             doc.setFont('helvetica', 'bold');
                             doc.setFontSize(10);
                             doc.setTextColor(255, 255, 255);
                             doc.text('✓', W - 18, y + 13.5, { align: 'center' });
                         } else {
-                            doc.setDrawColor(200, 210, 200);
+                            doc.setDrawColor(226, 232, 240);
                             doc.setLineWidth(0.5);
                             doc.circle(W - 18, y + 11, 5, 'S');
                         }
@@ -15893,13 +15895,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     doc.rect(0, H - 22, W, 22, 'F');
                     doc.setFont('helvetica', 'normal');
                     doc.setFontSize(8);
-                    doc.setTextColor(180, 210, 180);
+                    doc.setTextColor(176, 214, 236);
                     doc.text('Documento gerado pelo ImobiPro · Sistema de Gestão Imobiliária', W/2, H - 10, { align: 'center' });
 
                     const totalDocs = App.cliente.LOTE_DOCS.length;
                     const entregues = Object.values(checked).filter(Boolean).length;
                     doc.setFont('helvetica', 'bold');
-                    doc.setTextColor(196, 220, 196);
+                    doc.setTextColor(200, 230, 248);
                     doc.text(`${entregues}/${totalDocs} documentos recebidos`, W/2, H - 4, { align: 'center' });
 
                     const safeName = nome.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20);
@@ -15953,11 +15955,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
                     const W = 210, H = 297;
-                    doc.setFillColor(240, 243, 240);
+                    doc.setFillColor(245, 247, 250);
                     doc.rect(0, 0, W, H, 'F');
-                    doc.setFillColor(46, 74, 49);
+                    doc.setFillColor(29, 111, 164);
                     doc.roundedRect(10, 10, W-20, 52, 6, 6, 'F');
-                    doc.setFillColor(196, 114, 74);
+                    doc.setFillColor(39, 174, 96);
                     doc.roundedRect(10, 56, W-20, 5, 2, 2, 'F');
                     doc.setFont('helvetica', 'bold');
                     doc.setFontSize(22);
@@ -15965,7 +15967,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     doc.text('ImobiPro', 22, 28);
                     doc.setFontSize(11);
                     doc.setFont('helvetica', 'normal');
-                    doc.setTextColor(200, 220, 200);
+                    doc.setTextColor(176, 214, 236);
                     doc.text('Sistema de Gestão Imobiliária', 22, 36);
                     doc.setFont('helvetica', 'bold');
                     doc.setFontSize(13);
@@ -15973,11 +15975,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     doc.text('DOCUMENTAÇÃO NECESSÁRIA', W - 22, 27, { align: 'right' });
                     doc.setFont('helvetica', 'normal');
                     doc.setFontSize(10);
-                    doc.setTextColor(196, 220, 196);
+                    doc.setTextColor(176, 214, 236);
                     doc.text('PARA COMPRA DE LOTE', W - 22, 35, { align: 'right' });
                     doc.setFont('helvetica', 'italic');
                     doc.setFontSize(9);
-                    doc.setTextColor(180, 210, 180);
+                    doc.setTextColor(200, 230, 248);
                     doc.text(`Preparado para: ${cliente.nome}`, 22, 50);
                     const today = new Date().toLocaleDateString('pt-BR');
                     doc.text(`Data: ${today}`, W - 22, 50, { align: 'right' });
@@ -15993,12 +15995,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     let y = 92;
                     docs.forEach((d, i) => {
                         const isDone = checked[d.id];
-                        doc.setFillColor(isDone ? 230 : 255, isDone ? 245 : 255, isDone ? 230 : 255);
+                        doc.setFillColor(isDone ? 235 : 255, isDone ? 245 : 255, isDone ? 255 : 255);
                         doc.roundedRect(10, y, W-20, 22, 4, 4, 'F');
-                        isDone ? doc.setDrawColor(46, 125, 66) : doc.setDrawColor(46, 74, 49);
+                        isDone ? doc.setDrawColor(39, 174, 96) : doc.setDrawColor(29, 111, 164);
                         doc.setLineWidth(isDone ? 0.8 : 0.4);
                         doc.roundedRect(10, y, W-20, 22, 4, 4, 'S');
-                        doc.setFillColor(46, 74, 49);
+                        doc.setFillColor(29, 111, 164);
                         doc.circle(22, y+11, 5, 'F');
                         doc.setFont('helvetica', 'bold');
                         doc.setFontSize(9);
@@ -16006,35 +16008,35 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         doc.text(`${i+1}`, 22, y + 13.5, { align: 'center' });
                         doc.setFont('helvetica', 'bold');
                         doc.setFontSize(11);
-                        doc.setTextColor(isDone ? 46 : 46, isDone ? 125 : 74, isDone ? 66 : 49);
+                        doc.setTextColor(isDone ? 39 : 29, isDone ? 174 : 111, isDone ? 96 : 164);
                         doc.text(d.label, 32, y + 9);
                         doc.setFont('helvetica', 'normal');
                         doc.setFontSize(8);
-                        doc.setTextColor(120, 140, 120);
+                        doc.setTextColor(100, 116, 139);
                         doc.text(d.obs, 32, y + 16);
                         if (isDone) {
-                            doc.setFillColor(46, 125, 66);
+                            doc.setFillColor(39, 174, 96);
                             doc.circle(W - 18, y + 11, 5, 'F');
                             doc.setFont('helvetica', 'bold');
                             doc.setFontSize(10);
                             doc.setTextColor(255, 255, 255);
                             doc.text('✓', W - 18, y + 13.5, { align: 'center' });
                         } else {
-                            doc.setDrawColor(200, 210, 200);
+                            doc.setDrawColor(226, 232, 240);
                             doc.setLineWidth(0.5);
                             doc.circle(W - 18, y + 11, 5, 'S');
                         }
                         y += 26;
                     });
-                    doc.setFillColor(46, 74, 49);
+                    doc.setFillColor(29, 111, 164);
                     doc.rect(0, H - 22, W, 22, 'F');
                     doc.setFont('helvetica', 'normal');
                     doc.setFontSize(8);
-                    doc.setTextColor(180, 210, 180);
+                    doc.setTextColor(176, 214, 236);
                     doc.text('Documento gerado pelo ImobiPro · Sistema de Gestão Imobiliária', W/2, H - 10, { align: 'center' });
                     const entregues = Object.values(checked).filter(Boolean).length;
                     doc.setFont('helvetica', 'bold');
-                    doc.setTextColor(196, 220, 196);
+                    doc.setTextColor(200, 230, 248);
                     doc.text(`${entregues}/6 documentos recebidos`, W/2, H - 4, { align: 'center' });
                     const safeName = cliente.nome.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20);
                     doc.save(`Documentacao_Lote_${safeName}.pdf`);
@@ -16433,18 +16435,18 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                     const needsConj = estadoCivil === 'casado' || estadoCivil === 'uniao_estavel';
                     const sections = [
-                        { titulo: 'DOCUMENTOS PESSOAIS', cor: [46,74,49], docs: App.cliente.PROF_DOCS_PESSOAIS },
-                        { titulo: 'COMPROVAÇÃO DE RENDA', cor: [196,114,74], docs: profData.docs },
+                        { titulo: 'DOCUMENTOS PESSOAIS', cor: [29,111,164], docs: App.cliente.PROF_DOCS_PESSOAIS },
+                        { titulo: 'COMPROVAÇÃO DE RENDA', cor: [39,174,96], docs: profData.docs },
                     ];
                     if (needsConj) sections.push({ titulo: 'DOCUMENTOS DO CÔNJUGE', cor: [79,70,229], docs: App.cliente.PROF_DOCS_CONJUGAL });
 
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
                     const W = 210, H = 297;
-                    const primaryR = 46, primaryG = 74, primaryB = 49;
-                    const accentR = 196, accentG = 114, accentB = 74;
+                    const primaryR = 29, primaryG = 111, primaryB = 164;   // --primary
+                    const accentR = 39, accentG = 174, accentB = 96;       // --accent
 
-                    doc.setFillColor(240, 243, 240);
+                    doc.setFillColor(245, 247, 250);
                     doc.rect(0, 0, W, H, 'F');
 
                     doc.setFillColor(primaryR, primaryG, primaryB);
@@ -16458,7 +16460,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     doc.text('ImobiPro', 22, 28);
                     doc.setFontSize(11);
                     doc.setFont('helvetica', 'normal');
-                    doc.setTextColor(200, 220, 200);
+                    doc.setTextColor(176, 214, 236);
                     doc.text('Sistema de Gestão Imobiliária', 22, 36);
                     doc.setFont('helvetica', 'bold');
                     doc.setFontSize(13);
@@ -16466,13 +16468,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     doc.text('DOCUMENTAÇÃO NECESSÁRIA', W - 22, 27, { align: 'right' });
                     doc.setFont('helvetica', 'normal');
                     doc.setFontSize(9);
-                    doc.setTextColor(196, 220, 196);
+                    doc.setTextColor(176, 214, 236);
                     doc.text('PARA AVALIAÇÃO E APROVAÇÃO', W - 22, 35, { align: 'right' });
                     doc.text(`Perfil: ${profData.label}`, W - 22, 43, { align: 'right' });
 
                     doc.setFont('helvetica', 'italic');
                     doc.setFontSize(9);
-                    doc.setTextColor(180, 210, 180);
+                    doc.setTextColor(200, 230, 248);
                     doc.text(`Preparado para: ${nome}`, 22, 50);
                     const today = new Date().toLocaleDateString('pt-BR');
                     doc.text(`Data: ${today}`, W - 22, 50, { align: 'right' });
@@ -16510,9 +16512,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         sec.docs.forEach((d, i) => {
                             if (y + rowH > H - pageMargin) { doc.addPage(); y = 15; }
                             const isDone = !!checked[d.id];
-                            doc.setFillColor(isDone ? 230 : 255, isDone ? 245 : 255, isDone ? 230 : 255);
+                            doc.setFillColor(isDone ? 235 : 255, isDone ? 245 : 255, isDone ? 255 : 255);
                             doc.roundedRect(10, y, W-20, rowH, 4, 4, 'F');
-                            doc.setDrawColor(isDone ? 46 : sec.cor[0], isDone ? 125 : sec.cor[1], isDone ? 66 : sec.cor[2]);
+                            doc.setDrawColor(isDone ? 39 : sec.cor[0], isDone ? 174 : sec.cor[1], isDone ? 96 : sec.cor[2]);
                             doc.setLineWidth(isDone ? 0.8 : 0.4);
                             doc.roundedRect(10, y, W-20, rowH, 4, 4, 'S');
                             doc.setFillColor(...sec.cor);
@@ -16520,17 +16522,17 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(255,255,255);
                             doc.text(`${i+1}`, 22, y+13.5, { align: 'center' });
                             doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5);
-                            doc.setTextColor(isDone ? 46 : sec.cor[0], isDone ? 125 : sec.cor[1], isDone ? 66 : sec.cor[2]);
+                            doc.setTextColor(isDone ? 39 : sec.cor[0], isDone ? 174 : sec.cor[1], isDone ? 96 : sec.cor[2]);
                             doc.text(d.label, 32, y+9);
-                            doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(120,140,120);
+                            doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(100,116,139);
                             doc.text(d.obs, 32, y+16);
                             if (isDone) {
-                                doc.setFillColor(46,125,66);
+                                doc.setFillColor(39,174,96);
                                 doc.circle(W-18, y+11, 5, 'F');
                                 doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(255,255,255);
                                 doc.text('✓', W-18, y+13.5, { align: 'center' });
                             } else {
-                                doc.setDrawColor(200,210,200); doc.setLineWidth(0.5);
+                                doc.setDrawColor(226,232,240); doc.setLineWidth(0.5);
                                 doc.circle(W-18, y+11, 5, 'S');
                             }
                             y += rowH + 4;
@@ -16544,11 +16546,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         doc.setPage(p);
                         doc.setFillColor(primaryR, primaryG, primaryB);
                         doc.rect(0, H-22, W, 22, 'F');
-                        doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(180,210,180);
+                        doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(176,214,236);
                         doc.text('Documento gerado pelo ImobiPro · Sistema de Gestão Imobiliária', W/2, H-10, { align: 'center' });
                         const allDocs2 = [...App.cliente.PROF_DOCS_PESSOAIS, ...profData.docs, ...(needsConj ? App.cliente.PROF_DOCS_CONJUGAL : [])];
                         const doneCnt = allDocs2.filter(d => checked[d.id]).length;
-                        doc.setFont('helvetica', 'bold'); doc.setTextColor(196,220,196);
+                        doc.setFont('helvetica', 'bold'); doc.setTextColor(200,230,248);
                         doc.text(`${doneCnt}/${allDocs2.length} documentos recebidos`, W/2, H-4, { align: 'center' });
                     }
 
@@ -19070,7 +19072,7 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     let y = M;
 
                     // Header
-                    doc.setFillColor(46, 74, 49);
+                    doc.setFillColor(21, 90, 138);
                     doc.rect(0, 0, PW, 28, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFontSize(18); doc.setFont('helvetica', 'bold');
@@ -19087,11 +19089,11 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     const allTasks = this.ROTINA_BLOCOS.reduce((s, b) => s + b.tasks.length, 0);
                     const doneTasks = Object.values(this.rotinaState || {}).filter(Boolean).length;
                     const pct = allTasks > 0 ? Math.round((doneTasks / allTasks) * 100) : 0;
-                    doc.setFillColor(239, 240, 236);
+                    doc.setFillColor(235, 244, 251);
                     doc.rect(M, y, CW, 16, 'F');
-                    doc.setTextColor(46, 74, 49); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(29, 111, 164); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
                     doc.text(`Progresso: ${doneTasks}/${allTasks} tarefas (${pct}%)`, M + 4, y + 7);
-                    doc.setTextColor(80, 80, 80); doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+                    doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
                     doc.text(`Score Diário baseado nas tarefas completadas hoje`, M + 4, y + 13);
                     y += 22;
 
@@ -19099,7 +19101,7 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     this.ROTINA_BLOCOS.forEach(bloco => {
                         if (y > PH - 40) { doc.addPage(); y = 20; }
                         // Bloco header
-                        doc.setFillColor(68, 84, 71);
+                        doc.setFillColor(29, 111, 164);
                         doc.rect(M, y, CW, 10, 'F');
                         doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
                         doc.text(`${bloco.titulo}  ${bloco.horario}`, M + 4, y + 7);
@@ -19109,14 +19111,14 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                             if (y > PH - 20) { doc.addPage(); y = 20; }
                             const done = (this.rotinaState || {})[task.id];
                             // Checkbox
-                            doc.setDrawColor(100, 100, 100); doc.setLineWidth(0.4);
+                            doc.setDrawColor(203, 213, 225); doc.setLineWidth(0.4);
                             doc.rect(M + 1, y, 5, 5);
                             if (done) {
-                                doc.setDrawColor(46, 125, 66); doc.setLineWidth(0.8);
+                                doc.setDrawColor(39, 174, 96); doc.setLineWidth(0.8);
                                 doc.line(M + 2, y + 2.5, M + 3.5, y + 4);
                                 doc.line(M + 3.5, y + 4, M + 6, y + 1);
                             }
-                            doc.setTextColor(done ? 120 : 30, done ? 120 : 30, done ? 120 : 30);
+                            doc.setTextColor(done ? 148 : 26, done ? 163 : 35, done ? 184 : 50);
                             doc.setFont('helvetica', done ? 'normal' : 'normal'); doc.setFontSize(8.5);
                             const lines = doc.splitTextToSize(`${task.texto}  [${task.tempo}]`, CW - 12);
                             doc.text(lines, M + 9, y + 4);
@@ -19129,7 +19131,7 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     const pages = doc.internal.getNumberOfPages();
                     for (let p = 1; p <= pages; p++) {
                         doc.setPage(p);
-                        doc.setFillColor(46, 74, 49);
+                        doc.setFillColor(21, 90, 138);
                         doc.rect(0, PH - 10, PW, 10, 'F');
                         doc.setTextColor(255, 255, 255); doc.setFontSize(7); doc.setFont('helvetica', 'normal');
                         doc.text('ImobiPro — Rotina do Corretor de Elite', M, PH - 4);
@@ -19558,9 +19560,9 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                     let y      = 0;
 
                     // ── cabeçalho ──────────────────────────
-                    doc.setFillColor(46, 74, 49);
+                    doc.setFillColor(21, 90, 138);
                     doc.rect(0, 0, PW, 40, 'F');
-                    doc.setFillColor(196, 114, 74);
+                    doc.setFillColor(39, 174, 96);
                     doc.rect(0, 37, PW, 3, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFontSize(20); doc.setFont('helvetica','bold');
@@ -19572,12 +19574,12 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                     y = 50;
 
                     // ── bloco CRM ──────────────────────────
-                    doc.setFillColor(239, 240, 236);
+                    doc.setFillColor(235, 244, 251);
                     const crmH = 32;
                     doc.rect(M, y, CW, crmH, 'F');
-                    doc.setDrawColor(46, 74, 49); doc.setLineWidth(0.5);
+                    doc.setDrawColor(29, 111, 164); doc.setLineWidth(0.5);
                     doc.rect(M, y, CW, crmH, 'S');
-                    doc.setFillColor(46, 74, 49);
+                    doc.setFillColor(29, 111, 164);
                     doc.rect(M, y, 3, crmH, 'F');
 
                     const clientes = (window.UI && UI.data && UI.data.clientes) || [];
@@ -19595,29 +19597,29 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                         return d && Math.floor((now2-d)/86400000) > 14;
                     }).length;
 
-                    doc.setTextColor(46, 74, 49);
+                    doc.setTextColor(29, 111, 164);
                     doc.setFontSize(8); doc.setFont('helvetica','bold');
                     doc.text('SNAPSHOT DO CRM', M+6, y+8);
-                    doc.setFont('helvetica','normal'); doc.setTextColor(50, 50, 50);
+                    doc.setFont('helvetica','normal'); doc.setTextColor(26, 35, 50);
                     doc.text(`Clientes: ${clientes.length}   |   Vendas totais: ${vendas}   |   Conversão: ${taxa}%   |   Travados: ${trav}`, M+6, y+16);
                     doc.text(`Leads este mês: ${lm}   |   Visitas este mês: ${vm}   |   Imóveis no portfólio: ${imoveis.length}`, M+6, y+23);
                     doc.text(`Gerado em: ${now2.toLocaleDateString('pt-BR')} às ${now2.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`, M+6, y+30);
                     y += crmH + 10;
 
                     // ── divisor ────────────────────────────
-                    doc.setDrawColor(196, 114, 74); doc.setLineWidth(0.8);
+                    doc.setDrawColor(39, 174, 96); doc.setLineWidth(0.8);
                     doc.line(M, y, PW-M, y);
                     y += 6;
 
                     // ── título da análise ──────────────────
-                    doc.setTextColor(46, 74, 49);
+                    doc.setTextColor(29, 111, 164);
                     doc.setFontSize(14); doc.setFont('helvetica','bold');
                     doc.text(titulo, M, y);
                     y += 8;
 
                     // ── conteúdo ───────────────────────────
                     doc.setFontSize(10); doc.setFont('helvetica','normal');
-                    doc.setTextColor(30, 30, 30);
+                    doc.setTextColor(26, 35, 50);
                     const LH  = 5.8;
                     const linhas = doc.splitTextToSize(conteudo, CW);
                     for (let i = 0; i < linhas.length; i++) {
@@ -19627,9 +19629,9 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                         const l = linhas[i];
                         const isHead = /^[━═─]{4,}/.test(l) || /^\d️⃣/.test(l) || /^[A-ZÁÉÍÓÚ\s]{6,}:/.test(l);
                         if (isHead) {
-                            doc.setFont('helvetica','bold'); doc.setTextColor(46, 74, 49);
+                            doc.setFont('helvetica','bold'); doc.setTextColor(29, 111, 164);
                         } else {
-                            doc.setFont('helvetica','normal'); doc.setTextColor(30, 30, 30);
+                            doc.setFont('helvetica','normal'); doc.setTextColor(26, 35, 50);
                         }
                         doc.text(l, M, y);
                         y += LH;
@@ -19639,7 +19641,7 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                     const pages = doc.internal.getNumberOfPages();
                     for (let p = 1; p <= pages; p++) {
                         doc.setPage(p);
-                        doc.setFillColor(46, 74, 49);
+                        doc.setFillColor(21, 90, 138);
                         doc.rect(0, PH-12, PW, 12, 'F');
                         doc.setTextColor(255,255,255); doc.setFontSize(7); doc.setFont('helvetica','normal');
                         doc.text('ImobiPro — Sistema de Gestão Imobiliária', M, PH-5);
@@ -21168,9 +21170,9 @@ Cubra: abertura (30 seg), qualificação BANT adaptada ao perfil, apresentação
                     let y      = 0;
 
                     // ── cabeçalho ──────────────────────────
-                    doc.setFillColor(46, 74, 49);
+                    doc.setFillColor(21, 90, 138);
                     doc.rect(0, 0, PW, 40, 'F');
-                    doc.setFillColor(196, 114, 74);
+                    doc.setFillColor(39, 174, 96);
                     doc.rect(0, 37, PW, 3, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFontSize(20); doc.setFont('helvetica','bold');
@@ -21185,43 +21187,43 @@ Cubra: abertura (30 seg), qualificação BANT adaptada ao perfil, apresentação
                     const c2     = this._getCRMContext();
                     const imoveis2 = (this.getData().imoveis) || [];
                     const crmH   = 32;
-                    doc.setFillColor(239, 240, 236);
+                    doc.setFillColor(235, 244, 251);
                     doc.rect(M, y, CW, crmH, 'F');
-                    doc.setDrawColor(46, 74, 49); doc.setLineWidth(0.5);
+                    doc.setDrawColor(29, 111, 164); doc.setLineWidth(0.5);
                     doc.rect(M, y, CW, crmH, 'S');
-                    doc.setFillColor(46, 74, 49);
+                    doc.setFillColor(29, 111, 164);
                     doc.rect(M, y, 3, crmH, 'F');
-                    doc.setTextColor(46, 74, 49);
+                    doc.setTextColor(29, 111, 164);
                     doc.setFontSize(8); doc.setFont('helvetica','bold');
                     doc.text('SNAPSHOT DO CRM', M+6, y+8);
-                    doc.setFont('helvetica','normal'); doc.setTextColor(50, 50, 50);
+                    doc.setFont('helvetica','normal'); doc.setTextColor(26, 35, 50);
                     doc.text(`Clientes: ${c2.totalLeads}   |   Vendas totais: ${c2.vendas}   |   Conversão: ${c2.taxaConversao}%   |   Travados: ${c2.travados}`, M+6, y+16);
                     doc.text(`Leads este mês: ${c2.leadsMes}   |   Visitas este mês: ${c2.visitasMes}   |   Imóveis: ${imoveis2.length}   |   Dias restantes: ${c2.diasRestantes}`, M+6, y+23);
                     doc.text(`Canal principal: ${c2.canalTop}   |   Vendas este mês: ${c2.vendasMes}`, M+6, y+30);
                     y += crmH + 10;
 
                     // ── divisor ────────────────────────────
-                    doc.setDrawColor(196, 114, 74); doc.setLineWidth(0.8);
+                    doc.setDrawColor(39, 174, 96); doc.setLineWidth(0.8);
                     doc.line(M, y, PW-M, y);
                     y += 6;
 
                     // ── título ─────────────────────────────
-                    doc.setTextColor(46, 74, 49);
+                    doc.setTextColor(29, 111, 164);
                     doc.setFontSize(14); doc.setFont('helvetica','bold');
                     doc.text(titulo, M, y);
                     y += 8;
 
                     // ── conteúdo ───────────────────────────
                     doc.setFontSize(10); doc.setFont('helvetica','normal');
-                    doc.setTextColor(30, 30, 30);
+                    doc.setTextColor(26, 35, 50);
                     const LH     = 5.8;
                     const linhas = doc.splitTextToSize(conteudo, CW);
                     for (let i = 0; i < linhas.length; i++) {
                         if (y + LH > PH - 18) { doc.addPage(); y = 20; }
                         const l      = linhas[i];
                         const isHead = /^[━═─]{4,}/.test(l) || /^\d+️/.test(l) || /^[A-ZÁÉÍÓÚ ]{6,}:/.test(l);
-                        if (isHead) { doc.setFont('helvetica','bold'); doc.setTextColor(46,74,49); }
-                        else        { doc.setFont('helvetica','normal'); doc.setTextColor(30,30,30); }
+                        if (isHead) { doc.setFont('helvetica','bold'); doc.setTextColor(29,111,164); }
+                        else        { doc.setFont('helvetica','normal'); doc.setTextColor(26,35,50); }
                         doc.text(l, M, y);
                         y += LH;
                     }
@@ -21230,7 +21232,7 @@ Cubra: abertura (30 seg), qualificação BANT adaptada ao perfil, apresentação
                     const pages = doc.internal.getNumberOfPages();
                     for (let p = 1; p <= pages; p++) {
                         doc.setPage(p);
-                        doc.setFillColor(46, 74, 49);
+                        doc.setFillColor(21, 90, 138);
                         doc.rect(0, PH-12, PW, 12, 'F');
                         doc.setTextColor(255,255,255); doc.setFontSize(7); doc.setFont('helvetica','normal');
                         doc.text('ImobiPro — Sistema de Gestão Imobiliária', M, PH-5);
@@ -21995,22 +21997,22 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                        PALETA — cores sólidas (jsPDF não suporta alpha)
                     ═══════════════════════════════════════════════ */
                     const P = {
-                        // Verdes
-                        g1:[20,38,22],   g2:[38,64,41],   g3:[58,92,63],
-                        g4:[90,130,96],  gL:[220,236,222],gXL:[240,246,241],
-                        // Terracota
-                        t1:[196,114,74], t2:[218,148,108],tL:[245,228,215],tXL:[251,244,238],
+                        // Azuis primários (--primary family)
+                        g1:[21,90,138],   g2:[29,111,164],  g3:[46,139,192],
+                        g4:[100,175,215], gL:[210,232,246], gXL:[235,244,251],
+                        // Verde acento (--accent)
+                        t1:[39,174,96],   t2:[46,204,113],  tL:[212,239,223],tXL:[233,247,239],
                         // Semânticas
-                        ok:[36,118,58],  okL:[218,244,226],okXL:[238,250,241],
-                        wa:[172,108,24], waL:[253,242,210],waXL:[255,250,232],
-                        er:[168,44,44],  erL:[252,225,225],erXL:[255,240,240],
+                        ok:[39,174,96],   okL:[212,239,223],okXL:[233,247,239],
+                        wa:[172,108,24],  waL:[253,242,210],waXL:[255,250,232],
+                        er:[168,44,44],   erL:[252,225,225],erXL:[255,240,240],
                         // Neutros
-                        bk:[22,32,24],   mk:[78,100,82],  mt:[138,158,142],
-                        b0:[236,241,234],b1:[245,248,243],b2:[251,253,250],
+                        bk:[26,35,50],    mk:[100,116,139], mt:[148,163,184],
+                        b0:[226,232,240], b1:[241,245,249], b2:[248,250,252],
                         wh:[255,255,255],
-                        bd:[205,218,207],bdL:[228,237,230],
+                        bd:[203,213,225], bdL:[226,232,240],
                         // Sombra simulada (cinza muito claro)
-                        sh:[210,218,212],
+                        sh:[213,220,228],
                     };
 
                     /* ═══════════════════════════════════════════════
@@ -24659,7 +24661,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                     const mg=10, cw=(W-mg*2-6)/2; // largura de cada coluna (2 colunas com gap=6)
                     let y=0;
 
-                    const C_PRI=[46,74,49],C_ACC=[196,114,74],C_TXT=[26,43,28],C_MUT=[110,125,112],C_WAR=[184,112,32],C_BOR=[215,212,205],C_WHT=[255,255,255];
+                    const C_PRI=[29,111,164],C_ACC=[39,174,96],C_TXT=[26,35,50],C_MUT=[100,116,139],C_WAR=[184,112,32],C_BOR=[226,232,240],C_WHT=[255,255,255];
                     const sf=(sz,w,col)=>{doc.setFontSize(sz);doc.setFont('helvetica',w||'normal');doc.setTextColor(...(col||C_TXT));};
                     const fr=(x,yx,w,h,col,r)=>{doc.setFillColor(...col);r?doc.roundedRect(x,yx,w,h,1.5,1.5,'F'):doc.rect(x,yx,w,h,'F');};
                     const ln=(x1,y1,x2,y2,col,lw)=>{doc.setDrawColor(...(col||C_BOR));doc.setLineWidth(lw||0.2);doc.line(x1,y1,x2,y2);};
