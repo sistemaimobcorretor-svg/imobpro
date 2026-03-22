@@ -1752,72 +1752,92 @@
             text-decoration: none;
         }
 
-        .confirm-whatsapp-modal {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            max-width: 400px;
-            width: 90%;
-            margin: auto;
-            text-align: center;
+        /* ── Modal WhatsApp: novo fluxo de seleção direta ── */
+        .wpp-modal-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 4px;
         }
-
-        .confirm-whatsapp-modal .modal-icon {
-            font-size: 3rem;
-            color: #25D366;
-            margin-bottom: 16px;
+        .wpp-modal-header-icon {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: #dcfce7; color: #16a34a;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0;
         }
-
-        .confirm-whatsapp-modal .modal-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 8px;
+        .wpp-modal-title { font-size: 1.05rem; font-weight: 800; color: var(--dark); }
+        .wpp-modal-sub   { font-size: 0.8rem; color: var(--text-secondary); margin-top: 1px; }
+        .wpp-modal-divider {
+            height: 1px; background: var(--border); margin: 14px 0;
         }
-
-        .confirm-whatsapp-modal .modal-description {
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-            line-height: 1.4;
-        }
-
-        .confirm-whatsapp-options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .confirm-whatsapp-btn {
-            padding: 16px;
-            border-radius: 12px;
-            border: none;
-            font-size: 1rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .confirm-whatsapp-btn:active { transform: scale(0.98); }
-
-        .confirm-whatsapp-btn.conversa {
-            background: rgba(30,50,32,0.08);
-            color: var(--primary);
-        }
-
-        .confirm-whatsapp-btn.orcamento {
-            background: rgba(196,114,74,0.10);
-            color: var(--accent);
-        }
-
-        .confirm-whatsapp-btn.cancelar {
+        .wpp-option-card {
             background: var(--light);
-            color: var(--text-secondary);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 14px 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: border-color .18s, box-shadow .18s, transform .15s;
+            text-align: left;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
         }
+        .wpp-option-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 16px rgba(37,211,102,0.18);
+        }
+        .wpp-option-card:hover {
+            border-color: #25D366;
+            box-shadow: 0 2px 12px rgba(37,211,102,0.12);
+        }
+        .wpp-option-card.wpp-simples { border-left: 4px solid var(--primary); }
+        .wpp-option-card.wpp-aniversario { border-left: 4px solid #C4724A; }
+        .wpp-option-card.wpp-followup1 { border-left: 4px solid #2E4A31; }
+        .wpp-option-card.wpp-followup2 { border-left: 4px solid #B87020; }
+        .wpp-option-card.wpp-followup3 { border-left: 4px solid #B83030; }
+        .wpp-option-header {
+            display: flex; align-items: center; gap: 9px; margin-bottom: 8px;
+        }
+        .wpp-option-icon {
+            width: 30px; height: 30px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; flex-shrink: 0;
+        }
+        .wpp-option-label { font-size: 0.88rem; font-weight: 700; color: var(--dark); }
+        .wpp-option-badge {
+            margin-left: auto; font-size: 0.7rem; font-weight: 700;
+            padding: 2px 8px; border-radius: 20px;
+        }
+        .wpp-option-preview {
+            font-size: 0.78rem; color: var(--text-secondary);
+            line-height: 1.5; white-space: pre-wrap;
+            max-height: 72px; overflow: hidden;
+            position: relative;
+        }
+        .wpp-option-preview::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+            height: 28px;
+            background: linear-gradient(transparent, var(--light));
+        }
+        .wpp-open-btn {
+            margin-top: 10px; width: 100%;
+            background: #25D366; color: white;
+            border: none; border-radius: 10px;
+            padding: 11px; font-size: 0.88rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            cursor: pointer; transition: opacity .15s;
+        }
+        .wpp-open-btn:active { opacity: 0.85; }
+        .wpp-cancel-btn {
+            width: 100%; background: var(--light);
+            border: 1px solid var(--border); border-radius: 10px;
+            padding: 12px; font-size: 0.88rem; font-weight: 600;
+            color: var(--text-secondary); cursor: pointer; margin-top: 6px;
+        }
+        /* keep old class for backwards compat */
+        .confirm-whatsapp-modal {}
+        .confirm-whatsapp-options {}
+        .confirm-whatsapp-btn { display: none; }
+        .confirm-whatsapp-btn.cancelar { display: none; }
 
         .crop-modal {
             position: fixed;
@@ -7248,50 +7268,32 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
         <div class="modal-overlay" id="overlay-whatsapp-confirm"></div>
         <div class="modal-sheet" id="sheet-whatsapp-confirm">
             <div class="sheet-handle"></div>
-            <div class="confirm-whatsapp-modal">
-                <div class="modal-icon">
-                    <i class="fab fa-whatsapp"></i>
-                </div>
-                <div class="modal-title">Enviar para WhatsApp</div>
-                <div class="modal-description" id="whatsapp-confirm-description">
-                    Como você gostaria de iniciar a conversa com o cliente?
-                </div>
 
-                <!-- PAINEL DE SCRIPT SUGERIDO -->
-                <div id="whatsapp-script-sugerido" style="display:none; margin: 0 0 14px 0; border-radius: 14px; overflow: hidden; border: 1.5px solid var(--border);">
-                    <div id="whatsapp-script-header" style="padding: 9px 14px; display: flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.03em;">
-                        <i id="whatsapp-script-icon" class="fas fa-comment-alt"></i>
-                        <span id="whatsapp-script-label">Script Sugerido</span>
-                        <span id="whatsapp-script-badge" style="margin-left:auto; background: rgba(255,255,255,0.25); border-radius: 20px; padding: 2px 9px; font-size: 0.72rem;"></span>
-                    </div>
-                    <div style="background: white; padding: 12px 14px;">
-                        <div id="whatsapp-script-texto" style="font-size: 0.83rem; color: var(--dark); line-height: 1.55; white-space: pre-wrap;"></div>
-                        <button onclick="App.whatsapp.copiarScript()" style="margin-top: 10px; width: 100%; background: var(--surface-glass-dark); border: 1px solid var(--border); border-radius: 9px; padding: 8px; font-size: 0.8rem; font-weight: 600; color: var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                            <i class="fas fa-copy"></i> Copiar script
-                        </button>
-                    </div>
+            <!-- Header -->
+            <div class="wpp-modal-header">
+                <div class="wpp-modal-header-icon"><i class="fab fa-whatsapp"></i></div>
+                <div>
+                    <div class="wpp-modal-title">Enviar mensagem</div>
+                    <div class="wpp-modal-sub" id="whatsapp-confirm-description">Selecione como quer entrar em contato</div>
                 </div>
+            </div>
+            <div class="wpp-modal-divider"></div>
 
-                <div class="confirm-whatsapp-options">
-                    <button class="confirm-whatsapp-btn conversa" onclick="App.whatsapp.openConversaSimplesCliente()">
-                        <i class="fas fa-comment-dots"></i>
-                        <div style="text-align: left; flex: 1;">
-                            <div style="font-weight: 700; font-size: 1.1rem;">Apenas Conversa</div>
-                            <div style="font-size: 0.85rem; font-weight: normal;">Abrir conversa simples sem enviar ficha</div>
-                        </div>
-                    </button>
-                    <button class="confirm-whatsapp-btn orcamento" onclick="App.whatsapp.openMensagemPersonalizadaCliente()">
-                        <i class="fas fa-birthday-cake"></i>
-                        <div style="text-align: left; flex: 1;">
-                            <div style="font-weight: 700; font-size: 1.1rem;">Mensagem Personalizada</div>
-                            <div style="font-size: 0.85rem; font-weight: normal;">Enviar mensagem com aniversário ou detalhes do imóvel</div>
-                        </div>
-                    </button>
-                </div>
-                <button class="confirm-whatsapp-btn cancelar" onclick="UI.closeModals()">
-                    <i class="fas fa-times"></i>
-                    Cancelar
-                </button>
+            <!-- Cards de opção — populados via JS -->
+            <div id="wpp-options-container"></div>
+
+            <!-- Botão cancelar -->
+            <button class="wpp-cancel-btn" onclick="UI.closeModals()">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+
+            <!-- Elementos ocultos mantidos para compatibilidade -->
+            <div id="whatsapp-script-sugerido" style="display:none">
+                <div id="whatsapp-script-header"></div>
+                <i id="whatsapp-script-icon"></i>
+                <span id="whatsapp-script-label"></span>
+                <span id="whatsapp-script-badge"></span>
+                <div id="whatsapp-script-texto"></div>
             </div>
         </div>
 
@@ -17528,41 +17530,51 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`
                 },
 
                 confirmOpenCliente: (clienteId) => {
-                    // ── Abre o modal de confirmação com o script sugerido ────
-                    // O modal é síncrono — nenhum async aqui.
-                    // O WhatsApp só abre quando o usuário clicar num botão do modal
-                    // (openConversaSimplesCliente / openMensagemPersonalizadaCliente),
-                    // garantindo que o toque do usuário seja o evento direto no iOS PWA.
+                    // ─── Síncrono total. Gera os cards de opção e abre o modal.
+                    // Cada card tem botão "Abrir WhatsApp" — o toque no botão
+                    // dispara Utils.openWhatsApp dentro de um evento direto do usuário,
+                    // garantindo funcionamento no iOS PWA. ─────────────────────────
                     UI.currentWhatsappClienteId = clienteId;
+                    UI.currentWhatsappMsgOverride = null;
+
                     const cliente = UI.data.clientes.find(c => c.id === clienteId);
                     if (!cliente) return;
 
-                    const continuar = App.whatsapp.verificarTempoEtapa(cliente);
-                    if (!continuar) { Utils.toast('Contato cancelado.'); return; }
+                    if (!App.whatsapp.verificarTempoEtapa(cliente)) {
+                        Utils.toast('Contato cancelado.'); return;
+                    }
 
-                    // Preenche o script sugerido no modal
-                    const scriptData = App.whatsapp.getScriptParaProximoContato(cliente);
-                    const isBirthday = Utils.isBirthdayToday(cliente.dataNascimento);
+                    const phoneNumber  = Utils.formatPhoneForWhatsApp(cliente.telefone);
+                    if (!phoneNumber) { Utils.toast('Cliente sem telefone cadastrado', 'error'); return; }
 
-                    const descEl    = document.getElementById('whatsapp-confirm-description');
-                    const scriptBox = document.getElementById('whatsapp-script-sugerido');
-                    const headerEl  = document.getElementById('whatsapp-script-header');
-                    const iconEl    = document.getElementById('whatsapp-script-icon');
-                    const labelEl   = document.getElementById('whatsapp-script-label');
-                    const badgeEl   = document.getElementById('whatsapp-script-badge');
-                    const textoEl   = document.getElementById('whatsapp-script-texto');
+                    const primeiroNome = (cliente.nome || 'Cliente').split(' ')[0];
+                    const settings     = UI.data.settings || {};
+                    const proximoContato = (cliente.contatos || 0) + 1;
+                    const isBirthday   = Utils.isBirthdayToday(cliente.dataNascimento);
 
-                    if (isBirthday) {
-                        // Mensagem de aniversário
+                    // ── Helper: incrementa contador e abre URL ──────────────
+                    function abrirComMsg(url) {
+                        Utils.openWhatsApp(url);
+                        cliente.contatos = (cliente.contatos || 0) + 1;
+                        DB.put('clientes', cliente).then(() => {
+                            Storage.getClientes().then(lista => {
+                                UI.data.clientes = lista;
+                                UI.closeModals();
+                                UI.renderClientes();
+                                UI.renderFunil();
+                            });
+                        });
+                    }
+
+                    // ── Gera a URL sem mensagem (apenas conversa) ───────────
+                    const urlSimples = `https://wa.me/${phoneNumber}`;
+
+                    // ── Gera mensagem de aniversário ────────────────────────
+                    function msgAniversario() {
+                        const hora = new Date().getHours();
+                        const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
                         const idade = Utils.calculateAge(cliente.dataNascimento);
-                        const primeiroNome = (cliente.nome || '').split(' ')[0];
-                        const settings = UI.data.settings || {};
-                        const hour = new Date().getHours();
-                        let greeting = 'Boa noite';
-                        if (hour >= 5 && hour < 12) greeting = 'Bom dia';
-                        if (hour >= 12 && hour < 18) greeting = 'Boa tarde';
-                        const anivMsg =
-`${greeting}, ${primeiroNome}! 🎉🎂
+                        return `${saudacao}, ${primeiroNome}! 🎉🎂
 
 Me chamo ${settings.nome || 'seu corretor(a)'}, sou do time de vendas da ${settings.imobiliaria || 'nossa imobiliária'}.
 Gostaria de parabenizá-lo(a) pelos seus ${idade} anos! 🎊
@@ -17573,36 +17585,99 @@ Que este novo ano de vida seja repleto de conquistas! 🏆
 Fico à disposição para ajudá-lo(a) na realização do sonho da casa própria! 🏠
 
 📞 Contato: ${settings.telefone || ''}
-🏢 Imobiliária: ${settings.imobiliaria || ''}`;
-                        // Armazena a mensagem de aniversário para ser usada ao clicar
-                        UI.currentWhatsappMsgOverride = anivMsg;
-                        if (descEl) descEl.textContent = `🎂 Hoje é aniversário de ${cliente.nome}!`;
-                        if (headerEl) { headerEl.style.background = 'linear-gradient(90deg,#C4724A,#D98A62)'; headerEl.style.color = 'white'; }
-                        if (iconEl)  iconEl.className = 'fas fa-birthday-cake';
-                        if (labelEl) labelEl.textContent = 'Mensagem de Aniversário';
-                        if (badgeEl) badgeEl.textContent = '🎉';
-                        if (textoEl) textoEl.textContent = anivMsg;
-                        if (scriptBox) scriptBox.style.display = 'block';
-                    } else {
-                        UI.currentWhatsappMsgOverride = null;
-                        const proximoContato = (cliente.contatos || 0) + 1;
-                        if (descEl) descEl.textContent = `Como deseja iniciar a conversa com ${cliente.nome}? (${proximoContato}º contato)`;
-                        if (scriptBox) {
-                            if (scriptData && scriptData.texto) {
-                                if (headerEl) { headerEl.style.background = `linear-gradient(90deg, ${scriptData.cor || 'var(--primary)'}, ${scriptData.cor || 'var(--primary)'}dd)`; headerEl.style.color = 'white'; }
-                                if (iconEl)  iconEl.className = scriptData.icon || 'fas fa-comment-alt';
-                                if (labelEl) labelEl.textContent = scriptData.label || 'Script Sugerido';
-                                if (badgeEl) badgeEl.textContent = scriptData.badge || '';
-                                if (textoEl) textoEl.textContent = scriptData.texto;
-                                scriptBox.style.display = 'block';
-                            } else {
-                                scriptBox.style.display = 'none';
-                            }
-                        }
+🏢 ${settings.imobiliaria || ''}`;
+                    }
+
+                    // ── Gera mensagem de follow-up por número de contato ────
+                    const SCRIPTS = App.whatsapp.SCRIPTS_FOLLOWUP;
+                    function msgFollowup(n) {
+                        const s = SCRIPTS[n] || SCRIPTS[3];
+                        return s.texto(primeiroNome);
+                    }
+
+                    // ── Monta os cards ──────────────────────────────────────
+                    const cards = [];
+
+                    // Card 1: Apenas Conversa
+                    cards.push({
+                        classe:  'wpp-simples',
+                        iconCls: 'fas fa-comment-dots',
+                        iconBg:  'rgba(46,74,49,0.10)',
+                        iconClr: 'var(--primary)',
+                        label:   'Apenas Conversa',
+                        badge:   '',
+                        badgeBg: '',
+                        preview: 'Abre uma conversa em branco — sem texto pré-preenchido.',
+                        url:     urlSimples
+                    });
+
+                    // Card 2: Mensagem de aniversário (só aparece no aniversário)
+                    if (isBirthday) {
+                        const mAniv = msgAniversario();
+                        cards.push({
+                            classe:  'wpp-aniversario',
+                            iconCls: 'fas fa-birthday-cake',
+                            iconBg:  'rgba(196,114,74,0.12)',
+                            iconClr: '#C4724A',
+                            label:   '🎂 Aniversário',
+                            badge:   'Hoje!',
+                            badgeBg: 'rgba(196,114,74,0.15)',
+                            preview: mAniv,
+                            url:     `https://wa.me/${phoneNumber}?text=${encodeURIComponent(mAniv)}`
+                        });
+                    }
+
+                    // Card 3: Script de follow-up (1º, 2º ou 3º contato)
+                    const scriptIdx = Math.min(proximoContato, 3);
+                    const scriptMeta = SCRIPTS[scriptIdx] || SCRIPTS[1];
+                    const mScript = msgFollowup(scriptIdx);
+                    cards.push({
+                        classe:  `wpp-followup${scriptIdx}`,
+                        iconCls: scriptMeta.icon,
+                        iconBg:  `${scriptMeta.cor}22`,
+                        iconClr: scriptMeta.cor,
+                        label:   scriptMeta.label,
+                        badge:   scriptMeta.badge,
+                        badgeBg: `${scriptMeta.cor}22`,
+                        preview: mScript,
+                        url:     `https://wa.me/${phoneNumber}?text=${encodeURIComponent(mScript)}`
+                    });
+
+                    // ── Renderiza os cards ──────────────────────────────────
+                    const container = document.getElementById('wpp-options-container');
+                    const descEl    = document.getElementById('whatsapp-confirm-description');
+                    if (descEl) descEl.textContent = `${proximoContato}º contato com ${cliente.nome}`;
+
+                    if (container) {
+                        // Gera HTML dos cards e injeta
+                        container.innerHTML = cards.map((c, idx) => `
+                            <div class="wpp-option-card ${c.classe}" id="wpp-card-${idx}">
+                                <div class="wpp-option-header">
+                                    <div class="wpp-option-icon" style="background:${c.iconBg};color:${c.iconClr};">
+                                        <i class="${c.iconCls}"></i>
+                                    </div>
+                                    <span class="wpp-option-label">${c.label}</span>
+                                    ${c.badge ? `<span class="wpp-option-badge" style="background:${c.badgeBg};color:${c.iconClr};">${c.badge}</span>` : ''}
+                                </div>
+                                <div class="wpp-option-preview">${c.preview}</div>
+                                <button class="wpp-open-btn" id="wpp-btn-${idx}">
+                                    <i class="fab fa-whatsapp"></i> Enviar esta mensagem
+                                </button>
+                            </div>
+                        `).join('');
+
+                        // Associa onclick diretamente (evita problemas com closures em iOS)
+                        cards.forEach((c, idx) => {
+                            const btn = document.getElementById(`wpp-btn-${idx}`);
+                            if (btn) btn.onclick = function(e) {
+                                e.stopPropagation();
+                                abrirComMsg(c.url);
+                            };
+                        });
                     }
 
                     UI.openModal('whatsapp-confirm');
-                },
+                },,
 
                 // Núcleo: incrementa contador e abre WhatsApp com mensagem baseada no nº de contatos
                 abrirWhatsAppComScript: (clienteId) => {
@@ -17666,54 +17741,15 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                 },
 
                 openConversaSimplesCliente: () => {
-                    // "Apenas Conversa" — abre WhatsApp sem mensagem pré-preenchida
+                    // Fallback: chamado pelos botões antigos (agora os cards fazem isso)
                     if (!UI.currentWhatsappClienteId) { UI.closeModals(); return; }
-                    const cliente = UI.data.clientes.find(c => c.id === UI.currentWhatsappClienteId);
-                    if (!cliente) { UI.closeModals(); return; }
-                    const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
-                    if (!phoneNumber) { Utils.toast('Cliente sem telefone cadastrado', 'error'); return; }
-                    const url = `https://wa.me/${phoneNumber}`;
-                    Utils.openWhatsApp(url);
-                    // Salva contador em background
-                    cliente.contatos = (cliente.contatos || 0) + 1;
-                    UI.currentWhatsappMsgOverride = null;
-                    DB.put('clientes', cliente).then(() => {
-                        Storage.getClientes().then(lista => {
-                            UI.data.clientes = lista;
-                            UI.closeModals();
-                            UI.renderClientes();
-                            UI.renderFunil();
-                        });
-                    });
+                    App.whatsapp.abrirWhatsAppComScript(UI.currentWhatsappClienteId);
                 },
 
                 openMensagemPersonalizadaCliente: () => {
-                    // "Mensagem Personalizada" — usa script de follow-up ou aniversário
+                    // Fallback: chamado pelos botões antigos (agora os cards fazem isso)
                     if (!UI.currentWhatsappClienteId) { UI.closeModals(); return; }
-                    const msgOverride = UI.currentWhatsappMsgOverride;
-                    if (msgOverride) {
-                        // Mensagem de aniversário: já foi gerada no confirmOpenCliente
-                        const cliente = UI.data.clientes.find(c => c.id === UI.currentWhatsappClienteId);
-                        if (!cliente) { UI.closeModals(); return; }
-                        const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
-                        if (!phoneNumber) { Utils.toast('Cliente sem telefone cadastrado', 'error'); return; }
-                        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(msgOverride)}`;
-                        Utils.openWhatsApp(url);
-                        UI.currentWhatsappMsgOverride = null;
-                        // Salva contador em background
-                        cliente.contatos = (cliente.contatos || 0) + 1;
-                        DB.put('clientes', cliente).then(() => {
-                            Storage.getClientes().then(lista => {
-                                UI.data.clientes = lista;
-                                UI.closeModals();
-                                UI.renderClientes();
-                                UI.renderFunil();
-                            });
-                        });
-                    } else {
-                        // Script de follow-up 1, 2 ou 3
-                        App.whatsapp.abrirWhatsAppComScript(UI.currentWhatsappClienteId);
-                    }
+                    App.whatsapp.abrirWhatsAppComScript(UI.currentWhatsappClienteId);
                 },
 
                 confirmOpenImovel: (imovelId) => {
