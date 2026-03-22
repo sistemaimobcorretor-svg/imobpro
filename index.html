@@ -7466,8 +7466,17 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             
             parseCurrency: (str) => {
                 if (!str || str.trim() === '') return 0;
-                const cleaned = str.replace(/[^\d,]/g, '').replace(',', '.');
+                // Suporta tanto "1.234,56" quanto "1234.56"
+                let cleaned = str.replace(/\./g, '').replace(',', '.');
                 return parseFloat(cleaned) || 0;
+            },
+
+            // Formata um número (ex: 649228.34) para o padrão da máscara "649.228,34"
+            formatMoneyField: (val) => {
+                if (val === null || val === undefined || val === '') return '';
+                const num = parseFloat(val);
+                if (isNaN(num)) return '';
+                return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             },
             
             formatDate: (dateStr) => {
@@ -14180,7 +14189,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     document.getElementById('c-email').value = cliente.email || '';
                     document.getElementById('c-imovel-interesse').value = cliente.imovelInteresseId || '';
                     document.getElementById('c-data-nascimento').value = cliente.dataNascimento || '';
-                    document.getElementById('c-renda-mensal').value = cliente.rendaMensal ? cliente.rendaMensal.toString() : '';
+                    document.getElementById('c-renda-mensal').value = cliente.rendaMensal ? Utils.formatMoneyField(cliente.rendaMensal) : '';
                     if(document.getElementById('c-dependentes')) document.getElementById('c-dependentes').value = (cliente.dependentes || 0).toString();
                     document.getElementById('c-taxa-juros').value = cliente.taxaJuros || '';
                     document.getElementById('c-faixa-preco').value = cliente.faixaPreco || '';
@@ -16418,8 +16427,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         document.getElementById('i-titulo').value = imovel.titulo || '';
                         document.getElementById('i-tipo').value = imovel.tipo || 'apartamento';
                         document.getElementById('i-transacao').value = imovel.transacao || 'venda';
-                        document.getElementById('i-preco-venda').value = imovel.precoVenda ? imovel.precoVenda.toString() : '';
-                        document.getElementById('i-preco-aluguel').value = imovel.precoAluguel ? imovel.precoAluguel.toString() : '';
+                        document.getElementById('i-preco-venda').value = imovel.precoVenda ? Utils.formatMoneyField(imovel.precoVenda) : '';
+                        document.getElementById('i-preco-aluguel').value = imovel.precoAluguel ? Utils.formatMoneyField(imovel.precoAluguel) : '';
                         document.getElementById('i-endereco').value = imovel.endereco || '';
                         document.getElementById('i-area').value = imovel.area ? imovel.area.toString().replace('.', ',') : '';
                         document.getElementById('i-quartos').value = imovel.quartos || '';
@@ -16427,7 +16436,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         document.getElementById('i-vagas').value = imovel.vagas || '';
                         document.getElementById('i-status').value = imovel.status || 'disponivel';
                         document.getElementById('i-gas-encanado').value = imovel.gasEncanado || 'nao';
-                        document.getElementById('i-condominio').value = imovel.condominio ? imovel.condominio.toString() : '';
+                        document.getElementById('i-condominio').value = imovel.condominio ? Utils.formatMoneyField(imovel.condominio) : '';
                         document.getElementById('i-descricao').value = imovel.descricao || '';
                         document.getElementById('i-observacoes').value = imovel.observacoes || '';
                         document.getElementById('i-construtora').value = imovel.construtora || '';
@@ -16440,7 +16449,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         document.getElementById('i-estagio-lancamento').value = imovel.estagioLancamento || 'nenhum';
                         document.getElementById('i-data-lancamento').value = imovel.dataLancamento || '';
                         
-                        document.getElementById('i-valor-avaliacao').value = imovel.valorAvaliacao ? imovel.valorAvaliacao.toString() : '';
+                        document.getElementById('i-valor-avaliacao').value = imovel.valorAvaliacao ? Utils.formatMoneyField(imovel.valorAvaliacao) : '';
                         
                         document.getElementById('i-tabela-pdf-data').value = imovel.tabelaPDF || '';
                         document.getElementById('i-tabela-pdf-nome').value = imovel.tabelaPDFNome || '';
