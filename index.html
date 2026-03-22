@@ -23,47 +23,47 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
-        /* ===== PALETA FUNIL PRO — aplicada ao sistema imobiliário ===== */
+        /* ===== PALETA FUNIL PRO — DARK GREEN THEME ===== */
         :root {
-            --primary: #2E4A31;        /* Verde florestal principal */
-            --primary-dark: #1A2B1C;
-            --primary-light: #3D6142;
-            --secondary: #445447;      /* Verde médio */
-            --accent: #C4724A;         /* Terracota */
-            --accent-light: #D98A62;
-            --success: #2E7D42;        /* Verde ok */
-            --warning: #B87020;        /* Âmbar quente */
-            --danger: #B83030;         /* Vermelho */
-            --dark: #1A2B1C;
-            --text-secondary: #7A8A7C;
-            --light: #EFF0EC;
-            --surface: #FFFFFF;
-            --border: #DDE0D8;
-            --surface-glass: rgba(255, 255, 255, 0.72);
-            --surface-glass-dark: rgba(46, 74, 49, 0.08);
+            --primary: #4CAF80;        /* Verde menta vibrante — destaque sobre fundo escuro */
+            --primary-dark: #2E7D57;
+            --primary-light: #6FCF97;
+            --secondary: #8ABFA0;      /* Verde médio suave */
+            --accent: #E8A87C;         /* Terracota claro — contraste quente */
+            --accent-light: #F0C4A0;
+            --success: #56C27A;        /* Verde ok brilhante */
+            --warning: #F0A030;        /* Âmbar quente */
+            --danger: #E05555;         /* Vermelho suave */
+            --dark: #F0F5F1;           /* Texto principal — quase branco esverdeado */
+            --text-secondary: #9DB8A4; /* Texto secundário — verde acinzentado */
+            --light: rgba(255,255,255,0.08);   /* Fundos suaves sobre escuro */
+            --surface: rgba(255,255,255,0.10); /* Cards e superfícies glass */
+            --border: rgba(255,255,255,0.12);  /* Bordas sutis */
+            --surface-glass: rgba(255,255,255,0.10);
+            --surface-glass-dark: rgba(46,74,49,0.35);
 
             /* CORES ESPECIAIS */
-            --gold: #C4724A;      /* Terracota (substitui dourado) */
-            --verm: #B83030;      /* Vermelho */
+            --gold: #E8A87C;      /* Terracota claro */
+            --verm: #E05555;      /* Vermelho suave */
 
-            --type-visita: #2E4A31;
-            --type-reuniao-construtor: #445447;
-            --type-reuniao-equipe: #3D6142;
-            --type-documentacao: #2E7D42;
-            --type-plantao: #C4724A;
-            --type-outro: #7A8A7C;
-            --type-ligacao: #445447;
+            --type-visita: #4CAF80;
+            --type-reuniao-construtor: #8ABFA0;
+            --type-reuniao-equipe: #6FCF97;
+            --type-documentacao: #56C27A;
+            --type-plantao: #E8A87C;
+            --type-outro: #9DB8A4;
+            --type-ligacao: #8ABFA0;
             --type-whatsapp: #25D366;
-            --type-reuniao: #2E4A31;
+            --type-reuniao: #4CAF80;
 
-            --funnel-lead: #445447;
-            --funnel-contato: #3D6142;
-            --funnel-cpf: #C4724A;
-            --funnel-sem-restricao: #B87020;
-            --funnel-documentacao: #7A8A7C;
-            --funnel-aprovado: #2E7D42;
-            --funnel-contrato: #2E4A31;
-            --funnel-venda: #1A2B1C;
+            --funnel-lead: #8ABFA0;
+            --funnel-contato: #6FCF97;
+            --funnel-cpf: #E8A87C;
+            --funnel-sem-restricao: #F0A030;
+            --funnel-documentacao: #9DB8A4;
+            --funnel-aprovado: #56C27A;
+            --funnel-contrato: #4CAF80;
+            --funnel-venda: #2E7D57;
 
             /* PALETA EXPANDIDA */
             --indigo: #4F46E5;
@@ -92,10 +92,10 @@
             --nav-height: calc(65px + var(--safe-bottom));
             --radius-lg: 18px;
             --radius-md: 14px;
-            --shadow-sm: 0 2px 8px rgba(30,50,32,0.06);
-            --shadow-md: 0 4px 20px rgba(30,50,32,0.10);
-            --shadow-float: 0 10px 40px rgba(30,50,32,0.16);
-            --shadow-3d: 0 8px 20px rgba(30,50,32,0.18), 0 2px 6px rgba(30,50,32,0.10);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.25);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.30);
+            --shadow-float: 0 10px 40px rgba(0,0,0,0.40);
+            --shadow-3d: 0 8px 20px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.20);
         }
 
         * { 
@@ -233,18 +233,18 @@
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.88);
+            background: rgba(255, 255, 255, 0.10);
             backdrop-filter: blur(20px) saturate(1.8);
             -webkit-backdrop-filter: blur(20px) saturate(1.8);
             padding: 18px 14px;
             border-radius: var(--radius-md);
-            box-shadow: 0 8px 24px rgba(30,50,32,0.12), 0 2px 6px rgba(30,50,32,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.30), 0 2px 6px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,0.15);
             display: flex;
             flex-direction: column;
             gap: 8px;
             cursor: pointer;
             transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-            border: 1px solid rgba(255,255,255,0.95);
+            border: 1px solid rgba(255,255,255,0.14);
             min-height: 90px;
             text-align: center;
             align-items: center;
@@ -258,13 +258,13 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 40%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 100%);
+            background: linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 100%);
             border-radius: var(--radius-md) var(--radius-md) 0 0;
             pointer-events: none;
         }
         .stat-card:active { 
             transform: scale(0.95) rotateX(5deg);
-            box-shadow: 0 15px 35px rgba(196,114,74,0.35), 0 5px 12px rgba(30,50,32,0.15);
+            box-shadow: 0 15px 35px rgba(232,168,124,0.25), 0 5px 12px rgba(0,0,0,0.30);
         }
         .stat-card:active .stat-icon {
             transform: scale(1.2) translateZ(20px);
@@ -280,40 +280,40 @@
             box-shadow: 0 3px 8px rgba(30,50,32,0.15);
         }
         .stat-value { 
-            font-size: 1.55rem; font-weight: 900; color: var(--dark); line-height: 1;
+            font-size: 1.55rem; font-weight: 900; color: #FFFFFF; line-height: 1;
             letter-spacing: -0.5px;
-            text-shadow: 0 1px 3px rgba(30,50,32,0.08);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.30);
         }
         .stat-label { 
             font-size: 0.76rem; color: var(--text-secondary); font-weight: 700; 
             letter-spacing: 0.4px; text-transform: uppercase;
         }
 
-        /* Classes de fundo com transparência baseada na nova paleta */
-        .bg-blue { background: rgba(30,50,32,0.12); color: var(--primary); }
-        .bg-green { background: rgba(46,125,85,0.12); color: var(--success); }
-        .bg-orange { background: rgba(232,160,32,0.12); color: var(--warning); }
-        .bg-red { background: rgba(192,57,43,0.12); color: var(--danger); }
-        .bg-purple { background: rgba(196,114,74,0.12); color: var(--accent); }
-        .bg-cyan { background: rgba(92,122,140,0.12); color: var(--secondary); }
-        .bg-gold { background: rgba(196,114,74,0.15); color: var(--gold); }
-        .bg-verm { background: rgba(192,57,43,0.12); color: var(--verm); }
-        .bg-indigo { background: var(--bg-indigo); color: var(--indigo); }
-        .bg-violet { background: var(--bg-violet); color: var(--violet); }
-        .bg-teal { background: var(--bg-teal); color: var(--teal); }
-        .bg-coral { background: var(--bg-coral); color: var(--coral); }
-        .bg-amber { background: var(--bg-amber); color: var(--amber); }
-        .bg-sky { background: var(--bg-sky); color: var(--sky); }
-        .bg-pink { background: var(--bg-pink); color: var(--pink); }
+        /* Classes de fundo com transparência — dark theme */
+        .bg-blue { background: rgba(76,175,128,0.20); color: var(--primary); }
+        .bg-green { background: rgba(86,194,122,0.20); color: var(--success); }
+        .bg-orange { background: rgba(240,160,48,0.20); color: var(--warning); }
+        .bg-red { background: rgba(224,85,85,0.20); color: var(--danger); }
+        .bg-purple { background: rgba(232,168,124,0.20); color: var(--accent); }
+        .bg-cyan { background: rgba(138,191,160,0.20); color: var(--secondary); }
+        .bg-gold { background: rgba(232,168,124,0.22); color: var(--gold); }
+        .bg-verm { background: rgba(224,85,85,0.20); color: var(--verm); }
+        .bg-indigo { background: rgba(99,102,241,0.20); color: #a5b4fc; }
+        .bg-violet { background: rgba(139,92,246,0.20); color: #c4b5fd; }
+        .bg-teal { background: rgba(20,184,166,0.20); color: #5eead4; }
+        .bg-coral { background: rgba(244,63,94,0.20); color: #fda4af; }
+        .bg-amber { background: rgba(245,158,11,0.20); color: #fcd34d; }
+        .bg-sky { background: rgba(14,165,233,0.20); color: #7dd3fc; }
+        .bg-pink { background: rgba(236,72,153,0.20); color: #f9a8d4; }
 
         .section-title {
             font-size: 1.05rem; font-weight: 800; margin-bottom: 14px;
             display: flex; justify-content: space-between; align-items: center;
             width: 100%;
-            color: var(--dark);
+            color: #FFFFFF;
             letter-spacing: -0.3px;
             padding-bottom: 8px;
-            border-bottom: 2px solid rgba(255,255,255,0.08);
+            border-bottom: 2px solid rgba(255,255,255,0.10);
         }
 
         .search-container {
@@ -322,13 +322,14 @@
         }
         .search-input {
             width: 100%; padding: 12px 12px 12px 40px;
-            border: 1px solid var(--border); border-radius: var(--radius-md);
-            background: var(--surface); font-size: 1rem; outline: none;
+            border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius-md);
+            background: rgba(255,255,255,0.10); font-size: 1rem; outline: none;
             -webkit-appearance: none;
             font-family: 'Inter', sans-serif;
-            color: var(--dark);
+            color: #FFFFFF;
         }
-        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,50,32,0.10); }
+        .search-input::placeholder { color: var(--text-secondary); }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(76,175,128,0.20); background: rgba(255,255,255,0.14); }
         .search-icon {
             position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
             color: var(--text-secondary);
@@ -336,22 +337,22 @@
         }
 
         .property-card {
-            background: rgba(255,255,255,0.94);
-            backdrop-filter: blur(16px) saturate(1.8);
-            -webkit-backdrop-filter: blur(16px) saturate(1.8);
+            background: rgba(255,255,255,0.10);
+            backdrop-filter: blur(20px) saturate(1.8);
+            -webkit-backdrop-filter: blur(20px) saturate(1.8);
             border-radius: var(--radius-md);
             margin-bottom: 18px;
-            box-shadow: 0 6px 24px rgba(30,50,32,0.12), 0 2px 6px rgba(30,50,32,0.06);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.30), 0 2px 6px rgba(0,0,0,0.20);
             position: relative;
             overflow: hidden;
             transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
             cursor: pointer;
             width: 100%;
-            border: 1px solid rgba(255,255,255,1);
+            border: 1px solid rgba(255,255,255,0.14);
         }
         .property-card:active { 
             transform: scale(0.97) translateY(2px);
-            box-shadow: 0 15px 40px rgba(196,114,74,0.30), 0 4px 12px rgba(30,50,32,0.15);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.30);
         }
 
         /* ===== CARD CAROUSEL (auto-slide on property cards) ===== */
@@ -385,7 +386,7 @@
             transition: all 0.3s;
         }
         .card-carousel-dot.active {
-            background: white;
+            background: rgba(255,255,255,0.08);
             width: 18px;
             border-radius: 3px;
         }
@@ -393,7 +394,7 @@
         .property-image {
             width: 100%; height: 180px;
             object-fit: cover;
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             display: flex; align-items: center; justify-content: center;
             color: var(--text-secondary);
             position: relative;
@@ -415,14 +416,14 @@
         .badge-lancamento { background: var(--secondary); color: white; }
         .badge-gold { background: var(--gold); color: white; }
         .badge-verm { background: var(--verm); color: white; }
-        .property-content { padding: 16px; }
+        .property-content { padding: 16px; background: rgba(20, 35, 22, 0.85); }
         .property-title { 
-            font-weight: 800; font-size: 1rem; color: var(--dark);
+            font-weight: 800; font-size: 1rem; color: #FFFFFF;
             margin-bottom: 4px; line-height: 1.3;
             letter-spacing: -0.2px;
         }
         .property-address { 
-            font-size: 0.85rem; color: var(--text-secondary); 
+            font-size: 0.85rem; color: rgba(255,255,255,0.55); 
             margin-bottom: 8px; display: flex; align-items: center; gap: 4px;
         }
         .property-features {
@@ -431,20 +432,20 @@
         }
         .feature {
             display: flex; flex-direction: column; align-items: center;
-            font-size: 0.75rem; color: var(--text-secondary);
+            font-size: 0.75rem; color: rgba(255,255,255,0.55);
             min-width: 50px;
         }
-        .feature i { font-size: 1rem; margin-bottom: 2px; color: var(--primary); }
+        .feature i { font-size: 1rem; margin-bottom: 2px; color: #A8D5AC; }
         
         .property-price {
-            font-size: 1.35rem; font-weight: 900; color: var(--primary);
+            font-size: 1.35rem; font-weight: 900; color: #A8D5AC;
             margin-bottom: 8px;
             letter-spacing: -0.5px;
         }
-        .property-price .period { font-size: 0.9rem; color: var(--text-secondary); }
+        .property-price .period { font-size: 0.9rem; color: rgba(255,255,255,0.45); }
         .property-actions {
             display: flex; gap: 8px; margin-top: 12px;
-            padding-top: 12px; border-top: 1px solid var(--border);
+            padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.10);
             width: 100%;
         }
         .btn-sm {
@@ -454,9 +455,9 @@
             cursor: pointer;
             min-height: 36px;
         }
-        .btn-light { background: var(--light); color: var(--text-secondary); }
-        .btn-primary-soft { background: rgba(30,50,32,0.08); color: var(--primary); }
-        .btn-whatsapp { background: #dcfce7; color: #16a34a; }
+        .btn-light { background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.70); }
+        .btn-primary-soft { background: rgba(168,213,172,0.15); color: #A8D5AC; }
+        .btn-whatsapp { background: rgba(37,211,102,0.15); color: #4ade80; }
 
         /* client-card defined below in calendar section */
 
@@ -464,7 +465,7 @@
             display: flex; justify-content: space-between; align-items: flex-start;
             margin-bottom: 12px;
         }
-        .client-name { font-weight: 700; font-size: 1rem; color: var(--dark); }
+        .client-name { font-weight: 700; font-size: 1rem; color: #FFFFFF; }
         .client-type {
             font-size: 0.7rem; padding: 3px 8px; border-radius: 99px;
             font-weight: 600;
@@ -475,7 +476,7 @@
         }
         .client-row {
             display: flex; align-items: center; gap: 8px;
-            font-size: 0.85rem; color: var(--text-secondary);
+            font-size: 0.85rem; color: rgba(255,255,255,0.55);
         }
 
         .client-actions {
@@ -483,7 +484,7 @@
             gap: 8px;
             margin-top: 12px;
             padding-top: 12px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid rgba(255,255,255,0.10);
             width: 100%;
             flex-wrap: wrap;
         }
@@ -588,13 +589,13 @@
         .schedule-type.outro { background: var(--type-outro); }
         
         .schedule-time {
-            font-size: 0.85rem; color: var(--text-secondary);
+            font-size: 0.85rem; color: rgba(255,255,255,0.55);
             display: flex; align-items: center; gap: 6px;
             margin-bottom: 8px;
             flex-wrap: wrap;
         }
-        .schedule-title { font-weight: 600; color: var(--dark); margin-bottom: 4px; }
-        .schedule-notes { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; }
+        .schedule-title { font-weight: 600; color: #FFFFFF; margin-bottom: 4px; }
+        .schedule-notes { font-size: 0.85rem; color: rgba(255,255,255,0.55); line-height: 1.4; }
 
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
@@ -674,7 +675,7 @@
 
         .modal-sheet {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: var(--surface);
+            background: linear-gradient(180deg, #1e3520 0%, #162818 100%);
             border-radius: 20px 20px 0 0;
             padding: 24px 16px calc(24px + var(--safe-bottom));
             transform: translateY(100%);
@@ -683,32 +684,35 @@
             overflow-y: auto;
             z-index: 101;
             width: 100%;
+            border-top: 1px solid rgba(255,255,255,0.12);
         }
         .modal-overlay.active + .modal-sheet { transform: translateY(0); }
 
         .sheet-handle {
-            width: 40px; height: 4px; background: var(--border);
+            width: 40px; height: 4px; background: rgba(255,255,255,0.20);
             border-radius: 2px; margin: 0 auto 20px;
         }
 
         .form-group { margin-bottom: 16px; width: 100%; }
         .form-label { 
             display: block; font-size: 0.9rem; font-weight: 600; 
-            margin-bottom: 6px; color: var(--dark); 
+            margin-bottom: 6px; color: rgba(255,255,255,0.80); 
         }
         .form-control {
             width: 100%; padding: 14px;
-            border: 1px solid var(--border);
+            border: 1px solid rgba(255,255,255,0.15);
             border-radius: 12px;
             font-size: 1rem;
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             -webkit-appearance: none;
             font-family: 'Inter', sans-serif;
-            color: var(--dark);
+            color: #FFFFFF;
         }
-        .form-control:focus { background: white; border-color: var(--primary); outline: none; }
+        .form-control::placeholder { color: rgba(255,255,255,0.30); }
+        .form-control:focus { background: rgba(255,255,255,0.13); border-color: rgba(168,213,172,0.60); outline: none; box-shadow: 0 0 0 3px rgba(168,213,172,0.12); }
         textarea.form-control { min-height: 100px; resize: none; }
-        select.form-control { color: var(--dark); }
+        select.form-control { color: #FFFFFF; }
+        select.form-control option { background: #1e3520; color: #FFFFFF; }
 
         .form-row {
             display: flex; gap: 12px;
@@ -726,44 +730,47 @@
         }
 
         .details-card {
-            background: var(--surface);
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: var(--radius-lg);
             padding: 20px;
             margin-bottom: 16px;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.12);
             width: 100%;
         }
         
         .details-header {
             display: flex; justify-content: space-between;
             align-items: flex-start; margin-bottom: 20px;
-            padding-bottom: 15px; border-bottom: 1px solid var(--border);
+            padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.10);
         }
         
         .details-title {
             font-size: 1.3rem; font-weight: 800;
-            color: var(--dark);
+            color: #FFFFFF;
             flex: 1;
         }
         
         .details-price {
             font-size: 1.5rem; font-weight: 800;
-            color: var(--primary);
+            color: #A8D5AC;
         }
         
         .details-section {
             margin-bottom: 20px;
             width: 100%;
-            background: var(--surface);
+            background: rgba(255,255,255,0.06);
             border-radius: var(--radius-md);
             padding: 16px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
+            box-shadow: none;
+            border: 1px solid rgba(255,255,255,0.10);
         }
         
         .details-section-title {
             font-size: 0.9rem; font-weight: 700;
-            color: var(--primary); text-transform: uppercase;
+            color: #A8D5AC; text-transform: uppercase;
             letter-spacing: 0.5px; margin-bottom: 8px;
             display: flex; align-items: center; gap: 8px;
         }
@@ -779,18 +786,18 @@
         }
         
         .info-label {
-            font-size: 0.8rem; color: var(--text-secondary);
+            font-size: 0.8rem; color: rgba(255,255,255,0.45);
             font-weight: 500;
         }
         
         .info-value {
-            font-size: 1rem; color: var(--dark);
+            font-size: 1rem; color: #FFFFFF;
             font-weight: 600;
         }
         
         .details-actions {
             display: flex; gap: 12px; margin-top: 24px;
-            padding-top: 20px; border-top: 1px solid var(--border);
+            padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.10);
             width: 100%;
             flex-wrap: wrap;
         }
@@ -808,7 +815,7 @@
         .btn-details:active { transform: scale(0.95); }
         
         .btn-details-primary {
-            background: var(--primary); color: white;
+            background: linear-gradient(135deg, #2E4A31, #3D6142); color: white;
         }
         
         .btn-details-whatsapp {
@@ -816,7 +823,7 @@
         }
         
         .btn-details-secondary {
-            background: var(--light); color: var(--text-secondary);
+            background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.70);
         }
 
         .image-gallery {
@@ -832,7 +839,7 @@
             border-radius: 8px;
             overflow: hidden;
             height: 120px;
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             cursor: pointer;
         }
 
@@ -976,7 +983,7 @@
         }
 
         .carousel-dot.active {
-            background: white;
+            background: rgba(255,255,255,0.08);
         }
 
         .carousel-arrow {
@@ -1199,9 +1206,9 @@
             cursor: pointer;
             white-space: nowrap;
             transition: all 0.2s;
-            border: 1px solid var(--border);
-            background: white;
-            color: var(--text-secondary);
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.60);
             flex-shrink: 0;
         }
 
@@ -1281,11 +1288,14 @@
         }
 
         .funnel-container {
-            background: var(--surface);
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: var(--radius-md);
             padding: 16px;
             margin-bottom: 24px;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.20);
+            border: 1px solid rgba(255,255,255,0.10);
             overflow: hidden;
             width: 100%;
         }
@@ -1305,10 +1315,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border-left: 4px solid;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: var(--shadow-sm);
+            background: rgba(255,255,255,0.07);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            border-right: 1px solid rgba(255,255,255,0.08);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             width: 100%;
-            /* Centralização */
             text-align: center;
         }
 
@@ -1340,8 +1352,8 @@
         }
 
         .funnel-stage-count {
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--dark);
+            background: rgba(255,255,255,0.15);
+            color: #FFFFFF;
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 0.8rem;
@@ -1363,7 +1375,8 @@
         }
 
         .funnel-client-item {
-            background: rgba(241, 245, 249, 0.7);
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.10);
             padding: 8px 12px;
             border-radius: 6px;
             margin-bottom: 6px;
@@ -1377,16 +1390,16 @@
         }
 
         .funnel-client-item:hover {
-            background: rgba(226, 232, 240, 0.9);
+            background: rgba(255,255,255,0.12);
         }
 
         .funnel-client-item:active {
-            box-shadow: 0 0 10px 3px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 0 10px 3px rgba(168,213,172,0.20);
         }
 
         .funnel-client-name {
             font-weight: 600;
-            color: var(--dark);
+            color: #FFFFFF;
         }
 
         .funnel-client-days {
@@ -1412,7 +1425,7 @@
         }
 
         .link-card {
-            background: var(--surface);
+            background: rgba(255,255,255,0.08);
             border-radius: var(--radius-md);
             padding: 16px;
             box-shadow: var(--shadow-sm);
@@ -1436,7 +1449,7 @@
             width: 40px;
             height: 40px;
             border-radius: 8px;
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1542,7 +1555,7 @@
         }
 
         .video-url-display {
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             border-radius: 6px;
             padding: 8px;
             font-size: 0.75rem;
@@ -1584,7 +1597,7 @@
         }
 
         .report-summary {
-            background: var(--surface);
+            background: rgba(255,255,255,0.08);
             border-radius: var(--radius-md);
             padding: 16px;
             margin-bottom: 16px;
@@ -1598,7 +1611,7 @@
         }
 
         .report-table th {
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             padding: 12px;
             text-align: left;
             font-weight: 600;
@@ -1614,7 +1627,7 @@
         }
 
         .report-table tr:hover {
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
         }
 
         .client-select-item {
@@ -1626,7 +1639,7 @@
             cursor: pointer;
         }
         .client-select-item:hover {
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
         }
         .client-select-item input[type="checkbox"] {
             width: 20px;
@@ -1697,7 +1710,7 @@
         .progress-envio {
             margin-top: 16px;
             padding: 16px;
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             border-radius: var(--radius-md);
             text-align: center;
         }
@@ -1730,7 +1743,7 @@
         }
 
         .whatsapp-links-list {
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             border-radius: 8px;
             padding: 12px;
             max-height: 300px;
@@ -1738,12 +1751,13 @@
             font-size: 0.8rem;
         }
         .whatsapp-link-item {
-            background: white;
+            background: rgba(255,255,255,0.08);
             padding: 8px;
             margin-bottom: 6px;
             border-radius: 4px;
             border-left: 3px solid #25D366;
             word-break: break-all;
+            color: rgba(255,255,255,0.80);
         }
         .whatsapp-link-item a {
             color: var(--primary);
@@ -1757,18 +1771,18 @@
         }
         .wpp-modal-header-icon {
             width: 42px; height: 42px; border-radius: 50%;
-            background: #dcfce7; color: #16a34a;
+            background: rgba(37,211,102,0.15); color: #25D366;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.3rem; flex-shrink: 0;
         }
-        .wpp-modal-title { font-size: 1.05rem; font-weight: 800; color: var(--dark); }
+        .wpp-modal-title { font-size: 1.05rem; font-weight: 800; color: rgba(255,255,255,0.92); }
         .wpp-modal-sub   { font-size: 0.8rem; color: var(--text-secondary); margin-top: 1px; }
         .wpp-modal-divider {
-            height: 1px; background: var(--border); margin: 14px 0;
+            height: 1px; background: rgba(255,255,255,0.10); margin: 14px 0;
         }
         .wpp-option-card {
-            background: var(--light);
-            border: 1.5px solid var(--border);
+            background: rgba(255,255,255,0.07);
+            border: 1.5px solid rgba(255,255,255,0.13);
             border-radius: 14px;
             padding: 14px 14px 12px;
             margin-bottom: 10px;
@@ -1788,10 +1802,10 @@
             box-shadow: 0 2px 12px rgba(37,211,102,0.12);
         }
         .wpp-option-card.wpp-simples { border-left: 4px solid var(--primary); }
-        .wpp-option-card.wpp-aniversario { border-left: 4px solid #C4724A; }
-        .wpp-option-card.wpp-followup1 { border-left: 4px solid #2E4A31; }
-        .wpp-option-card.wpp-followup2 { border-left: 4px solid #B87020; }
-        .wpp-option-card.wpp-followup3 { border-left: 4px solid #B83030; }
+        .wpp-option-card.wpp-aniversario { border-left: 4px solid #E8A87C; }
+        .wpp-option-card.wpp-followup1 { border-left: 4px solid #4CAF80; }
+        .wpp-option-card.wpp-followup2 { border-left: 4px solid var(--warning); }
+        .wpp-option-card.wpp-followup3 { border-left: 4px solid var(--danger); }
         .wpp-option-header {
             display: flex; align-items: center; gap: 9px; margin-bottom: 8px;
         }
@@ -1800,7 +1814,7 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 0.85rem; flex-shrink: 0;
         }
-        .wpp-option-label { font-size: 0.88rem; font-weight: 700; color: var(--dark); }
+        .wpp-option-label { font-size: 0.88rem; font-weight: 700; color: rgba(255,255,255,0.90); }
         .wpp-option-badge {
             margin-left: auto; font-size: 0.7rem; font-weight: 700;
             padding: 2px 8px; border-radius: 20px;
@@ -1814,7 +1828,7 @@
         .wpp-option-preview::after {
             content: ''; position: absolute; bottom: 0; left: 0; right: 0;
             height: 28px;
-            background: linear-gradient(transparent, var(--light));
+            background: linear-gradient(transparent, rgba(22,38,24,0.97));
         }
         .wpp-open-btn {
             margin-top: 10px; width: 100%;
@@ -1826,8 +1840,8 @@
         }
         .wpp-open-btn:active { opacity: 0.85; }
         .wpp-cancel-btn {
-            width: 100%; background: var(--light);
-            border: 1px solid var(--border); border-radius: 10px;
+            width: 100%; background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 10px;
             padding: 12px; font-size: 0.88rem; font-weight: 600;
             color: var(--text-secondary); cursor: pointer; margin-top: 6px;
         }
@@ -1871,7 +1885,7 @@
             color: white;
         }
         .crop-btn.cancel {
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             color: var(--text-secondary);
         }
 
@@ -2110,7 +2124,7 @@
             transition: 0.2s;
         }
         .quick-chip.active { background: var(--primary); color: white; }
-        .quick-chip:not(.active) { background: var(--light); color: var(--secondary); }
+        .quick-chip:not(.active) { background: rgba(255,255,255,0.08); color: var(--secondary); }
         body.dark-mode .quick-chip:not(.active) { background: #1E2E20; color: #ccc; }
 
         /* ===== CHART MINI ===== */
@@ -2159,12 +2173,12 @@
 
         /* ===== CALENDAR AGENDA STYLES ===== */
         .calendar-container {
-            background: var(--surface-glass);
-            backdrop-filter: blur(16px) saturate(1.5);
-            -webkit-backdrop-filter: blur(16px) saturate(1.5);
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px) saturate(1.5);
+            -webkit-backdrop-filter: blur(20px) saturate(1.5);
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-3d);
-            border: 1px solid rgba(255,255,255,0.80);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.10);
             padding: 16px;
             margin-bottom: 20px;
             overflow: hidden;
@@ -2175,13 +2189,13 @@
         }
         .calendar-month-label {
             font-size: 1.05rem; font-weight: 800;
-            color: var(--primary); letter-spacing: -0.3px;
+            color: #A8D5AC; letter-spacing: -0.3px;
         }
         .calendar-nav-btn {
-            background: var(--light); border: none; border-radius: 8px;
+            background: rgba(255,255,255,0.10); border: none; border-radius: 8px;
             width: 34px; height: 34px;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: var(--primary); font-size: 0.9rem;
+            cursor: pointer; color: rgba(255,255,255,0.80); font-size: 0.9rem;
             transition: background 0.2s, transform 0.15s;
         }
         .calendar-nav-btn:active { background: var(--primary); color: white; transform: scale(0.95); }
@@ -2191,7 +2205,7 @@
         }
         .calendar-weekday {
             text-align: center; font-size: 0.68rem; font-weight: 700;
-            color: var(--text-secondary); text-transform: uppercase;
+            color: rgba(255,255,255,0.40); text-transform: uppercase;
             letter-spacing: 0.5px; padding: 4px 0;
         }
         .calendar-days {
@@ -2203,21 +2217,21 @@
             border-radius: 50%; font-size: 0.82rem; font-weight: 500;
             cursor: pointer; position: relative;
             transition: background 0.2s, color 0.2s, transform 0.15s;
-            color: var(--dark);
+            color: rgba(255,255,255,0.85);
         }
         .calendar-day:empty { cursor: default; }
-        .calendar-day:not(:empty):hover { background: rgba(30,50,32,0.08); }
+        .calendar-day:not(:empty):hover { background: rgba(255,255,255,0.10); }
         .calendar-day:active { transform: scale(0.90); }
-        .calendar-day.other-month { color: var(--border); }
+        .calendar-day.other-month { color: rgba(255,255,255,0.20); }
         .calendar-day.today {
             background: var(--primary);
             color: white;
             font-weight: 800;
-            box-shadow: 0 3px 10px rgba(30,50,32,0.35);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.35);
         }
         .calendar-day.selected:not(.today) {
-            background: rgba(196,114,74,0.20);
-            color: var(--accent);
+            background: rgba(196,114,74,0.25);
+            color: var(--accent-light);
             font-weight: 700;
             border: 1.5px solid var(--accent);
         }
@@ -2233,47 +2247,47 @@
         
         .calendar-selected-date {
             font-size: 1rem; font-weight: 700;
-            color: var(--primary); margin-bottom: 12px;
+            color: #A8D5AC; margin-bottom: 12px;
             padding: 10px 0 8px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid rgba(255,255,255,0.10);
             display: flex; align-items: center; justify-content: space-between;
         }
         .calendar-selected-badge {
-            background: rgba(30,50,32,0.08);
-            color: var(--primary);
+            background: rgba(168,213,172,0.15);
+            color: #A8D5AC;
             padding: 3px 10px; border-radius: 20px;
             font-size: 0.75rem; font-weight: 700;
         }
         
         .mini-chart-container {
-            background: rgba(255,255,255,0.90);
+            background: rgba(255,255,255,0.06);
             backdrop-filter: blur(16px) saturate(1.6);
             -webkit-backdrop-filter: blur(16px) saturate(1.6);
             border-radius: var(--radius-md);
             padding: 18px 16px;
             margin-bottom: 16px;
-            box-shadow: 0 4px 20px rgba(30,50,32,0.10), 0 1px 0 rgba(255,255,255,0.9);
-            border: 1px solid rgba(255,255,255,0.95);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.20);
+            border: 1px solid rgba(255,255,255,0.10);
         }
 
         /* ===== UPDATED CLIENT & SCHEDULE CARDS ===== */
         .client-card {
-            background: rgba(255,255,255,0.92);
-            backdrop-filter: blur(16px) saturate(1.6);
-            -webkit-backdrop-filter: blur(16px) saturate(1.6);
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px) saturate(1.6);
+            -webkit-backdrop-filter: blur(20px) saturate(1.6);
             border-radius: var(--radius-md);
             padding: 16px;
             margin-bottom: 12px;
-            box-shadow: 0 4px 18px rgba(30,50,32,0.10), 0 1px 0 rgba(255,255,255,0.9);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.10);
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
-            border: 1px solid rgba(255,255,255,0.98);
+            border: 1px solid rgba(255,255,255,0.12);
             width: 100%;
         }
         .client-card:active { 
             transform: scale(0.98) translateY(1px);
-            box-shadow: 0 15px 35px rgba(196,114,74,0.25), 0 4px 10px rgba(30,50,32,0.12);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.40), 0 4px 10px rgba(0,0,0,0.25);
         }
 
         /* Prioridade alta — borda esquerda colorida */
@@ -2282,26 +2296,26 @@
         }
         .client-priority-alta { border-left-color: var(--accent) !important; }
         .client-priority-media { border-left-color: var(--warning) !important; }
-        .client-priority-normal { border-left-color: var(--border) !important; }
+        .client-priority-normal { border-left-color: rgba(255,255,255,0.15) !important; }
 
         .schedule-card {
-            background: var(--surface-glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-radius: var(--radius-md);
             padding: 16px;
             margin-bottom: 12px;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.20);
             border-left: 4px solid var(--type-visita);
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             width: 100%;
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.10);
             border-left: 4px solid var(--type-visita);
         }
         .schedule-card:active { 
             transform: scale(0.98);
-            box-shadow: 0 15px 35px rgba(196,114,74,0.25), 0 4px 10px rgba(30,50,32,0.12);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.40), 0 4px 10px rgba(0,0,0,0.25);
         }
 
         /* ===== COACH PANEL STYLES ===== */
@@ -2399,12 +2413,14 @@
 
         /* Performance meter */
         .perf-meter {
-            background: var(--surface-glass);
+            background: rgba(255,255,255,0.07);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-radius: var(--radius-md);
             padding: 16px;
             margin-bottom: 14px;
             box-shadow: var(--shadow-md);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
         }
         .perf-meter-header {
             display: flex;
@@ -2415,7 +2431,7 @@
         .perf-meter-label {
             font-size: 0.82rem;
             font-weight: 700;
-            color: var(--dark);
+            color: rgba(255,255,255,0.85);
         }
         .perf-meter-value {
             font-size: 0.82rem;
@@ -2424,7 +2440,7 @@
         }
         .perf-bar-track {
             height: 8px;
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             border-radius: 99px;
             overflow: hidden;
         }
@@ -2440,11 +2456,11 @@
 
         /* Rotina do Dia */
         .rotina-block {
-            background: var(--surface-glass);
+            background: rgba(255,255,255,0.07);
             border-radius: var(--radius-md);
             overflow: hidden;
             box-shadow: var(--shadow-md);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
             margin-bottom: 14px;
         }
         .rotina-header {
@@ -2488,12 +2504,12 @@
             align-items: flex-start;
             gap: 10px;
             padding: 10px 16px;
-            border-bottom: 1px solid rgba(0,0,0,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
             cursor: pointer;
             transition: background 0.15s;
         }
         .rotina-task:last-child { border-bottom: none; }
-        .rotina-task:active { background: rgba(0,0,0,0.03); }
+        .rotina-task:active { background: rgba(255,255,255,0.05); }
         .rotina-task.done .rotina-task-text { 
             text-decoration: line-through; 
             color: var(--text-secondary); 
@@ -2501,7 +2517,7 @@
         .rotina-task-check {
             width: 22px; height: 22px;
             border-radius: 50%;
-            border: 2px solid var(--border);
+            border: 2px solid rgba(255,255,255,0.20);
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
             margin-top: 1px;
@@ -2517,7 +2533,7 @@
             flex: 1;
             font-size: 0.85rem;
             font-weight: 500;
-            color: var(--dark);
+            color: rgba(255,255,255,0.85);
             line-height: 1.4;
         }
         .rotina-task-time {
@@ -2529,12 +2545,12 @@
 
         /* Estratégias */
         .estrategia-card {
-            background: var(--surface-glass);
+            background: rgba(255,255,255,0.07);
             border-radius: var(--radius-md);
             padding: 16px;
             margin-bottom: 12px;
             box-shadow: var(--shadow-md);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
             border-left: 4px solid var(--accent);
             position: relative;
             overflow: hidden;
@@ -2545,7 +2561,7 @@
             top: -10px; right: -5px;
             font-size: 5rem;
             font-weight: 900;
-            color: rgba(0,0,0,0.03);
+            color: rgba(255,255,255,0.04);
             line-height: 1;
         }
         .estrategia-mentor {
@@ -2585,7 +2601,7 @@
         .estrategia-title {
             font-size: 0.95rem;
             font-weight: 800;
-            color: var(--dark);
+            color: rgba(255,255,255,0.92);
             margin-bottom: 6px;
         }
         .estrategia-desc {
@@ -2607,12 +2623,12 @@
 
         /* Metas */
         .meta-card {
-            background: var(--surface-glass);
+            background: rgba(255,255,255,0.07);
             border-radius: var(--radius-md);
             padding: 14px 16px;
             margin-bottom: 10px;
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
         }
         .meta-header {
             display: flex;
@@ -2623,7 +2639,7 @@
         .meta-label {
             font-size: 0.82rem;
             font-weight: 700;
-            color: var(--dark);
+            color: rgba(255,255,255,0.85);
         }
         .meta-values {
             font-size: 0.75rem;
@@ -2632,7 +2648,7 @@
         }
         .meta-progress-track {
             height: 10px;
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             border-radius: 99px;
             overflow: hidden;
             margin-bottom: 4px;
@@ -2743,7 +2759,7 @@
             margin-bottom: 14px;
             text-align: center;
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
             position: relative;
         }
         .coach-quote-mark {
@@ -2781,7 +2797,7 @@
             padding: 14px 12px;
             text-align: center;
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
         }
         .kpi-value {
             font-size: 1.4rem;
@@ -2855,7 +2871,7 @@
             color: white;
         }
         .coach-tab-btn:not(.active) {
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             color: var(--secondary);
         }
         .coach-tab-panel { display: none; }
@@ -2883,14 +2899,14 @@
             font-weight: 700;
             text-align: center;
             color: var(--dark);
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             -webkit-appearance: none;
             font-family: 'Inter', sans-serif;
         }
         .meta-input-field:focus {
             outline: none;
             border-color: var(--primary);
-            background: white;
+            background: rgba(255,255,255,0.08);
         }
 
         /* Progress ring */
@@ -2904,7 +2920,7 @@
             border-radius: var(--radius-md);
             margin-bottom: 14px;
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
         }
         .progress-ring svg { overflow: visible; }
         .progress-ring-info {
@@ -2992,7 +3008,7 @@
             border-radius: var(--radius-md);
             padding: 16px;
             box-shadow: var(--shadow-3d);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
             margin-bottom: 12px;
         }
 
@@ -3002,7 +3018,7 @@
             margin-bottom: 12px;
             overflow: hidden;
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
             transition: transform 0.2s;
         }
         .vc-stage:active { transform: scale(0.98); }
@@ -3036,7 +3052,7 @@
         }
         .vc-stage.open .vc-stage-body { display: block; }
         .vc-stage-progress-bar {
-            height: 4px; border-radius: 2px; background: var(--light);
+            height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08);
             margin: 0 16px 12px; overflow: hidden;
         }
         .vc-stage-progress-fill { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
@@ -3087,7 +3103,7 @@
             border-radius: var(--radius-md);
             padding: 16px 14px;
             box-shadow: var(--shadow-3d);
-            border: 1px solid rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.12);
             text-align: center;
             position: relative; overflow: hidden;
         }
@@ -3106,7 +3122,7 @@
             margin-bottom: 8px;
         }
         .vc-funil-label { font-size: 0.78rem; color: var(--dark); font-weight: 600; width: 110px; flex-shrink: 0; }
-        .vc-funil-track { flex: 1; height: 22px; background: var(--light); border-radius: 11px; overflow: hidden; }
+        .vc-funil-track { flex: 1; height: 22px; background: rgba(255,255,255,0.08); border-radius: 11px; overflow: hidden; }
         .vc-funil-fill { height: 100%; border-radius: 11px; display: flex; align-items: center; padding-left: 10px; font-size: 0.72rem; font-weight: 700; color: white; transition: width 1s cubic-bezier(0.34,1.56,0.64,1); }
         .vc-funil-num { font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); width: 28px; text-align: right; flex-shrink: 0; }
 
@@ -3117,7 +3133,7 @@
             padding: 14px;
             margin-bottom: 10px;
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
             display: flex; align-items: center; gap: 12px;
         }
         .vc-canal-icon { font-size: 1.6rem; flex-shrink: 0; }
@@ -3125,7 +3141,7 @@
         .vc-canal-name { font-size: 0.9rem; font-weight: 700; color: var(--dark); }
         .vc-canal-desc { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; }
         .vc-canal-pct { font-size: 0.9rem; font-weight: 800; color: var(--primary); }
-        .vc-canal-bar-track { height: 4px; background: var(--light); border-radius: 2px; margin-top: 6px; }
+        .vc-canal-bar-track { height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-top: 6px; }
         .vc-canal-bar-fill { height: 100%; border-radius: 2px; background: var(--primary); transition: width 1s; }
 
         /* Scripts */
@@ -3153,21 +3169,21 @@
         .vc-meta-input {
             width: 80px; padding: 8px 10px; border: 1.5px solid var(--border);
             border-radius: 8px; font-size: 1rem; font-weight: 700; text-align: center;
-            color: var(--dark); background: var(--light);
+            color: var(--dark); background: rgba(255,255,255,0.08);
             -webkit-appearance: none; font-family: 'Inter', sans-serif;
         }
-        .vc-meta-input:focus { border-color: var(--primary); outline: none; background: white; }
+        .vc-meta-input:focus { border-color: var(--primary); outline: none; background: rgba(255,255,255,0.08); }
         .vc-meta-prog-card {
             border-radius: var(--radius-md); padding: 14px;
             background: var(--surface-glass);
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
             margin-bottom: 10px;
         }
         .vc-meta-prog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .vc-meta-prog-name { font-size: 0.9rem; font-weight: 700; color: var(--dark); }
         .vc-meta-prog-vals { font-size: 0.8rem; color: var(--text-secondary); }
-        .vc-meta-prog-track { height: 10px; background: var(--light); border-radius: 5px; overflow: hidden; }
+        .vc-meta-prog-track { height: 10px; background: rgba(255,255,255,0.08); border-radius: 5px; overflow: hidden; }
         .vc-meta-prog-fill { height: 100%; border-radius: 5px; transition: width 1s cubic-bezier(0.34,1.56,0.64,1); }
         .vc-meta-prog-pct { font-size: 0.75rem; font-weight: 700; margin-top: 5px; }
 
@@ -3179,7 +3195,7 @@
             padding: 12px 14px;
             margin-bottom: 10px;
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
             opacity: 0.45;
         }
         .vc-conquista-card.unlocked { opacity: 1; border-color: gold; box-shadow: 0 4px 16px rgba(196,114,74,0.25); }
@@ -3204,7 +3220,7 @@
             border-radius: var(--radius-md);
             padding: 12px 14px;
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
         }
         .vc-timeline-day { font-size: 0.75rem; font-weight: 800; color: var(--primary); margin-bottom: 3px; }
         .vc-timeline-action { font-size: 0.85rem; font-weight: 700; color: var(--dark); }
@@ -3230,7 +3246,7 @@
             border-radius: var(--radius-md);
             padding: 14px;
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
         }
         .vc-bant-letter { font-size: 1.6rem; font-weight: 900; color: var(--primary); line-height: 1; }
         .vc-bant-word { font-size: 0.8rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
@@ -3239,7 +3255,7 @@
 
         /* Projeção */
         .vc-projecao-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-        .vc-projecao-item { text-align: center; padding: 12px 8px; background: var(--light); border-radius: 10px; }
+        .vc-projecao-item { text-align: center; padding: 12px 8px; background: rgba(255,255,255,0.08); border-radius: 10px; }
         .vc-projecao-val { font-size: 1.2rem; font-weight: 900; color: var(--dark); }
         .vc-projecao-lbl { font-size: 0.68rem; color: var(--text-secondary); margin-top: 2px; font-weight: 600; }
 
@@ -3251,7 +3267,7 @@
             border-radius: var(--radius-md);
             margin-bottom: 10px;
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
         }
         .vc-posv-avatar {
             width: 40px; height: 40px; border-radius: 50%;
@@ -3281,7 +3297,7 @@
         .vc-chat-msg.vc-chat-user { flex-direction: row-reverse; }
         .vc-chat-avatar {
             width: 30px; height: 30px; border-radius: 50%;
-            background: var(--light); display: flex; align-items: center;
+            background: rgba(255,255,255,0.08); display: flex; align-items: center;
             justify-content: center; font-size: 1rem; flex-shrink: 0;
         }
         .vc-chat-bubble {
@@ -3331,7 +3347,7 @@
         .vc-dica-card {
             background: var(--surface-glass); border-radius: var(--radius-md);
             padding: 14px 16px; margin-bottom: 10px;
-            box-shadow: var(--shadow-sm); border: 1px solid rgba(255,255,255,0.75);
+            box-shadow: var(--shadow-sm); border: 1px solid rgba(255,255,255,0.12);
             border-left: 4px solid var(--accent);
         }
         .vc-dica-title {
@@ -3345,13 +3361,13 @@
         }
         /* ===== PAINEL LEITURA ===== */
         .leitura-card {
-            background: var(--surface-glass);
+            background: rgba(255,255,255,0.08);
             backdrop-filter: blur(12px) saturate(1.4);
             -webkit-backdrop-filter: blur(12px) saturate(1.4);
             border-radius: var(--radius-md);
             margin-bottom: 16px;
             box-shadow: var(--shadow-3d);
-            border: 1px solid rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.12);
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
@@ -3371,37 +3387,37 @@
             font-size:3rem;
         }
         .leitura-card-body { padding: 14px 16px; }
-        .leitura-card-title { font-size:1rem; font-weight:800; color:var(--dark); margin-bottom:4px; line-height:1.3; }
+        .leitura-card-title { font-size:1rem; font-weight:800; color:rgba(255,255,255,0.92); margin-bottom:4px; line-height:1.3; }
         .leitura-card-author { font-size:0.8rem; color:var(--text-secondary); margin-bottom:6px; }
         .leitura-card-meta { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
         .leitura-badge {
             padding: 3px 10px; border-radius: 20px;
             font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3px;
         }
-        .leitura-badge-livro { background: rgba(79,70,229,0.15); color: var(--indigo); }
-        .leitura-badge-artigo { background: rgba(13,148,136,0.15); color: var(--teal); }
-        .leitura-badge-pdf { background: rgba(244,63,94,0.15); color: var(--coral); }
-        .leitura-badge-material { background: rgba(245,158,11,0.15); color: var(--amber); }
+        .leitura-badge-livro { background: rgba(79,70,229,0.20); color: #a5b4fc; }
+        .leitura-badge-artigo { background: rgba(13,148,136,0.20); color: #5eead4; }
+        .leitura-badge-pdf { background: rgba(244,63,94,0.20); color: #fda4af; }
+        .leitura-badge-material { background: rgba(245,158,11,0.20); color: #fcd34d; }
         .leitura-card-progress { 
-            height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 6px;
+            height: 4px; background: rgba(255,255,255,0.12); border-radius: 2px; overflow: hidden; margin-top: 6px;
         }
         .leitura-card-progress-fill { height:100%; border-radius:2px; background: linear-gradient(90deg, var(--indigo), var(--violet)); transition: width 0.5s; }
         .leitura-card-actions {
             display:flex; gap:8px; padding: 10px 16px;
-            border-top: 1px solid var(--border);
-            background: rgba(255,255,255,0.5);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            background: rgba(0,0,0,0.15);
         }
-        .leitura-attachments { padding: 12px 16px; border-top: 1px solid var(--border); }
+        .leitura-attachments { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.08); }
         .leitura-attach-item {
             display:flex; align-items:center; gap:10px;
             padding: 10px 12px; border-radius: 10px;
-            background: var(--light); margin-bottom: 8px;
-            border: 1px solid var(--border); cursor: pointer;
+            background: rgba(255,255,255,0.07); margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.10); cursor: pointer;
             transition: background 0.2s;
         }
-        .leitura-attach-item:active { background: rgba(79,70,229,0.1); }
+        .leitura-attach-item:active { background: rgba(79,70,229,0.15); }
         .leitura-attach-icon { font-size:1.4rem; flex-shrink:0; }
-        .leitura-attach-name { font-size:0.82rem; font-weight:600; color:var(--dark); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .leitura-attach-name { font-size:0.82rem; font-weight:600; color:rgba(255,255,255,0.85); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .leitura-attach-size { font-size:0.7rem; color:var(--text-secondary); }
 
         /* ===== GALLERY GRID DE ANEXOS (novo) ===== */
@@ -3419,7 +3435,7 @@
             cursor: pointer;
             border: 2px solid transparent;
             transition: border-color 0.2s, transform 0.15s;
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
         }
         .leitura-attach-thumb:active { transform: scale(0.94); border-color: var(--indigo); }
         .leitura-attach-thumb img {
@@ -3453,14 +3469,14 @@
         .leitura-attach-list-item {
             display: flex; align-items: center; gap: 10px;
             padding: 9px 12px; border-radius: 10px;
-            background: var(--light); margin-bottom: 6px;
-            border: 1px solid var(--border); cursor: pointer;
+            background: rgba(255,255,255,0.07); margin-bottom: 6px;
+            border: 1px solid rgba(255,255,255,0.10); cursor: pointer;
             transition: background 0.15s, transform 0.15s;
         }
-        .leitura-attach-list-item:active { background: rgba(79,70,229,0.1); transform: scale(0.98); }
+        .leitura-attach-list-item:active { background: rgba(79,70,229,0.15); transform: scale(0.98); }
         .leitura-attach-list-thumb {
             width: 40px; height: 40px; border-radius: 7px; overflow: hidden; flex-shrink: 0;
-            background: var(--border); display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.10); display: flex; align-items: center; justify-content: center;
         }
         .leitura-attach-list-thumb img { width: 100%; height: 100%; object-fit: cover; }
         .leitura-attach-list-pdf-icon { font-size: 1.3rem; color: var(--coral); }
@@ -3471,7 +3487,7 @@
 
         /* ===== BLOCO DE NOTAS ===== */
         .nota-card {
-            background: rgba(255,255,255,0.94);
+            background: rgba(255,255,255,0.09);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-radius: var(--radius-md);
@@ -3479,7 +3495,7 @@
             box-shadow: var(--shadow-md);
             overflow: hidden;
             transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
-            border: 1px solid rgba(255,255,255,0.9);
+            border: 1px solid rgba(255,255,255,0.13);
             position: relative;
         }
         .nota-card:active { transform: scale(0.98); }
@@ -3494,7 +3510,7 @@
             margin-bottom: 8px;
         }
         .nota-card-title {
-            font-size: 0.95rem; font-weight: 800; color: var(--dark);
+            font-size: 0.95rem; font-weight: 800; color: rgba(255,255,255,0.92);
             flex: 1; line-height: 1.3;
         }
         .nota-pin-icon {
@@ -3502,7 +3518,7 @@
             transform: rotate(45deg);
         }
         .nota-card-content {
-            font-size: 0.82rem; color: var(--secondary); line-height: 1.55;
+            font-size: 0.82rem; color: rgba(255,255,255,0.60); line-height: 1.55;
             display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
             overflow: hidden; margin-bottom: 10px;
             white-space: pre-wrap;
@@ -3510,8 +3526,8 @@
         .nota-card-footer {
             display: flex; align-items: center; justify-content: space-between;
             padding: 10px 16px;
-            border-top: 1px solid rgba(0,0,0,0.06);
-            background: rgba(0,0,0,0.02);
+            border-top: 1px solid rgba(255,255,255,0.07);
+            background: rgba(0,0,0,0.12);
         }
         .nota-cat-badge {
             font-size: 0.68rem; font-weight: 700; padding: 3px 8px;
@@ -3529,7 +3545,7 @@
             border-radius: 8px; color: var(--text-secondary); font-size: 0.9rem;
             transition: background 0.15s, color 0.15s;
         }
-        .nota-action-btn:active { background: var(--light); }
+        .nota-action-btn:active { background: rgba(255,255,255,0.08); }
         .nota-action-btn.danger:active { color: var(--danger); }
 
         /* Modal notas */
@@ -3655,7 +3671,7 @@
         }
         .leitura-cat-btn {
             padding:8px 16px; border-radius:20px; font-size:0.8rem; font-weight:600;
-            border:1.5px solid var(--border); background:white; cursor:pointer;
+            border:1.5px solid var(--border); background:rgba(255,255,255,0.08); cursor:pointer;
             white-space:nowrap; transition:all 0.2s; color:var(--secondary);
             flex-shrink:0;
         }
@@ -3690,8 +3706,8 @@
         body.has-bg-image .estrategia-card,
         body.has-bg-image .leitura-card,
         body.has-bg-image .rotina-block {
-            background: rgba(255, 255, 255, 0.96) !important;
-            box-shadow: 0 8px 28px rgba(30,50,32,0.18), 0 2px 8px rgba(0,0,0,0.12) !important;
+            background: rgba(20, 35, 22, 0.82) !important;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.30) !important;
         }
 
         body.has-bg-image .waiting-item {
@@ -3701,8 +3717,8 @@
 
         body.has-bg-image header,
         body.has-bg-image .bottom-nav {
-            background: rgba(255, 255, 255, 1) !important;
-            box-shadow: 0 2px 24px rgba(30,50,32,0.16) !important;
+            background: rgba(20, 35, 22, 0.92) !important;
+            box-shadow: 0 2px 24px rgba(0,0,0,0.40) !important;
         }
 
         /* Textos e fontes: garante que sempre sejam totalmente opacos */
@@ -3774,7 +3790,7 @@
         }
         .btn-lista-pdf:active { opacity: 0.8; }
         .lista-item-card {
-            background: rgba(255,255,255,0.94);
+            background: rgba(255,255,255,0.09);
             border-radius: var(--radius-md);
             padding: 14px 16px;
             margin-bottom: 10px;
@@ -3788,10 +3804,10 @@
         .lista-item-card.mensagem { border-left-color: #25D366; }
         .lista-item-card.travado { border-left-color: var(--danger); }
         .lista-item-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-        .lista-item-nome { font-size: 0.95rem; font-weight: 800; color: var(--dark); }
+        .lista-item-nome { font-size: 0.95rem; font-weight: 800; color: rgba(255,255,255,0.92); }
         .lista-item-etapa { font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; color: white; white-space: nowrap; }
         .lista-item-meta { font-size: 0.78rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .lista-item-motivo { font-size: 0.8rem; color: var(--secondary); font-style: italic; margin-top: 2px; }
+        .lista-item-motivo { font-size: 0.8rem; color: var(--text-secondary); font-style: italic; margin-top: 2px; }
         .lista-item-acoes { display: flex; gap: 8px; margin-top: 4px; }
         .btn-acao-mini {
             flex: 1;
@@ -3815,11 +3831,12 @@
             margin-bottom: 16px;
         }
         .lista-stat-mini {
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.09);
             border-radius: 10px;
             padding: 12px 10px;
             text-align: center;
             box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(255,255,255,0.12);
         }
         .lista-stat-mini-val { font-size: 1.3rem; font-weight: 900; color: var(--primary); }
         .lista-stat-mini-lbl { font-size: 0.68rem; color: var(--text-secondary); font-weight: 600; margin-top: 2px; }
@@ -3835,7 +3852,7 @@
         /* ===== SIMULADOR CEF ===== */
         .sim-chip {
             padding: 7px 14px; border-radius: 18px;
-            border: 1.5px solid var(--border); background: var(--light);
+            border: 1.5px solid var(--border); background: rgba(255,255,255,0.08);
             font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);
             cursor: pointer; transition: all .18s; font-family: inherit;
         }
@@ -3849,11 +3866,11 @@
         .sim-val.bad  { color:var(--danger); }
         .sim-val.gold { color:var(--accent); }
         .sim-metric-row { display:flex; gap:10px; margin-bottom:12px; }
-        .sim-metric { flex:1; background:var(--light); border:1px solid var(--border); border-radius:12px; padding:10px; text-align:center; }
-        .sim-metric.accent { background:rgba(46,74,49,0.07); border-color:rgba(46,74,49,0.25); }
-        .sim-metric.gold   { background:rgba(196,114,74,0.07); border-color:rgba(196,114,74,0.25); }
+        .sim-metric { flex:1; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:10px; text-align:center; }
+        .sim-metric.accent { background:rgba(76,175,128,0.12); border-color:rgba(76,175,128,0.25); }
+        .sim-metric.gold   { background:rgba(232,168,124,0.12); border-color:rgba(232,168,124,0.25); }
         .sim-metric-lbl { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-secondary); margin-bottom:4px; }
-        .sim-metric-val { font-size:1.05rem; font-weight:800; color:var(--dark); line-height:1.1; }
+        .sim-metric-val { font-size:1.05rem; font-weight:800; color:#FFFFFF; line-height:1.1; }
         .sim-metric-sub { font-size:0.65rem; color:var(--text-secondary); margin-top:2px; }
         .sim-alert { padding:10px 12px; border-radius:10px; font-size:0.78rem; line-height:1.5; margin-bottom:8px; border-left:3px solid; display:flex; gap:7px; align-items:flex-start; }
         .sim-alert.ok   { background:rgba(46,125,66,0.08);  border-color:var(--success); color:#1a5c32; }
@@ -3891,7 +3908,7 @@
             left: 3px;
             width: 18px;
             height: 18px;
-            background: white;
+            background: rgba(255,255,255,0.08);
             border-radius: 50%;
             box-shadow: 0 1px 4px rgba(0,0,0,0.25);
             transition: transform 0.22s cubic-bezier(.4,0,.2,1);
@@ -3937,7 +3954,7 @@
         }
         #idle-warning-overlay.show { display: flex; }
         #idle-warning-box {
-            background: #fff;
+            background:transparent;
             border-radius: 22px;
             padding: 32px 28px 28px;
             max-width: 340px;
@@ -4006,6 +4023,531 @@
         }
         .idle-btn-exit:active { background: rgba(184,48,48,0.2); }
 
+
+        /* ===== PALETA DARK-GREEN — OVERRIDES GLOBAIS ===== */
+        /* Redefinição das CSS vars para contexto escuro */
+        :root {
+            --surface:           #1E3320;
+            --surface-2:         #243B27;
+            --surface-3:         #2A4430;
+            --border:            rgba(255,255,255,0.10);
+            --border-solid:      rgba(255,255,255,0.13);
+            --light:             rgba(255,255,255,0.07);
+            --dark:              #EAEFE8;
+            --text-secondary:    rgba(255,255,255,0.50);
+            --shadow-sm:         0 2px 8px rgba(0,0,0,0.25);
+            --shadow-md:         0 4px 20px rgba(0,0,0,0.35);
+            --shadow-float:      0 10px 40px rgba(0,0,0,0.45);
+            --surface-glass:     rgba(26,43,28,0.72);
+            --surface-glass-dark:rgba(16,28,18,0.80);
+            --accent-light:      #D98A62;
+        }
+
+        /* ── Cards genéricos ─────────────────────────────────────── */
+        .stat-card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.30), 0 2px 6px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,0.10);
+        }
+        .stat-card::before {
+            background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%);
+        }
+        .stat-value { color: #EAEFE8; text-shadow: none; }
+        .stat-label { color: rgba(255,255,255,0.50); }
+
+        .property-card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.11);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.30), 0 2px 6px rgba(0,0,0,0.18);
+        }
+        .property-title { color: #EAEFE8; }
+        .property-address { color: rgba(255,255,255,0.50); }
+        .property-price  { color: #A8D5AC; }
+        .property-content { border-top: 1px solid rgba(255,255,255,0.08); }
+        .property-actions { border-top: 1px solid rgba(255,255,255,0.08); }
+
+        /* Client cards */
+        .client-card, [class*="client-card"] {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.28) !important;
+        }
+        .client-name  { color: #EAEFE8 !important; }
+        .client-actions { border-top: 1px solid rgba(255,255,255,0.08) !important; }
+
+        /* Schedule / agenda cards */
+        .schedule-card {
+            background: rgba(255,255,255,0.07) !important;
+            border-top:    1px solid rgba(255,255,255,0.09) !important;
+            border-right:  1px solid rgba(255,255,255,0.09) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.09) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25) !important;
+        }
+        .schedule-title { color: #EAEFE8 !important; }
+        .schedule-time, .schedule-notes { color: rgba(255,255,255,0.50) !important; }
+
+        /* Details / info cards */
+        .details-card, .details-section {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.28) !important;
+        }
+        .details-header { border-bottom: 1px solid rgba(255,255,255,0.10) !important; }
+        .details-title  { color: #EAEFE8 !important; }
+        .details-price  { color: #A8D5AC !important; }
+        .details-actions { border-top: 1px solid rgba(255,255,255,0.10) !important; }
+        .details-section-title { color: #A8D5AC !important; }
+        .info-label { color: rgba(255,255,255,0.45) !important; }
+        .info-value { color: #EAEFE8 !important; }
+
+        /* Funnel */
+        .funnel-container {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.10) !important;
+        }
+        .funnel-stage {
+            background: rgba(255,255,255,0.06) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.20) !important;
+        }
+        .funnel-stage:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.35) !important; }
+        .funnel-stage-count {
+            background: rgba(255,255,255,0.12) !important;
+            color: #EAEFE8 !important;
+        }
+        .funnel-stage-title { color: #EAEFE8 !important; }
+        .funnel-client-item {
+            background: rgba(255,255,255,0.05) !important;
+        }
+        .funnel-client-item:hover { background: rgba(255,255,255,0.10) !important; }
+        .funnel-client-name { color: #EAEFE8 !important; }
+        .funnel-client-days { color: rgba(255,255,255,0.45) !important; }
+        /* Funnel stage backgrounds ajustados para dark */
+        .stage-lead       { background: linear-gradient(90deg,rgba(255,255,255,0.08) 0%,rgba(255,255,255,0.03) 100%) !important; }
+        .stage-contato    { background: linear-gradient(90deg,rgba(168,213,172,0.10) 0%,rgba(168,213,172,0.04) 100%) !important; }
+        .stage-cpf        { background: linear-gradient(90deg,rgba(196,114,74,0.12) 0%,rgba(196,114,74,0.04) 100%) !important; }
+        .stage-sem-restricao { background: linear-gradient(90deg,rgba(184,112,32,0.12) 0%,rgba(184,112,32,0.04) 100%) !important; }
+        .stage-documentacao  { background: linear-gradient(90deg,rgba(122,138,124,0.12) 0%,rgba(122,138,124,0.04) 100%) !important; }
+        .stage-aprovado   { background: linear-gradient(90deg,rgba(46,125,66,0.14) 0%,rgba(46,125,66,0.05) 100%) !important; }
+        .stage-contrato   { background: linear-gradient(90deg,rgba(61,97,66,0.14) 0%,rgba(61,97,66,0.05) 100%) !important; }
+        .stage-venda      { background: linear-gradient(90deg,rgba(168,213,172,0.12) 0%,rgba(168,213,172,0.04) 100%) !important; }
+
+        /* Link cards */
+        .link-card {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.22) !important;
+        }
+        .link-title { color: #EAEFE8 !important; }
+        .link-url   { color: rgba(255,255,255,0.40) !important; }
+        .link-icon  { background: rgba(255,255,255,0.10) !important; color: #A8D5AC !important; }
+
+        /* Report */
+        .report-summary {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.10) !important;
+        }
+        .report-table th {
+            background: rgba(255,255,255,0.08) !important;
+            color: #EAEFE8 !important;
+            border-bottom: 2px solid rgba(255,255,255,0.12) !important;
+        }
+        .report-table td { border-bottom: 1px solid rgba(255,255,255,0.08) !important; color: #EAEFE8 !important; }
+        .report-table tr:hover { background: rgba(255,255,255,0.05) !important; }
+
+        /* ── Forms ───────────────────────────────────────────────── */
+        .form-label  { color: rgba(255,255,255,0.75) !important; }
+        .form-control {
+            background: rgba(255,255,255,0.08) !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+            color: #EAEFE8 !important;
+        }
+        .form-control::placeholder { color: rgba(255,255,255,0.28) !important; }
+        .form-control:focus {
+            background: rgba(255,255,255,0.12) !important;
+            border-color: rgba(168,213,172,0.55) !important;
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(168,213,172,0.12) !important;
+        }
+        select.form-control option { background: #243B27; color: #EAEFE8; }
+        textarea.form-control { color: #EAEFE8 !important; }
+
+        .search-input {
+            background: rgba(255,255,255,0.08) !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+            color: #EAEFE8 !important;
+        }
+        .search-input::placeholder { color: rgba(255,255,255,0.28) !important; }
+        .search-input:focus { border-color: rgba(168,213,172,0.55) !important; box-shadow: 0 0 0 3px rgba(168,213,172,0.12) !important; }
+        .search-icon { color: rgba(255,255,255,0.35) !important; }
+
+        /* ── Botões ──────────────────────────────────────────────── */
+        .btn-block {
+            background: linear-gradient(135deg,#2E6B35,#3D8045) !important;
+            color: white !important;
+            box-shadow: 0 4px 14px rgba(46,107,53,0.45) !important;
+        }
+        .btn-light {
+            background: rgba(255,255,255,0.10) !important;
+            color: rgba(255,255,255,0.70) !important;
+        }
+        .btn-primary-soft {
+            background: rgba(168,213,172,0.14) !important;
+            color: #A8D5AC !important;
+        }
+        .btn-details-secondary {
+            background: rgba(255,255,255,0.10) !important;
+            color: rgba(255,255,255,0.70) !important;
+        }
+        .btn-details-primary {
+            background: linear-gradient(135deg,#2E6B35,#3D8045) !important;
+            color: white !important;
+        }
+        .btn-sm.btn-light {
+            background: rgba(255,255,255,0.10) !important;
+            color: rgba(255,255,255,0.65) !important;
+        }
+
+        /* ── Filter chips ────────────────────────────────────────── */
+        .filter-chip {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.14) !important;
+            color: rgba(255,255,255,0.55) !important;
+        }
+        .filter-chip.active {
+            background: linear-gradient(135deg,#2E6B35,#3D8045) !important;
+            border-color: transparent !important;
+            color: white !important;
+        }
+
+        /* ── Sheet modal ─────────────────────────────────────────── */
+        .modal-sheet {
+            background: #1A2E1C !important;
+            border-top: 1px solid rgba(255,255,255,0.10) !important;
+            box-shadow: 0 -8px 40px rgba(0,0,0,0.50) !important;
+        }
+        .sheet-handle { background: rgba(255,255,255,0.18) !important; }
+
+        /* ── Section titles ──────────────────────────────────────── */
+        .section-title { color: #EAEFE8 !important; border-bottom-color: rgba(255,255,255,0.08) !important; }
+        .section-title span { color: #EAEFE8 !important; }
+
+        /* ── Client select list ──────────────────────────────────── */
+        .client-select-item { border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
+        .client-select-item:hover { background: rgba(255,255,255,0.07) !important; }
+        .client-select-name  { color: #EAEFE8 !important; }
+        .client-select-phone { color: rgba(255,255,255,0.45) !important; }
+
+        /* ── Progress ────────────────────────────────────────────── */
+        .progress-container { background: rgba(255,255,255,0.12) !important; }
+        .progress-bar { background: linear-gradient(90deg,#2E6B35,#A8D5AC) !important; }
+
+        /* ── Misc util ───────────────────────────────────────────── */
+        .empty-state { color: rgba(255,255,255,0.35) !important; }
+        .highlight   { color: #A8D5AC !important; }
+        .warning-note {
+            background: rgba(184,112,32,0.12) !important;
+            border-color: rgba(184,112,32,0.30) !important;
+            color: #D4A855 !important;
+        }
+        .birthday-alert {
+            background: linear-gradient(135deg,rgba(196,114,74,0.14),rgba(196,114,74,0.06)) !important;
+            border-left-color: var(--accent) !important;
+        }
+        .birthday-alert-content { color: #EAEFE8 !important; }
+
+        /* Drop zone */
+        .drop-zone {
+            background: rgba(255,255,255,0.04) !important;
+            border-color: rgba(168,213,172,0.35) !important;
+            color: #A8D5AC !important;
+        }
+        .drop-zone:hover { background: rgba(255,255,255,0.08) !important; }
+
+        /* ── bg-* icon classes ajustados para dark ───────────────── */
+        .bg-blue   { background: rgba(168,213,172,0.14); color: #A8D5AC; }
+        .bg-green  { background: rgba(46,125,66,0.20);  color: #7BC987; }
+        .bg-orange { background: rgba(184,112,32,0.18); color: #D4A855; }
+        .bg-red    { background: rgba(184,48,48,0.18);  color: #E88080; }
+        .bg-purple { background: rgba(196,114,74,0.18); color: #D98A62; }
+        .bg-cyan   { background: rgba(122,138,124,0.20);color: #B0C4B3; }
+        .bg-gold   { background: rgba(196,114,74,0.20); color: #D98A62; }
+        .bg-verm   { background: rgba(184,48,48,0.18);  color: #E88080; }
+
+        /* ── Toast ───────────────────────────────────────────────── */
+        .toast { background: #1A2E1C !important; color: #EAEFE8 !important; border: 1px solid rgba(255,255,255,0.12) !important; }
+
+        /* ── User badge no header ────────────────────────────────── */
+        .user-badge {
+            background: rgba(255,255,255,0.10) !important;
+            border-color: rgba(255,255,255,0.15) !important;
+        }
+        .user-badge:active { background: rgba(255,255,255,0.17) !important; }
+
+        /* ── Cliente phone display ───────────────────────────────── */
+        .cliente-phone-display {
+            background: linear-gradient(135deg,rgba(46,74,49,0.25) 0%,rgba(61,97,66,0.15) 100%) !important;
+            border-color: rgba(168,213,172,0.22) !important;
+        }
+        .cliente-phone-number { color: #A8D5AC !important; }
+        .btn-phone-call { background: rgba(168,213,172,0.14) !important; color: #A8D5AC !important; }
+
+        /* ── Video thumbnail ─────────────────────────────────────── */
+        .video-url-display {
+            background: rgba(255,255,255,0.06) !important;
+            border-color: rgba(255,255,255,0.12) !important;
+            color: rgba(255,255,255,0.60) !important;
+        }
+
+        /* ── Idle warning box ────────────────────────────────────── */
+        #idle-warning-overlay { background: rgba(0,0,0,0.70) !important; }
+        #idle-warning-box {
+            background: #1A2E1C !important;
+            border: 1px solid rgba(255,255,255,0.12) !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.60) !important;
+        }
+        #idle-warning-box h3, #idle-warning-box p { color: #EAEFE8 !important; }
+        #idle-warning-box p  { color: rgba(255,255,255,0.55) !important; }
+
+        /* ── plantoes info ───────────────────────────────────────── */
+        .plantoes-info {
+            background: rgba(196,114,74,0.10) !important;
+            border-left-color: var(--accent) !important;
+        }
+        .plantoes-summary { color: var(--accent) !important; }
+
+        /* ── Admin section inner modal ───────────────────────────── */
+        #admin-section .section-title { color: #EAEFE8 !important; }
+
+        /* ── Perf meters (VendaCerta / Coach) ───────────────────── */
+        .perf-meter {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.28) !important;
+        }
+        .perf-meter-label { color: #EAEFE8 !important; }
+        .perf-meter-value { color: #A8D5AC !important; }
+        .perf-bar-track  { background: rgba(255,255,255,0.10) !important; }
+
+        /* ── Rotina do dia ───────────────────────────────────────── */
+        .rotina-block {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.28) !important;
+        }
+        .rotina-task { border-bottom: 1px solid rgba(255,255,255,0.07) !important; }
+        .rotina-task:active { background: rgba(255,255,255,0.06) !important; }
+        .rotina-task-text { color: #EAEFE8 !important; }
+        .rotina-task.done .rotina-task-text { color: rgba(255,255,255,0.38) !important; }
+        .rotina-task-time { color: rgba(255,255,255,0.40) !important; }
+        .rotina-task-check { border-color: rgba(255,255,255,0.20) !important; }
+
+        /* ── Estratégia cards ────────────────────────────────────── */
+        .estrategia-card {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+            border-left: 4px solid var(--accent) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.28) !important;
+        }
+        .estrategia-card::after { color: rgba(255,255,255,0.04) !important; }
+        .estrategia-mentor-name { color: #A8D5AC !important; }
+        .estrategia-mentor-title { color: rgba(255,255,255,0.45) !important; }
+        .estrategia-title { color: #EAEFE8 !important; }
+        .estrategia-desc  { color: rgba(255,255,255,0.55) !important; }
+        .estrategia-action { color: #A8D5AC !important; border-top: 1px solid rgba(255,255,255,0.08) !important; }
+        .estrategia-tag { background: rgba(196,114,74,0.18) !important; color: var(--accent) !important; }
+
+        /* ── Meta cards ──────────────────────────────────────────── */
+        .meta-card {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.25) !important;
+        }
+        .meta-label  { color: #EAEFE8 !important; }
+        .meta-values { color: rgba(255,255,255,0.45) !important; }
+        .meta-progress-track { background: rgba(255,255,255,0.10) !important; }
+        .meta-note { color: rgba(255,255,255,0.40) !important; }
+
+        /* ── Coach quote ─────────────────────────────────────────── */
+        .coach-quote {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.25) !important;
+        }
+        .coach-quote-text { color: #EAEFE8 !important; }
+        .coach-quote-author { color: var(--accent) !important; }
+        .coach-quote-mark { color: rgba(196,114,74,0.25) !important; }
+
+        /* ── KPI cards ───────────────────────────────────────────── */
+        .kpi-card, .vc-kpi-card {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.12) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.30) !important;
+        }
+        .kpi-value, .vc-kpi-val { color: #EAEFE8 !important; }
+        .kpi-label, .vc-kpi-lbl { color: rgba(255,255,255,0.45) !important; }
+        .kpi-change, .vc-kpi-trend.up { color: #7BC987 !important; }
+        .vc-kpi-trend.down { color: #E88080 !important; }
+
+        /* ── VC Stage cards ──────────────────────────────────────── */
+        .vc-stage {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.25) !important;
+        }
+        .vc-stage-header { background: transparent !important; }
+        .vc-stage-name  { color: #EAEFE8 !important; }
+        .vc-stage-meta  { color: rgba(255,255,255,0.45) !important; }
+        .vc-stage-body  { border-top: 1px solid rgba(255,255,255,0.08) !important; }
+        .vc-stage-progress-bar { background: rgba(255,255,255,0.10) !important; }
+        .vc-stage-chevron { color: rgba(255,255,255,0.40) !important; }
+        .vc-checklist-item { border-bottom: 1px solid rgba(255,255,255,0.07) !important; }
+        .vc-check-box { border-color: rgba(255,255,255,0.20) !important; }
+        .vc-check-text { color: #EAEFE8 !important; }
+        .vc-check-tip  { color: rgba(255,255,255,0.40) !important; }
+        .vc-checklist-item.done .vc-check-text { color: rgba(255,255,255,0.38) !important; }
+
+        /* ── VC Ação cards ───────────────────────────────────────── */
+        .vc-acao-card {
+            background: rgba(255,255,255,0.07) !important;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.25) !important;
+        }
+        .vc-acao-title { color: #EAEFE8 !important; }
+        .vc-acao-desc  { color: rgba(255,255,255,0.50) !important; }
+
+        /* ── VC Canal cards ──────────────────────────────────────── */
+        .vc-canal-card {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.22) !important;
+        }
+        .vc-canal-name { color: #EAEFE8 !important; }
+        .vc-canal-desc { color: rgba(255,255,255,0.45) !important; }
+        .vc-canal-pct  { color: #A8D5AC !important; }
+        .vc-canal-bar-track { background: rgba(255,255,255,0.10) !important; }
+        .vc-canal-bar-fill  { background: #A8D5AC !important; }
+
+        /* ── VC Script cards ─────────────────────────────────────── */
+        .vc-script-card {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+            border-left: 4px solid var(--accent) !important;
+        }
+        .vc-script-title { color: #EAEFE8 !important; }
+        .vc-script-body  { background: rgba(196,114,74,0.08) !important; color: rgba(255,255,255,0.65) !important; }
+
+        /* ── VC Meta inputs ──────────────────────────────────────── */
+        .vc-meta-label  { color: #EAEFE8 !important; }
+        .vc-meta-input  {
+            background: rgba(255,255,255,0.08) !important;
+            border-color: rgba(255,255,255,0.15) !important;
+            color: #EAEFE8 !important;
+        }
+        .vc-meta-input:focus { border-color: rgba(168,213,172,0.55) !important; background: rgba(255,255,255,0.13) !important; outline: none !important; }
+        .vc-meta-prog-card {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+        }
+        .vc-meta-prog-name { color: #EAEFE8 !important; }
+        .vc-meta-prog-vals { color: rgba(255,255,255,0.45) !important; }
+        .vc-meta-prog-track { background: rgba(255,255,255,0.10) !important; }
+        .vc-meta-prog-pct  { color: rgba(255,255,255,0.55) !important; }
+
+        /* ── VC Conquista cards ──────────────────────────────────── */
+        .vc-conquista-card {
+            background: rgba(255,255,255,0.06) !important;
+            border: 1px solid rgba(255,255,255,0.10) !important;
+        }
+        .vc-conquista-card.unlocked { border-color: rgba(196,114,74,0.60) !important; box-shadow: 0 4px 16px rgba(196,114,74,0.20) !important; }
+        .vc-conquista-name   { color: #EAEFE8 !important; }
+        .vc-conquista-desc   { color: rgba(255,255,255,0.45) !important; }
+        .vc-conquista-status { color: #7BC987 !important; }
+
+        /* ── VC Funil bars ───────────────────────────────────────── */
+        .vc-funil-label { color: #EAEFE8 !important; }
+        .vc-funil-track { background: rgba(255,255,255,0.10) !important; }
+        .vc-funil-num   { color: rgba(255,255,255,0.45) !important; }
+
+        /* ── VC Card base (generic) ──────────────────────────────── */
+        .vc-card {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.11) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.28) !important;
+        }
+
+        /* ── VC Timeline ─────────────────────────────────────────── */
+        .vc-timeline::before { background: rgba(255,255,255,0.12) !important; }
+
+        /* ── Add image btn ───────────────────────────────────────── */
+        .add-image-btn {
+            border-color: rgba(255,255,255,0.18) !important;
+            color: rgba(255,255,255,0.40) !important;
+        }
+        .add-image-btn:hover { border-color: #A8D5AC !important; color: #A8D5AC !important; }
+        .image-counter { color: rgba(255,255,255,0.40) !important; }
+        .image-gallery-item { background: rgba(255,255,255,0.08) !important; }
+
+        /* ── IA quick buttons (coach) ────────────────────────────── */
+        .vc-ia-quick-btn {
+            background: rgba(255,255,255,0.08) !important;
+            border: 1px solid rgba(255,255,255,0.14) !important;
+            color: rgba(255,255,255,0.70) !important;
+        }
+        .vc-ia-quick-btn:active { background: rgba(255,255,255,0.14) !important; }
+
+        /* ── PWA banner / loading ────────────────────────────────── */
+        #loading {
+            background: linear-gradient(150deg, #1A2B1C 0%, #2E4A31 60%, #3D6142 100%) !important;
+            color: #EAEFE8 !important;
+        }
+
+        /* ── Sidebar / inner panels ──────────────────────────────── */
+        .panel-section {
+            background: rgba(255,255,255,0.06) !important;
+            border: 1px solid rgba(255,255,255,0.10) !important;
+        }
+        .panel-label { color: rgba(255,255,255,0.45) !important; }
+        .panel-value { color: #EAEFE8 !important; }
+
+        /* ── Swipe action items ──────────────────────────────────── */
+        .swipe-action-delete { background: #B83030 !important; }
+        .swipe-action-edit   { background: #2E6B35 !important; }
+
+        /* ── Date/calendar elements ──────────────────────────────── */
+        .cal-day-num { color: rgba(255,255,255,0.55) !important; }
+        .cal-day-num.today { color: #A8D5AC !important; }
+        .cal-day-num.selected { background: #2E6B35 !important; color: white !important; }
+        .cal-day-num.has-event::after { background: #A8D5AC !important; }
+        .calendar-grid-header span { color: rgba(255,255,255,0.40) !important; }
+
+        /* ── Chip / tag elements ─────────────────────────────────── */
+        .tag-chip {
+            background: rgba(255,255,255,0.09) !important;
+            color: rgba(255,255,255,0.65) !important;
+            border: 1px solid rgba(255,255,255,0.14) !important;
+        }
+
+        /* ── Report summary values ───────────────────────────────── */
+        .report-value { color: #EAEFE8 !important; }
+        .report-label { color: rgba(255,255,255,0.45) !important; }
+
+        /* ── Section headings inside sheets ──────────────────────── */
+        .modal-sheet h3, .modal-sheet h4, .modal-sheet p,
+        .modal-sheet label, .modal-sheet span:not([class]) {
+            color: #EAEFE8;
+        }
+        .modal-sheet p { color: rgba(255,255,255,0.55); }
+
+        /* ── User modal sheet ────────────────────────────────────── */
+        #sheet-usuarios .user-badge {
+            background: rgba(255,255,255,0.08) !important;
+            border-color: rgba(255,255,255,0.14) !important;
+        }
+        #sheet-usuarios .user-avatar { background: #2E6B35 !important; color: white !important; }
+
+        /* ── Generic text color cleanup ──────────────────────────── */
+        p, span, li, td, th, label, small { color: inherit; }
+
+        /* ===== FIM OVERRIDES DARK-GREEN ===== */
 
         /* ===== TELA DE LOGIN ===== */
         #login-screen {
@@ -4240,7 +4782,7 @@
         .usuario-item {
             display: flex; align-items: center; gap: 12px;
             padding: 12px 14px;
-            background: var(--light);
+            background: rgba(255,255,255,0.08);
             border-radius: 12px;
             margin-bottom: 8px;
         }
@@ -4331,7 +4873,7 @@
 (function(){
     'use strict';
 
-    var BIN_ID  = '69bf5457b7ec241ddc8e5b7b';
+    var BIN_ID  = '69c06347b7ec241ddc920377';
     var API_KEY = '$2a$10$xxIvXXIjG7A86QLIGEifv.jhyYGb3oxNTy37NWXJwY4/PDwozFjvK';
     var WA_NUM  = '5582996622036';
     var BASE    = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
@@ -5154,7 +5696,7 @@
                     </div>
 
                     <!-- Resultado da análise rápida -->
-                    <div id="vc-ia-loading" style="display:none;background:rgba(46,74,49,0.06);border-radius:14px;padding:24px;text-align:center;margin-bottom:16px;">
+                    <div id="vc-ia-loading" style="display:none;background:rgba(255,255,255,0.06);border-radius:14px;padding:24px;text-align:center;margin-bottom:16px;">
                         <div style="display:flex;justify-content:center;gap:8px;margin-bottom:10px;">
                             <div style="width:10px;height:10px;background:var(--primary);border-radius:50%;animation:vcDot 1.2s infinite;"></div>
                             <div style="width:10px;height:10px;background:var(--accent);border-radius:50%;animation:vcDot 1.2s infinite 0.4s;"></div>
@@ -5174,7 +5716,7 @@
                                 <button onclick="VendaCerta.downloadPDF()" style="background:linear-gradient(135deg,#C4724A,#D98A62);border:none;border-radius:8px;padding:5px 10px;font-size:0.72rem;font-weight:700;color:white;cursor:pointer;display:flex;align-items:center;gap:4px;"><i class="fas fa-file-pdf"></i> PDF</button>
                             </div>
                         </div>
-                        <div id="vc-ia-text" style="font-size:0.85rem;color:var(--dark);line-height:1.75;background:rgba(46,74,49,0.05);padding:16px;border-radius:12px;border-left:4px solid var(--primary);white-space:pre-wrap;"></div>
+                        <div id="vc-ia-text" style="font-size:0.85rem;color:rgba(255,255,255,0.88);line-height:1.75;background:rgba(255,255,255,0.06);padding:16px;border-radius:12px;border-left:4px solid var(--primary);white-space:pre-wrap;"></div>
                         <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;" id="vc-ia-followup-btns"></div>
                     </div>
 
@@ -5186,7 +5728,7 @@
 
                     <!-- Chat livre com IA -->
                     <div style="font-size:0.82rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">💬 Chat com Coach IA</div>
-                    <div id="vc-chat-container" style="background:var(--surface);border-radius:14px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:12px;">
+                    <div id="vc-chat-container" style="background:rgba(255,255,255,0.08);border-radius:14px;border:1px solid rgba(255,255,255,0.12);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:12px;">
                         <div id="vc-chat-messages" style="min-height:180px;max-height:320px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;">
                             <!-- Mensagem inicial do coach -->
                             <div class="vc-chat-msg vc-chat-bot" style="animation:fadeIn 0.3s ease;">
@@ -5194,8 +5736,8 @@
                                 <div class="vc-chat-bubble bot">Olá! Sou seu Coach IA. Posso analisar seu funil, sugerir estratégias de prospecção, scripts de vendas, como superar objeções e muito mais. O que você precisa hoje?</div>
                             </div>
                         </div>
-                        <div style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;background:rgba(239,240,236,0.5);">
-                            <textarea id="vc-chat-input" placeholder="Pergunte qualquer coisa sobre vendas imobiliárias..." style="flex:1;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:0.85rem;resize:none;min-height:42px;max-height:100px;font-family:'Inter',sans-serif;background:white;outline:none;color:var(--dark);" rows="1" onkeydown="VendaCerta.chatKeyDown(event)" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';"></textarea>
+                        <div style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;background:rgba(22,38,24,0.80);">
+                            <textarea id="vc-chat-input" placeholder="Pergunte qualquer coisa sobre vendas imobiliárias..." style="flex:1;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:0.85rem;resize:none;min-height:42px;max-height:100px;font-family:'Inter',sans-serif;background:rgba(255,255,255,0.08);outline:none;color:var(--dark);" rows="1" onkeydown="VendaCerta.chatKeyDown(event)" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';"></textarea>
                             <button onclick="VendaCerta.sendChat()" id="vc-chat-send-btn" style="background:var(--primary);color:white;border:none;border-radius:10px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">
                                 <i class="fas fa-paper-plane" style="font-size:0.9rem;"></i>
                             </button>
@@ -5239,7 +5781,7 @@
                             <div style="display:flex;align-items:center;gap:8px;"><span style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#2E4A31,#3D6142);color:white;display:flex;align-items:center;justify-content:center;font-size:0.8rem;">👤</span> Selecionar Cliente</div>
                             <span id="cons-clientes-badge" style="font-size:0.7rem;color:var(--text-secondary);font-weight:600;"></span>
                         </div>
-                        <select id="cons-cliente-select" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:0.9rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" onchange="VendaCerta.consLoadCliente(this.value)">
+                        <select id="cons-cliente-select" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:0.9rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" onchange="VendaCerta.consLoadCliente(this.value)">
                             <option value="">— Selecione um cliente para analisar —</option>
                         </select>
                         <button onclick="VendaCerta.consInit()" style="margin-top:8px;width:100%;padding:8px;background:rgba(46,74,49,0.07);border:1px solid rgba(46,74,49,0.15);border-radius:8px;color:var(--primary);font-size:0.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
@@ -5256,27 +5798,27 @@
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Renda CLT / Formal (R$)</label>
-                                    <input type="number" id="cons-renda-clt" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
+                                    <input type="number" id="cons-renda-clt" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
                                 </div>
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Renda MEI / PJ (R$)</label>
-                                    <input type="number" id="cons-renda-mei" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
+                                    <input type="number" id="cons-renda-mei" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
                                 </div>
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Renda Autônomo (R$)</label>
-                                    <input type="number" id="cons-renda-autonomo" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
+                                    <input type="number" id="cons-renda-autonomo" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
                                 </div>
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Renda Aluguéis (R$)</label>
-                                    <input type="number" id="cons-renda-aluguel" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
+                                    <input type="number" id="cons-renda-aluguel" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
                                 </div>
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Aposentadoria / Pensão (R$)</label>
-                                    <input type="number" id="cons-renda-apo" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
+                                    <input type="number" id="cons-renda-apo" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
                                 </div>
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Outras Rendas (R$)</label>
-                                    <input type="number" id="cons-renda-outras" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
+                                    <input type="number" id="cons-renda-outras" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
                                 </div>
                             </div>
 
@@ -5285,19 +5827,19 @@
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Financiamentos (R$)</label>
-                                    <input type="number" id="cons-div-financ" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
+                                    <input type="number" id="cons-div-financ" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
                                 </div>
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Cartão de Crédito (R$)</label>
-                                    <input type="number" id="cons-div-cartao" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
+                                    <input type="number" id="cons-div-cartao" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
                                 </div>
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Empréstimos (R$)</label>
-                                    <input type="number" id="cons-div-emprest" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
+                                    <input type="number" id="cons-div-emprest" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
                                 </div>
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Aluguel Atual (R$)</label>
-                                    <input type="number" id="cons-div-aluguel" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
+                                    <input type="number" id="cons-div-aluguel" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
                                 </div>
                             </div>
 
@@ -5306,21 +5848,21 @@
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Saldo FGTS (R$)</label>
-                                    <input type="number" id="cons-fgts" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
+                                    <input type="number" id="cons-fgts" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
                                 </div>
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Poupança / Investimentos (R$)</label>
-                                    <input type="number" id="cons-poupanca" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
+                                    <input type="number" id="cons-poupanca" placeholder="0,00" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" oninput="VendaCerta.consCalc()">
                                 </div>
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Dependentes</label>
-                                    <select id="cons-dependentes" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" onchange="VendaCerta.consCalc()">
+                                    <select id="cons-dependentes" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" onchange="VendaCerta.consCalc()">
                                         <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4+</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Possui restrição (SPC/Serasa)?</label>
-                                    <select id="cons-restricao" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" onchange="VendaCerta.consCalc()">
+                                    <select id="cons-restricao" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" onchange="VendaCerta.consCalc()">
                                         <option value="nao">Não</option><option value="sim">Sim</option><option value="desconhecido">Não sei</option>
                                     </select>
                                 </div>
@@ -5330,7 +5872,7 @@
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Tipo de vínculo</label>
-                                    <select id="cons-vinculo" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" onchange="VendaCerta.consCalc()">
+                                    <select id="cons-vinculo" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" onchange="VendaCerta.consCalc()">
                                         <option value="clt">CLT (Carteira)</option>
                                         <option value="servidor">Servidor Público</option>
                                         <option value="mei">MEI</option>
@@ -5341,7 +5883,7 @@
                                 </div>
                                 <div>
                                     <label style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Programa pretendido</label>
-                                    <select id="cons-programa" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:white;color:var(--dark);outline:none;font-family:'Inter',sans-serif;" onchange="VendaCerta.consCalc()">
+                                    <select id="cons-programa" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:rgba(255,255,255,0.08);color:#FFFFFF;outline:none;font-family:'Inter',sans-serif;" onchange="VendaCerta.consCalc()">
                                         <option value="mcmv1">MCMV Faixa 1 (até R$2.640)</option>
                                         <option value="mcmv2">MCMV Faixa 2 (até R$4.400)</option>
                                         <option value="mcmv3">MCMV Faixa 3 (até R$8.000)</option>
@@ -5359,7 +5901,7 @@
                     </div>
 
                     <!-- Resultado -->
-                    <div id="cons-loading" style="display:none;background:rgba(46,74,49,0.06);border-radius:14px;padding:24px;text-align:center;margin-bottom:16px;">
+                    <div id="cons-loading" style="display:none;background:rgba(255,255,255,0.06);border-radius:14px;padding:24px;text-align:center;margin-bottom:16px;">
                         <div style="display:flex;justify-content:center;gap:8px;margin-bottom:10px;">
                             <div style="width:10px;height:10px;background:var(--primary);border-radius:50%;animation:vcDot 1.2s infinite;"></div>
                             <div style="width:10px;height:10px;background:var(--accent);border-radius:50%;animation:vcDot 1.2s infinite 0.4s;"></div>
@@ -5407,15 +5949,15 @@
 
                     <!-- Chat Consultoria IA -->
                     <div class="vc-section-title" style="margin-top:8px;"><i class="fas fa-robot"></i> Chat Consultoria Financeira</div>
-                    <div id="cons-chat-container" style="background:var(--surface);border-radius:14px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:12px;">
+                    <div id="cons-chat-container" style="background:rgba(255,255,255,0.08);border-radius:14px;border:1px solid rgba(255,255,255,0.12);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:12px;">
                         <div id="cons-chat-messages" style="min-height:160px;max-height:280px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;">
                             <div class="vc-chat-msg vc-chat-bot">
                                 <div class="vc-chat-avatar">📋</div>
                                 <div class="vc-chat-bubble bot">Olá! Sou sua Consultora IA de Finanças. Preencha o formulário acima e clique em "Analisar" para uma análise completa. Ou pergunte diretamente sobre IR, FGTS, Caixa Econômica, organização financeira e muito mais!</div>
                             </div>
                         </div>
-                        <div style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;background:rgba(239,240,236,0.5);">
-                            <textarea id="cons-chat-input" placeholder="Pergunte sobre IR, FGTS, aprovação na Caixa..." style="flex:1;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:0.85rem;resize:none;min-height:42px;max-height:100px;font-family:'Inter',sans-serif;background:white;outline:none;color:var(--dark);" rows="1" onkeydown="VendaCerta.consChatKeyDown(event)" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';"></textarea>
+                        <div style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;background:rgba(22,38,24,0.80);">
+                            <textarea id="cons-chat-input" placeholder="Pergunte sobre IR, FGTS, aprovação na Caixa..." style="flex:1;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:0.85rem;resize:none;min-height:42px;max-height:100px;font-family:'Inter',sans-serif;background:rgba(255,255,255,0.08);outline:none;color:var(--dark);" rows="1" onkeydown="VendaCerta.consChatKeyDown(event)" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';"></textarea>
                             <button onclick="VendaCerta.consSendChat()" style="background:var(--primary);color:white;border:none;border-radius:10px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">
                                 <i class="fas fa-paper-plane" style="font-size:0.9rem;"></i>
                             </button>
@@ -5900,7 +6442,7 @@
 
                 <!-- TAB: RENDA IDEAL -->
                 <div id="sim-tab-renda" class="coach-tab-panel">
-                    <div style="background:rgba(46,74,49,0.06);border:1px solid rgba(46,74,49,0.2);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:0.82rem;color:var(--primary);line-height:1.6;">
+                    <div style="background:rgba(168,213,172,0.08);border:1px solid rgba(168,213,172,0.18);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:0.82rem;color:var(--primary);line-height:1.6;">
                         <strong>Regra dos 30%:</strong> a 1ª parcela SAC (ou parcela Price) não pode ultrapassar 30% da renda efetiva (após desconto de dependentes). Informe nascimento para limitar prazo pela regra de idade.
                     </div>
                     <div class="vc-card" style="margin-bottom:12px;">
@@ -5962,7 +6504,7 @@
 
                 <!-- TAB: IMÓVEL MÁXIMO -->
                 <div id="sim-tab-imovel" class="coach-tab-panel">
-                    <div style="background:rgba(46,74,49,0.06);border:1px solid rgba(46,74,49,0.2);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:0.82rem;color:var(--primary);line-height:1.6;">
+                    <div style="background:rgba(168,213,172,0.08);border:1px solid rgba(168,213,172,0.18);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:0.82rem;color:var(--primary);line-height:1.6;">
                         <strong>4 limitadores:</strong> (1) parcela ≤ 30% renda efetiva, (2) cota máx. modalidade, (3) teto da faixa, (4) prazo máx. pela regra de idade. Dependentes reduzem a renda efetiva.
                     </div>
                     <div class="vc-card" style="margin-bottom:12px;">
@@ -6027,11 +6569,11 @@
                                     <th style="color:white;padding:7px 8px;text-align:center;">Taxa a.a.</th><th style="color:white;padding:7px 8px;text-align:center;">Teto</th><th style="color:white;padding:7px 8px;text-align:center;">Cota</th>
                                 </tr></thead>
                                 <tbody>
-                                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><span style="background:#e6f4ed;color:#1a5c35;padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.65rem;">MCMV F1</span></td><td style="padding:8px;color:var(--text-secondary);">≤ R$2.850</td><td style="padding:8px;text-align:center;">4–5%</td><td style="padding:8px;text-align:center;">R$275k</td><td style="padding:8px;text-align:center;">90%</td></tr>
-                                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><span style="background:#e6eefa;color:#184a80;padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.65rem;">MCMV F2</span></td><td style="padding:8px;color:var(--text-secondary);">R$2.851–4.700</td><td style="padding:8px;text-align:center;">5,5–7%</td><td style="padding:8px;text-align:center;">R$350k</td><td style="padding:8px;text-align:center;">80%</td></tr>
-                                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><span style="background:#fdf5e0;color:#8c5f00;padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.65rem;">MCMV F3</span></td><td style="padding:8px;color:var(--text-secondary);">R$4.701–8.600</td><td style="padding:8px;text-align:center;">7,66–8,16%</td><td style="padding:8px;text-align:center;">R$350k</td><td style="padding:8px;text-align:center;">80%</td></tr>
-                                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><span style="background:#ede8f8;color:#4a2a9a;padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.65rem;">MCMV F4</span></td><td style="padding:8px;color:var(--text-secondary);">R$8.601–12.000</td><td style="padding:8px;text-align:center;">10–10,5%</td><td style="padding:8px;text-align:center;">R$500k</td><td style="padding:8px;text-align:center;">80%</td></tr>
-                                    <tr><td style="padding:8px;"><span style="background:#fff3f0;color:#8c3020;padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.65rem;">SBPE</span></td><td style="padding:8px;color:var(--text-secondary);">Qualquer</td><td style="padding:8px;text-align:center;">10,26–11,19%</td><td style="padding:8px;text-align:center;">R$2,25M</td><td style="padding:8px;text-align:center;">80%</td></tr>
+                                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><span style="background:rgba(46,194,113,0.15);color:#4ade80;padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.65rem;">MCMV F1</span></td><td style="padding:8px;color:var(--text-secondary);">≤ R$2.850</td><td style="padding:8px;text-align:center;">4–5%</td><td style="padding:8px;text-align:center;">R$275k</td><td style="padding:8px;text-align:center;">90%</td></tr>
+                                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><span style="background:rgba(79,130,230,0.15);color:#93c5fd;padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.65rem;">MCMV F2</span></td><td style="padding:8px;color:var(--text-secondary);">R$2.851–4.700</td><td style="padding:8px;text-align:center;">5,5–7%</td><td style="padding:8px;text-align:center;">R$350k</td><td style="padding:8px;text-align:center;">80%</td></tr>
+                                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><span style="background:rgba(240,160,32,0.15);color:#fcd34d;padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.65rem;">MCMV F3</span></td><td style="padding:8px;color:var(--text-secondary);">R$4.701–8.600</td><td style="padding:8px;text-align:center;">7,66–8,16%</td><td style="padding:8px;text-align:center;">R$350k</td><td style="padding:8px;text-align:center;">80%</td></tr>
+                                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><span style="background:rgba(139,92,246,0.15);color:#c4b5fd;padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.65rem;">MCMV F4</span></td><td style="padding:8px;color:var(--text-secondary);">R$8.601–12.000</td><td style="padding:8px;text-align:center;">10–10,5%</td><td style="padding:8px;text-align:center;">R$500k</td><td style="padding:8px;text-align:center;">80%</td></tr>
+                                    <tr><td style="padding:8px;"><span style="background:rgba(244,63,94,0.15);color:#fda4af;padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.65rem;">SBPE</span></td><td style="padding:8px;color:var(--text-secondary);">Qualquer</td><td style="padding:8px;text-align:center;">10,26–11,19%</td><td style="padding:8px;text-align:center;">R$2,25M</td><td style="padding:8px;text-align:center;">80%</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -6205,10 +6747,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                     <!-- Documentos Pessoais (comuns a todos) -->
                     <div style="margin-bottom:10px;">
-                        <div style="font-size:0.75rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px 4px;background:rgba(46,74,49,0.06);border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;">
+                        <div style="font-size:0.75rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px 4px;background:rgba(255,255,255,0.10);border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;">
                             📁 DOCUMENTOS PESSOAIS (todos os perfis)
                         </div>
-                        <div id="prof-docs-pessoais" style="background:white;border-radius:0 0 12px 12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
+                        <div id="prof-docs-pessoais" style="background:rgba(255,255,255,0.07);border-radius:0 0 12px 12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
                         </div>
                     </div>
 
@@ -6217,7 +6759,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         <div style="font-size:0.75rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px 4px;background:rgba(196,114,74,0.06);border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;">
                             💰 COMPROVAÇÃO DE RENDA / VÍNCULO
                         </div>
-                        <div id="prof-docs-renda" style="background:white;border-radius:0 0 12px 12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
+                        <div id="prof-docs-renda" style="background:rgba(255,255,255,0.07);border-radius:0 0 12px 12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
                         </div>
                     </div>
 
@@ -6226,7 +6768,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         <div style="font-size:0.75rem;font-weight:800;color:var(--indigo);text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px 4px;background:rgba(79,70,229,0.06);border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;">
                             💍 DOCUMENTOS DO CÔNJUGE / CONVIVENTE
                         </div>
-                        <div id="prof-docs-conjugal" style="background:white;border-radius:0 0 12px 12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
+                        <div id="prof-docs-conjugal" style="background:rgba(255,255,255,0.07);border-radius:0 0 12px 12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
                         </div>
                     </div>
 
@@ -6234,7 +6776,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <div id="prof-obs-box" style="display:none;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:0.82rem;color:#92660a;line-height:1.5;"></div>
 
                     <!-- Progresso -->
-                    <div style="background:white;border-radius:10px;border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;">
+                    <div style="background:rgba(255,255,255,0.07);border-radius:10px;border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                             <span style="font-size:0.8rem;font-weight:700;color:var(--dark);">Progresso da Documentação</span>
                             <span id="prof-progress-text" style="font-size:0.8rem;font-weight:700;color:var(--primary);">0 / 0</span>
@@ -6321,7 +6863,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             </div>
                         </div>
                     </div>
-                    <div id="lote-docs-checklist" style="background:white;border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
+                    <div id="lote-docs-checklist" style="background:rgba(255,255,255,0.07);border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
                         <!-- Items inserted by JS -->
                     </div>
                     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
@@ -6413,7 +6955,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </div>
 
                 <button type="submit" class="btn-block">Salvar Cliente</button>
-                <button type="button" class="btn-block" style="background: var(--light); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
+                <button type="button" class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
             </form>
         </div>
 
@@ -6432,7 +6974,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             </div>
 
             <!-- Dados do cliente (somente leitura) -->
-            <div style="background:rgba(46,74,49,0.06);border-radius:12px;padding:14px;margin-bottom:16px;border:1px solid rgba(46,74,49,0.12);">
+            <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.10);">
                 <div style="font-size:0.72rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">📋 Dados do Cliente</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                     <div>
@@ -6488,19 +7030,19 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <option value="sbpe">SBPE — Sistema Brasileiro de Poupança e Empréstimo</option>
                     <option value="mcmv">Minha Casa Minha Vida (FGTS)</option>
                 </select>
-                <div id="envio-regime-obs" style="margin-top:6px;font-size:0.75rem;color:var(--text-secondary);line-height:1.5;padding:8px 10px;background:var(--light);border-radius:8px;border-left:3px solid var(--indigo);display:none;"></div>
+                <div id="envio-regime-obs" style="margin-top:6px;font-size:0.75rem;color:var(--text-secondary);line-height:1.5;padding:8px 10px;background:rgba(79,70,229,0.12);border-radius:8px;border-left:3px solid var(--indigo);display:none;"></div>
             </div>
 
             <!-- Preview do corpo do email -->
             <div style="margin-bottom:16px;">
                 <div style="font-size:0.8rem;font-weight:700;color:var(--dark);margin-bottom:6px;">📧 Prévia do Corpo do E-mail</div>
-                <div id="envio-preview-email" style="background:var(--light);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:0.8rem;color:var(--dark);line-height:1.6;max-height:180px;overflow-y:auto;white-space:pre-wrap;font-family:monospace;"></div>
+                <div id="envio-preview-email" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;font-size:0.8rem;color:#FFFFFF;line-height:1.6;max-height:180px;overflow-y:auto;white-space:pre-wrap;font-family:monospace;"></div>
             </div>
 
             <!-- Lista de documentos a enviar -->
             <div id="envio-docs-lista-wrap" style="margin-bottom:16px;display:none;">
                 <div style="font-size:0.8rem;font-weight:700;color:var(--dark);margin-bottom:6px;">📎 Documentos para Enviar</div>
-                <div id="envio-docs-lista" style="background:var(--light);border:1px solid var(--border);border-radius:10px;padding:10px;max-height:150px;overflow-y:auto;"></div>
+                <div id="envio-docs-lista" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px;max-height:150px;overflow-y:auto;"></div>
                 <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:6px;"><i class="fas fa-info-circle"></i> Os documentos serão baixados como ZIP para você anexar manualmente ao e-mail.</div>
             </div>
 
@@ -6510,7 +7052,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <button type="button" id="envio-btn-baixar-zip" class="btn-block" style="background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;display:none;" onclick="App.cliente.baixarDocsZip()">
                 <i class="fas fa-file-archive"></i> Baixar Documentos (ZIP)
             </button>
-            <button type="button" class="btn-block" style="background:var(--light);color:var(--secondary);margin-top:8px;" onclick="UI.closeModals()">Cancelar</button>
+            <button type="button" class="btn-block" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.60);margin-top:8px;" onclick="UI.closeModals()">Cancelar</button>
         </div>
         <div class="modal-overlay" id="overlay-imovel"></div>
         <div class="modal-sheet" id="sheet-imovel">
@@ -6775,7 +7317,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </div>
 
                 <button type="submit" class="btn-block">Salvar Imóvel</button>
-                <button type="button" class="btn-block" style="background: var(--light); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
+                <button type="button" class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
             </form>
         </div>
 
@@ -6990,7 +7532,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </div>
 
                 <button type="submit" class="btn-block">Salvar Agendamento</button>
-                <button type="button" class="btn-block" style="background: var(--light); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
+                <button type="button" class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
             </form>
         </div>
 
@@ -7146,7 +7688,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <button class="btn-block" style="background: var(--success); margin-top: 16px;" onclick="UI.addEtapaFunil()">
                 <i class="fas fa-plus"></i> Adicionar Etapa
             </button>
-            <button class="btn-block" style="background: var(--light); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Fechar</button>
+            <button class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Fechar</button>
         </div>
 
         <div class="modal-overlay" id="overlay-link"></div>
@@ -7179,7 +7721,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <textarea id="l-descricao" class="form-control" placeholder="Descrição do link..."></textarea>
                 </div>
                 <button type="submit" class="btn-block">Salvar Link</button>
-                <button type="button" class="btn-block" style="background: var(--light); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
+                <button type="button" class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
             </form>
         </div>
 
@@ -7221,7 +7763,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <button class="btn-block" style="background: #25D366;" onclick="UI.iniciarEnvioMassa()">
                 <i class="fab fa-whatsapp"></i> Iniciar Envio
             </button>
-            <button class="btn-block" style="background: var(--light); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
+            <button class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
         </div>
 
         <!-- MODAL NOTIFICAR LANÇAMENTO -->
@@ -7242,7 +7784,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <textarea id="msg-lancamento" class="form-control" rows="4" placeholder="Ex: Olá {nome}, o imóvel [Título] que estava em pré-lançamento agora está em LANÇAMENTO! Venha conhecer... 🏡"></textarea>
             </div>
 
-            <button class="btn-block" style="background: var(--light); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Fechar</button>
+            <button class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Fechar</button>
         </div>
 
         <div class="modal-overlay" id="overlay-lista-espera"></div>
@@ -7263,7 +7805,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <button class="btn-block" style="background: var(--primary);" onclick="UI.salvarListaEspera()">
                 <i class="fas fa-save"></i> Salvar Lista de Espera
             </button>
-            <button class="btn-block" style="background: var(--light); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
+            <button class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
         </div>
 
         <!-- MODAL DE CONFIRMAÇÃO WHATSAPP (MODIFICADO) -->
@@ -7317,7 +7859,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <button class="btn-block" style="background: var(--primary);" onclick="UI.gerarPortfolioSelecionados()">
                 <i class="fas fa-file-pdf"></i> Gerar PDF dos Selecionados
             </button>
-            <button class="btn-block" style="background: var(--light); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
+            <button class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
         </div>
 
         <!-- MODAL: SELEÇÃO DE FOTOS PARA PDF -->
@@ -7333,7 +7875,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <button class="btn-block" style="background: var(--primary);" onclick="UI.generatePDFWithSelectedImages()">
                     <i class="fas fa-file-pdf"></i> Gerar PDF
                 </button>
-                <button class="btn-block" style="background: var(--light); color: var(--secondary);" onclick="UI.closeModals()">
+                <button class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary);" onclick="UI.closeModals()">
                     Cancelar
                 </button>
             </div>
@@ -7371,13 +7913,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Resultado (Taxa de Evolução Mensal)</label>
-                    <div id="calc-resultado" style="font-size: 1.5rem; font-weight: 700; color: var(--primary); text-align: center; padding: 16px; background: var(--light); border-radius: 8px;">R$ 0,00</div>
+                    <div id="calc-resultado" style="font-size: 1.5rem; font-weight: 700; color: var(--primary); text-align: center; padding: 16px; background: rgba(255,255,255,0.08); border-radius: 8px;">R$ 0,00</div>
                 </div>
                 <div style="display: flex; gap: 8px;">
                     <button type="submit" class="btn-block" style="background: var(--primary);">Calcular</button>
                     <button type="button" class="btn-block" style="background: var(--success);" onclick="UI.exportEvolucaoObraPDF()">Exportar PDF</button>
                 </div>
-                <button type="button" class="btn-block" style="background: var(--light); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Fechar</button>
+                <button type="button" class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Fechar</button>
             </form>
         </div>
 
@@ -7464,7 +8006,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     </button>
                 </div>
                 <button type="submit" class="btn-block" style="background:var(--amber);">💾 Salvar Nota</button>
-                <button type="button" class="btn-block" style="background:var(--light);color:var(--secondary);margin-top:8px;" onclick="UI.closeModals()">Cancelar</button>
+                <button type="button" class="btn-block" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.60);margin-top:8px;" onclick="UI.closeModals()">Cancelar</button>
             </form>
         </div>
 
@@ -7522,7 +8064,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <div class="form-group">
                     <label class="form-label">Capa (imagem)</label>
                     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                        <button type="button" class="btn-sm" style="background:var(--light);color:var(--secondary);" onclick="document.getElementById('lr-capa-input').click()">
+                        <button type="button" class="btn-sm" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.60);" onclick="document.getElementById('lr-capa-input').click()">
                             <i class="fas fa-image"></i> Selecionar capa
                         </button>
                         <span id="lr-capa-nome" style="font-size:0.8rem;color:var(--text-secondary);">Nenhuma imagem</span>
@@ -7542,7 +8084,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <input type="hidden" id="lr-anexos-data" value="[]">
                 </div>
                 <button type="submit" class="btn-block" style="background:var(--indigo);">Salvar</button>
-                <button type="button" class="btn-block" style="background:var(--light);color:var(--secondary);margin-top:8px;" onclick="UI.closeModals()">Cancelar</button>
+                <button type="button" class="btn-block" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.60);margin-top:8px;" onclick="UI.closeModals()">Cancelar</button>
             </form>
         </div>
 
@@ -10738,7 +11280,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 const icon = ETAPA_ICONS[cliente.etapaFunil] || 'handshake';
 
                 const imovelInfo = imovel ? `
-                    <div style="display:flex;align-items:center;gap:6px;margin-top:6px;padding:6px 8px;background:rgba(46,74,49,0.06);border-radius:8px;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-top:6px;padding:6px 8px;background:rgba(255,255,255,0.07);border-radius:8px;">
                         <i class="fas fa-home" style="color:var(--primary);font-size:0.8rem;flex-shrink:0;"></i>
                         <span style="font-size:0.8rem;color:var(--secondary);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${imovel.titulo.length > 35 ? imovel.titulo.substring(0,33)+'...' : imovel.titulo}</span>
                         ${imovel.precoVenda ? `<span style="font-size:0.75rem;color:var(--success);font-weight:700;margin-left:auto;flex-shrink:0;">${Utils.formatCurrency(imovel.precoVenda)}</span>` : ''}
@@ -10769,7 +11311,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 <button style="background:#25D366;color:white;border:none;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;cursor:pointer;box-shadow:0 2px 8px rgba(37,211,102,0.35);" onclick="event.stopPropagation();App.whatsapp.confirmOpenCliente('${cliente.id}')" title="WhatsApp">
                                     <i class="fab fa-whatsapp"></i>
                                 </button>
-                                <button style="background:var(--light);color:var(--secondary);border:none;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;cursor:pointer;" onclick="event.stopPropagation();App.cliente.edit('${cliente.id}')" title="Editar">
+                                <button style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.60);border:none;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;cursor:pointer;" onclick="event.stopPropagation();App.cliente.edit('${cliente.id}')" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
                             </div>
@@ -10903,7 +11445,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 if (inativos.length > 0) {
                     html += `<div style="margin:20px 0 10px;display:flex;align-items:center;gap:10px;">
                         <div style="flex:1;height:1px;background:var(--border);"></div>
-                        <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);white-space:nowrap;padding:4px 12px;background:var(--light);border-radius:20px;border:1px solid var(--border);">
+                        <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);white-space:nowrap;padding:4px 12px;background:rgba(255,255,255,0.08);border-radius:20px;border:1px solid rgba(255,255,255,0.12);">
                             <i class="fas fa-check-circle" style="color:var(--success);margin-right:4px;"></i> VENDAS CONCLUÍDAS (${inativos.length})
                         </div>
                         <div style="flex:1;height:1px;background:var(--border);"></div>
@@ -11495,7 +12037,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         <div class="details-section" style="background: linear-gradient(135deg, rgba(46,74,49,0.09), rgba(46,74,49,0.02)); border: 1.5px solid rgba(46,74,49,0.20); margin-top:4px;">
                             <div class="details-section-title" style="color:var(--primary);"><i class="fas fa-user-check"></i> RENDA IDEAL — CAIXA ECONÔMICA</div>
                             ${usandoAvaliacao ? `<div style="font-size:0.75rem;color:var(--accent);background:rgba(196,114,74,0.10);border-radius:7px;padding:6px 10px;margin-bottom:10px;">📋 Baseado no <strong>Valor de Avaliação</strong>: ${Utils.formatCurrency(baseCalc)}</div>` : `<div style="font-size:0.75rem;color:var(--text-secondary);background:rgba(0,0,0,0.04);border-radius:7px;padding:6px 10px;margin-bottom:10px;">📋 Baseado no <strong>Preço de Venda</strong>: ${Utils.formatCurrency(baseCalc)} · Informe o Valor de Avaliação para maior precisão.</div>`}
-                            <div style="background:white;border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(30,50,32,0.08);">
+                            <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(30,50,32,0.08);">
                                 <div style="font-size:0.72rem;color:var(--text-secondary);font-weight:700;letter-spacing:0.5px;margin-bottom:6px;">RENDA MÍNIMA NECESSÁRIA</div>
                                 <div style="font-size:1.6rem;font-weight:900;color:var(--primary);">${Utils.formatCurrency(m.rendaNecessaria)}<span style="font-size:0.85rem;font-weight:500;color:var(--text-secondary)">/mês</span></div>
                                 <div style="font-size:0.8rem;color:var(--text-secondary);margin-top:4px;">Prestação estimada: <strong>${Utils.formatCurrency(m.prestacao)}/mês</strong> · Taxa: ${m.taxa}% a.a.</div>
@@ -11541,7 +12083,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             </button>
                         </div>
                     </div>
-                    <button class="btn-block" style="background: var(--light); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Fechar</button>
+                    <button class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Fechar</button>
                 `;
                 
                 document.getElementById('imovel-details-content').innerHTML = detailsContent;
@@ -11570,22 +12112,22 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         <div class="details-section" style="background: linear-gradient(135deg, rgba(46,74,49,0.08), rgba(46,74,49,0.03)); border: 1.5px solid rgba(46,74,49,0.18); border-radius: 14px; margin-bottom:14px;">
                             <div class="details-section-title" style="color:var(--primary);"><i class="fas fa-home"></i> PODER DE COMPRA — CAIXA ECONÔMICA</div>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                                <div style="background:white;border-radius:10px;padding:12px;border-left:3px solid var(--primary);box-shadow:0 2px 8px rgba(30,50,32,0.08);">
+                                <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px;border-left:3px solid var(--primary);box-shadow:0 2px 8px rgba(30,50,32,0.08);">
                                     <div style="font-size:0.72rem;color:var(--text-secondary);font-weight:600;margin-bottom:4px;">VALOR MÁX. DO IMÓVEL</div>
                                     <div style="font-size:1.15rem;font-weight:900;color:var(--primary);">${Utils.formatCurrency(poderCompra.maxImovelPelaRenda)}</div>
                                     <div style="font-size:0.68rem;color:var(--text-secondary);margin-top:2px;">com 20% de entrada</div>
                                 </div>
-                                <div style="background:white;border-radius:10px;padding:12px;border-left:3px solid var(--accent);box-shadow:0 2px 8px rgba(30,50,32,0.08);">
+                                <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px;border-left:3px solid var(--accent);box-shadow:0 2px 8px rgba(30,50,32,0.08);">
                                     <div style="font-size:0.72rem;color:var(--text-secondary);font-weight:600;margin-bottom:4px;">MÁX. FINANCIÁVEL (80%)</div>
                                     <div style="font-size:1.15rem;font-weight:900;color:var(--accent);">${Utils.formatCurrency(poderCompra.maxFinanciadoRenda)}</div>
                                     <div style="font-size:0.68rem;color:var(--text-secondary);margin-top:2px;">pela renda e pelo prazo</div>
                                 </div>
-                                <div style="background:white;border-radius:10px;padding:12px;border-left:3px solid var(--warning);box-shadow:0 2px 8px rgba(30,50,32,0.08);">
+                                <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px;border-left:3px solid var(--warning);box-shadow:0 2px 8px rgba(30,50,32,0.08);">
                                     <div style="font-size:0.72rem;color:var(--text-secondary);font-weight:600;margin-bottom:4px;">PRAZO MÁXIMO</div>
                                     <div style="font-size:1.15rem;font-weight:900;color:var(--warning);">${poderCompra.maxMeses} meses</div>
                                     <div style="font-size:0.68rem;color:var(--text-secondary);margin-top:2px;">${Math.floor(poderCompra.maxMeses/12)} anos — termina com ${poderCompra.idadeFimContrato.toFixed(0)} anos</div>
                                 </div>
-                                <div style="background:white;border-radius:10px;padding:12px;border-left:3px solid var(--success);box-shadow:0 2px 8px rgba(30,50,32,0.08);">
+                                <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px;border-left:3px solid var(--success);box-shadow:0 2px 8px rgba(30,50,32,0.08);">
                                     <div style="font-size:0.72rem;color:var(--text-secondary);font-weight:600;margin-bottom:4px;">PRESTAÇÃO MÁXIMA (30%)</div>
                                     <div style="font-size:1.15rem;font-weight:900;color:var(--success);">${Utils.formatCurrency(poderCompra.maxPrestacao)}</div>
                                     <div style="font-size:0.68rem;color:var(--text-secondary);margin-top:2px;">de ${Utils.formatCurrency(cliente.rendaMensal)} de renda</div>
@@ -11599,7 +12141,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 } else if (cliente.dataNascimento && cliente.rendaMensal) {
                     const idadeAtual = Utils.calculateAge(cliente.dataNascimento);
                     if (idadeAtual >= 80) {
-                        simulacaoHTML += `<div class="warning-note" style="background:#fee2e2;color:#991b1b;">❌ Cliente com ${idadeAtual} anos não pode financiar pela Caixa. Limite: Idade + Prazo ≤ 80 anos.</div>`;
+                        simulacaoHTML += `<div class="warning-note" style="background:rgba(184,48,48,0.20);color:#fca5a5;">❌ Cliente com ${idadeAtual} anos não pode financiar pela Caixa. Limite: Idade + Prazo ≤ 80 anos.</div>`;
                     }
                 }
 
@@ -11788,12 +12330,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                     </button>
                                 </div>
                             </div>
-                            <div style="background:white;border-radius:10px;border:1px solid var(--border);overflow:hidden;">
+                            <div style="background:rgba(255,255,255,0.07);border-radius:10px;border:1px solid var(--border);overflow:hidden;">
                                 ${(App.cliente.LOTE_DOCS || []).map((d, i) => {
                                     const checked = cliente.loteDocsChecked || {};
                                     const done = checked[d.id];
                                     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:${i<5?'1px solid var(--border)':'none'};background:${done?'rgba(46,125,66,0.04)':''}">
-                                        <div style="width:20px;height:20px;border-radius:5px;background:${done?'var(--success)':'var(--light)'};border:2px solid ${done?'var(--success)':'var(--border)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-size:0.65rem;">${done?'<i class="fas fa-check"></i>':''}</div>
+                                        <div style="width:20px;height:20px;border-radius:5px;background:${done?'var(--success)':'rgba(255,255,255,0.10)'};border:2px solid ${done?'var(--success)':'rgba(255,255,255,0.20)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-size:0.65rem;">${done?'<i class="fas fa-check"></i>':''}</div>
                                         <span style="font-size:0.88rem;font-weight:600;color:${done?'var(--text-secondary)':'var(--dark)'};${done?'text-decoration:line-through':''}">${d.icon} ${i+1}. ${d.label}</span>
                                     </div>`;
                                 }).join('')}
@@ -11838,11 +12380,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                         <div style="background:rgba(255,255,255,0.85);height:100%;width:${pct}%;border-radius:4px;transition:width 0.3s;"></div>
                                     </div>
                                 </div>
-                                <div style="background:white;border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:10px;">
+                                <div style="background:rgba(255,255,255,0.07);border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:10px;">
                                     ${allDocsList.map((d, i) => {
                                         const isDone = !!checked[d.id];
                                         return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:${i<allDocsList.length-1?'1px solid var(--border)':'none'};background:${isDone?'rgba(46,125,66,0.04)':''}">
-                                            <div style="width:20px;height:20px;border-radius:5px;background:${isDone?'var(--success)':'var(--light)'};border:2px solid ${isDone?'var(--success)':'var(--border)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-size:0.65rem;">${isDone?'<i class="fas fa-check"></i>':''}</div>
+                                            <div style="width:20px;height:20px;border-radius:5px;background:${isDone?'var(--success)':'rgba(255,255,255,0.10)'};border:2px solid ${isDone?'var(--success)':'rgba(255,255,255,0.20)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-size:0.65rem;">${isDone?'<i class="fas fa-check"></i>':''}</div>
                                             <span style="font-size:0.88rem;font-weight:600;color:${isDone?'var(--text-secondary)':'var(--dark)'};${isDone?'text-decoration:line-through':''}">${d.icon} ${d.label}</span>
                                         </div>`;
                                     }).join('')}
@@ -11882,7 +12424,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             </button>
                         </div>
                     </div>
-                    <button class="btn-block" style="background: var(--light); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Fechar</button>
+                    <button class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Fechar</button>
                 `;
                 
                 document.getElementById('cliente-details-content').innerHTML = detailsContent;
@@ -13259,7 +13801,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 <div class="client-info">
                                     <div class="client-row"><strong>Tel:</strong> ${c.telefone}</div>
                                     <div class="client-row"><strong>Interesse:</strong> ${c.faixaPreco || 'Não inf.'}</div>
-                                    <div style="margin-top: 8px; background: var(--light); padding: 10px; border-radius: 6px; font-size: 0.9rem; border: 1px dashed var(--border);">
+                                    <div style="margin-top: 8px; background: rgba(255,255,255,0.08); padding: 10px; border-radius: 6px; font-size: 0.9rem; border: 1px dashed var(--border);">
                                         <strong>Observações:</strong><br>
                                         <span style="color: #334155;">${c.observacoes || '<em>Clique no lápis para adicionar observações...</em>'}</span>
                                     </div>
@@ -14298,7 +14840,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 if (!imovel) return;
 
                 document.getElementById('info-imovel-lancamento').innerHTML = `
-                    <div style="background: #ffedd5; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                    <div style="background:rgba(240,160,48,0.15); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
                         <h4>${imovel.titulo}</h4>
                         <p>Estágio: <strong>Lançamento</strong></p>
                         <p>Data: ${Utils.formatDate(imovel.dataLancamento)}</p>
@@ -14372,7 +14914,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 if (!imovel) return;
 
                 document.getElementById('info-imovel-espera').innerHTML = `
-                    <div style="background: #e0f2fe; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                    <div style="background:rgba(14,165,233,0.12); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
                         <h4>${imovel.titulo}</h4>
                         <p>Selecione os clientes que devem ser avisados quando este imóvel entrar em lançamento.</p>
                     </div>
@@ -16294,7 +16836,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 : `<span style="background:rgba(79,70,229,0.12);color:var(--indigo);font-size:0.62rem;font-weight:700;padding:2px 6px;border-radius:20px;margin-left:6px;">SBPE</span>`;
 
                             const conjugeInfo = (cliente.conjugeNome || cliente.conjugeCpf)
-                                ? `<div style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:8px;padding:6px 8px;background:white;border-radius:7px;border:1px solid var(--border);">
+                                ? `<div style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:8px;padding:6px 8px;background:rgba(255,255,255,0.08);border-radius:7px;border:1px solid var(--border);">
                                     ${cliente.conjugeNome ? `<span>👤 <strong>${cliente.conjugeNome}</strong></span>` : ''}
                                     ${cliente.conjugeCpf ? `<span style="margin-left:8px;">📄 ${cliente.conjugeCpf}</span>` : ''}
                                    </div>`
@@ -17174,7 +17716,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                     ${thumbnail ? `
                                         <img src="${thumbnail}" style="width: 60px; height: 40px; border-radius: 4px; object-fit: cover;">
                                     ` : `
-                                        <div style="width: 60px; height: 40px; background: var(--light); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                        <div style="width: 60px; height: 40px; background: rgba(255,255,255,0.08); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
                                             <i class="fas fa-video" style="color: var(--secondary);"></i>
                                         </div>
                                     `}
@@ -19367,7 +19909,7 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                         const diasNaEtapa = entradaDate ? Math.floor((now - entradaDate) / 86400000) : null;
                         const travado = diasNaEtapa !== null && diasNaEtapa > 14 && e.chave !== 'venda';
                         const imovel = c.imovelInteresseId ? imoveis.find(i => i.id === c.imovelInteresseId) : null;
-                        html += `<div style="display:flex;align-items:center;gap:10px;padding:10px;background:${travado ? 'rgba(184,48,48,0.06)' : 'rgba(255,255,255,0.7)'};border-radius:10px;margin-bottom:6px;border:1px solid ${travado ? 'rgba(184,48,48,0.2)' : 'rgba(255,255,255,0.8)'};">
+                        html += `<div style="display:flex;align-items:center;gap:10px;padding:10px;background:${travado ? 'rgba(184,48,48,0.06)' : 'rgba(255,255,255,0.09)'};border-radius:10px;margin-bottom:6px;border:1px solid ${travado ? 'rgba(184,48,48,0.20)' : 'rgba(255,255,255,0.13)'};">
                             <div style="width:34px;height:34px;border-radius:50%;background:${e.cor};color:white;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">${initials}</div>
                             <div style="flex:1;min-width:0;">
                                 <div style="font-weight:600;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nome || 'Cliente'}</div>
@@ -19408,15 +19950,15 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                 const fmt = v => v > 0 ? 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0}) : 'N/D';
                 el.innerHTML = `
                     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
-                        <div style="text-align:center;padding:12px 6px;background:rgba(255,255,255,0.6);border-radius:10px;">
+                        <div style="text-align:center;padding:12px 6px;background:rgba(255,255,255,0.09);border-radius:10px;">
                             <div style="font-size:1.1rem;font-weight:900;color:var(--success);">${fmt(receitaRealizada)}</div>
                             <div style="font-size:0.7rem;color:var(--text-secondary);margin-top:3px;">🏆 Realizada</div>
                         </div>
-                        <div style="text-align:center;padding:12px 6px;background:rgba(255,255,255,0.6);border-radius:10px;">
+                        <div style="text-align:center;padding:12px 6px;background:rgba(255,255,255,0.09);border-radius:10px;">
                             <div style="font-size:1.1rem;font-weight:900;color:var(--warning);">${fmt(receitaQuente)}</div>
                             <div style="font-size:0.7rem;color:var(--text-secondary);margin-top:3px;">🔥 Ponderada</div>
                         </div>
-                        <div style="text-align:center;padding:12px 6px;background:rgba(255,255,255,0.6);border-radius:10px;">
+                        <div style="text-align:center;padding:12px 6px;background:rgba(255,255,255,0.09);border-radius:10px;">
                             <div style="font-size:1.1rem;font-weight:900;color:var(--primary);">${fmt(receitaPotencial)}</div>
                             <div style="font-size:0.7rem;color:var(--text-secondary);margin-top:3px;">💡 Potencial</div>
                         </div>
@@ -19469,7 +20011,7 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                                 </div>
                             </div>
                             <div style="display:flex;align-items:center;gap:8px;">
-                                <div style="flex:1;height:8px;background:var(--light);border-radius:4px;overflow:hidden;">
+                                <div style="flex:1;height:8px;background:rgba(255,255,255,0.12);border-radius:4px;overflow:hidden;">
                                     <div style="height:100%;background:${cor};width:${taxaAvanc}%;border-radius:4px;transition:width 1s;"></div>
                                 </div>
                                 <div style="font-size:0.72rem;color:${taxaConv>0?'var(--success)':'var(--text-secondary)'};font-weight:700;min-width:60px;text-align:right;">
@@ -19750,7 +20292,7 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                             <div style="display:flex;justify-content:space-between;font-size:0.78rem;font-weight:600;margin-bottom:4px;">
                                 <span>${e.nome}</span><span style="color:${e.cor};">${cnt} (${pct}%)</span>
                             </div>
-                            <div style="height:8px;background:var(--light);border-radius:4px;overflow:hidden;">
+                            <div style="height:8px;background:rgba(255,255,255,0.12);border-radius:4px;overflow:hidden;">
                                 <div style="height:100%;border-radius:4px;background:${e.cor};width:${Math.max(pct,1)}%;transition:width 1s;"></div>
                             </div>
                         </div>`;
@@ -19776,7 +20318,7 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                             <div style="display:flex;justify-content:space-between;font-size:0.78rem;font-weight:600;margin-bottom:4px;">
                                 <span style="text-transform:capitalize;">${origem}</span><span style="color:${CORES[i]};">${cnt} leads (${pct}%)</span>
                             </div>
-                            <div style="height:8px;background:var(--light);border-radius:4px;overflow:hidden;">
+                            <div style="height:8px;background:rgba(255,255,255,0.12);border-radius:4px;overflow:hidden;">
                                 <div style="height:100%;border-radius:4px;background:${CORES[i]};width:${pct}%;transition:width 1s;"></div>
                             </div>
                         </div>`;
@@ -19896,11 +20438,11 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                         </div>
                         <div class="vc-projecao-grid">
                             <div class="vc-projecao-item">
-                                <div class="vc-projecao-val" style="color:#2E4A31;">${projecaoLeads}</div>
+                                <div class="vc-projecao-val" style="color:#A8D5AC;">${projecaoLeads}</div>
                                 <div class="vc-projecao-lbl">Projeção Leads</div>
                             </div>
                             <div class="vc-projecao-item">
-                                <div class="vc-projecao-val" style="color:#3D6142;">${projecaoVisitas}</div>
+                                <div class="vc-projecao-val" style="color:#A8D5AC;">${projecaoVisitas}</div>
                                 <div class="vc-projecao-lbl">Projeção Visitas</div>
                             </div>
                             <div class="vc-projecao-item">
@@ -20940,15 +21482,15 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                     <div class="vc-indicacao-card">
                         <div style="font-weight:800;font-size:0.95rem;color:var(--accent);margin-bottom:8px;">📊 A Matemática das Indicações</div>
                         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-                            <div style="text-align:center;padding:10px 6px;background:rgba(255,255,255,0.6);border-radius:10px;">
+                            <div style="text-align:center;padding:10px 6px;background:rgba(255,255,255,0.09);border-radius:10px;">
                                 <div style="font-size:1.4rem;font-weight:900;color:var(--primary);">78%</div>
                                 <div style="font-size:0.68rem;color:var(--text-secondary);">indicariam o corretor</div>
                             </div>
-                            <div style="text-align:center;padding:10px 6px;background:rgba(255,255,255,0.6);border-radius:10px;">
+                            <div style="text-align:center;padding:10px 6px;background:rgba(255,255,255,0.09);border-radius:10px;">
                                 <div style="font-size:1.4rem;font-weight:900;color:var(--accent);">12%</div>
                                 <div style="font-size:0.68rem;color:var(--text-secondary);">recebem contato pós-venda</div>
                             </div>
-                            <div style="text-align:center;padding:10px 6px;background:rgba(255,255,255,0.6);border-radius:10px;">
+                            <div style="text-align:center;padding:10px 6px;background:rgba(255,255,255,0.09);border-radius:10px;">
                                 <div style="font-size:1.4rem;font-weight:900;color:var(--success);">3x</div>
                                 <div style="font-size:0.68rem;color:var(--text-secondary);">indicações por cliente</div>
                             </div>
@@ -20972,7 +21514,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                     const dataVenda = c.dataEntradaFunil ? new Date(c.dataEntradaFunil) : (c.dataCriacao ? new Date(c.dataCriacao) : null);
                     const diasDesdeVenda = dataVenda ? Math.floor((now - dataVenda) / 86400000) : null;
                     const waMsgTexto = `Olá ${(c.nome||'').split(' ')[0]}! Tudo bem? Passando para saber como está sendo a experiência no seu novo imóvel 😊 Qualquer dúvida estou à disposição!`;
-                    return `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.7);border-radius:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.9);box-shadow:0 2px 8px rgba(30,50,32,0.04);">
+                    return `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.09);border-radius:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.13);box-shadow:0 2px 8px rgba(30,50,32,0.04);">
                         <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#2E4A31,#3D6142);color:white;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0;">${initials}</div>
                         <div style="flex:1;min-width:0;">
                             <div style="font-weight:700;font-size:0.9rem;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nome || 'Cliente'}</div>
@@ -23179,7 +23721,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                     body.innerHTML = '';
                     arrows.forEach(a => body.appendChild(a));
                     const iframe = document.createElement('iframe');
-                    iframe.style.cssText = 'width:100%;height:100%;border:none;display:block;background:#fff;';
+                    iframe.style.cssText = 'width:100%;height:100%;border:none;display:block;background:transparent;';
                     iframe.src = blobURL;
                     body.appendChild(iframe);
                     toolbar.style.display = 'none';
@@ -23517,7 +24059,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 if (!grid) return;
                 if (!imgs || !imgs.length) { grid.innerHTML = ''; return; }
                 grid.innerHTML = imgs.map((src, i) => `
-                    <div style="position:relative;border-radius:10px;overflow:hidden;height:90px;background:var(--light);">
+                    <div style="position:relative;border-radius:10px;overflow:hidden;height:90px;background:rgba(255,255,255,0.08);">
                         <img src="${src}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
                         <button type="button" onclick="Notas._removeImagem(${i})" style="position:absolute;top:4px;right:4px;background:rgba(184,48,48,0.9);color:white;border:none;border-radius:50%;width:22px;height:22px;font-size:0.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">
                             <i class="fas fa-times"></i>
