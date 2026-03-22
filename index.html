@@ -5243,6 +5243,16 @@
                         <div class="stat-value" id="dash-comissao">R$ 0</div>
                         <div class="stat-label">Comissão em Neg.</div>
                     </div>
+                    <div class="stat-card" onclick="UI.navigate('venda-certa')">
+                        <div class="stat-icon bg-red"><i class="fas fa-bullseye"></i></div>
+                        <div class="stat-value" style="font-size:1.4rem; line-height:1;">🏆</div>
+                        <div class="stat-label">Venda Certa</div>
+                    </div>
+                    <div class="stat-card" onclick="UI.navigate('simulador')">
+                        <div class="stat-icon bg-cyan"><i class="fas fa-calculator"></i></div>
+                        <div class="stat-value" style="font-size:1.4rem; line-height:1;">🏦</div>
+                        <div class="stat-label">Simulador</div>
+                    </div>
                 </div>
 
                 <!-- Mini Chart de desempenho -->
@@ -6658,17 +6668,17 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <a href="#" class="nav-item" data-target="coach-view" onclick="UI.switchTab(this); Coach.init(); return false;">
                 <i class="fas fa-trophy"></i> <span>Coach</span>
             </a>
-            <a href="#" class="nav-item" data-target="venda-certa-view" onclick="UI.switchTab(this); VendaCerta.init(); return false;">
-                <i class="fas fa-bullseye"></i> <span>Venda Certa</span>
-            </a>
             <a href="#" class="nav-item" data-target="leitura-view" onclick="UI.switchTab(this); Leitura.init(); return false;">
                 <i class="fas fa-book-open"></i> <span>Leitura</span>
             </a>
-            <a href="#" class="nav-item" data-target="simulador-view" onclick="UI.switchTab(this); Simulador.init(); return false;">
-                <i class="fas fa-calculator"></i> <span>Simulador</span>
-            </a>
             <a href="#" class="nav-item" data-target="notas-view" onclick="UI.switchTab(this); Notas.init(); return false;">
                 <i class="fas fa-sticky-note"></i> <span>Notas</span>
+            </a>
+            <a href="#" class="nav-item" data-target="venda-certa-view" onclick="UI.switchTab(this); VendaCerta.init(); return false;" style="display:none">
+                <i class="fas fa-bullseye"></i> <span>Venda Certa</span>
+            </a>
+            <a href="#" class="nav-item" data-target="simulador-view" onclick="UI.switchTab(this); Simulador.init(); return false;" style="display:none">
+                <i class="fas fa-calculator"></i> <span>Simulador</span>
             </a>
         </nav>
 
@@ -10535,6 +10545,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     UI.renderFunil();
                 } else if (target === 'coach-view') {
                     fab.style.display = 'none';
+                } else if (target === 'venda-certa-view') {
+                    fab.style.display = 'none';
+                    VendaCerta.init();
                 } else if (target === 'simulador-view') {
                     fab.style.display = 'none';
                     Simulador.init();
