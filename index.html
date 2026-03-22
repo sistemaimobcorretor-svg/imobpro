@@ -7559,39 +7559,37 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             db: null,
             
             init: function() {
+                const self = this;
                 return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(this.name, this.version);
-                    
+                    let request;
+                    try {
+                        request = indexedDB.open(self.name, self.version);
+                    } catch(e) {
+                        return reject(e);
+                    }
+
                     request.onerror = (event) => {
-                        console.error('Erro ao abrir IndexedDB:', event);
-                        // Tenta sem versão específica como fallback
-                        try {
-                            const fb = indexedDB.open(this.name);
-                            fb.onsuccess = (e) => { this.db = e.target.result; resolve(); };
-                            fb.onerror   = () => reject(event);
-                        } catch(e2) { reject(event); }
+                        console.error('IndexedDB error:', event.target.error);
+                        reject(event.target.error || event);
                     };
-                    
-                    request.onsuccess = (event) => {
-                        this.db = event.target.result;
-                        console.log('IndexedDB aberto com sucesso, versão:', this.db.version);
-                        resolve();
+
+                    request.onblocked = () => {
+                        console.warn('IndexedDB blocked — outra aba pode estar aberta');
                     };
-                    
+
                     request.onupgradeneeded = (event) => {
+                        // SÍNCRONO — IDB não suporta await aqui
                         const db = event.target.result;
-                        const oldVersion = event.oldVersion;
-                        console.log(`Upgrade DB: v${oldVersion} → v${this.version}`);
-                        // createObjectStores é síncrono (IDB não suporta await no onupgradeneeded)
-                        this.createObjectStores(db);
-                        // migrateDatabase é async — não pode ser chamada aqui; é chamada após onsuccess
+                        console.log('DB upgrade:', event.oldVersion, '->', self.version);
+                        self.createObjectStores(db);
                     };
 
                     request.onsuccess = (event) => {
-                        this.db = event.target.result;
-                        console.log('IndexedDB pronto, versão:', this.db.version);
-                        // Executa migrações de dados após o banco estar aberto
-                        this.migrateDatabase(this.db, event.target.result.version - 1).catch(e => console.warn('migrate:', e));
+                        self.db = event.target.result;
+                        self.db.onerror = (e) => console.error('DB error:', e.target.error);
+                        console.log('DB pronto v' + self.db.version);
+                        // Migrações de dados (async, em background)
+                        self.migrateDatabase(self.db, self.db.version - 1).catch(e => console.warn('migrate:', e));
                         resolve();
                     };
                 });
@@ -24322,9 +24320,10 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
 
         // ===== AUTH MODULE =====
         const Auth = (() => {
+            'use strict';
             const SESSION_KEY = 'imobipro_session';
 
-            // ── Hash simples (sem crypto externo) ──────────────────────────
+            // ── Utilitários ────────────────────────────────────────────────
             async function hashPassword(password) {
                 const encoder = new TextEncoder();
                 const data = encoder.encode(password + 'imobipro_salt_2025');
@@ -24336,96 +24335,23 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); } catch(e) { return null; }
             }
             function setSession(user) {
-                sessionStorage.setItem(SESSION_KEY, JSON.stringify({ id: user.id, username: user.username, nome: user.nome, role: user.role }));
+                try { sessionStorage.setItem(SESSION_KEY, JSON.stringify({ id: user.id, username: user.username, nome: user.nome, role: user.role })); } catch(e) {}
             }
             function clearSession() {
-                sessionStorage.removeItem(SESSION_KEY);
-            }
-
-            // ── Inicialização ──────────────────────────────────────────────
-            async function init() {
-                // Garante que DB está pronto
-                if (!DB.db) {
-                    try { await DB.init(); }
-                    catch(e) {
-                        console.error('Auth.init: DB falhou:', e);
-                        loadLoginBg();
-                        showLogin();
-                        // Mostra botão de recuperação
-                        const dbErrEl  = document.getElementById('login-db-error');
-                        const resetBtn = document.getElementById('login-reset-btn');
-                        if (dbErrEl)  { dbErrEl.textContent = 'Erro ao abrir banco: ' + String(e); dbErrEl.style.display = 'block'; }
-                        if (resetBtn) resetBtn.style.display = 'block';
-                        return;
-                    }
-                }
-
-                // Verifica sessão existente
-                const session = getSession();
-                if (session) {
-                    try {
-                        if (DB.db.objectStoreNames.contains('usuarios')) {
-                            const u = await DB.get('usuarios', session.id);
-                            if (u) { showApp(session); return; }
-                        }
-                    } catch(e) { console.warn('Auth.init session check failed:', e); }
-                }
-
-                // Se não há store de usuários ou nenhum usuário, vai para cadastro
-                try {
-                    if (!DB.db.objectStoreNames.contains('usuarios')) {
-                        loadLoginBg(); showLogin(); showCadastro(); return;
-                    }
-                    const todos = await DB.getAll('usuarios');
-                    if (todos.length === 0) { loadLoginBg(); showLogin(); showCadastro(); return; }
-                } catch(e) {
-                    console.warn('Auth.init getAll usuarios falhou:', e);
-                }
-
-                loadLoginBg();
-                showLogin();
-            }
-
-            function showApp(user) {
-                document.getElementById('login-screen').classList.add('hidden');
-                loadLoginBg();
-                startIdleMonitor();
-                const badge = document.getElementById('user-badge-header');
-                const initial = (user.nome || user.username || '?').charAt(0).toUpperCase();
-                document.getElementById('user-badge-avatar').textContent = initial;
-                document.getElementById('user-badge-name').textContent = user.nome || user.username;
-                badge.style.display = 'flex';
-            }
-
-            function showLogin() {
-                document.getElementById('login-screen').classList.remove('hidden');
-                showLoginPanel();
-            }
-
-            function showLoginPanel() {
-                document.getElementById('login-panel').style.display = 'block';
-                document.getElementById('cadastro-panel').style.display = 'none';
-                clearMsg('login-error');
-            }
-
-            function showCadastro() {
-                document.getElementById('login-panel').style.display = 'none';
-                document.getElementById('cadastro-panel').style.display = 'block';
-                clearMsg('cadastro-error');
-                clearMsg('cadastro-success');
+                try { sessionStorage.removeItem(SESSION_KEY); } catch(e) {}
             }
 
             function clearMsg(id) {
                 const el = document.getElementById(id);
-                if (el) { el.textContent = ''; el.classList.remove('show'); }
+                if (el) { el.textContent = ''; el.style.display = 'none'; }
             }
             function showError(id, msg) {
                 const el = document.getElementById(id);
-                if (el) { el.textContent = msg; el.classList.add('show'); }
+                if (el) { el.textContent = msg; el.style.display = 'block'; el.classList.add('show'); }
             }
             function showSuccess(id, msg) {
                 const el = document.getElementById(id);
-                if (el) { el.textContent = msg; el.classList.add('show'); }
+                if (el) { el.textContent = msg; el.style.display = 'block'; el.classList.add('show'); }
             }
 
             function toggleEye(inputId, btn) {
@@ -24440,6 +24366,105 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 }
             }
 
+            // ── Tela de login ──────────────────────────────────────────────
+            function showApp(user) {
+                document.getElementById('login-screen').classList.add('hidden');
+                loadLoginBg();
+                startIdleMonitor();
+                const badge = document.getElementById('user-badge-header');
+                const initial = (user.nome || user.username || '?').charAt(0).toUpperCase();
+                document.getElementById('user-badge-avatar').textContent = initial;
+                document.getElementById('user-badge-name').textContent = user.nome || user.username;
+                if (badge) badge.style.display = 'flex';
+            }
+
+            function showLogin() {
+                document.getElementById('login-screen').classList.remove('hidden');
+                showLoginPanel();
+            }
+            function showLoginPanel() {
+                const lp = document.getElementById('login-panel');
+                const cp = document.getElementById('cadastro-panel');
+                if (lp) lp.style.display = 'block';
+                if (cp) cp.style.display = 'none';
+                clearMsg('login-error');
+                const dbErr = document.getElementById('login-db-error');
+                const resetBtn = document.getElementById('login-reset-btn');
+                if (dbErr) dbErr.style.display = 'none';
+                if (resetBtn) resetBtn.style.display = 'none';
+            }
+            function showCadastro() {
+                const lp = document.getElementById('login-panel');
+                const cp = document.getElementById('cadastro-panel');
+                if (lp) lp.style.display = 'none';
+                if (cp) cp.style.display = 'block';
+                clearMsg('cadastro-error');
+                clearMsg('cadastro-success');
+            }
+
+            function loadLoginBg() {
+                try {
+                    const s = UI.data && UI.data.settings;
+                    if (s && s.loginBgImage) {
+                        const layer = document.getElementById('login-bg-layer');
+                        if (layer) { layer.style.backgroundImage = `url('${s.loginBgImage}')`; layer.style.opacity = (s.loginBgOpacity || 40) / 100; }
+                    }
+                } catch(e) {}
+            }
+
+            function applyLoginBg(img, opacity) {
+                const layer = document.getElementById('login-bg-layer');
+                if (!layer) return;
+                if (img) { layer.style.backgroundImage = `url('${img}')`; layer.style.opacity = opacity; }
+                else { layer.style.backgroundImage = 'none'; }
+            }
+
+            // ── Garante que DB está pronto e tem a store de usuários ───────
+            async function ensureDB() {
+                if (!DB.db) await DB.init();
+                if (!DB.db) throw new Error('Banco de dados não pôde ser aberto.');
+                if (!DB.db.objectStoreNames.contains('usuarios')) {
+                    throw new Error('Store de usuários não encontrada. Clique em "Recriar banco de dados".');
+                }
+            }
+
+            // ── Inicialização ──────────────────────────────────────────────
+            async function init() {
+                try {
+                    await ensureDB();
+                } catch(e) {
+                    console.error('Auth.init DB error:', e);
+                    loadLoginBg();
+                    showLogin();
+                    showError('login-error', String(e.message || e));
+                    const resetBtn = document.getElementById('login-reset-btn');
+                    if (resetBtn) resetBtn.style.display = 'block';
+                    return;
+                }
+
+                // Tenta restaurar sessão existente
+                const session = getSession();
+                if (session && session.id) {
+                    try {
+                        const u = await DB.get('usuarios', session.id);
+                        if (u) { showApp(session); return; }
+                    } catch(e) { console.warn('Sessão inválida:', e); }
+                    clearSession();
+                }
+
+                // Verifica se há usuários cadastrados
+                let todos = [];
+                try { todos = await DB.getAll('usuarios'); } catch(e) { todos = []; }
+
+                loadLoginBg();
+                if (todos.length === 0) {
+                    showLogin();
+                    showCadastro();
+                } else {
+                    showLogin();
+                }
+            }
+
             // ── Login ──────────────────────────────────────────────────────
             async function login() {
                 clearMsg('login-error');
@@ -24451,54 +24476,44 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 const username = (document.getElementById('login-username').value || '').trim().toLowerCase();
                 const password = document.getElementById('login-password').value || '';
 
-                if (!username || !password) { showError('login-error', 'Preencha usuário e senha.'); return; }
+                if (!username || !password) {
+                    showError('login-error', 'Preencha usuário e senha.');
+                    return;
+                }
 
                 const btn = document.querySelector('#login-panel .login-btn');
                 if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Entrando...'; }
 
                 try {
-                    // Garante DB inicializado
-                    if (!DB.db) {
-                        try { await DB.init(); }
-                        catch(dbErr) {
-                            const msg = 'Erro ao abrir o banco de dados local. Tente recarregar a página. Se persistir, use "Recriar banco de dados" abaixo.';
-                            showError('login-error', msg);
-                            if (dbErrEl)  { dbErrEl.textContent = String(dbErr); dbErrEl.style.display = 'block'; }
-                            if (resetBtn) resetBtn.style.display = 'block';
-                            return;
-                        }
-                    }
-
-                    // Verifica se a store 'usuarios' existe (pode faltar em bancos antigos)
-                    if (!DB.db.objectStoreNames.contains('usuarios')) {
-                        if (dbErrEl)  { dbErrEl.textContent = 'Store de usuários não encontrada no banco. Use "Recriar banco" para corrigir.'; dbErrEl.style.display = 'block'; }
-                        if (resetBtn) resetBtn.style.display = 'block';
-                        showError('login-error', 'Banco de dados desatualizado. Clique em "Recriar banco de dados" abaixo.');
-                        return;
-                    }
+                    await ensureDB();
 
                     let todos = [];
                     try { todos = await DB.getAll('usuarios'); } catch(e) { todos = []; }
 
                     if (todos.length === 0) {
-                        showError('login-error', 'Nenhum usuário cadastrado. Clique em "Cadastrar-se" para criar sua conta.');
+                        showError('login-error', 'Nenhum usuário cadastrado. Clique em "Cadastrar-se".');
                         return;
                     }
 
-                    const user = todos.find(u => u.username.toLowerCase() === username);
-                    if (!user) { showError('login-error', 'Usuário não encontrado. Verifique o nome de usuário.'); return; }
+                    const user = todos.find(u => (u.username || '').toLowerCase() === username);
+                    if (!user) {
+                        showError('login-error', 'Usuário não encontrado.');
+                        return;
+                    }
 
                     const hash = await hashPassword(password);
-                    if (hash !== user.passwordHash) { showError('login-error', 'Senha incorreta. Tente novamente.'); return; }
+                    if (hash !== user.passwordHash) {
+                        showError('login-error', 'Senha incorreta.');
+                        return;
+                    }
 
                     setSession(user);
-                    showApp(user);
                     document.getElementById('login-password').value = '';
+                    showApp(user);
 
                 } catch(e) {
                     console.error('Erro login:', e);
-                    const msg = 'Erro inesperado: ' + (e.message || String(e));
-                    showError('login-error', msg);
+                    showError('login-error', e.message || String(e));
                     if (dbErrEl)  { dbErrEl.textContent = String(e); dbErrEl.style.display = 'block'; }
                     if (resetBtn) resetBtn.style.display = 'block';
                 } finally {
@@ -24511,57 +24526,51 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 clearMsg('cadastro-error');
                 clearMsg('cadastro-success');
 
-                const nome = (document.getElementById('cad-nome').value || '').trim();
+                const nome     = (document.getElementById('cad-nome').value || '').trim();
                 const username = (document.getElementById('cad-username').value || '').trim().toLowerCase();
-                const senha = document.getElementById('cad-senha').value || '';
+                const senha    = document.getElementById('cad-senha').value || '';
                 const confirma = document.getElementById('cad-confirma').value || '';
 
-                if (!nome) { showError('cadastro-error', 'Informe seu nome.'); return; }
+                if (!nome)     { showError('cadastro-error', 'Informe seu nome.'); return; }
                 if (!username) { showError('cadastro-error', 'Informe um nome de usuário.'); return; }
-                if (username.length < 3) { showError('cadastro-error', 'Usuário deve ter pelo menos 3 caracteres.'); return; }
-                if (!/^[a-z0-9._]+$/.test(username)) { showError('cadastro-error', 'Usuário só pode ter letras, números, ponto e underline.'); return; }
-                if (senha.length < 6) { showError('cadastro-error', 'Senha deve ter pelo menos 6 caracteres.'); return; }
+                if (username.length < 3) { showError('cadastro-error', 'Usuário: mínimo 3 caracteres.'); return; }
+                if (!/^[a-z0-9._]+$/.test(username)) { showError('cadastro-error', 'Usuário: só letras, números, ponto e underline.'); return; }
+                if (senha.length < 6) { showError('cadastro-error', 'Senha: mínimo 6 caracteres.'); return; }
                 if (senha !== confirma) { showError('cadastro-error', 'As senhas não coincidem.'); return; }
 
                 const btn = document.querySelector('#cadastro-panel .login-btn');
                 if (btn) btn.disabled = true;
 
                 try {
-                    // Garante que DB está pronto
-                    if (!DB.db) await DB.init();
+                    await ensureDB();
 
                     let todos = [];
                     try { todos = await DB.getAll('usuarios'); } catch(e) { todos = []; }
 
-                    if (todos.find(u => u.username.toLowerCase() === username)) {
-                        showError('cadastro-error', 'Este nome de usuário já está em uso.'); return;
+                    if (todos.find(u => (u.username || '').toLowerCase() === username)) {
+                        showError('cadastro-error', 'Nome de usuário já em uso.');
+                        return;
                     }
 
                     const hash = await hashPassword(senha);
-                    const isFirst = todos.length === 0;
                     const novoUser = {
                         id: Date.now().toString(36) + Math.random().toString(36).substr(2),
-                        nome,
-                        username,
+                        nome, username,
                         passwordHash: hash,
-                        role: isFirst ? 'admin' : 'user',
+                        role: todos.length === 0 ? 'admin' : 'user',
                         dataCriacao: new Date().toISOString()
                     };
 
                     await DB.put('usuarios', novoUser);
-
                     showSuccess('cadastro-success', '✅ Conta criada! Entrando...');
-                    ['cad-nome','cad-username','cad-senha','cad-confirma'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-
-                    // Auto-login após cadastro
-                    setTimeout(async () => {
-                        setSession(novoUser);
-                        showApp(novoUser);
-                    }, 1200);
+                    ['cad-nome','cad-username','cad-senha','cad-confirma'].forEach(id => {
+                        const el = document.getElementById(id); if (el) el.value = '';
+                    });
+                    setTimeout(() => { setSession(novoUser); showApp(novoUser); }, 1000);
 
                 } catch(e) {
                     console.error('Erro cadastro:', e);
-                    showError('cadastro-error', 'Erro ao criar conta: ' + (e.message || e));
+                    showError('cadastro-error', e.message || String(e));
                 } finally {
                     if (btn) btn.disabled = false;
                 }
@@ -24573,90 +24582,71 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 stopIdleMonitor();
                 clearSession();
                 closeUserMenu();
-                document.getElementById('user-badge-header').style.display = 'none';
+                const badge = document.getElementById('user-badge-header');
+                if (badge) badge.style.display = 'none';
                 document.getElementById('login-username').value = '';
                 document.getElementById('login-password').value = '';
                 showLogin();
             }
 
-            // ── Menu de usuário / Gerenciar ────────────────────────────────
-            async function openUserMenu() {
+            // ── Menu usuário ────────────────────────────────────────────────
+            function openUserMenu() {
                 const session = getSession();
-                if (!session) return;
-
-                document.getElementById('modal-user-logado').textContent = session.nome + ' (@' + session.username + ')';
-
-                // Limpa campos de alterar senha
-                ['chg-senha-atual','chg-senha-nova','chg-senha-confirma'].forEach(id => {
-                    const el = document.getElementById(id); if(el) el.value = '';
-                });
-                const chgMsg = document.getElementById('chg-msg');
-                if (chgMsg) { chgMsg.style.display = 'none'; chgMsg.textContent = ''; }
-
-                // Admin: mostrar lista de usuários
-                const adminSection = document.getElementById('admin-section');
-                if (session.role === 'admin') {
-                    adminSection.style.display = 'block';
-                    await renderUsuariosList();
-                } else {
-                    adminSection.style.display = 'none';
-                }
-
-                document.getElementById('overlay-usuarios').classList.add('active');
-                document.getElementById('sheet-usuarios').style.transform = 'translateY(0)';
+                const modal = document.getElementById('modal-user-logado');
+                if (modal && session) modal.textContent = session.nome || session.username;
+                const adminSec = document.getElementById('admin-section');
+                if (adminSec) adminSec.style.display = session && session.role === 'admin' ? 'block' : 'none';
+                if (session && session.role === 'admin') renderUsuariosList();
+                const overlay = document.getElementById('overlay-usuarios');
+                const sheet = document.getElementById('sheet-usuarios');
+                if (overlay) overlay.classList.add('active');
+                if (sheet) sheet.style.transform = 'translateY(0)';
             }
-
             function closeUserMenu() {
-                document.getElementById('overlay-usuarios').classList.remove('active');
-                document.getElementById('sheet-usuarios').style.transform = '';
+                const overlay = document.getElementById('overlay-usuarios');
+                const sheet = document.getElementById('sheet-usuarios');
+                if (overlay) overlay.classList.remove('active');
+                if (sheet) sheet.style.transform = '';
             }
 
             async function renderUsuariosList() {
-                const todos = await DB.getAll('usuarios');
-                const session = getSession();
                 const container = document.getElementById('usuarios-list-modal');
                 if (!container) return;
-
-                if (todos.length === 0) {
-                    container.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;text-align:center;padding:12px">Nenhum usuário cadastrado.</p>';
-                    return;
-                }
-
+                let todos = [];
+                try { todos = await DB.getAll('usuarios'); } catch(e) {}
+                const session = getSession();
                 container.innerHTML = todos.map(u => `
-                    <div class="usuario-item">
-                        <div class="u-avatar">${(u.nome||u.username||'?').charAt(0).toUpperCase()}</div>
-                        <div class="u-info">
-                            <div class="u-name">${u.nome}</div>
-                            <div class="u-role">${u.username} · ${u.role === 'admin' ? '👑 Admin' : '👤 Usuário'}</div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+                        <div style="width:36px;height:36px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0;">
+                            ${(u.nome || u.username || '?').charAt(0).toUpperCase()}
                         </div>
-                        <div class="u-actions">
-                            ${u.id !== session.id ? `<button class="u-del-btn" onclick="Auth.deletarUsuario('${u.id}')"><i class="fas fa-trash"></i></button>` : '<span style="font-size:0.72rem;color:var(--text-secondary);padding:4px">você</span>'}
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:600;font-size:0.9rem;">${u.nome || u.username}</div>
+                            <div style="font-size:0.78rem;color:var(--text-secondary);">@${u.username} · ${u.role === 'admin' ? 'Admin' : 'Usuário'}</div>
                         </div>
+                        ${u.id !== session?.id ? `<button onclick="Auth.deletarUsuario('${u.id}')" style="background:rgba(184,48,48,0.1);border:none;border-radius:8px;padding:6px 10px;color:var(--danger);font-size:0.78rem;cursor:pointer;font-weight:600;">Excluir</button>` : '<span style="font-size:0.75rem;color:var(--text-secondary);">você</span>'}
                     </div>
-                `).join('');
+                `).join('') || '<p style="font-size:0.85rem;color:var(--text-secondary);">Nenhum usuário cadastrado.</p>';
             }
 
             async function deletarUsuario(id) {
-                if (!confirm('Remover este usuário?')) return;
-                await DB.delete('usuarios', id);
-                await renderUsuariosList();
-                if (window.UI && UI.showToast) UI.showToast('Usuário removido.');
+                if (!confirm('Excluir este usuário?')) return;
+                try {
+                    await DB.delete('usuarios', id);
+                    renderUsuariosList();
+                    Utils.toast('Usuário excluído');
+                } catch(e) { Utils.toast('Erro ao excluir: ' + e.message, 'error'); }
             }
 
             async function novoUsuarioAdmin() {
                 const nome = prompt('Nome completo do novo usuário:');
                 if (!nome || !nome.trim()) return;
-                const username = prompt('Nome de usuário (letras, números, ponto, underline):');
-                if (!username || !username.trim()) return;
-                if (!/^[a-z0-9._]+$/i.test(username.trim())) { alert('Nome de usuário inválido.'); return; }
+                const username = prompt('Nome de usuário (sem espaços):');
+                if (!username || username.trim().length < 3) { alert('Usuário inválido.'); return; }
                 const senha = prompt('Senha (mínimo 6 caracteres):');
-                if (!senha || senha.length < 6) { alert('Senha muito curta.'); return; }
-
+                if (!senha || senha.length < 6) { alert('Senha inválida.'); return; }
                 try {
-                    const todos = await DB.getAll('usuarios');
-                    if (todos.find(u => u.username.toLowerCase() === username.trim().toLowerCase())) {
-                        alert('Este nome de usuário já está em uso.'); return;
-                    }
+                    await ensureDB();
                     const hash = await hashPassword(senha);
                     const novoUser = {
                         id: Date.now().toString(36) + Math.random().toString(36).substr(2),
@@ -24665,195 +24655,110 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                         dataCriacao: new Date().toISOString()
                     };
                     await DB.put('usuarios', novoUser);
-                    await renderUsuariosList();
-                    if (window.UI && UI.showToast) UI.showToast('✅ Usuário criado com sucesso!');
-                } catch(e) { alert('Erro ao criar usuário.'); }
+                    renderUsuariosList();
+                    Utils.toast('Usuário criado com sucesso!');
+                } catch(e) { Utils.toast('Erro: ' + e.message, 'error'); }
             }
 
-            // ── Alterar senha ──────────────────────────────────────────────
             async function alterarSenha() {
-                const msgEl = document.getElementById('chg-msg');
-                const showMsg = (txt, ok) => {
-                    msgEl.textContent = txt;
-                    msgEl.style.display = 'block';
-                    msgEl.style.background = ok ? 'rgba(46,125,66,0.15)' : 'rgba(184,48,48,0.15)';
-                    msgEl.style.color = ok ? 'var(--success)' : 'var(--danger)';
-                    msgEl.style.border = ok ? '1px solid rgba(46,125,66,0.3)' : '1px solid rgba(184,48,48,0.3)';
-                    msgEl.style.borderRadius = '9px'; msgEl.style.padding = '9px 12px';
-                };
+                const atual   = document.getElementById('chg-senha-atual').value || '';
+                const nova    = document.getElementById('chg-senha-nova').value || '';
+                const confirma = document.getElementById('chg-senha-confirma').value || '';
+                const msgEl   = document.getElementById('chg-msg');
+                const show = (msg, ok) => { if (msgEl) { msgEl.textContent = msg; msgEl.style.display = 'block'; msgEl.style.background = ok ? 'rgba(46,125,85,0.10)' : 'rgba(184,48,48,0.08)'; msgEl.style.color = ok ? 'var(--success)' : 'var(--danger)'; } };
+
+                if (!atual || !nova || !confirma) { show('Preencha todos os campos.'); return; }
+                if (nova.length < 6) { show('Nova senha: mínimo 6 caracteres.'); return; }
+                if (nova !== confirma) { show('As senhas não coincidem.'); return; }
 
                 const session = getSession();
-                if (!session) return;
-
-                const atual = document.getElementById('chg-senha-atual').value;
-                const nova = document.getElementById('chg-senha-nova').value;
-                const confirma = document.getElementById('chg-senha-confirma').value;
-
-                if (!atual || !nova || !confirma) { showMsg('Preencha todos os campos.', false); return; }
-                if (nova.length < 6) { showMsg('Nova senha deve ter pelo menos 6 caracteres.', false); return; }
-                if (nova !== confirma) { showMsg('As novas senhas não coincidem.', false); return; }
+                if (!session) { show('Sessão expirada. Faça login novamente.'); return; }
 
                 try {
+                    await ensureDB();
                     const user = await DB.get('usuarios', session.id);
-                    if (!user) { showMsg('Usuário não encontrado.', false); return; }
+                    if (!user) { show('Usuário não encontrado.'); return; }
                     const hashAtual = await hashPassword(atual);
-                    if (hashAtual !== user.passwordHash) { showMsg('Senha atual incorreta.', false); return; }
+                    if (hashAtual !== user.passwordHash) { show('Senha atual incorreta.'); return; }
                     user.passwordHash = await hashPassword(nova);
                     await DB.put('usuarios', user);
-                    showMsg('✅ Senha alterada com sucesso!', true);
-                    ['chg-senha-atual','chg-senha-nova','chg-senha-confirma'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-                } catch(e) { showMsg('Erro ao alterar senha.', false); }
+                    show('✅ Senha alterada com sucesso!', true);
+                    ['chg-senha-atual','chg-senha-nova','chg-senha-confirma'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+                } catch(e) { show('Erro: ' + (e.message || e)); }
             }
 
-            // ── Carrega bg do login das settings ──────────────────────────────
-            async function loadLoginBg() {
+            // ── Resetar banco ───────────────────────────────────────────────
+            async function resetarBanco() {
+                if (!confirm('⚠️ Isso vai apagar TODOS os dados do sistema (clientes, imóveis, etc.)\n\nSó faça isso se não conseguir acessar o sistema de nenhuma forma.\n\nDeseja continuar?')) return;
                 try {
-                    const s = await DB.get('settings', 'main');
-                    if (s && s.loginBgImage) {
-                        applyLoginBg(s.loginBgImage, (s.loginBgOpacity || 40) / 100);
-                    }
-                } catch(e) {}
+                    await new Promise((res, rej) => {
+                        const req = indexedDB.deleteDatabase('ImobiProDB');
+                        req.onsuccess = () => res();
+                        req.onerror   = () => rej(new Error('Falha ao deletar banco'));
+                        req.onblocked = () => { alert('Feche outras abas do ImobiPro e tente novamente.'); rej(new Error('blocked')); };
+                    });
+                    alert('✅ Banco resetado. A página será recarregada.');
+                    location.reload();
+                } catch(e) { alert('Erro: ' + (e.message || e)); }
             }
 
-            // ── Aplica imagem de fundo na tela de login ──────────────────────
-            function applyLoginBg(imgData, opacity) {
-                const layer = document.getElementById('login-bg-layer');
-                const overlay = document.getElementById('login-bg-overlay');
-                if (!layer) return;
-                if (imgData) {
-                    layer.style.backgroundImage = `url('${imgData}')`;
-                    layer.style.opacity = opacity !== undefined ? opacity : 0.4;
-                    if (overlay) overlay.style.display = 'block';
-                } else {
-                    layer.style.backgroundImage = 'none';
-                    layer.style.opacity = 0;
-                    if (overlay) overlay.style.display = 'none';
-                }
-            }
-
-
-            // ══════════════════════════════════════════════════════════════
-            // IDLE TIMER — 1 min sem interação → aviso → 5s → logout auto
-            // ══════════════════════════════════════════════════════════════
-            const IDLE_TIMEOUT  = 60 * 1000;   // 1 minuto
-            const WARN_TIMEOUT  = 5 * 1000;     // 5 segundos para responder
-            const CIRCUMFERENCE = 2 * Math.PI * 24; // raio 24 → ≈ 150.796
-
-            let idleTimer    = null;
-            let warnTimer    = null;
-            let countInterval = null;
-            let warnCount    = 5;
+            // ── Idle Timer ─────────────────────────────────────────────────
+            const IDLE_TIMEOUT  = 60 * 1000;
+            const WARN_TIMEOUT  = 5 * 1000;
+            const CIRCUMFERENCE = 2 * Math.PI * 24;
+            let idleTimer = null, warnTimer = null, countInterval = null, warnCount = 5;
 
             function resetIdle() {
-                // Só monitora quando há sessão ativa
                 if (!getSession()) return;
                 clearTimeout(idleTimer);
                 idleTimer = setTimeout(showIdleWarning, IDLE_TIMEOUT);
             }
-
             function startIdleMonitor() {
                 const events = ['mousemove','mousedown','keydown','touchstart','scroll','click','input'];
                 events.forEach(ev => document.addEventListener(ev, resetIdle, { passive: true }));
                 resetIdle();
             }
-
             function stopIdleMonitor() {
-                clearTimeout(idleTimer);
-                clearTimeout(warnTimer);
-                clearInterval(countInterval);
+                clearTimeout(idleTimer); clearTimeout(warnTimer); clearInterval(countInterval);
                 idleTimer = warnTimer = countInterval = null;
             }
-
             function showIdleWarning() {
-                // Não mostra se o login já está visível
                 if (!getSession()) return;
                 const overlay = document.getElementById('idle-warning-overlay');
                 if (!overlay) return;
                 overlay.classList.add('show');
-
-                // Inicia contagem regressiva
-                warnCount = 5;
-                updateRing(5);
-
+                warnCount = 5; updateRing(5);
                 clearInterval(countInterval);
-                countInterval = setInterval(() => {
-                    warnCount--;
-                    updateRing(warnCount);
-                    if (warnCount <= 0) {
-                        clearInterval(countInterval);
-                        idleLogout();
-                    }
-                }, 1000);
-
-                // Segurança extra: força logout após WARN_TIMEOUT + 200ms
+                countInterval = setInterval(() => { warnCount--; updateRing(warnCount); if (warnCount <= 0) { clearInterval(countInterval); idleLogout(); } }, 1000);
                 clearTimeout(warnTimer);
                 warnTimer = setTimeout(idleLogout, WARN_TIMEOUT + 200);
             }
-
             function updateRing(seconds) {
                 const numEl = document.getElementById('idle-countdown-num');
                 const ringEl = document.getElementById('idle-ring-fg');
                 if (numEl) numEl.textContent = Math.max(0, seconds);
-                if (ringEl) {
-                    const progress = seconds / 5; // 5 = total seconds
-                    ringEl.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
-                }
+                if (ringEl) ringEl.style.strokeDashoffset = CIRCUMFERENCE * (1 - seconds / 5);
             }
-
             function hideIdleWarning() {
                 const overlay = document.getElementById('idle-warning-overlay');
                 if (overlay) overlay.classList.remove('show');
-                clearInterval(countInterval);
-                clearTimeout(warnTimer);
+                clearInterval(countInterval); clearTimeout(warnTimer);
             }
-
-            function idleContinue() {
-                hideIdleWarning();
-                resetIdle();
-            }
-
+            function idleContinue() { hideIdleWarning(); resetIdle(); }
             function idleLogout() {
-                hideIdleWarning();
-                stopIdleMonitor();
-                clearSession();
+                hideIdleWarning(); stopIdleMonitor(); clearSession();
                 const badge = document.getElementById('user-badge-header');
                 if (badge) badge.style.display = 'none';
-                document.getElementById('login-username').value = '';
-                document.getElementById('login-password').value = '';
-                // Fecha qualquer modal aberto
+                const lu = document.getElementById('login-username');
+                const lp = document.getElementById('login-password');
+                if (lu) lu.value = ''; if (lp) lp.value = '';
                 if (window.UI && UI.closeModals) UI.closeModals();
-                loadLoginBg();
-                showLogin();
+                loadLoginBg(); showLogin();
             }
 
-            // ── Reseta banco de dados (apenas stores de usuário) ─────────
-            async function resetarBanco() {
-                if (!confirm(
-                    '⚠️ ATENÇÃO\n\n' +
-                    'Isso vai apagar APENAS os dados de login (usuários).\n' +
-                    'Seus clientes, imóveis e visitas serão mantidos.\n\n' +
-                    'Deseja continuar?'
-                )) return;
-
-                try {
-                    // Deleta o banco inteiro e recria
-                    await new Promise((res, rej) => {
-                        const req = indexedDB.deleteDatabase('ImobiProDB');
-                        req.onsuccess = () => res();
-                        req.onerror   = () => rej(new Error('Falha ao deletar banco'));
-                        req.onblocked = () => {
-                            alert('Feche outras abas do ImobiPro e tente novamente.');
-                            rej(new Error('blocked'));
-                        };
-                    });
-                    alert('✅ Banco resetado! A página será recarregada.\nCrie uma nova conta ao abrir o sistema.');
-                    location.reload();
-                } catch(e) {
-                    alert('Erro ao resetar: ' + (e.message || e));
-                }
-            }
-
-            return { init, login, cadastrar, logout, showLogin, showLoginPanel, showCadastro, toggleEye, openUserMenu, closeUserMenu, deletarUsuario, novoUsuarioAdmin, alterarSenha, applyLoginBg, idleContinue, idleLogout, resetarBanco };
+            return { init, login, cadastrar, logout, showLogin, showLoginPanel, showCadastro,
+                     toggleEye, openUserMenu, closeUserMenu, deletarUsuario, novoUsuarioAdmin,
+                     alterarSenha, applyLoginBg, idleContinue, idleLogout, resetarBanco };
         })();
 
         window.Auth = Auth;
