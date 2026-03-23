@@ -235,7 +235,7 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: calc(var(--header-height) + 16px) 16px calc(var(--nav-height) + 80px);
+            padding: calc(var(--header-height) + 16px) 16px calc(var(--nav-height) + 16px);
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
             width: 100%;
@@ -710,6 +710,16 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
+        }
+        /* Elimina barra escura abaixo da nav em dispositivos com safe-area (iPhone notch/home bar) */
+        .bottom-nav::before {
+            content: '';
+            position: absolute;
+            bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+            left: 0; right: 0;
+            height: env(safe-area-inset-bottom, 0px);
+            background: #FFFFFF;
+            pointer-events: none;
         }
         .bottom-nav::-webkit-scrollbar { display: none; }
 
@@ -1634,19 +1644,65 @@
         
         .loading {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--primary);
             width: 100%;
+            background: #F5F7FA;
+            gap: 16px;
         }
         
         .loading i {
             margin-right: 10px;
             animation: spin 1s linear infinite;
         }
-        
+
+        .loading-logo {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--dark);
+            letter-spacing: -1px;
+        }
+        .loading-logo span { color: var(--primary); }
+        .loading-bar-wrap {
+            width: 160px;
+            height: 4px;
+            background: #E2E8F0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .loading-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 4px;
+            animation: loadingBar 1.8s ease-in-out infinite;
+        }
+        @keyframes loadingBar {
+            0%   { width: 0%; margin-left: 0; }
+            50%  { width: 70%; margin-left: 15%; }
+            100% { width: 0%; margin-left: 100%; }
+        }
+        .loading-msg {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* ── Skeleton shimmer para cards do dash ── */
+        @keyframes shimmer {
+            0%   { background-position: -400px 0; }
+            100% { background-position: 400px 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #e8edf2 25%, #f4f6f9 50%, #e8edf2 75%);
+            background-size: 400px 100%;
+            animation: shimmer 1.4s infinite linear;
+            border-radius: 8px;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -5236,7 +5292,7 @@
 (function(){
     'use strict';
 
-    var BIN_ID  = '69c129b2c3097a1dd54fc25e';
+    var BIN_ID  = '69bf5457b7ec241ddc8e5b7b';
     var API_KEY = '$2a$10$xxIvXXIjG7A86QLIGEifv.jhyYGb3oxNTy37NWXJwY4/PDwozFjvK';
     var WA_NUM  = '5582996622036';
     var BASE    = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
@@ -5483,7 +5539,11 @@
     </div>
 
     <div id="loading" class="loading">
-        <i class="fas fa-spinner"></i> Inicializando sistema...
+        <div class="loading-logo"><span>Imobi</span>Pro</div>
+        <div class="loading-bar-wrap">
+            <div class="loading-bar-fill"></div>
+        </div>
+        <div class="loading-msg"><i class="fas fa-spinner" style="margin-right:6px;animation:spin 1s linear infinite;"></i> Carregando dados...</div>
     </div>
 
     <div id="app" style="display: none; width: 100%; height: 100%;">
@@ -5559,37 +5619,37 @@
 
                     <div class="stat-card" onclick="UI.navigate('imoveis')">
                         <div class="stat-icon bg-blue"><i class="fas fa-building"></i></div>
-                        <div class="stat-value" id="dash-total-imoveis">0</div>
+                        <div class="stat-value dash-loading-val" id="dash-total-imoveis"><span class="skeleton" style="display:inline-block;width:28px;height:18px;border-radius:5px;">&nbsp;</span></div>
                         <div class="stat-label">Imóveis</div>
                     </div>
                     <div class="stat-card" onclick="UI.navigate('clientes')">
                         <div class="stat-icon bg-green"><i class="fas fa-users"></i></div>
-                        <div class="stat-value" id="dash-total-clientes">0</div>
+                        <div class="stat-value dash-loading-val" id="dash-total-clientes"><span class="skeleton" style="display:inline-block;width:28px;height:18px;border-radius:5px;">&nbsp;</span></div>
                         <div class="stat-label">Clientes</div>
                     </div>
                     <div class="stat-card" onclick="UI.navigate('agenda')">
                         <div class="stat-icon bg-orange"><i class="fas fa-calendar-alt"></i></div>
-                        <div class="stat-value" id="dash-visitas">0</div>
+                        <div class="stat-value dash-loading-val" id="dash-visitas"><span class="skeleton" style="display:inline-block;width:28px;height:18px;border-radius:5px;">&nbsp;</span></div>
                         <div class="stat-label">Agenda</div>
                     </div>
                     <div class="stat-card" onclick="UI.navigate('relatorios')">
                         <div class="stat-icon bg-red"><i class="fas fa-chart-line"></i></div>
-                        <div class="stat-value" id="dash-vendas">R$ 0</div>
+                        <div class="stat-value dash-loading-val" id="dash-vendas"><span class="skeleton" style="display:inline-block;width:44px;height:18px;border-radius:5px;">&nbsp;</span></div>
                         <div class="stat-label">Vendas</div>
                     </div>
                     <div class="stat-card" onclick="UI.navigate('funil')">
                         <div class="stat-icon bg-cyan"><i class="fas fa-handshake"></i></div>
-                        <div class="stat-value" id="dash-negociacoes">0</div>
+                        <div class="stat-value dash-loading-val" id="dash-negociacoes"><span class="skeleton" style="display:inline-block;width:28px;height:18px;border-radius:5px;">&nbsp;</span></div>
                         <div class="stat-label">Negoc.</div>
                     </div>
                     <div class="stat-card" onclick="UI.navigate('imoveis')">
                         <div class="stat-icon bg-purple"><i class="fas fa-star"></i></div>
-                        <div class="stat-value" id="dash-destaques">0</div>
+                        <div class="stat-value dash-loading-val" id="dash-destaques"><span class="skeleton" style="display:inline-block;width:28px;height:18px;border-radius:5px;">&nbsp;</span></div>
                         <div class="stat-label">Destaques</div>
                     </div>
                     <div class="stat-card" onclick="UI.navigate('funil')" title="Comissão prevista em negociações">
                         <div class="stat-icon bg-gold"><i class="fas fa-coins"></i></div>
-                        <div class="stat-value" id="dash-comissao">R$ 0</div>
+                        <div class="stat-value dash-loading-val" id="dash-comissao"><span class="skeleton" style="display:inline-block;width:44px;height:18px;border-radius:5px;">&nbsp;</span></div>
                         <div class="stat-label">Comissão</div>
                     </div>
                     <div class="stat-card" onclick="UI.navigate('venda-certa')">
@@ -7062,31 +7122,31 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <a href="#" class="nav-item" data-target="clientes-view" onclick="UI.switchTab(this); return false;">
                 <i class="fas fa-users"></i> <span>Clientes</span>
             </a>
-            <a href="#" class="nav-item" data-target="funil-view" onclick="UI.switchTab(this); return false;" style="display:none">
+            <a href="#" class="nav-item" data-target="funil-view" onclick="UI.switchTab(this); return false;">
                 <i class="fas fa-filter"></i> <span>Funil</span>
             </a>
-            <a href="#" class="nav-item" data-target="agenda-view" onclick="UI.switchTab(this); return false;" style="display:none">
+            <a href="#" class="nav-item" data-target="agenda-view" onclick="UI.switchTab(this); return false;">
                 <i class="fas fa-calendar-alt"></i> <span>Agenda</span>
             </a>
-            <a href="#" class="nav-item" data-target="links-view" onclick="UI.switchTab(this); return false;" style="display:none">
+            <a href="#" class="nav-item" data-target="links-view" onclick="UI.switchTab(this); return false;">
                 <i class="fas fa-link"></i> <span>Links</span>
             </a>
-            <a href="#" class="nav-item" data-target="relatorios-view" onclick="UI.switchTab(this); return false;" style="display:none">
+            <a href="#" class="nav-item" data-target="relatorios-view" onclick="UI.switchTab(this); return false;">
                 <i class="fas fa-chart-bar"></i> <span>Relatórios</span>
             </a>
-            <a href="#" class="nav-item" data-target="coach-view" onclick="UI.switchTab(this); Coach.init(); return false;" style="display:none">
+            <a href="#" class="nav-item" data-target="coach-view" onclick="UI.switchTab(this); Coach.init(); return false;">
                 <i class="fas fa-trophy"></i> <span>Coach</span>
             </a>
-            <a href="#" class="nav-item" data-target="leitura-view" onclick="UI.switchTab(this); Leitura.init(); return false;" style="display:none">
+            <a href="#" class="nav-item" data-target="leitura-view" onclick="UI.switchTab(this); Leitura.init(); return false;">
                 <i class="fas fa-book-open"></i> <span>Leitura</span>
             </a>
-            <a href="#" class="nav-item" data-target="notas-view" onclick="UI.switchTab(this); Notas.init(); return false;" style="display:none">
+            <a href="#" class="nav-item" data-target="notas-view" onclick="UI.switchTab(this); Notas.init(); return false;">
                 <i class="fas fa-sticky-note"></i> <span>Notas</span>
             </a>
-            <a href="#" class="nav-item" data-target="venda-certa-view" onclick="UI.switchTab(this); VendaCerta.init(); return false;" style="display:none">
+            <a href="#" class="nav-item" data-target="venda-certa-view" onclick="UI.switchTab(this); VendaCerta.init(); return false;">
                 <i class="fas fa-bullseye"></i> <span>Venda Certa</span>
             </a>
-            <a href="#" class="nav-item" data-target="simulador-view" onclick="UI.switchTab(this); Simulador.init(); return false;" style="display:none">
+            <a href="#" class="nav-item" data-target="simulador-view" onclick="UI.switchTab(this); Simulador.init(); return false;">
                 <i class="fas fa-calculator"></i> <span>Simulador</span>
             </a>
         </nav>
@@ -7384,14 +7444,18 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         <select id="c-documento-tipo" class="form-control" style="flex: 2; min-width: 150px;">
                             <!-- preenchido via JS -->
                         </select>
-                        <button type="button" class="btn-sm btn-primary-soft" onclick="App.cliente.adicionarDocumento()">
-                            <i class="fas fa-upload"></i> Adicionar
+                        <button type="button" class="btn-sm btn-primary-soft" onclick="App.cliente.adicionarDocumento()" title="Adicionar PDF ou imagem (JPG, PNG, etc.)">
+                            <i class="fas fa-upload"></i> PDF/Foto
                         </button>
-                        <button type="button" class="btn-sm btn-primary-soft" onclick="App.cliente.scanDocumento()">
-                            <i class="fas fa-camera"></i> Escanear
+                        <button type="button" class="btn-sm btn-primary-soft" onclick="App.cliente.scanDocumento()" title="Tirar foto com a câmera">
+                            <i class="fas fa-camera"></i> Câmera
                         </button>
                     </div>
-                    <input type="file" id="c-documento-file" accept=".pdf,image/*" style="display: none;" onchange="App.cliente.processDocumento(this)">
+                    <div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:6px;">
+                        <i class="fas fa-info-circle" style="color:var(--primary);"></i>
+                        Aceita PDF, JPG, PNG, WEBP e outros formatos de imagem
+                    </div>
+                    <input type="file" id="c-documento-file" accept=".pdf,image/*,.jpg,.jpeg,.png,.gif,.webp,.bmp,.tiff,.heic,.heif" style="display: none;" onchange="App.cliente.processDocumento(this)">
                     <input type="file" id="c-documento-camera" accept="image/*" capture="environment" style="display: none;" onchange="App.cliente.processCameraDocumento(this)">
                     <div id="c-documentos-list" style="margin-top: 8px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 8px;">
                         <!-- Lista de documentos será inserida aqui -->
@@ -9295,25 +9359,28 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             },
 
             documentTypes: [
-                { value: 'simulador_caixa',         label: '🏦 Simulador Caixa Econômica Federal' },
-                { value: 'proposta_compra_venda',   label: '📝 Proposta de Compra e Venda' },
-                { value: 'comprovante_renda_formal', label: '💰 Comprovante de Renda (formal)' },
-                { value: 'contracheque',             label: '🧾 Contracheque (3 últimos)' },
-                { value: 'declaracao_ir',            label: '📊 Declaração de Imposto de Renda' },
-                { value: 'carteira_trabalho',        label: '📗 Carteira de Trabalho (páginas de identificação e contrato)' },
-                { value: 'extrato_bancario',         label: '🏧 Extrato Bancário (últimos 3 meses)' },
-                { value: 'comprovante_residencia',   label: '🏠 Comprovante de Residência' },
-                { value: 'rg',                       label: '🪪 Documento de Identidade (RG/CNH)' },
-                { value: 'cpf',                      label: '🔢 CPF' },
-                { value: 'certidao_casamento',       label: '💍 Certidão de Casamento (se aplicável)' },
-                { value: 'renda_informal',           label: '📄 Comprovante de Renda (informal) - declaração própria' },
-                { value: 'declaracao_autonomo',      label: '🖊️ Declaração de Autônomo' },
-                { value: 'recibos',                  label: '🗂️ Recibos/Comprovantes de Recebimento' },
-                { value: 'escritura',                label: '📜 Escritura do Imóvel' },
-                { value: 'matricula',                label: '🏛️ Matrícula do Imóvel' },
-                { value: 'iptu',                     label: '🏷️ IPTU' },
-                { value: 'contrato',                 label: '✍️ Contrato de Compra e Venda' },
-                { value: 'outros',                   label: '📁 Outros' }
+                { value: 'certidao_nascimento_titular',   label: '👶 Certidão de Nascimento - Titular' },
+                { value: 'certidao_nascimento_dependente',label: '👶 Certidão de Nascimento - Dependente' },
+                { value: 'rg',                            label: '🪪 Documento de Identidade (RG/CNH)' },
+                { value: 'cpf',                           label: '🔢 CPF' },
+                { value: 'rg_cpf_dependente',             label: '🪪 RG, CPF ou CNH - Dependente' },
+                { value: 'simulador_caixa',               label: '🏦 Simulador Caixa Econômica Federal' },
+                { value: 'proposta_compra_venda',         label: '📝 Proposta de Compra e Venda' },
+                { value: 'comprovante_renda_formal',      label: '💰 Comprovante de Renda (formal)' },
+                { value: 'contracheque',                  label: '🧾 Contracheque (3 últimos)' },
+                { value: 'declaracao_ir',                 label: '📊 Declaração de Imposto de Renda' },
+                { value: 'carteira_trabalho',             label: '📗 Carteira de Trabalho (páginas de identificação e contrato)' },
+                { value: 'extrato_bancario',              label: '🏧 Extrato Bancário (últimos 3 meses)' },
+                { value: 'comprovante_residencia',        label: '🏠 Comprovante de Residência' },
+                { value: 'certidao_casamento',            label: '💍 Certidão de Casamento (se aplicável)' },
+                { value: 'renda_informal',                label: '📄 Comprovante de Renda (informal) - declaração própria' },
+                { value: 'declaracao_autonomo',           label: '🖊️ Declaração de Autônomo' },
+                { value: 'recibos',                       label: '🗂️ Recibos/Comprovantes de Recebimento' },
+                { value: 'escritura',                     label: '📜 Escritura do Imóvel' },
+                { value: 'matricula',                     label: '🏛️ Matrícula do Imóvel' },
+                { value: 'iptu',                          label: '🏷️ IPTU' },
+                { value: 'contrato',                      label: '✍️ Contrato de Compra e Venda' },
+                { value: 'outros',                        label: '📁 Outros' }
             ],
 
             getInterestRateByIncome: function(renda) {
@@ -10389,39 +10456,22 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 // O <a> é adicionado ao body temporariamente para garantir que o
                 // clique seja tratado como evento de usuário pelo browser.
                 function abrirLink(href) {
-                    const a = document.createElement('a');
+                    var a = document.createElement('a');
                     a.href = href;
                     a.target = '_blank';
                     a.rel = 'noopener noreferrer';
                     a.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
                     document.body.appendChild(a);
                     a.click();
-                    setTimeout(function() { document.body.removeChild(a); }, 300);
+                    setTimeout(function() {
+                        if (document.body.contains(a)) document.body.removeChild(a);
+                    }, 300);
                 }
 
-                const isIOS        = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-                const isStandalone = window.navigator.standalone === true
-                                  || window.matchMedia('(display-mode: standalone)').matches;
-
-                if (isIOS && isStandalone) {
-                    // iOS PWA: tenta deep link nativo primeiro (abre WhatsApp.app sem sair)
-                    const waMatch = url.match(/wa\.me\/([^?]+)(\?text=(.+))?/);
-                    if (waMatch) {
-                        const phone = waMatch[1];
-                        const text  = waMatch[3] || '';
-                        const deep  = text
-                            ? 'whatsapp://send?phone=' + phone + '&text=' + text
-                            : 'whatsapp://send?phone=' + phone;
-                        abrirLink(deep);
-                        // Fallback: se WhatsApp não instalado, abre wa.me após 800ms
-                        setTimeout(function() { abrirLink(url); }, 800);
-                    } else {
-                        abrirLink(url);
-                    }
-                } else {
-                    // Android, iOS Safari normal, Desktop — abre em nova aba
-                    abrirLink(url);
-                }
+                // ── Sempre usa wa.me via _blank — não usa deep link whatsapp://
+                // O deep link whatsapp:// fecha o PWA no iOS; wa.me abre via Safari
+                // que redireciona para o WhatsApp sem fechar o sistema.
+                abrirLink(url);
             },
 
             // =========================================================
@@ -10817,9 +10867,16 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     
                     await DB.migrateFromLocalStorage();
                     
+                    const loadingMsg = document.querySelector('#loading .loading-msg');
+                    const setLoadMsg = (txt) => { if (loadingMsg) loadingMsg.innerHTML = `<i class="fas fa-spinner" style="margin-right:6px;animation:spin 1s linear infinite;"></i> ${txt}`; };
+
+                    setLoadMsg('Carregando clientes...');
                     UI.data.clientes = await Storage.getClientes();
+                    setLoadMsg('Carregando imóveis...');
                     UI.data.imoveis = await Storage.getImoveis();
+                    setLoadMsg('Carregando agenda...');
                     UI.data.visitas = await Storage.getVisitas();
+                    setLoadMsg('Carregando configurações...');
                     UI.data.links = await Storage.getLinks();
                     UI.data.funilEtapas = await Storage.getFunilEtapas();
                     UI.data.settings = await Storage.getSettings();
@@ -10964,6 +11021,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     fab.style.display = 'none';
                 }
 
+                if(target === 'dashboard-view') UI.renderDashboard();
                 if(target === 'clientes-view') UI.renderClientes();
                 if(target === 'imoveis-view') UI.renderImoveis();
                 if(target === 'agenda-view') UI.renderAgenda();
@@ -11002,12 +11060,18 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             renderDashboard: () => {
                 const { clientes, imoveis, visitas } = UI.data;
                 
-                document.getElementById('dash-total-clientes').innerText = clientes.length;
-                document.getElementById('dash-total-imoveis').innerText = imoveis.length;
+                // Limpa skeleton e insere valores reais
+                const setVal = (id, val) => {
+                    const el = document.getElementById(id);
+                    if (el) { el.innerHTML = ''; el.innerText = val; }
+                };
+
+                setVal('dash-total-clientes', clientes.length);
+                setVal('dash-total-imoveis', imoveis.length);
                 
                 const hoje = Utils.getToday();
                 const visitasHoje = visitas.filter(v => v.data === hoje && v.status !== 'cancelado');
-                document.getElementById('dash-visitas').innerText = visitasHoje.length;
+                setVal('dash-visitas', visitasHoje.length);
                 
                 const hojeDate = new Date();
                 const inicioMes = new Date(hojeDate.getFullYear(), hojeDate.getMonth(), 1);
@@ -11029,10 +11093,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     }
                 });
                 
-                document.getElementById('dash-vendas').innerText = Utils.formatCurrency(totalVendas);
+                setVal('dash-vendas', Utils.formatCurrency(totalVendas));
                 
-                // Comissão prevista e contagem: somente clientes na etapa de funil "Negociações"
-                // Identifica dinamicamente o(s) stage(s) cujo nome contenha "negoci" (case-insensitive)
+                // Comissão prevista e contagem
                 const etapasNegociacaoIds = (UI.data.funilEtapas || [])
                     .filter(e => /negoci/i.test(e.nome))
                     .map(e => e.id);
@@ -11049,13 +11112,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     }
                 });
                 const comissaoEl = document.getElementById('dash-comissao');
-                if (comissaoEl) comissaoEl.innerText = Utils.formatCurrency(totalComissaoPrevista);
+                if (comissaoEl) { comissaoEl.innerHTML = ''; comissaoEl.innerText = Utils.formatCurrency(totalComissaoPrevista); }
                 
                 const negociacoes = clientes.filter(c => etapasNegociacaoIds.includes(c.etapaFunil)).length;
-                document.getElementById('dash-negociacoes').innerText = negociacoes;
+                setVal('dash-negociacoes', negociacoes);
                 
                 const destaques = imoveis.filter(i => i.destaque).length;
-                document.getElementById('dash-destaques').innerText = destaques;
+                setVal('dash-destaques', destaques);
                 
                 // Render mini bar chart - last 6 months of new clients
                 UI.renderMiniChart(clientes);
@@ -11903,7 +11966,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     `;
                 };
 
-                let html = ativos.map((c, i) => renderCard(c, i)).join('');
+                let html = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">` + ativos.map((c, i) => renderCard(c, i)).join('') + `</div>`;
 
                 if (inativos.length > 0) {
                     html += `<div style="margin:20px 0 10px;display:flex;align-items:center;gap:10px;">
@@ -11913,7 +11976,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         </div>
                         <div style="flex:1;height:1px;background:var(--border);"></div>
                     </div>`;
-                    html += inativos.map(c => renderCard(c, null)).join('');
+                    html += `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">` + inativos.map(c => renderCard(c, null)).join('') + `</div>`;
                 }
 
                 list.innerHTML = html;
@@ -11948,7 +12011,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     return;
                 }
 
-                list.innerHTML = filtered.map(i => UI.createImovelCard(i)).join('');
+                list.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">` + filtered.map(i => UI.createImovelCard(i)).join('') + `</div>`;
             },
 
             filterImoveis: (tipo, status) => {
@@ -15020,7 +15083,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     btnCall.className = 'btn-phone-action btn-phone-call';
                     btnCall.title = 'Ligar';
                     btnCall.innerHTML = '<i class="fas fa-phone"></i>';
-                    btnCall.onclick = () => { window.location.href = 'tel:' + cliente.telefone.replace(/\D/g,''); };
+                    btnCall.onclick = () => { window.open('tel:' + cliente.telefone.replace(/\D/g,''), '_self'); };
 
                     const btnWa = document.createElement('button');
                     btnWa.type = 'button';
@@ -15900,7 +15963,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     body += `📋 *CRECI:* ${settings.creci || '5794-AL'}`;
                     
                     const mailtoLink = `mailto:${cliente.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                    window.location.href = mailtoLink;
+                    window.open(mailtoLink, '_self');
                 },
                 
                 handleVendaStage: async (clienteId) => {
@@ -15971,19 +16034,33 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const tipo = document.getElementById('c-documento-tipo').value;
                     const tipoLabel = Utils.documentTypes.find(t => t.value === tipo)?.label || tipo;
                     
-                    if (file.type.startsWith('image/')) {
+                    // Aceita qualquer imagem (image/*) — inclui HEIC, WEBP, BMP, TIFF, PNG, JPG, GIF, etc.
+                    const isImage = file.type.startsWith('image/') || /\.(heic|heif|jpg|jpeg|png|gif|webp|bmp|tiff?|avif)$/i.test(file.name);
+                    const isPdf   = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+
+                    if (isImage) {
+                        // Imagens de arquivo: salvar diretamente como base64, sem passar pelo Cropper
                         const reader = new FileReader();
-                        reader.onload = (e) => {
-                            UI.cropData = {
-                                tipo,
-                                tipoLabel,
+                        reader.onload = async (e) => {
+                            const base64 = e.target.result;
+                            const docs = JSON.parse(document.getElementById('c-documentos-data').value || '[]');
+                            if (base64.length > 10 * 1024 * 1024) {
+                                Utils.toast('Imagem muito grande. Máximo 10MB.', 'error');
+                                return;
+                            }
+                            docs.push({
+                                tipo: tipo,
+                                tipoLabel: tipoLabel,
                                 nome: file.name,
-                                data: e.target.result
-                            };
-                            App.openCropModal(e.target.result);
+                                dados: base64,
+                                dataUpload: new Date().toISOString()
+                            });
+                            document.getElementById('c-documentos-data').value = JSON.stringify(docs);
+                            App.cliente.renderDocumentosList(docs);
+                            Utils.toast('Imagem adicionada com sucesso!');
                         };
                         reader.readAsDataURL(file);
-                    } else if (file.type === 'application/pdf') {
+                    } else if (isPdf) {
                         const reader = new FileReader();
                         reader.onload = async (e) => {
                             const base64 = e.target.result;
@@ -16001,10 +16078,18 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             });
                             document.getElementById('c-documentos-data').value = JSON.stringify(docs);
                             App.cliente.renderDocumentosList(docs);
+                            Utils.toast('PDF adicionado com sucesso!');
                         };
                         reader.readAsDataURL(file);
                     } else {
-                        Utils.toast('Formato de arquivo não suportado', 'error');
+                        // Tenta tratar como imagem genérica como último recurso
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            UI.cropData = { tipo, tipoLabel, nome: file.name, data: e.target.result };
+                            App.openCropModal(e.target.result);
+                        };
+                        reader.onerror = () => Utils.toast('Formato de arquivo não suportado', 'error');
+                        reader.readAsDataURL(file);
                     }
                     
                     input.value = '';
@@ -16080,24 +16165,32 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     if (!container) return;
                     
                     if (docs.length === 0) {
-                        container.innerHTML = '<div style="text-align: center; color: var(--secondary); padding: 8px;">Nenhum documento anexado.</div>';
+                        container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 12px; font-size:0.82rem;"><i class="fas fa-paperclip" style="margin-right:6px;opacity:0.4;"></i>Nenhum documento anexado.</div>';
                         return;
                     }
                     
                     let html = '';
                     docs.forEach((doc, index) => {
-                        const isImage = doc.dados.startsWith('data:image');
-                        const icon = isImage ? 'fa-image' : 'fa-file-pdf';
+                        const isImage = doc.dados && doc.dados.startsWith('data:image');
+                        const isPdf   = doc.dados && doc.dados.startsWith('data:application/pdf');
+                        const icon    = isPdf ? 'fa-file-pdf' : isImage ? 'fa-image' : 'fa-file-alt';
+                        const iconColor = isPdf ? '#E74C3C' : isImage ? '#1D6FA4' : '#64748B';
+                        const thumb   = isImage
+                            ? `<img src="${doc.dados}" alt="thumb" style="width:36px;height:36px;object-fit:cover;border-radius:6px;border:1px solid var(--border);flex-shrink:0;">`
+                            : `<div style="width:36px;height:36px;border-radius:6px;background:rgba(231,76,60,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas ${icon}" style="color:${iconColor};font-size:1.1rem;"></i></div>`;
                         html += `
-                            <div style="display: flex; align-items: center; gap: 8px; padding: 6px; border-bottom: 1px solid var(--border);">
-                                <i class="fas ${icon}" style="color: var(--primary);"></i>
-                                <div style="flex: 1; font-size: 0.85rem;">
-                                    <div><strong>${doc.tipoLabel}</strong></div>
-                                    <div style="color: var(--secondary);">${doc.nome}</div>
+                            <div style="display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid var(--border);transition:background 0.15s;border-radius:6px;">
+                                ${thumb}
+                                <div style="flex:1;min-width:0;">
+                                    <div style="font-size:0.82rem;font-weight:700;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${doc.tipoLabel || 'Documento'}</div>
+                                    <div style="font-size:0.74rem;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${doc.nome}</div>
                                 </div>
-                                <button class="icon-btn" onclick="App.cliente.removerDocumento(${index})" style="color: var(--danger);">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                <div style="display:flex;gap:4px;flex-shrink:0;">
+                                    ${isImage ? `<button class="icon-btn" onclick="UI.openFullscreen([{src:'${doc.dados}',alt:'${doc.tipoLabel}'}],0)" style="color:var(--primary);padding:5px;" title="Ver imagem"><i class="fas fa-eye"></i></button>` : ''}
+                                    <button class="icon-btn" onclick="App.cliente.removerDocumento(${index})" style="color:var(--danger);padding:5px;" title="Remover">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         `;
                     });
@@ -16139,14 +16232,17 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                 // ===== DOCUMENTAÇÃO LOTE =====
                 LOTE_DOCS: [
-                    { id: 'rg_cpf',          label: 'RG (ou CNH) + CPF',                icon: '🪪', obs: 'Documento de identificação com foto' },
-                    { id: 'comp_res',        label: 'Comprovante de Residência',         icon: '🏠', obs: 'Água, luz, gás ou correspondência bancária (últimos 3 meses)' },
-                    { id: 'est_civil',       label: 'Certidão de Estado Civil',          icon: '💍', obs: 'Certidão de nascimento ou casamento atualizada' },
-                    { id: 'simulador_caixa', label: 'Simulador Caixa Econômica Federal', icon: '🏦', obs: 'Simulação de financiamento gerada no site da Caixa Econômica Federal' },
-                    { id: 'proposta_cv',     label: 'Proposta de Compra e Venda',        icon: '📝', obs: 'Proposta assinada pelo cliente e pelo corretor' },
-                    { id: 'email',           label: 'E-mail',                            icon: '📧', obs: 'E-mail válido para envio de documentos' },
-                    { id: 'telefone',        label: 'Telefone (WhatsApp)',                icon: '📱', obs: 'Número com WhatsApp ativo' },
-                    { id: 'profissao',       label: 'Profissão',                         icon: '💼', obs: 'Informar cargo e empresa atual' },
+                    { id: 'cert_nasc_titular',  label: 'Certidão de Nascimento - Titular',    icon: '👶', obs: 'Certidão de nascimento original ou cópia autenticada do titular' },
+                    { id: 'cert_nasc_dep',      label: 'Certidão de Nascimento - Dependente', icon: '👶', obs: 'Certidão de nascimento de cada dependente declarado' },
+                    { id: 'rg_cpf',             label: 'RG (ou CNH) + CPF',                   icon: '🪪', obs: 'Documento de identificação com foto' },
+                    { id: 'rg_cpf_dep',         label: 'RG, CPF ou CNH - Dependente',         icon: '🪪', obs: 'Documento de identidade do dependente com foto ou CPF' },
+                    { id: 'comp_res',           label: 'Comprovante de Residência',            icon: '🏠', obs: 'Água, luz, gás ou correspondência bancária (últimos 3 meses)' },
+                    { id: 'est_civil',          label: 'Certidão de Estado Civil',             icon: '💍', obs: 'Certidão de nascimento ou casamento atualizada' },
+                    { id: 'simulador_caixa',    label: 'Simulador Caixa Econômica Federal',    icon: '🏦', obs: 'Simulação de financiamento gerada no site da Caixa Econômica Federal' },
+                    { id: 'proposta_cv',        label: 'Proposta de Compra e Venda',           icon: '📝', obs: 'Proposta assinada pelo cliente e pelo corretor' },
+                    { id: 'email',              label: 'E-mail',                               icon: '📧', obs: 'E-mail válido para envio de documentos' },
+                    { id: 'telefone',           label: 'Telefone (WhatsApp)',                  icon: '📱', obs: 'Número com WhatsApp ativo' },
+                    { id: 'profissao',          label: 'Profissão',                            icon: '💼', obs: 'Informar cargo e empresa atual' },
                 ],
 
                 toggleLoteDocumentacao: function(preChecked) {
@@ -16505,11 +16601,14 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                 // ===== DOCUMENTOS POR PROFISSÃO =====
                 PROF_DOCS_PESSOAIS: [
-                    { id: 'rg_cnh',       label: 'RG ou CNH (com foto)',              icon: '🪪', obs: 'Documento de identidade oficial com foto, dentro da validade' },
-                    { id: 'cpf',          label: 'CPF',                                icon: '📄', obs: 'Cadastro de Pessoa Física (pode ser o do próprio RG/CNH)' },
-                    { id: 'comp_res',     label: 'Comprovante de Residência',          icon: '🏠', obs: 'Conta de água, luz ou gás — últimos 90 dias' },
-                    { id: 'cert_civil',   label: 'Certidão de Estado Civil',           icon: '💍', obs: 'Certidão de nascimento (solteiro) ou casamento/divórcio atualizada' },
-                    { id: 'declaracao_ir',label: 'Declaração de IR (última)',          icon: '📊', obs: 'Última declaração de Imposto de Renda (se declarante)' },
+                    { id: 'cert_nasc_titular',  label: 'Certidão de Nascimento - Titular',    icon: '👶', obs: 'Certidão de nascimento original ou cópia autenticada do titular' },
+                    { id: 'cert_nasc_dep',      label: 'Certidão de Nascimento - Dependente', icon: '👶', obs: 'Certidão de nascimento de cada dependente declarado' },
+                    { id: 'rg_cnh',             label: 'RG ou CNH (com foto)',                icon: '🪪', obs: 'Documento de identidade oficial com foto, dentro da validade' },
+                    { id: 'cpf',                label: 'CPF',                                 icon: '📄', obs: 'Cadastro de Pessoa Física (pode ser o do próprio RG/CNH)' },
+                    { id: 'rg_cpf_dep',         label: 'RG, CPF ou CNH - Dependente',         icon: '🪪', obs: 'Documento de identidade do dependente com foto ou CPF' },
+                    { id: 'comp_res',           label: 'Comprovante de Residência',           icon: '🏠', obs: 'Conta de água, luz ou gás — últimos 90 dias' },
+                    { id: 'cert_civil',         label: 'Certidão de Estado Civil',            icon: '💍', obs: 'Certidão de nascimento (solteiro) ou casamento/divórcio atualizada' },
+                    { id: 'declaracao_ir',      label: 'Declaração de IR (última)',           icon: '📊', obs: 'Última declaração de Imposto de Renda (se declarante)' },
                 ],
 
                 PROF_DOCS_RENDA: {
@@ -17457,7 +17556,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const corpo = App.cliente._gerarCorpoEmail(cliente, empreendimento, corretor, gerente, valorAvaliacao, nDocs);
                     const corpoEnc = encodeURIComponent(corpo);
 
-                    window.location.href = 'mailto:' + emailCorrespondente + '?subject=' + assunto + '&body=' + corpoEnc;
+                    window.open('mailto:' + emailCorrespondente + '?subject=' + assunto + '&body=' + corpoEnc, '_self');
 
                     if (nDocs > 0) {
                         Utils.toast('E-mail aberto! Baixando documentos para anexar...', 'success');
@@ -25402,11 +25501,41 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 if (avatarEl) avatarEl.textContent = initial;
                 if (nameEl)   nameEl.textContent   = user.nome || user.username;
                 if (badge)    badge.style.display   = 'flex';
-                // Renderiza o app agora que está visível
+                // Renderiza imediatamente com os dados já disponíveis em UI.data
+                // (carregados por UI.init antes de Auth.init ser chamado)
                 if (window.UI) {
-                    try { UI.renderDashboard(); } catch(e) {}
+                    // Render síncrono imediato — sem esperar reload assíncrono
+                    try { UI.renderDashboard(); } catch(e) { console.warn('renderDashboard (imediato):', e); }
                     try { UI.renderFunil(); } catch(e) {}
                     try { UI.verificarLancamentos(); } catch(e) {}
+
+                    // Reload assíncrono em background para garantir dados mais frescos
+                    // (sem bloquear a exibição)
+                    (async () => {
+                        try {
+                            // Mostra skeleton nos cards durante reload silencioso
+                            const skelEl = (id, w) => {
+                                const el = document.getElementById(id);
+                                if (el && !el.querySelector('.skeleton')) {
+                                    el.innerHTML = `<span class="skeleton" style="display:inline-block;width:${w};height:18px;border-radius:5px;">&nbsp;</span>`;
+                                }
+                            };
+                            skelEl('dash-total-clientes','28px'); skelEl('dash-total-imoveis','28px');
+                            skelEl('dash-visitas','28px'); skelEl('dash-negociacoes','28px');
+                            skelEl('dash-destaques','28px'); skelEl('dash-vendas','44px'); skelEl('dash-comissao','44px');
+
+                            UI.data.clientes    = await Storage.getClientes();
+                            UI.data.imoveis     = await Storage.getImoveis();
+                            UI.data.visitas     = await Storage.getVisitas();
+                            UI.data.links       = await Storage.getLinks();
+                            UI.data.funilEtapas = await Storage.getFunilEtapas();
+                            UI.data.settings    = await Storage.getSettings();
+                            // Segunda renderização com dados confirmados do banco
+                            try { UI.renderDashboard(); } catch(e) {}
+                            try { UI.renderFunil(); } catch(e) {}
+                            try { UI.verificarLancamentos(); } catch(e) {}
+                        } catch(e) { console.warn('showApp reload background:', e); }
+                    })();
                 }
             }
 
@@ -25859,7 +25988,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 a.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
                 document.body.appendChild(a);
                 a.click();
-                setTimeout(function(){ document.body.removeChild(a); }, 300);
+                setTimeout(function(){ if(document.body.contains(a)) document.body.removeChild(a); }, 300);
             }
         };
 
