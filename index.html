@@ -314,12 +314,12 @@
         /* Stat cards — compact iOS widget style */
         .stat-card {
             background: #FFFFFF;
-            padding: 10px 6px;
+            padding: clamp(6px, 1.8vw, 12px) clamp(4px, 1.2vw, 8px);
             border-radius: 14px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 3px 10px rgba(0,0,0,0.04);
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: clamp(2px, 0.6vw, 4px);
             cursor: pointer;
             transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
             border: 1px solid rgba(0,0,0,0.055);
@@ -330,26 +330,41 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
+            width: 100%;
+            box-sizing: border-box;
         }
         .stat-card::before { display: none; }
         .stat-card::after { display: none; }
         .stat-card:active { transform: scale(0.92); box-shadow: 0 2px 6px rgba(29,111,164,0.12); }
 
         .stat-icon {
-            width: 38px; height: 38px;
-            border-radius: 11px;
+            /* 4 colunas no mobile: cada card ~23vw. Ícone proporcional */
+            width: clamp(26px, 5vw, 40px);
+            height: clamp(26px, 5vw, 40px);
+            border-radius: clamp(7px, 1.2vw, 11px);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.05rem;
+            font-size: clamp(0.7rem, 1.9vw, 1.1rem);
             box-shadow: none;
-            margin-bottom: 4px;
+            margin-bottom: clamp(2px, 0.5vw, 5px);
+            flex-shrink: 0;
         }
         .stat-value {
-            font-size: 1.2rem; font-weight: 900; color: var(--dark); line-height: 1;
-            letter-spacing: -0.3px;
+            font-size: clamp(0.7rem, 2.8vw, 1.25rem);
+            font-weight: 900; color: var(--dark); line-height: 1;
+            letter-spacing: -0.2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
         .stat-label {
-            font-size: 0.62rem; color: var(--text-secondary); font-weight: 600;
+            font-size: clamp(0.45rem, 1.5vw, 0.65rem);
+            color: var(--text-secondary); font-weight: 600;
             letter-spacing: 0.1px; text-transform: uppercase; line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
 
         /* ── Icon bg classes — light palette ── */
@@ -4198,7 +4213,7 @@
         /* Progress dark */
         body.dark-mode .progress-container { background: rgba(255,255,255,0.08) !important; }
 
-        /* Idle warning dark */
+        /* ── Dark mode idle warning ── */
         body.dark-mode #idle-warning-box {
             background: #1E293B !important;
             border-color: rgba(255,255,255,0.10) !important;
@@ -4826,6 +4841,74 @@
         p, span, li, td, th, label, small { color: inherit; }
 
         /* ===== FIM OVERRIDES DARK-GREEN ===== */
+
+        /* ===== QUICK-ACCESS CARDS — Dashboard ===== */
+        .dash-nav-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .dash-nav-card {
+            border-radius: 16px;
+            padding: 16px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            text-decoration: none;
+            min-height: 72px;
+        }
+        .dash-nav-card::after {
+            content: '';
+            position: absolute;
+            top: -30px; right: -20px;
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .dash-nav-card:active { transform: scale(0.95); }
+
+        .dash-nav-card.c-funil    { background: linear-gradient(135deg, #0F4C73 0%, #1D6FA4 100%); box-shadow: 0 4px 16px rgba(29,111,164,0.28); }
+        .dash-nav-card.c-agenda   { background: linear-gradient(135deg, #7C3AED 0%, #9D5CEA 100%); box-shadow: 0 4px 16px rgba(124,58,237,0.28); }
+        .dash-nav-card.c-links    { background: linear-gradient(135deg, #0E7490 0%, #0891B2 100%); box-shadow: 0 4px 16px rgba(8,145,178,0.28); }
+        .dash-nav-card.c-relat    { background: linear-gradient(135deg, #065F46 0%, #059669 100%); box-shadow: 0 4px 16px rgba(5,150,105,0.28); }
+        .dash-nav-card.c-leitura  { background: linear-gradient(135deg, #92400E 0%, #D97706 100%); box-shadow: 0 4px 16px rgba(217,119,6,0.28); }
+        .dash-nav-card.c-notas    { background: linear-gradient(135deg, #831843 0%, #DB2777 100%); box-shadow: 0 4px 16px rgba(219,39,119,0.28); }
+
+        .dash-nav-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.20);
+            border: 1.5px solid rgba(255,255,255,0.28);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.15rem;
+            color: #FFFFFF;
+            flex-shrink: 0;
+        }
+        .dash-nav-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+        .dash-nav-title {
+            font-size: 0.88rem; font-weight: 800;
+            color: #FFFFFF; letter-spacing: -0.2px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .dash-nav-sub {
+            font-size: 0.68rem; color: rgba(255,255,255,0.65);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .dash-nav-arrow {
+            font-size: 0.7rem; color: rgba(255,255,255,0.50);
+            flex-shrink: 0;
+        }
+
+        /* dark mode — cards já têm gradiente, mantêm igual */
+        body.dark-mode .dash-nav-card { opacity: 0.92; }
 
         /* ===== TELA DE LOGIN ===== */
         #login-screen {
@@ -5519,6 +5602,66 @@
                         <div class="stat-value" style="font-size:1rem;line-height:1;">🏦</div>
                         <div class="stat-label">Simulador</div>
                     </div>
+                </div>
+
+                <!-- ── Acesso Rápido ── -->
+                <div class="section-title" style="margin-bottom:10px;">Acesso Rápido</div>
+                <div class="dash-nav-grid">
+
+                    <div class="dash-nav-card c-funil" onclick="UI.navigate('funil')">
+                        <div class="dash-nav-icon"><i class="fas fa-filter"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Funil</span>
+                            <span class="dash-nav-sub">Pipeline de vendas</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
+                    <div class="dash-nav-card c-agenda" onclick="UI.navigate('agenda')">
+                        <div class="dash-nav-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Agenda</span>
+                            <span class="dash-nav-sub">Visitas e reuniões</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
+                    <div class="dash-nav-card c-links" onclick="UI.navigate('links')">
+                        <div class="dash-nav-icon"><i class="fas fa-link"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Links</span>
+                            <span class="dash-nav-sub">Atalhos e portais</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
+                    <div class="dash-nav-card c-relat" onclick="UI.navigate('relatorios')">
+                        <div class="dash-nav-icon"><i class="fas fa-chart-bar"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Relatórios</span>
+                            <span class="dash-nav-sub">Desempenho e vendas</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
+                    <div class="dash-nav-card c-leitura" onclick="UI.navigateLeitura()">
+                        <div class="dash-nav-icon"><i class="fas fa-book-open"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Leitura</span>
+                            <span class="dash-nav-sub">Desenvolvimento</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
+                    <div class="dash-nav-card c-notas" onclick="UI.navigateNotas()">
+                        <div class="dash-nav-icon"><i class="fas fa-sticky-note"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Notas</span>
+                            <span class="dash-nav-sub">Anotações rápidas</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
                 </div>
 
                 <!-- Mini Chart de desempenho -->
@@ -6919,25 +7062,25 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <a href="#" class="nav-item" data-target="clientes-view" onclick="UI.switchTab(this); return false;">
                 <i class="fas fa-users"></i> <span>Clientes</span>
             </a>
-            <a href="#" class="nav-item" data-target="funil-view" onclick="UI.switchTab(this); return false;">
+            <a href="#" class="nav-item" data-target="funil-view" onclick="UI.switchTab(this); return false;" style="display:none">
                 <i class="fas fa-filter"></i> <span>Funil</span>
             </a>
-            <a href="#" class="nav-item" data-target="agenda-view" onclick="UI.switchTab(this); return false;">
+            <a href="#" class="nav-item" data-target="agenda-view" onclick="UI.switchTab(this); return false;" style="display:none">
                 <i class="fas fa-calendar-alt"></i> <span>Agenda</span>
             </a>
-            <a href="#" class="nav-item" data-target="links-view" onclick="UI.switchTab(this); return false;">
+            <a href="#" class="nav-item" data-target="links-view" onclick="UI.switchTab(this); return false;" style="display:none">
                 <i class="fas fa-link"></i> <span>Links</span>
             </a>
-            <a href="#" class="nav-item" data-target="relatorios-view" onclick="UI.switchTab(this); return false;">
+            <a href="#" class="nav-item" data-target="relatorios-view" onclick="UI.switchTab(this); return false;" style="display:none">
                 <i class="fas fa-chart-bar"></i> <span>Relatórios</span>
             </a>
             <a href="#" class="nav-item" data-target="coach-view" onclick="UI.switchTab(this); Coach.init(); return false;" style="display:none">
                 <i class="fas fa-trophy"></i> <span>Coach</span>
             </a>
-            <a href="#" class="nav-item" data-target="leitura-view" onclick="UI.switchTab(this); Leitura.init(); return false;">
+            <a href="#" class="nav-item" data-target="leitura-view" onclick="UI.switchTab(this); Leitura.init(); return false;" style="display:none">
                 <i class="fas fa-book-open"></i> <span>Leitura</span>
             </a>
-            <a href="#" class="nav-item" data-target="notas-view" onclick="UI.switchTab(this); Notas.init(); return false;">
+            <a href="#" class="nav-item" data-target="notas-view" onclick="UI.switchTab(this); Notas.init(); return false;" style="display:none">
                 <i class="fas fa-sticky-note"></i> <span>Notas</span>
             </a>
             <a href="#" class="nav-item" data-target="venda-certa-view" onclick="UI.switchTab(this); VendaCerta.init(); return false;" style="display:none">
@@ -10838,6 +10981,16 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             navigateCoach: () => {
                 const el = document.querySelector('.nav-item[data-target="coach-view"]');
                 if(el) { UI.switchTab(el); Coach.init(); }
+            },
+
+            navigateLeitura: () => {
+                const el = document.querySelector('.nav-item[data-target="leitura-view"]');
+                if(el) { UI.switchTab(el); Leitura.init(); }
+            },
+
+            navigateNotas: () => {
+                const el = document.querySelector('.nav-item[data-target="notas-view"]');
+                if(el) { UI.switchTab(el); Notas.init(); }
             },
 
             searchImoveis: function(searchTerm) {
