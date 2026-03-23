@@ -418,7 +418,7 @@
             color: var(--dark);
             transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .search-input::placeholder { color: rgba(242,247,243,0.30); }
+        .search-input::placeholder { color: var(--text-muted); }
         .search-input:focus { 
             border-color: rgba(61,170,110,0.50); 
             box-shadow: 0 0 0 3px rgba(61,170,110,0.10); 
@@ -426,7 +426,7 @@
         }
         .search-icon {
             position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            color: rgba(242,247,243,0.35);
+            color: var(--text-muted);
             pointer-events: none;
             font-size: 0.9rem;
         }
@@ -478,11 +478,11 @@
         }
         .card-carousel-dot {
             width: 6px; height: 6px; border-radius: 50%;
-            background: rgba(255,255,255,0.55);
+            background: rgba(255,255,255,0.60);
             transition: all 0.3s;
         }
         .card-carousel-dot.active {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.95);
             width: 18px;
             border-radius: 3px;
         }
@@ -514,7 +514,7 @@
         .badge-verm { background: var(--verm); color: white; }
         .property-content { padding: 16px; background: transparent; }
         .property-title { 
-            font-weight: 800; font-size: 1rem; color: #F2F7F3;
+            font-weight: 800; font-size: 1rem; color: var(--dark);
             margin-bottom: 4px; line-height: 1.3;
             letter-spacing: -0.2px;
         }
@@ -576,7 +576,7 @@
         }
         .client-row {
             display: flex; align-items: center; gap: 8px;
-            font-size: 0.85rem; color: rgba(255,255,255,0.55);
+            font-size: 0.85rem; color: var(--text-secondary);
         }
 
         .client-actions {
@@ -584,7 +584,7 @@
             gap: 8px;
             margin-top: 12px;
             padding-top: 12px;
-            border-top: 1px solid rgba(255,255,255,0.10);
+            border-top: 1px solid var(--border);
             width: 100%;
             flex-wrap: wrap;
         }
@@ -689,13 +689,13 @@
         .schedule-type.outro { background: var(--type-outro); }
         
         .schedule-time {
-            font-size: 0.85rem; color: rgba(255,255,255,0.55);
+            font-size: 0.85rem; color: rgba(255,255,255,0.75);
             display: flex; align-items: center; gap: 6px;
             margin-bottom: 8px;
             flex-wrap: wrap;
         }
         .schedule-title { font-weight: 600; color: #FFFFFF; margin-bottom: 4px; }
-        .schedule-notes { font-size: 0.85rem; color: rgba(255,255,255,0.55); line-height: 1.4; }
+        .schedule-notes { font-size: 0.85rem; color: rgba(255,255,255,0.80); line-height: 1.4; }
 
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
@@ -796,7 +796,7 @@
         .form-group { margin-bottom: 16px; width: 100%; }
         .form-label { 
             display: block; font-size: 0.82rem; font-weight: 700; 
-            margin-bottom: 6px; color: rgba(242,247,243,0.75);
+            margin-bottom: 6px; color: var(--text-secondary);
             letter-spacing: 0.3px; text-transform: uppercase;
         }
         .form-control {
@@ -810,7 +810,7 @@
             color: var(--dark);
             transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
         }
-        .form-control::placeholder { color: rgba(242,247,243,0.28); }
+        .form-control::placeholder { color: var(--text-muted); }
         .form-control:focus { 
             background: #FFFFFF; 
             border-color: rgba(61,170,110,0.55); 
@@ -818,8 +818,8 @@
             box-shadow: 0 0 0 3px rgba(61,170,110,0.12);
         }
         textarea.form-control { min-height: 100px; resize: none; line-height: 1.5; }
-        select.form-control { color: #F2F7F3; }
-        select.form-control option { background: #142218; color: #F2F7F3; }
+        select.form-control { color: var(--dark); }
+        select.form-control option { background: #FFFFFF; color: var(--dark); }
 
         .form-row {
             display: flex; gap: 12px;
@@ -854,12 +854,12 @@
         .details-header {
             display: flex; justify-content: space-between;
             align-items: flex-start; margin-bottom: 20px;
-            padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.07);
+            padding-bottom: 15px; border-bottom: 1px solid var(--border);
         }
         
         .details-title {
             font-size: 1.3rem; font-weight: 900;
-            color: #F2F7F3;
+            color: var(--dark);
             flex: 1;
         }
         
@@ -901,13 +901,13 @@
         }
         
         .info-value {
-            font-size: 1rem; color: #F2F7F3;
+            font-size: 1rem; color: var(--dark);
             font-weight: 700;
         }
         
         .details-actions {
             display: flex; gap: 12px; margin-top: 24px;
-            padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.07);
+            padding-top: 20px; border-top: 1px solid var(--border);
             width: 100%;
             flex-wrap: wrap;
         }
@@ -937,9 +937,9 @@
         }
         
         .btn-details-secondary {
-            background: rgba(255,255,255,0.08); 
-            color: rgba(242,247,243,0.70);
-            border: 1px solid rgba(255,255,255,0.10);
+            background: var(--bg-base); 
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
         }
 
         .image-gallery {
@@ -1492,8 +1492,8 @@
         }
 
         .funnel-client-item {
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.10);
+            background: var(--bg-base);
+            border: 1px solid var(--border);
             padding: 8px 12px;
             border-radius: 6px;
             margin-bottom: 6px;
@@ -1957,7 +1957,7 @@
         }
         .wpp-open-btn:active { opacity: 0.85; }
         .wpp-cancel-btn {
-            width: 100%; background: rgba(255,255,255,0.07);
+            width: 100%; background: var(--bg-base);
             border: 1px solid var(--border); border-radius: 10px;
             padding: 12px; font-size: 0.88rem; font-weight: 600;
             color: var(--text-secondary); cursor: pointer; margin-top: 6px;
@@ -2242,7 +2242,7 @@
             color: var(--primary); letter-spacing: -0.3px;
         }
         .calendar-nav-btn {
-            background: rgba(255,255,255,0.07); border: none; border-radius: 8px;
+            background: var(--bg-base); border: none; border-radius: 8px;
             width: 34px; height: 34px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; color: var(--text-secondary); font-size: 0.9rem;
@@ -2343,7 +2343,7 @@
         }
         .client-priority-alta  { border-left-color: var(--danger) !important; }
         .client-priority-media { border-left-color: var(--warning) !important; }
-        .client-priority-normal{ border-left-color: rgba(255,255,255,0.10) !important; }
+        .client-priority-normal{ border-left-color: var(--border) !important; }
 
         .schedule-card {
             background: #FFFFFF;
@@ -2460,7 +2460,7 @@
 
         /* Performance meter */
         .perf-meter {
-            background: rgba(255,255,255,0.07);
+            background: var(--bg-base);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-radius: var(--radius-md);
@@ -2503,7 +2503,7 @@
 
         /* Rotina do Dia */
         .rotina-block {
-            background: rgba(255,255,255,0.07);
+            background: var(--bg-base);
             border-radius: var(--radius-md);
             overflow: hidden;
             box-shadow: var(--shadow-md);
@@ -2592,7 +2592,7 @@
 
         /* Estratégias */
         .estrategia-card {
-            background: rgba(255,255,255,0.07);
+            background: var(--bg-base);
             border-radius: var(--radius-md);
             padding: 16px;
             margin-bottom: 12px;
@@ -2670,7 +2670,7 @@
 
         /* Metas */
         .meta-card {
-            background: rgba(255,255,255,0.07);
+            background: var(--bg-base);
             border-radius: var(--radius-md);
             padding: 14px 16px;
             margin-bottom: 10px;
@@ -2754,11 +2754,11 @@
             color: rgba(255,255,255,0.6);
         }
         .coach-ia-response {
-            background: rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.12);
             border-radius: 12px;
             padding: 14px;
             font-size: 0.82rem;
-            color: rgba(255,255,255,0.9);
+            color: rgba(255,255,255,0.95);
             line-height: 1.6;
             min-height: 80px;
             border: 1px solid rgba(255,255,255,0.1);
@@ -3025,7 +3025,7 @@
             top: -30px; right: -30px;
             width: 120px; height: 120px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.07);
+            background: var(--bg-base);
         }
         .vc-hero::after {
             content: '';
@@ -3517,8 +3517,8 @@
         .leitura-attach-list-item {
             display: flex; align-items: center; gap: 10px;
             padding: 9px 12px; border-radius: 10px;
-            background: rgba(255,255,255,0.07); margin-bottom: 6px;
-            border: 1px solid rgba(255,255,255,0.10); cursor: pointer;
+            background: var(--bg-base); margin-bottom: 6px;
+            border: 1px solid var(--border); cursor: pointer;
             transition: background 0.15s, transform 0.15s;
         }
         .leitura-attach-list-item:active { background: rgba(79,70,229,0.15); transform: scale(0.98); }
@@ -3631,7 +3631,7 @@
         }
         .file-viewer-title { color:white; font-size:0.9rem; font-weight:700; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .file-viewer-counter {
-            color: rgba(255,255,255,0.55); font-size:0.75rem; font-weight:600;
+            color: var(--text-secondary); font-size:0.75rem; font-weight:600;
             flex-shrink:0; white-space:nowrap;
         }
         .file-viewer-close {
@@ -4597,8 +4597,8 @@
             border: 1px solid rgba(255,255,255,0.12) !important;
             box-shadow: 0 20px 60px rgba(0,0,0,0.60) !important;
         }
-        #idle-warning-box h3, #idle-warning-box p { color: #F2F7F3 !important; }
-        #idle-warning-box p  { color: rgba(255,255,255,0.55) !important; }
+        #idle-warning-box h3, #idle-warning-box p { color: var(--dark) !important; }
+        #idle-warning-box p  { color: var(--text-secondary) !important; }
 
         /* ── plantoes info ───────────────────────────────────────── */
         .plantoes-info {
@@ -4608,7 +4608,7 @@
         .plantoes-summary { color: var(--accent) !important; }
 
         /* ── Admin section inner modal ───────────────────────────── */
-        #admin-section .section-title { color: #F2F7F3 !important; }
+        #admin-section .section-title { color: var(--dark) !important; }
 
         /* ── Perf meters (VendaCerta / Coach) ───────────────────── */
         .perf-meter {
@@ -4650,13 +4650,13 @@
 
         /* ── Meta cards ──────────────────────────────────────────── */
         .meta-card {
-            background: rgba(255,255,255,0.07) !important;
+            background: var(--bg-base) !important;
             border: 1px solid rgba(255,255,255,0.11) !important;
             box-shadow: 0 3px 12px rgba(0,0,0,0.25) !important;
         }
-        .meta-label  { color: #F2F7F3 !important; }
+        .meta-label  { color: var(--dark) !important; }
         .meta-values { color: rgba(255,255,255,0.45) !important; }
-        .meta-progress-track { background: rgba(255,255,255,0.10) !important; }
+        .meta-progress-track { background: var(--border) !important; }
         .meta-note { color: rgba(255,255,255,0.40) !important; }
 
         /* ── Coach quote ─────────────────────────────────────────── */
@@ -4665,7 +4665,7 @@
             border: 1px solid rgba(255,255,255,0.11) !important;
             box-shadow: 0 3px 12px rgba(0,0,0,0.25) !important;
         }
-        .coach-quote-text { color: #F2F7F3 !important; }
+        .coach-quote-text { color: var(--dark) !important; }
         .coach-quote-author { color: var(--accent) !important; }
         .coach-quote-mark { color: rgba(196,114,74,0.25) !important; }
 
@@ -4826,9 +4826,9 @@
         /* ── Section headings inside sheets ──────────────────────── */
         .modal-sheet h3, .modal-sheet h4, .modal-sheet p,
         .modal-sheet label, .modal-sheet span:not([class]) {
-            color: #F2F7F3;
+            color: var(--dark);
         }
-        .modal-sheet p { color: rgba(255,255,255,0.55); }
+        .modal-sheet p { color: var(--text-secondary); }
 
         /* ── User modal sheet ────────────────────────────────────── */
         #sheet-usuarios .user-badge {
@@ -5198,7 +5198,7 @@
 #_lw_wall h1{color:#fff;font-size:22px;font-weight:700;margin-bottom:12px;line-height:1.3;}
 #_lw_wall p{color:rgba(255,255,255,0.70);font-size:15px;max-width:400px;line-height:1.7;margin-bottom:28px;}
 #_lw_wall .card{
-    background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);
+    background:var(--bg-base);border:1px solid var(--border);
     border-radius:16px;padding:18px 28px;margin-bottom:28px;max-width:400px;width:100%;
 }
 #_lw_wall .card small{display:block;color:rgba(255,255,255,0.45);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
@@ -7195,7 +7195,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         <div style="font-size:0.75rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px 4px;background:var(--light);border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;">
                             📁 DOCUMENTOS PESSOAIS (todos os perfis)
                         </div>
-                        <div id="prof-docs-pessoais" style="background:rgba(255,255,255,0.07);border-radius:0 0 12px 12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
+                        <div id="prof-docs-pessoais" style="background:var(--bg-base);border-radius:0 0 12px 12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
                         </div>
                     </div>
 
@@ -7204,7 +7204,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         <div style="font-size:0.75rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px 4px;background:rgba(196,114,74,0.06);border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;">
                             💰 COMPROVAÇÃO DE RENDA / VÍNCULO
                         </div>
-                        <div id="prof-docs-renda" style="background:rgba(255,255,255,0.07);border-radius:0 0 12px 12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
+                        <div id="prof-docs-renda" style="background:var(--bg-base);border-radius:0 0 12px 12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
                         </div>
                     </div>
 
@@ -7213,7 +7213,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         <div style="font-size:0.75rem;font-weight:800;color:var(--indigo);text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px 4px;background:rgba(79,70,229,0.06);border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;">
                             💍 DOCUMENTOS DO CÔNJUGE / CONVIVENTE
                         </div>
-                        <div id="prof-docs-conjugal" style="background:rgba(255,255,255,0.07);border-radius:0 0 12px 12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
+                        <div id="prof-docs-conjugal" style="background:var(--bg-base);border-radius:0 0 12px 12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
                         </div>
                     </div>
 
@@ -7221,7 +7221,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <div id="prof-obs-box" style="display:none;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:0.82rem;color:#92660a;line-height:1.5;"></div>
 
                     <!-- Progresso -->
-                    <div style="background:rgba(255,255,255,0.07);border-radius:10px;border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;">
+                    <div style="background:var(--bg-base);border-radius:10px;border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                             <span style="font-size:0.8rem;font-weight:700;color:var(--dark);">Progresso da Documentação</span>
                             <span id="prof-progress-text" style="font-size:0.8rem;font-weight:700;color:var(--primary);">0 / 0</span>
@@ -7308,7 +7308,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             </div>
                         </div>
                     </div>
-                    <div id="lote-docs-checklist" style="background:rgba(255,255,255,0.07);border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
+                    <div id="lote-docs-checklist" style="background:var(--bg-base);border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
                         <!-- Items inserted by JS -->
                     </div>
                     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
@@ -7419,7 +7419,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             </div>
 
             <!-- Dados do cliente (somente leitura) -->
-            <div style="background:var(--light);border-radius:12px;border:1px solid var(--border);padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.10);">
+            <div style="background:var(--light);border-radius:12px;border:1px solid var(--border);padding:14px;margin-bottom:16px;border:1px solid var(--border);">
                 <div style="font-size:0.72rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">📋 Dados do Cliente</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                     <div>
@@ -11743,7 +11743,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 const icon = ETAPA_ICONS[cliente.etapaFunil] || 'handshake';
 
                 const imovelInfo = imovel ? `
-                    <div style="display:flex;align-items:center;gap:6px;margin-top:6px;padding:6px 8px;background:rgba(255,255,255,0.07);border-radius:8px;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-top:6px;padding:6px 8px;background:var(--bg-base);border-radius:8px;">
                         <i class="fas fa-home" style="color:var(--primary);font-size:0.8rem;flex-shrink:0;"></i>
                         <span style="font-size:0.8rem;color:var(--secondary);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${imovel.titulo.length > 35 ? imovel.titulo.substring(0,33)+'...' : imovel.titulo}</span>
                         ${imovel.precoVenda ? `<span style="font-size:0.75rem;color:var(--success);font-weight:700;margin-left:auto;flex-shrink:0;">${Utils.formatCurrency(imovel.precoVenda)}</span>` : ''}
@@ -12793,12 +12793,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                     </button>
                                 </div>
                             </div>
-                            <div style="background:rgba(255,255,255,0.07);border-radius:10px;border:1px solid var(--border);overflow:hidden;">
+                            <div style="background:var(--bg-base);border-radius:10px;border:1px solid var(--border);overflow:hidden;">
                                 ${(App.cliente.LOTE_DOCS || []).map((d, i) => {
                                     const checked = cliente.loteDocsChecked || {};
                                     const done = checked[d.id];
                                     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:${i<5?'1px solid var(--border)':'none'};background:${done?'rgba(46,125,66,0.04)':''}">
-                                        <div style="width:20px;height:20px;border-radius:5px;background:${done?'var(--success)':'rgba(255,255,255,0.10)'};border:2px solid ${done?'var(--success)':'rgba(255,255,255,0.20)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-size:0.65rem;">${done?'<i class="fas fa-check"></i>':''}</div>
+                                        <div style="width:20px;height:20px;border-radius:5px;background:${done?'var(--success)':'var(--border)'};border:2px solid ${done?'var(--success)':'rgba(255,255,255,0.20)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-size:0.65rem;">${done?'<i class="fas fa-check"></i>':''}</div>
                                         <span style="font-size:0.88rem;font-weight:600;color:${done?'var(--text-secondary)':'var(--dark)'};${done?'text-decoration:line-through':''}">${d.icon} ${i+1}. ${d.label}</span>
                                     </div>`;
                                 }).join('')}
@@ -12843,11 +12843,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                         <div style="background:rgba(255,255,255,0.85);height:100%;width:${pct}%;border-radius:4px;transition:width 0.3s;"></div>
                                     </div>
                                 </div>
-                                <div style="background:rgba(255,255,255,0.07);border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:10px;">
+                                <div style="background:var(--bg-base);border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:10px;">
                                     ${allDocsList.map((d, i) => {
                                         const isDone = !!checked[d.id];
                                         return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:${i<allDocsList.length-1?'1px solid var(--border)':'none'};background:${isDone?'rgba(46,125,66,0.04)':''}">
-                                            <div style="width:20px;height:20px;border-radius:5px;background:${isDone?'var(--success)':'rgba(255,255,255,0.10)'};border:2px solid ${isDone?'var(--success)':'rgba(255,255,255,0.20)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-size:0.65rem;">${isDone?'<i class="fas fa-check"></i>':''}</div>
+                                            <div style="width:20px;height:20px;border-radius:5px;background:${isDone?'var(--success)':'var(--border)'};border:2px solid ${isDone?'var(--success)':'rgba(255,255,255,0.20)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-size:0.65rem;">${isDone?'<i class="fas fa-check"></i>':''}</div>
                                             <span style="font-size:0.88rem;font-weight:600;color:${isDone?'var(--text-secondary)':'var(--dark)'};${isDone?'text-decoration:line-through':''}">${d.icon} ${d.label}</span>
                                         </div>`;
                                     }).join('')}
