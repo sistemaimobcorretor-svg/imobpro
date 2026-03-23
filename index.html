@@ -254,92 +254,120 @@
             to { opacity: 1; transform: translateY(0); } 
         }
 
+        /* ── Dashboard grid — iPhone widget style ── */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
             width: 100%;
         }
 
+        /* Coach hero card — full-width spanning row */
+        .stat-card-coach-hero {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #0C4A6E 0%, #1D6FA4 55%, #2E8BC0 100%);
+            border-radius: 18px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            cursor: pointer;
+            transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s ease;
+            box-shadow: 0 6px 24px rgba(29,111,164,0.30), 0 2px 8px rgba(0,0,0,0.10);
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+        .stat-card-coach-hero::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -24px;
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.13) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .stat-card-coach-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -22px; left: 40px;
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .stat-card-coach-hero:active { transform: scale(0.975); box-shadow: 0 12px 36px rgba(29,111,164,0.35); }
+        .coach-hero-left { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+        .coach-hero-eyebrow { font-size: 0.63rem; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.58); }
+        .coach-hero-title-text { font-size: 1.1rem; font-weight: 900; color: #FFFFFF; letter-spacing: -0.3px; line-height: 1.2; }
+        .coach-hero-sub-text { font-size: 0.72rem; color: rgba(255,255,255,0.62); margin-top: 1px; line-height: 1.4; }
+        .coach-hero-right {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: rgba(255,255,255,0.16);
+            border: 1.5px solid rgba(255,255,255,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.45rem; flex-shrink: 0;
+        }
+
+        /* Stat cards — compact iOS widget style */
         .stat-card {
             background: #FFFFFF;
-            padding: 18px 14px;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
+            padding: 10px 6px;
+            border-radius: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 3px 10px rgba(0,0,0,0.04);
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 3px;
             cursor: pointer;
-            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-            border: 1px solid var(--border);
-            min-height: 90px;
+            transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
+            border: 1px solid rgba(0,0,0,0.055);
+            aspect-ratio: 1 / 1;
+            min-height: unset;
             text-align: center;
             align-items: center;
-            transform-style: preserve-3d;
-            perspective: 600px;
+            justify-content: center;
             position: relative;
             overflow: hidden;
         }
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 50%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 100%);
-            border-radius: var(--radius-md) var(--radius-md) 0 0;
-            pointer-events: none;
-        }
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(29,111,164,0.25), transparent);
-            border-radius: 0 0 var(--radius-md) var(--radius-md);
-        }
-        .stat-card:active { 
-            transform: scale(0.95) rotateX(5deg);
-            box-shadow: 0 10px 30px rgba(29,111,164,0.18), 0 4px 10px rgba(0,0,0,0.12);
-        }
-        .stat-card:active .stat-icon {
-            transform: scale(1.2) translateZ(20px);
-            transition: transform 0.1s;
-        }
+        .stat-card::before { display: none; }
+        .stat-card::after { display: none; }
+        .stat-card:active { transform: scale(0.92); box-shadow: 0 2px 6px rgba(29,111,164,0.12); }
 
         .stat-icon {
             width: 38px; height: 38px;
             border-radius: 11px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1rem;
-            transition: transform 0.1s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.30);
+            font-size: 1.05rem;
+            box-shadow: none;
+            margin-bottom: 4px;
         }
-        .stat-value { 
-            font-size: 1.55rem; font-weight: 900; color: #F2F7F3; line-height: 1;
-            letter-spacing: -0.5px;
+        .stat-value {
+            font-size: 1.2rem; font-weight: 900; color: var(--dark); line-height: 1;
+            letter-spacing: -0.3px;
         }
-        .stat-label { 
-            font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; 
-            letter-spacing: 0.6px; text-transform: uppercase;
+        .stat-label {
+            font-size: 0.62rem; color: var(--text-secondary); font-weight: 600;
+            letter-spacing: 0.1px; text-transform: uppercase; line-height: 1.2;
         }
 
-        /* ── Icon bg classes — premium dark palette ── */
-        .bg-blue   { background: rgba(61,170,110,0.18); color: var(--primary-light); }
-        .bg-green  { background: rgba(46,204,138,0.18); color: var(--success); }
-        .bg-orange { background: rgba(232,168,48,0.18); color: var(--warning); }
-        .bg-red    { background: rgba(224,82,82,0.18);  color: var(--danger); }
-        .bg-purple { background: rgba(201,169,110,0.20); color: var(--accent); }
-        .bg-cyan   { background: rgba(123,191,160,0.18); color: var(--secondary); }
-        .bg-gold   { background: rgba(201,169,110,0.22); color: var(--accent); }
-        .bg-verm   { background: rgba(224,82,82,0.18);  color: var(--danger); }
-        .bg-indigo { background: rgba(99,102,241,0.18); color: var(--indigo-light); }
-        .bg-violet { background: rgba(139,92,246,0.18); color: #C4B5FD; }
-        .bg-teal   { background: rgba(20,184,166,0.18); color: var(--teal-light); }
-        .bg-coral  { background: rgba(248,113,113,0.18); color: var(--coral); }
-        .bg-amber  { background: rgba(251,191,36,0.18); color: var(--amber); }
-        .bg-sky    { background: rgba(56,189,248,0.18); color: var(--sky); }
-        .bg-pink   { background: rgba(244,114,182,0.18); color: var(--pink); }
+        /* ── Icon bg classes — light palette ── */
+        .bg-blue   { background: #EBF4FB; color: #1D6FA4; }
+        .bg-green  { background: #E9F7EF; color: #27AE60; }
+        .bg-orange { background: #FEF3E7; color: #E67E22; }
+        .bg-red    { background: #FDEDEC; color: #E74C3C; }
+        .bg-purple { background: #F5EEF8; color: #8E44AD; }
+        .bg-cyan   { background: #E8F8F5; color: #0891B2; }
+        .bg-gold   { background: #FEF3E7; color: #E67E22; }
+        .bg-verm   { background: #FDEDEC; color: #E74C3C; }
+        .bg-indigo { background: #EEF2FF; color: #6366F1; }
+        .bg-violet { background: #F5F3FF; color: #7C3AED; }
+        .bg-teal   { background: #F0FDFA; color: #0891B2; }
+        .bg-coral  { background: #FEF2F2; color: #F87171; }
+        .bg-amber  { background: #FFFBEB; color: #F59E0B; }
+        .bg-sky    { background: #F0F9FF; color: #0EA5E9; }
+        .bg-pink   { background: #FDF2F8; color: #EC4899; }
 
         .section-title {
             font-size: 1.05rem; font-weight: 800; margin-bottom: 14px;
@@ -1965,33 +1993,23 @@
 
         @media (max-width: 360px) {
             .stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
             }
-            
-            .details-info-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .property-features {
-                justify-content: space-between;
-            }
-            
-            .feature {
-                min-width: 45px;
-            }
-            
-            .links-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .btn-details {
-                min-width: 100%;
-            }
+            .stat-card { border-radius: 11px; }
         }
 
         @media (min-width: 768px) {
             .stats-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(5, 1fr);
+                gap: 10px;
+            }
+            .stat-card { aspect-ratio: 1 / 1; }
+        }
+
+        @media (min-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(6, 1fr);
             }
         }
 
@@ -3954,6 +3972,240 @@
         body.dark-mode .sim-alert.age  { background:rgba(68,84,71,0.2); color:#9dbfa0; }
         body.dark-mode .sim-alert.dep  { background:rgba(196,114,74,0.15); color:#d98a62; }
 
+        /* ===== DARK MODE GLOBAL — TEMA ESCURO COMPLETO ===== */
+        body.dark-mode {
+            background: #0F172A;
+            color: #E2E8F0;
+        }
+        body.dark-mode header {
+            background: #1E293B !important;
+            border-bottom-color: rgba(255,255,255,0.08) !important;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.30) !important;
+        }
+        body.dark-mode .brand { color: #E2E8F0 !important; }
+        body.dark-mode .icon-btn { color: #94A3B8 !important; }
+        body.dark-mode .icon-btn:active { background: rgba(29,111,164,0.20) !important; }
+        body.dark-mode main { background: #0F172A; }
+        body.dark-mode .bottom-nav {
+            background: #1E293B !important;
+            border-top-color: rgba(255,255,255,0.08) !important;
+        }
+        body.dark-mode .nav-item { color: #64748B !important; }
+        body.dark-mode .nav-item.active { color: var(--primary-light) !important; }
+
+        /* Stat cards dark */
+        body.dark-mode .stat-card {
+            background: #1E293B !important;
+            border-color: rgba(255,255,255,0.07) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.30) !important;
+        }
+        body.dark-mode .stat-value { color: #F1F5F9 !important; text-shadow: none !important; }
+        body.dark-mode .stat-label { color: #64748B !important; }
+        body.dark-mode .stat-card::after { display: none !important; }
+
+        /* Coach hero dark */
+        body.dark-mode .stat-card-coach-hero {
+            background: linear-gradient(135deg, #0A2E44 0%, #0F4C73 55%, #1A6090 100%) !important;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.40) !important;
+        }
+
+        /* Icon bg classes dark */
+        body.dark-mode .bg-blue   { background: rgba(29,111,164,0.20) !important; color: #60A5FA !important; }
+        body.dark-mode .bg-green  { background: rgba(39,174,96,0.20) !important;  color: #4ADE80 !important; }
+        body.dark-mode .bg-orange { background: rgba(230,126,34,0.20) !important; color: #FB923C !important; }
+        body.dark-mode .bg-red    { background: rgba(231,76,60,0.20) !important;  color: #F87171 !important; }
+        body.dark-mode .bg-purple { background: rgba(124,58,237,0.20) !important; color: #C084FC !important; }
+        body.dark-mode .bg-cyan   { background: rgba(8,145,178,0.20) !important;  color: #22D3EE !important; }
+        body.dark-mode .bg-gold   { background: rgba(230,126,34,0.20) !important; color: #FBBF24 !important; }
+        body.dark-mode .bg-indigo { background: rgba(99,102,241,0.20) !important; color: #818CF8 !important; }
+
+        /* Section titles dark */
+        body.dark-mode .section-title { color: #E2E8F0 !important; border-bottom-color: rgba(255,255,255,0.08) !important; }
+        body.dark-mode .section-title span { color: #E2E8F0 !important; }
+
+        /* Cards dark */
+        body.dark-mode .property-card,
+        body.dark-mode .client-card,
+        body.dark-mode [class*="client-card"],
+        body.dark-mode .schedule-card,
+        body.dark-mode .details-card,
+        body.dark-mode .details-section,
+        body.dark-mode .link-card,
+        body.dark-mode .report-summary,
+        body.dark-mode .mini-chart-container,
+        body.dark-mode .calendar-container,
+        body.dark-mode .vc-card,
+        body.dark-mode .vc-kpi-card,
+        body.dark-mode .vc-stage,
+        body.dark-mode .vc-canal-card,
+        body.dark-mode .vc-script-card,
+        body.dark-mode .vc-meta-prog-card,
+        body.dark-mode .vc-conquista-card,
+        body.dark-mode .vc-timeline-content,
+        body.dark-mode .vc-acao-card,
+        body.dark-mode .vc-bant-card,
+        body.dark-mode .waiting-item,
+        body.dark-mode .lista-stat-mini,
+        body.dark-mode .wpp-option-card {
+            background: #1E293B !important;
+            border-color: rgba(255,255,255,0.08) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.30) !important;
+        }
+        body.dark-mode .property-title,
+        body.dark-mode .client-name,
+        body.dark-mode .schedule-title,
+        body.dark-mode .details-title,
+        body.dark-mode .link-title,
+        body.dark-mode .vc-stage-name,
+        body.dark-mode .vc-canal-name,
+        body.dark-mode .vc-script-title,
+        body.dark-mode .vc-acao-title,
+        body.dark-mode .vc-check-text,
+        body.dark-mode .vc-conquista-name,
+        body.dark-mode .vc-timeline-action,
+        body.dark-mode .vc-meta-prog-name,
+        body.dark-mode .funnel-client-name,
+        body.dark-mode .funnel-stage-title,
+        body.dark-mode .lista-stat-mini-val,
+        body.dark-mode .wpp-option-label {
+            color: #E2E8F0 !important;
+        }
+        body.dark-mode .property-address,
+        body.dark-mode .client-row,
+        body.dark-mode .schedule-time,
+        body.dark-mode .schedule-notes,
+        body.dark-mode .link-url,
+        body.dark-mode .vc-stage-meta,
+        body.dark-mode .vc-canal-desc,
+        body.dark-mode .vc-acao-desc,
+        body.dark-mode .vc-check-tip,
+        body.dark-mode .vc-conquista-desc,
+        body.dark-mode .vc-timeline-tip,
+        body.dark-mode .funnel-client-days,
+        body.dark-mode .lista-stat-mini-lbl,
+        body.dark-mode .wpp-option-preview {
+            color: #64748B !important;
+        }
+
+        /* Forms dark */
+        body.dark-mode .form-label  { color: #CBD5E1 !important; }
+        body.dark-mode .form-control {
+            background: #0F172A !important;
+            border-color: rgba(255,255,255,0.10) !important;
+            color: #E2E8F0 !important;
+        }
+        body.dark-mode .form-control::placeholder { color: #475569 !important; }
+        body.dark-mode .form-control:focus {
+            border-color: var(--primary-light) !important;
+            box-shadow: 0 0 0 3px rgba(29,111,164,0.25) !important;
+        }
+        body.dark-mode select.form-control option { background: #1E293B; color: #E2E8F0; }
+        body.dark-mode .search-input {
+            background: #1E293B !important;
+            border-color: rgba(255,255,255,0.10) !important;
+            color: #E2E8F0 !important;
+        }
+        body.dark-mode .search-input::placeholder { color: #475569 !important; }
+        body.dark-mode .search-icon { color: #475569 !important; }
+
+        /* Modal sheet dark */
+        body.dark-mode .modal-sheet {
+            background: #1E293B !important;
+            border-top-color: var(--primary) !important;
+        }
+        body.dark-mode .sheet-handle { background: #334155 !important; }
+        body.dark-mode .modal-sheet h3,
+        body.dark-mode .modal-sheet h4,
+        body.dark-mode .modal-sheet label { color: #E2E8F0 !important; }
+        body.dark-mode .modal-sheet p { color: #94A3B8 !important; }
+
+        /* Filter chips dark */
+        body.dark-mode .filter-chip {
+            background: #1E293B !important;
+            border-color: rgba(255,255,255,0.10) !important;
+            color: #94A3B8 !important;
+        }
+        body.dark-mode .filter-chip.active {
+            background: var(--primary) !important;
+            border-color: var(--primary) !important;
+            color: white !important;
+        }
+        body.dark-mode .quick-chip {
+            background: #1E293B !important;
+            border-color: rgba(255,255,255,0.10) !important;
+            color: #94A3B8 !important;
+        }
+        body.dark-mode .quick-chip.active {
+            background: var(--primary) !important;
+            color: white !important;
+        }
+
+        /* Funnel dark */
+        body.dark-mode .funnel-container { background: #1E293B !important; border-color: rgba(255,255,255,0.08) !important; }
+        body.dark-mode .funnel-stage { background: #0F172A !important; }
+        body.dark-mode .funnel-client-item { background: #1E293B !important; border-color: rgba(255,255,255,0.08) !important; }
+        body.dark-mode .funnel-client-item:hover { background: rgba(29,111,164,0.15) !important; }
+        body.dark-mode .stage-lead          { background: #1E293B !important; }
+        body.dark-mode .stage-contato       { background: rgba(29,111,164,0.12) !important; }
+        body.dark-mode .stage-cpf           { background: rgba(230,126,34,0.10) !important; }
+        body.dark-mode .stage-sem-restricao { background: rgba(243,156,18,0.10) !important; }
+        body.dark-mode .stage-documentacao  { background: rgba(100,116,139,0.12) !important; }
+        body.dark-mode .stage-aprovado      { background: rgba(39,174,96,0.10) !important; }
+        body.dark-mode .stage-contrato      { background: rgba(29,111,164,0.12) !important; }
+        body.dark-mode .stage-venda         { background: rgba(21,90,138,0.15) !important; }
+
+        /* Buttons dark */
+        body.dark-mode .btn-light { background: #0F172A !important; color: #94A3B8 !important; border-color: rgba(255,255,255,0.10) !important; }
+        body.dark-mode .btn-primary-soft { background: rgba(29,111,164,0.15) !important; color: var(--primary-light) !important; }
+        body.dark-mode .btn-details-secondary { background: #0F172A !important; color: #94A3B8 !important; border-color: rgba(255,255,255,0.10) !important; }
+
+        /* User badge dark */
+        body.dark-mode .user-badge { background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.12) !important; }
+        body.dark-mode .user-badge .user-name { color: #E2E8F0 !important; }
+
+        /* Toast dark */
+        body.dark-mode .toast { background: #1E293B !important; color: #E2E8F0 !important; border: 1px solid rgba(255,255,255,0.10) !important; }
+
+        /* Empty state dark */
+        body.dark-mode .empty-state { color: #475569 !important; }
+
+        /* Calendar dark */
+        body.dark-mode .calendar-container { background: #1E293B !important; border-color: rgba(255,255,255,0.08) !important; }
+        body.dark-mode .calendar-day { color: #CBD5E1 !important; }
+        body.dark-mode .calendar-day.other-month { color: #334155 !important; }
+        body.dark-mode .calendar-day:not(:empty):hover { background: rgba(29,111,164,0.20) !important; }
+        body.dark-mode .calendar-weekday { color: #64748B !important; }
+        body.dark-mode .calendar-month-label { color: var(--primary-light) !important; }
+        body.dark-mode .calendar-nav-btn { color: #94A3B8 !important; background: rgba(255,255,255,0.05) !important; }
+        body.dark-mode .calendar-selected-date { color: var(--primary-light) !important; border-top-color: rgba(255,255,255,0.08) !important; }
+        body.dark-mode .calendar-selected-badge { background: rgba(29,111,164,0.20) !important; color: var(--primary-light) !important; }
+
+        /* Report dark */
+        body.dark-mode .report-summary { background: #1E293B !important; border-color: rgba(255,255,255,0.08) !important; }
+        body.dark-mode .report-table th { background: #0F172A !important; color: #94A3B8 !important; border-bottom-color: rgba(255,255,255,0.08) !important; }
+        body.dark-mode .report-table td { border-bottom-color: rgba(255,255,255,0.05) !important; color: #CBD5E1 !important; }
+        body.dark-mode .report-table tr:hover { background: rgba(29,111,164,0.10) !important; }
+
+        /* Bar chart mini dark */
+        body.dark-mode .mini-chart-container { background: #1E293B !important; border-color: rgba(255,255,255,0.08) !important; }
+        body.dark-mode .mini-chart-title { color: #E2E8F0 !important; }
+        body.dark-mode .bar-label { color: #64748B !important; }
+
+        /* Birthday alert dark */
+        body.dark-mode .birthday-alert { background: rgba(230,126,34,0.12) !important; }
+        body.dark-mode .birthday-alert-content { color: #CBD5E1 !important; }
+
+        /* Progress dark */
+        body.dark-mode .progress-container { background: rgba(255,255,255,0.08) !important; }
+
+        /* Idle warning dark */
+        body.dark-mode #idle-warning-box {
+            background: #1E293B !important;
+            border-color: rgba(255,255,255,0.10) !important;
+        }
+        body.dark-mode #idle-warning-box h3 { color: #E2E8F0 !important; }
+        body.dark-mode #idle-warning-box p { color: #94A3B8 !important; }
+
         /* ===== MODAL DE INATIVIDADE ===== */
         #idle-warning-overlay {
             position: fixed;
@@ -4058,8 +4310,12 @@
         /* ── Cards genéricos premium ─────────────────────────────── */
         .stat-card {
             background: #FFFFFF;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(0,0,0,0.055);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 3px 10px rgba(0,0,0,0.04);
+            aspect-ratio: 1 / 1;
+            min-height: unset;
+            justify-content: center;
+            border-radius: 14px;
         }
         .stat-card::before { background: none; }
         .stat-value { color: var(--dark); text-shadow: none; }
@@ -5208,6 +5464,16 @@
             <div id="dashboard-view" class="view active">
                 <div class="section-title">Visão Geral</div>
                 <div class="stats-grid">
+                    <!-- Card Coach destaque — ocupa linha inteira -->
+                    <div class="stat-card-coach-hero" onclick="UI.navigateCoach()">
+                        <div class="coach-hero-left">
+                            <span class="coach-hero-eyebrow">Painel</span>
+                            <span class="coach-hero-title-text">🏆 Coach ImobiPro</span>
+                            <span class="coach-hero-sub-text">Rotina, metas e performance do corretor</span>
+                        </div>
+                        <div class="coach-hero-right">🎯</div>
+                    </div>
+
                     <div class="stat-card" onclick="UI.navigate('imoveis')">
                         <div class="stat-icon bg-blue"><i class="fas fa-building"></i></div>
                         <div class="stat-value" id="dash-total-imoveis">0</div>
@@ -5221,36 +5487,36 @@
                     <div class="stat-card" onclick="UI.navigate('agenda')">
                         <div class="stat-icon bg-orange"><i class="fas fa-calendar-alt"></i></div>
                         <div class="stat-value" id="dash-visitas">0</div>
-                        <div class="stat-label">Agendamentos Hoje</div>
+                        <div class="stat-label">Agenda</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="UI.navigate('relatorios')">
                         <div class="stat-icon bg-red"><i class="fas fa-chart-line"></i></div>
                         <div class="stat-value" id="dash-vendas">R$ 0</div>
-                        <div class="stat-label">Vendas Mês</div>
+                        <div class="stat-label">Vendas</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="UI.navigate('funil')">
                         <div class="stat-icon bg-cyan"><i class="fas fa-handshake"></i></div>
                         <div class="stat-value" id="dash-negociacoes">0</div>
-                        <div class="stat-label">Negociações</div>
+                        <div class="stat-label">Negoc.</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="UI.navigate('imoveis')">
                         <div class="stat-icon bg-purple"><i class="fas fa-star"></i></div>
                         <div class="stat-value" id="dash-destaques">0</div>
                         <div class="stat-label">Destaques</div>
                     </div>
-                    <div class="stat-card" title="Soma das comissões de imóveis vinculados a clientes em negociação ativa">
+                    <div class="stat-card" onclick="UI.navigate('funil')" title="Comissão prevista em negociações">
                         <div class="stat-icon bg-gold"><i class="fas fa-coins"></i></div>
                         <div class="stat-value" id="dash-comissao">R$ 0</div>
-                        <div class="stat-label">Comissão em Neg.</div>
+                        <div class="stat-label">Comissão</div>
                     </div>
                     <div class="stat-card" onclick="UI.navigate('venda-certa')">
                         <div class="stat-icon bg-red"><i class="fas fa-bullseye"></i></div>
-                        <div class="stat-value" style="font-size:1.4rem; line-height:1;">🏆</div>
+                        <div class="stat-value" style="font-size:1rem;line-height:1;">🏆</div>
                         <div class="stat-label">Venda Certa</div>
                     </div>
                     <div class="stat-card" onclick="UI.navigate('simulador')">
                         <div class="stat-icon bg-cyan"><i class="fas fa-calculator"></i></div>
-                        <div class="stat-value" style="font-size:1.4rem; line-height:1;">🏦</div>
+                        <div class="stat-value" style="font-size:1rem;line-height:1;">🏦</div>
                         <div class="stat-label">Simulador</div>
                     </div>
                 </div>
@@ -6665,7 +6931,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <a href="#" class="nav-item" data-target="relatorios-view" onclick="UI.switchTab(this); return false;">
                 <i class="fas fa-chart-bar"></i> <span>Relatórios</span>
             </a>
-            <a href="#" class="nav-item" data-target="coach-view" onclick="UI.switchTab(this); Coach.init(); return false;">
+            <a href="#" class="nav-item" data-target="coach-view" onclick="UI.switchTab(this); Coach.init(); return false;" style="display:none">
                 <i class="fas fa-trophy"></i> <span>Coach</span>
             </a>
             <a href="#" class="nav-item" data-target="leitura-view" onclick="UI.switchTab(this); Leitura.init(); return false;">
@@ -10567,6 +10833,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             navigate: (tabName) => {
                 const el = document.querySelector(`.nav-item[data-target="${tabName}-view"]`);
                 if(el) UI.switchTab(el);
+            },
+
+            navigateCoach: () => {
+                const el = document.querySelector('.nav-item[data-target="coach-view"]');
+                if(el) { UI.switchTab(el); Coach.init(); }
             },
 
             searchImoveis: function(searchTerm) {
