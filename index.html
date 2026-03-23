@@ -209,6 +209,12 @@
             border-bottom: 1px solid #E2E8F0;
             box-shadow: 0 1px 8px rgba(0,0,0,0.06), 0 2px 16px rgba(29,111,164,0.06);
         }
+        @media (min-width: 768px) {
+            header { padding-left: 24px; padding-right: 24px; }
+        }
+        @media (min-width: 1024px) {
+            header { padding-left: 32px; padding-right: 32px; }
+        }
 
         .brand {
             font-size: 1.3rem;
@@ -235,7 +241,7 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: calc(var(--header-height) + 16px) 16px calc(var(--nav-height) + 16px);
+            padding: calc(var(--header-height) + 12px) 14px calc(var(--nav-height) + 12px);
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
             width: 100%;
@@ -409,7 +415,7 @@
         }
         .search-input {
             width: 100%; padding: 13px 13px 13px 42px;
-            border: 1px solid rgba(255,255,255,0.09);
+            border: 1px solid var(--border);
             border-radius: var(--radius-md);
             background: #FFFFFF;
             font-size: 0.95rem; outline: none;
@@ -432,24 +438,18 @@
         }
 
         .property-card {
-            background: linear-gradient(160deg, rgba(26,45,30,0.92) 0%, rgba(20,34,24,0.96) 100%);
-            backdrop-filter: blur(16px) saturate(1.6);
-            -webkit-backdrop-filter: blur(16px) saturate(1.6);
+            background: #FFFFFF;
             border-radius: var(--radius-md);
-            margin-bottom: 18px;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.25);
+            margin-bottom: 0;
+            box-shadow: var(--shadow-sm);
             position: relative;
             overflow: hidden;
-            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+            transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
             cursor: pointer;
             width: 100%;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-top: 1px solid rgba(255,255,255,0.12);
+            border: 1px solid var(--border);
         }
-        .property-card:active { 
-            transform: scale(0.97) translateY(2px);
-            box-shadow: 0 18px 48px rgba(201,169,110,0.18), 0 6px 16px rgba(0,0,0,0.50);
-        }
+        .property-card:active { transform: scale(0.97); box-shadow: var(--shadow-md); }
 
         /* ===== CARD CAROUSEL (auto-slide on property cards) ===== */
         .card-carousel {
@@ -512,12 +512,8 @@
         .badge-lancamento { background: var(--secondary); color: white; }
         .badge-gold { background: var(--gold); color: white; }
         .badge-verm { background: var(--verm); color: white; }
-        .property-content { padding: 16px; background: transparent; }
-        .property-title { 
-            font-weight: 800; font-size: 1rem; color: var(--dark);
-            margin-bottom: 4px; line-height: 1.3;
-            letter-spacing: -0.2px;
-        }
+        .property-content { padding: 14px 16px 16px; background: #FFFFFF; }
+        .property-title { font-weight: 800; font-size: 0.95rem; color: var(--dark); margin-bottom: 4px; line-height: 1.3; letter-spacing: -0.2px; }
         .property-address { 
             font-size: 0.85rem; color: var(--text-secondary); 
             margin-bottom: 8px; display: flex; align-items: center; gap: 4px;
@@ -541,7 +537,7 @@
         .property-price .period { font-size: 0.9rem; color: var(--text-secondary); }
         .property-actions {
             display: flex; gap: 8px; margin-top: 12px;
-            padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 12px; border-top: 1px solid var(--border);
             width: 100%;
         }
         .btn-sm {
@@ -565,7 +561,7 @@
             display: flex; justify-content: space-between; align-items: flex-start;
             margin-bottom: 12px;
         }
-        .client-name { font-weight: 700; font-size: 1rem; color: #FFFFFF; }
+        .client-name { font-weight: 700; font-size: 0.95rem; color: var(--dark); line-height: 1.3; }
         .client-type {
             font-size: 0.7rem; padding: 3px 8px; border-radius: 99px;
             font-weight: 600;
@@ -582,11 +578,11 @@
         .client-actions {
             display: flex;
             gap: 8px;
-            margin-top: 12px;
-            padding-top: 12px;
+            margin-top: 10px;
+            padding-top: 10px;
             border-top: 1px solid var(--border);
             width: 100%;
-            flex-wrap: wrap;
+            align-items: center;
         }
 
         .client-actions > * {
@@ -599,43 +595,47 @@
             background: #25D366;
             color: white;
             border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 0;
+            border-radius: 9px;
+            font-size: 1.05rem;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.18s, background 0.18s;
             min-height: 36px;
+            min-width: 36px;
+            width: 36px;
+            flex-shrink: 0;
         }
         
         .btn-whatsapp-client:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
             background: #1da851;
         }
 
         .btn-email-client {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 1rem;
+            background: var(--primary-ultra);
+            color: var(--primary);
+            border: 1px solid var(--border-accent);
+            padding: 0;
+            border-radius: 9px;
+            font-size: 0.95rem;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            min-height: 36px;
             justify-content: center;
+            cursor: pointer;
+            transition: transform 0.18s, background 0.18s;
+            min-height: 36px;
+            min-width: 36px;
+            width: 36px;
+            flex-shrink: 0;
         }
-        
         .btn-email-client:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
+            background: rgba(29,111,164,0.15);
         }
 
         .client-card-inativo {
@@ -697,22 +697,24 @@
         .schedule-title { font-weight: 600; color: #FFFFFF; margin-bottom: 4px; }
         .schedule-notes { font-size: 0.85rem; color: rgba(255,255,255,0.80); line-height: 1.4; }
 
+        /* ===== BOTTOM NAV — Professional Responsive ===== */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             height: var(--nav-height);
             background: #FFFFFF;
-            border-top: 1.5px solid #E2E8F0;
-            box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
-            display: flex; justify-content: space-around;
+            border-top: 1px solid #E2E8F0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08), 0 -1px 0 rgba(0,0,0,0.04);
+            display: flex;
+            align-items: stretch;
             padding-bottom: var(--safe-bottom);
             z-index: 50;
             width: 100%;
             overflow-x: auto;
+            overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
         }
-        /* Elimina barra escura abaixo da nav em dispositivos com safe-area (iPhone notch/home bar) */
-        .bottom-nav::before {
+        .bottom-nav::after {
             content: '';
             position: absolute;
             bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
@@ -723,31 +725,73 @@
         }
         .bottom-nav::-webkit-scrollbar { display: none; }
 
-        /* Large screens: items fill full width */
-        @media (min-width: 600px) {
-            .bottom-nav { justify-content: space-around; overflow-x: visible; }
-            .nav-item { flex: 1; min-width: unset; }
-        }
-
-        /* Small screens: scrollable, fixed-width items */
-        @media (max-width: 599px) {
-            .bottom-nav { justify-content: flex-start; }
-            .nav-item { flex: 0 0 auto; min-width: 64px; }
+        /* Fade hint showing more items to scroll */
+        @media (max-width: 767px) {
+            .bottom-nav::before {
+                content: '';
+                position: absolute;
+                top: 0; bottom: 0; right: 0;
+                width: 28px;
+                background: linear-gradient(to left, rgba(255,255,255,0.95), transparent);
+                pointer-events: none;
+                z-index: 2;
+            }
         }
 
         .nav-item {
-            flex: 1; display: flex; flex-direction: column;
+            flex: 0 0 auto;
+            min-width: 60px;
+            display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             color: #94A3B8; text-decoration: none;
-            font-size: 0.68rem; font-weight: 600;
-            gap: 3px; transition: 0.2s;
-            padding: 6px 4px;
+            font-size: 0.6rem; font-weight: 600;
+            gap: 3px; 
+            padding: 6px 8px;
             white-space: nowrap;
+            position: relative;
+            transition: color 0.2s ease;
+            cursor: pointer;
+            border: none; background: none;
+            letter-spacing: 0.2px;
         }
-        .nav-item i { font-size: 1.2rem; margin-bottom: 2px; }
+        .nav-item i { 
+            font-size: 1.15rem; 
+            transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), color 0.2s; 
+        }
+        .nav-item span { line-height: 1; }
         .nav-item.active { color: var(--primary); }
         .nav-item.active i { 
-            filter: drop-shadow(0 2px 4px rgba(29,111,164,0.30));
+            transform: translateY(-1px);
+            filter: drop-shadow(0 2px 6px rgba(29,111,164,0.35));
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 28px; height: 2.5px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 0 0 3px 3px;
+        }
+        .nav-item:active i { transform: scale(0.88); }
+
+        /* Desktop: expand nav to show all items elegantly */
+        @media (min-width: 768px) {
+            .bottom-nav {
+                overflow-x: visible;
+                justify-content: center;
+                gap: 0;
+            }
+            .nav-item {
+                flex: 0 0 auto;
+                min-width: 72px;
+                max-width: 90px;
+                padding: 6px 10px;
+                font-size: 0.65rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .nav-item { min-width: 80px; font-size: 0.68rem; }
         }
 
         .fab {
@@ -2374,32 +2418,30 @@
             border: 1px solid var(--border);
         }
 
-        /* ── CLIENT CARD premium ── */
+        /* ── CLIENT CARD premium — light, clean ── */
         .client-card {
-            background: linear-gradient(160deg, rgba(26,45,30,0.90) 0%, rgba(20,34,24,0.95) 100%);
-            backdrop-filter: blur(20px) saturate(1.6);
-            -webkit-backdrop-filter: blur(20px) saturate(1.6);
+            background: #FFFFFF;
             border-radius: var(--radius-md);
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 6px 22px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.07);
+            padding: 14px;
+            margin-bottom: 0;
+            box-shadow: var(--shadow-sm);
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
             position: relative;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-top: 1px solid rgba(255,255,255,0.11);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--border);
             width: 100%;
         }
         .client-card:active { 
-            transform: scale(0.98) translateY(1px);
-            box-shadow: 0 18px 40px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.35);
+            transform: scale(0.97);
+            box-shadow: var(--shadow-md);
         }
         .client-card:not(.client-card-inativo) {
             border-left: 3px solid transparent;
         }
         .client-priority-alta  { border-left-color: var(--danger) !important; }
         .client-priority-media { border-left-color: var(--warning) !important; }
-        .client-priority-normal{ border-left-color: var(--border) !important; }
+        .client-priority-normal{ border-left-color: var(--border-strong) !important; }
 
         .schedule-card {
             background: #FFFFFF;
@@ -2415,10 +2457,7 @@
             border-right: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
         }
-        .schedule-card:active { 
-            transform: scale(0.98);
-            box-shadow: 0 18px 40px rgba(0,0,0,0.50), 0 4px 12px rgba(0,0,0,0.30);
-        }
+        .schedule-card:active { transform: scale(0.97); box-shadow: var(--shadow-md); }
 
         /* ===== COACH PANEL STYLES ===== */
         .coach-hero {
@@ -4393,9 +4432,9 @@
         .stat-label { color: var(--text-secondary); }
 
         .property-card {
-            background: #FFFFFF;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-md);
+            background: #FFFFFF !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: var(--shadow-sm) !important;
         }
         .property-title   { color: var(--dark); }
         .property-address { color: var(--text-secondary); }
@@ -5227,6 +5266,245 @@
             cursor: pointer; font-size: 0.85rem;
         }
 
+
+        /* ===== CLIENT CARDS GRID — Responsive ===== */
+        .client-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+        @media (min-width: 480px) {
+            .client-cards-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 900px) {
+            .client-cards-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (min-width: 1200px) {
+            .client-cards-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        /* Client info rows — light card */
+        .client-card .client-row {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+        }
+        .client-card .client-row i {
+            color: var(--primary);
+            width: 14px;
+            flex-shrink: 0;
+        }
+        .client-card .client-name {
+            color: var(--dark);
+        }
+
+        /* ===== FULL RESPONSIVENESS ===== */
+        /* Main layout for larger screens */
+        @media (min-width: 768px) {
+            main {
+                padding-left: 24px;
+                padding-right: 24px;
+                max-width: 100%;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+            .stats-grid .stat-card-coach-hero {
+                grid-column: 1 / 4;
+            }
+            .dash-nav-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .details-info-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (min-width: 1024px) {
+            body {
+                overflow: auto;
+            }
+            main {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding-left: 32px;
+                padding-right: 32px;
+            }
+            header {
+                padding-left: 32px;
+                padding-right: 32px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
+            .dash-nav-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        @media (min-width: 1280px) {
+            main { max-width: 1400px; }
+            .dash-nav-grid { grid-template-columns: repeat(6, 1fr); }
+        }
+
+        /* Imoveis/property grid responsive */
+        .imoveis-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+        @media (min-width: 600px) {
+            .imoveis-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 960px) {
+            .imoveis-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (min-width: 1280px) {
+            .imoveis-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        /* Form responsiveness */
+        @media (max-width: 400px) {
+            .form-row {
+                flex-direction: column;
+            }
+        }
+
+        /* Modal sheet max width on desktop */
+        @media (min-width: 640px) {
+            .modal-sheet {
+                max-width: 600px;
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%) translateY(100%);
+                border-radius: 20px;
+                bottom: 20px;
+            }
+            .modal-overlay.active + .modal-sheet {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* ===== PROFESSIONAL FOOTER inside app ===== */
+        .app-footer {
+            margin-top: 32px;
+            padding: 20px 0 8px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            text-align: center;
+        }
+        .app-footer-brand {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--dark);
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .app-footer-brand .brand-accent { color: var(--primary); }
+        .app-footer-text {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .app-footer-version {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            background: var(--bg-overlay);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* ===== LOGIN SCREEN — fully responsive ===== */
+        @media (min-width: 480px) {
+            .login-card {
+                max-width: 420px;
+                margin: 0 auto;
+                border-radius: 24px !important;
+            }
+            #login-screen {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                padding: 24px;
+            }
+            .login-logo {
+                margin-bottom: 24px;
+            }
+        }
+        @media (min-width: 768px) {
+            .login-card { max-width: 440px; }
+        }
+
+        /* ===== SECTION TITLE — responsive ===== */
+        @media (max-width: 360px) {
+            .section-title { font-size: 0.9rem; }
+        }
+
+        /* ===== DETAILS CARD — responsive ===== */
+        @media (max-width: 480px) {
+            .details-info-grid { grid-template-columns: repeat(2, 1fr); }
+            .details-actions { flex-direction: column; }
+            .btn-details { min-width: unset; width: 100%; }
+        }
+
+        /* ===== FORM IMPROVEMENTS ===== */
+        @media (max-width: 360px) {
+            .form-control { padding: 11px 12px; font-size: 0.92rem; }
+            .form-label { font-size: 0.75rem; }
+        }
+
+        /* ===== STATS GRID — extra small screens ===== */
+        @media (max-width: 320px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .stat-value { font-size: clamp(0.6rem, 2.5vw, 1.1rem); }
+        }
+
+        /* ===== TOAST — centered and responsive ===== */
+        @media (max-width: 480px) {
+            .toast { font-size: 0.82rem; padding: 10px 18px; max-width: 95vw; }
+        }
+
+        /* ===== PROPERTY FEATURES — responsive ===== */
+        @media (max-width: 360px) {
+            .property-features { gap: 8px; }
+            .feature { min-width: 40px; font-size: 0.7rem; }
+        }
+
+        /* ===== FUNIL VIEW — responsive grid ===== */
+        @media (min-width: 768px) {
+            #funil-clientes-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            #funil-clientes-list .client-card { margin-bottom: 0; }
+        }
+        @media (min-width: 1024px) {
+            #funil-clientes-list {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* ===== SCHEDULE / CLIENT CARD text fix ===== */
+        .schedule-card {
+            background: #FFFFFF;
+            border-left: 4px solid var(--type-visita);
+        }
+        .schedule-title { color: var(--dark) !important; font-weight: 600; }
+        .schedule-time { color: var(--text-secondary) !important; }
+        .schedule-notes { color: var(--text-secondary) !important; font-size: 0.82rem; }
+
+        /* Funil client cards fix */
+        #funil-view .client-card .client-name { color: var(--dark); }
+        #funil-view .client-card .client-row  { color: var(--text-secondary); }
+
     </style>
 
 <style>
@@ -5763,6 +6041,17 @@
                 </div>
                 <div id="negociacoes-list">
                 </div>
+
+                <!-- ===== APP FOOTER ===== -->
+                <div class="app-footer">
+                    <div class="app-footer-brand">
+                        <i class="fas fa-home" style="color:var(--primary);font-size:0.9rem;"></i>
+                        Imobi<span class="brand-accent">Pro</span>
+                    </div>
+                    <div class="app-footer-text">Gestão Imobiliária Profissional</div>
+                    <span class="app-footer-version">v5.0 · 2025</span>
+                </div>
+
             </div>
 
             <div id="imoveis-view" class="view">
@@ -7112,42 +7401,44 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <i class="fas fa-plus"></i>
         </button>
 
-        <nav class="bottom-nav">
+        <nav class="bottom-nav" id="bottom-nav">
+            <!-- Primary items — always visible -->
             <a href="#" class="nav-item active" data-target="dashboard-view" onclick="UI.switchTab(this); return false;">
-                <i class="fas fa-home"></i> <span>Início</span>
+                <i class="fas fa-home"></i><span>Início</span>
             </a>
             <a href="#" class="nav-item" data-target="imoveis-view" onclick="UI.switchTab(this); return false;">
-                <i class="fas fa-building"></i> <span>Imóveis</span>
+                <i class="fas fa-building"></i><span>Imóveis</span>
             </a>
             <a href="#" class="nav-item" data-target="clientes-view" onclick="UI.switchTab(this); return false;">
-                <i class="fas fa-users"></i> <span>Clientes</span>
+                <i class="fas fa-users"></i><span>Clientes</span>
             </a>
             <a href="#" class="nav-item" data-target="funil-view" onclick="UI.switchTab(this); return false;">
-                <i class="fas fa-filter"></i> <span>Funil</span>
+                <i class="fas fa-filter"></i><span>Funil</span>
             </a>
             <a href="#" class="nav-item" data-target="agenda-view" onclick="UI.switchTab(this); return false;">
-                <i class="fas fa-calendar-alt"></i> <span>Agenda</span>
+                <i class="fas fa-calendar-alt"></i><span>Agenda</span>
             </a>
-            <a href="#" class="nav-item" data-target="links-view" onclick="UI.switchTab(this); return false;">
-                <i class="fas fa-link"></i> <span>Links</span>
-            </a>
+            <!-- Secondary items — scroll to see -->
             <a href="#" class="nav-item" data-target="relatorios-view" onclick="UI.switchTab(this); return false;">
-                <i class="fas fa-chart-bar"></i> <span>Relatórios</span>
-            </a>
-            <a href="#" class="nav-item" data-target="coach-view" onclick="UI.switchTab(this); Coach.init(); return false;">
-                <i class="fas fa-trophy"></i> <span>Coach</span>
-            </a>
-            <a href="#" class="nav-item" data-target="leitura-view" onclick="UI.switchTab(this); Leitura.init(); return false;">
-                <i class="fas fa-book-open"></i> <span>Leitura</span>
-            </a>
-            <a href="#" class="nav-item" data-target="notas-view" onclick="UI.switchTab(this); Notas.init(); return false;">
-                <i class="fas fa-sticky-note"></i> <span>Notas</span>
+                <i class="fas fa-chart-bar"></i><span>Relatórios</span>
             </a>
             <a href="#" class="nav-item" data-target="venda-certa-view" onclick="UI.switchTab(this); VendaCerta.init(); return false;">
-                <i class="fas fa-bullseye"></i> <span>Venda Certa</span>
+                <i class="fas fa-bullseye"></i><span>Venda Certa</span>
+            </a>
+            <a href="#" class="nav-item" data-target="coach-view" onclick="UI.switchTab(this); Coach.init(); return false;">
+                <i class="fas fa-trophy"></i><span>Coach</span>
             </a>
             <a href="#" class="nav-item" data-target="simulador-view" onclick="UI.switchTab(this); Simulador.init(); return false;">
-                <i class="fas fa-calculator"></i> <span>Simulador</span>
+                <i class="fas fa-calculator"></i><span>Simulador</span>
+            </a>
+            <a href="#" class="nav-item" data-target="links-view" onclick="UI.switchTab(this); return false;">
+                <i class="fas fa-link"></i><span>Links</span>
+            </a>
+            <a href="#" class="nav-item" data-target="notas-view" onclick="UI.switchTab(this); Notas.init(); return false;">
+                <i class="fas fa-sticky-note"></i><span>Notas</span>
+            </a>
+            <a href="#" class="nav-item" data-target="leitura-view" onclick="UI.switchTab(this); Leitura.init(); return false;">
+                <i class="fas fa-book-open"></i><span>Leitura</span>
             </a>
         </nav>
 
@@ -11238,14 +11529,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                     <span class="client-type type-${cliente.tipo}">${Utils.getTipoClienteText(cliente.tipo)}</span>
                                 </div>
                                 <div class="client-info">
-                                    <div class="client-row"><i class="fas fa-phone"></i> ${cliente.telefone}</div>
+                                    <div class="client-row" style="color:var(--text-secondary);"><i class="fas fa-phone" style="color:var(--primary);"></i> ${cliente.telefone}</div>
                                     ${cliente.email ? `<div class="client-row"><i class="fas fa-envelope"></i> ${cliente.email}</div>` : ''}
                                     ${cliente.dataNascimento ? `<div class="client-row"><i class="fas fa-birthday-cake"></i> ${Utils.formatDate(cliente.dataNascimento)}</div>` : ''}
                                 </div>
                                 <div class="client-actions">
-                                    <button class="btn-whatsapp-client" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${cliente.id}')">
-                                        <i class="fab fa-whatsapp"></i> WhatsApp
-                                    </button>
+                                    <button class="btn-whatsapp-client" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${cliente.id}')"><i class="fab fa-whatsapp"></i></button>
                                     <button class="btn-sm btn-primary-soft" onclick="event.stopPropagation(); App.cliente.agendarAtividade('${cliente.id}')">
                                         <i class="fas fa-calendar-plus"></i>
                                     </button>
@@ -11460,7 +11749,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 </span>
                             </div>
                             <div class="client-info">
-                                <div class="client-row"><i class="fas fa-phone"></i> ${Utils.formatPhone(cliente.telefone)}</div>
+                                <div class="client-row" style="color:var(--text-secondary);"><i class="fas fa-phone" style="color:var(--primary);"></i> ${Utils.formatPhone(cliente.telefone)}</div>
                                 ${cliente.email ? `<div class="client-row"><i class="fas fa-envelope"></i> ${cliente.email}</div>` : ''}
                                 <div class="client-row"><i class="fas fa-calendar"></i> ${dias} dias nesta etapa${dias > 30 ? ' <span class="stale-badge">⚠️ Parado</span>' : ''}</div>
                                 ${cliente.faixaPreco ? `<div class="client-row"><i class="fas fa-search-dollar"></i> ${cliente.faixaPreco}</div>` : ''}
@@ -11468,9 +11757,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 ${cliente.profissao && App.cliente.PROF_LABELS ? `<div class="client-row"><i class="fas fa-briefcase"></i> <span class="origem-badge" style="background:rgba(196,114,74,0.12);color:var(--accent);">${App.cliente.PROF_LABELS[cliente.profissao] || cliente.profissao}</span></div>` : ''}
                             </div>
                             <div class="client-actions">
-                                <button class="btn-whatsapp-client" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${cliente.id}')">
-                                    <i class="fab fa-whatsapp"></i> WhatsApp
-                                </button>
+                                <button class="btn-whatsapp-client" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${cliente.id}')"><i class="fab fa-whatsapp"></i></button>
                                 <button class="btn-sm btn-primary-soft" onclick="event.stopPropagation(); App.cliente.agendarAtividade('${cliente.id}')">
                                     <i class="fas fa-calendar-plus"></i>
                                 </button>
@@ -11737,9 +12024,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 }
                 
                 const whatsappBtn = cliente && cliente.telefone ? `
-                    <button class="btn-whatsapp-client" style="flex: 0; min-width: auto; padding: 8px 12px;" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${cliente.id}')">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
-                    </button>
+                    <button class="btn-whatsapp-client" style="flex: 0; min-width: auto; padding: 8px 12px;" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${cliente.id}')"><i class="fab fa-whatsapp"></i></button>
                 ` : '';
                 
                 return `
@@ -11930,7 +12215,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 <span class="client-type" style="background: ${etapa.cor}; color: white;">${etapa.nome}</span>
                             </div>
                             <div class="client-info">
-                                <div class="client-row"><i class="fas fa-phone"></i> ${c.telefone}</div>
+                                <div class="client-row" style="color:var(--text-secondary);"><i class="fas fa-phone" style="color:var(--primary);"></i> ${c.telefone}</div>
                                 <div class="client-row"><i class="fas fa-id-card"></i> ${c.cpf || 'CPF não informado'}</div>
                                 ${c.email ? `<div class="client-row"><i class="fas fa-envelope"></i> ${c.email}</div>` : ''}
                                 ${c.dataNascimento ? `<div class="client-row"><i class="fas fa-birthday-cake"></i> ${Utils.formatDate(c.dataNascimento)}</div>` : ''}
@@ -11949,9 +12234,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 })()}
                             </div>
                             <div class="client-actions">
-                                <button class="btn-whatsapp-client" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${c.id}')">
-                                    <i class="fab fa-whatsapp"></i> WhatsApp
-                                </button>
+                                <button class="btn-whatsapp-client" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${c.id}')"><i class="fab fa-whatsapp"></i></button>
                                 <button class="btn-sm btn-primary-soft" onclick="event.stopPropagation(); App.cliente.agendarAtividade('${c.id}')">
                                     <i class="fas fa-calendar-plus"></i>
                                 </button>
@@ -11966,7 +12249,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     `;
                 };
 
-                let html = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">` + ativos.map((c, i) => renderCard(c, i)).join('') + `</div>`;
+                let html = `<div class="client-cards-grid">` + ativos.map((c, i) => renderCard(c, i)).join('') + `</div>`;
 
                 if (inativos.length > 0) {
                     html += `<div style="margin:20px 0 10px;display:flex;align-items:center;gap:10px;">
@@ -11976,7 +12259,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         </div>
                         <div style="flex:1;height:1px;background:var(--border);"></div>
                     </div>`;
-                    html += `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">` + inativos.map(c => renderCard(c, null)).join('') + `</div>`;
+                    html += `<div class="client-cards-grid">` + inativos.map(c => renderCard(c, null)).join('') + `</div>`;
                 }
 
                 list.innerHTML = html;
@@ -12011,7 +12294,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     return;
                 }
 
-                list.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">` + filtered.map(i => UI.createImovelCard(i)).join('') + `</div>`;
+                list.innerHTML = `<div class="imoveis-grid">` + filtered.map(i => UI.createImovelCard(i)).join('') + `</div>`;
             },
 
             filterImoveis: (tipo, status) => {
@@ -15389,13 +15672,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 <span class="client-type" style="background: #f97316; color: white;">Lista de Espera</span>
                             </div>
                             <div class="client-info">
-                                <div class="client-row"><i class="fas fa-phone"></i> ${c.telefone}</div>
+                                <div class="client-row" style="color:var(--text-secondary);"><i class="fas fa-phone" style="color:var(--primary);"></i> ${c.telefone}</div>
                                 ${c.email ? `<div class="client-row"><i class="fas fa-envelope"></i> ${c.email}</div>` : ''}
                             </div>
                             <div class="client-actions">
-                                <button class="btn-whatsapp-client" onclick="event.stopPropagation(); UI.enviarNotificacaoIndividual('${c.id}')">
-                                    <i class="fab fa-whatsapp"></i> WhatsApp
-                                </button>
+                                <button class="btn-whatsapp-client" onclick="event.stopPropagation(); UI.enviarNotificacaoIndividual('${c.id}')"><i class="fab fa-whatsapp"></i></button>
                             </div>
                         </div>
                     `).join('');
