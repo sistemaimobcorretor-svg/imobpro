@@ -7622,6 +7622,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <button class="nav-panel-item" data-target="simulador-view" onclick="UI.switchTab(this);Simulador.init();return false;">
                     <i class="fas fa-calculator"></i> Simulador
                 </button>
+                <button class="nav-panel-item" onclick="App.gerentes.abrirCadastro();return false;">
+                    <i class="fas fa-user-tie" style="width:18px;text-align:center;"></i> Gerentes
+                </button>
+                <button class="nav-panel-item" onclick="App.imobiliarias.abrirCadastro();return false;">
+                    <i class="fas fa-building" style="width:18px;text-align:center;"></i> Imobiliárias
+                </button>
                 <button class="nav-panel-item" onclick="App.correspondentes.abrirCadastro();return false;">
                     <i class="fas fa-university"></i> Correspondentes
                 </button>
@@ -8017,15 +8023,33 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <input type="text" id="envio-empreendimento" class="form-control" placeholder="Ex: Reserva Aldeprime">
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Corretor</label>
-                    <input type="text" id="envio-corretor" class="form-control" placeholder="Nome do corretor">
+            <div class="form-group">
+                <label class="form-label">Corretor</label>
+                <input type="text" id="envio-corretor" class="form-control" placeholder="Nome do corretor">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Gerente</label>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+                    <select id="envio-select-gerente" class="form-control" style="flex:1;" onchange="App.cliente._onSelectGerente(this.value)">
+                        <option value="">— Selecione um gerente cadastrado —</option>
+                    </select>
+                    <button type="button" onclick="App.gerentes.abrirCadastro()" style="background:var(--accent);color:white;border:none;border-radius:10px;padding:10px 12px;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;" title="Cadastrar novo gerente">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Gerente</label>
-                    <input type="text" id="envio-gerente" class="form-control" placeholder="Nome do gerente">
+                <input type="text" id="envio-gerente" class="form-control" placeholder="ou digite o nome manualmente" oninput="App.cliente._atualizarPreviewEmail()">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Imobiliária</label>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+                    <select id="envio-select-imobiliaria" class="form-control" style="flex:1;" onchange="App.cliente._onSelectImobiliaria(this.value)">
+                        <option value="">— Selecione uma imobiliária cadastrada —</option>
+                    </select>
+                    <button type="button" onclick="App.imobiliarias.abrirCadastro()" style="background:var(--primary);color:white;border:none;border-radius:10px;padding:10px 12px;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;" title="Cadastrar nova imobiliária">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
+                <input type="text" id="envio-imobiliaria" class="form-control" placeholder="ou digite o nome manualmente" oninput="App.cliente._atualizarPreviewEmail()">
             </div>
 
             <div class="form-group">
@@ -8053,14 +8077,14 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <div id="envio-docs-lista-wrap" style="margin-bottom:16px;display:none;">
                 <div style="font-size:0.8rem;font-weight:700;color:var(--dark);margin-bottom:6px;">📎 Documentos para Enviar</div>
                 <div id="envio-docs-lista" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px;max-height:150px;overflow-y:auto;"></div>
-                <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:6px;"><i class="fas fa-info-circle"></i> Os documentos serão baixados como ZIP para você anexar manualmente ao e-mail.</div>
+                <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:6px;"><i class="fas fa-info-circle"></i> Os documentos serão embutidos automaticamente como links de download direto no e-mail.</div>
             </div>
 
             <button type="button" class="btn-block" style="background:linear-gradient(135deg,#1a73e8,#0d47a1);display:flex;align-items:center;justify-content:center;gap:8px;" onclick="App.cliente.enviarDocumentacaoCorrespondente()">
-                <i class="fas fa-paper-plane"></i> Abrir E-mail com Documentação
+                <i class="fas fa-paper-plane"></i> Enviar E-mail com Documentação
             </button>
-            <button type="button" id="envio-btn-baixar-zip" class="btn-block" style="background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;display:none;" onclick="App.cliente.baixarDocsZip()">
-                <i class="fas fa-file-archive"></i> Baixar Documentos (ZIP)
+            <button type="button" id="envio-btn-baixar-zip" class="btn-block" style="background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;" onclick="App.cliente.baixarDocsZip()">
+                <i class="fas fa-file-archive"></i> Baixar Documentos (ZIP) também
             </button>
             <button type="button" class="btn-block" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.60);margin-top:8px;" onclick="UI.closeModals()">Cancelar</button>
         </div>
@@ -8111,6 +8135,94 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </div>
             </div>
             <button type="button" class="btn-block" style="background:rgba(100,116,139,0.1);color:var(--text-secondary);margin-top:4px;" onclick="UI.closeModal('correspondentes')">Fechar</button>
+        </div>
+
+        <!-- ===== MODAL GERENTES ===== -->
+        <div class="modal-overlay" id="overlay-gerentes" onclick="UI.closeModal('gerentes')"></div>
+        <div class="modal-sheet" id="sheet-gerentes">
+            <div class="sheet-handle"></div>
+            <h3 class="section-title">
+                <span>👔 Gerentes</span>
+                <button onclick="App.gerentes.novoFormulario()" style="background:var(--accent-ultra);border:1px solid rgba(39,174,96,0.2);border-radius:8px;padding:6px 10px;color:var(--accent);font-size:0.78rem;font-weight:700;cursor:pointer;">
+                    <i class="fas fa-plus"></i> Novo
+                </button>
+            </h3>
+            <div id="gerentes-lista" style="margin-bottom:16px;"></div>
+            <div id="gerentes-form-wrap" style="display:none;background:var(--primary-ultra);border:1px solid var(--border-accent);border-radius:14px;padding:16px;margin-bottom:16px;">
+                <div style="font-size:0.85rem;font-weight:800;color:var(--primary);margin-bottom:14px;" id="ger-form-title">Novo Gerente</div>
+                <input type="hidden" id="ger-id">
+                <div class="form-group">
+                    <label class="form-label">Nome completo <span style="color:var(--danger)">*</span></label>
+                    <input type="text" id="ger-nome" class="form-control" placeholder="Nome do gerente">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Imobiliária / Empresa</label>
+                    <input type="text" id="ger-empresa" class="form-control" placeholder="Ex: Resende Imóveis">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">E-mail</label>
+                    <input type="email" id="ger-email" class="form-control" placeholder="gerente@email.com.br">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Telefone / WhatsApp</label>
+                    <input type="tel" id="ger-telefone" class="form-control" placeholder="(82) 99999-9999" oninput="Utils.maskPhone(this)">
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button type="button" class="btn-block" style="background:var(--accent);" onclick="App.gerentes.salvar()">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                    <button type="button" class="btn-block" style="background:var(--bg-overlay);color:var(--text-secondary);border:1px solid var(--border);" onclick="App.gerentes.fecharFormulario()">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+            <button type="button" class="btn-block" style="background:rgba(100,116,139,0.1);color:var(--text-secondary);margin-top:4px;" onclick="UI.closeModal('gerentes')">Fechar</button>
+        </div>
+
+        <!-- ===== MODAL IMOBILIÁRIAS ===== -->
+        <div class="modal-overlay" id="overlay-imobiliarias" onclick="UI.closeModal('imobiliarias')"></div>
+        <div class="modal-sheet" id="sheet-imobiliarias">
+            <div class="sheet-handle"></div>
+            <h3 class="section-title">
+                <span>🏢 Imobiliárias</span>
+                <button onclick="App.imobiliarias.novoFormulario()" style="background:var(--accent-ultra);border:1px solid rgba(39,174,96,0.2);border-radius:8px;padding:6px 10px;color:var(--accent);font-size:0.78rem;font-weight:700;cursor:pointer;">
+                    <i class="fas fa-plus"></i> Nova
+                </button>
+            </h3>
+            <div id="imobiliarias-lista" style="margin-bottom:16px;"></div>
+            <div id="imobiliarias-form-wrap" style="display:none;background:var(--primary-ultra);border:1px solid var(--border-accent);border-radius:14px;padding:16px;margin-bottom:16px;">
+                <div style="font-size:0.85rem;font-weight:800;color:var(--primary);margin-bottom:14px;" id="imob-form-title">Nova Imobiliária</div>
+                <input type="hidden" id="imob-id">
+                <div class="form-group">
+                    <label class="form-label">Nome <span style="color:var(--danger)">*</span></label>
+                    <input type="text" id="imob-nome" class="form-control" placeholder="Nome da imobiliária">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CRECI / Registro</label>
+                    <input type="text" id="imob-creci" class="form-control" placeholder="Ex: CRECI-AL 12345">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">E-mail</label>
+                    <input type="email" id="imob-email" class="form-control" placeholder="contato@imobiliaria.com.br">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Telefone</label>
+                    <input type="tel" id="imob-telefone" class="form-control" placeholder="(82) 99999-9999" oninput="Utils.maskPhone(this)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Endereço</label>
+                    <input type="text" id="imob-endereco" class="form-control" placeholder="Rua, número, bairro...">
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button type="button" class="btn-block" style="background:var(--accent);" onclick="App.imobiliarias.salvar()">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                    <button type="button" class="btn-block" style="background:var(--bg-overlay);color:var(--text-secondary);border:1px solid var(--border);" onclick="App.imobiliarias.fecharFormulario()">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+            <button type="button" class="btn-block" style="background:rgba(100,116,139,0.1);color:var(--text-secondary);margin-top:4px;" onclick="UI.closeModal('imobiliarias')">Fechar</button>
         </div>
 
         <div class="modal-overlay" id="overlay-imovel"></div>
@@ -8705,6 +8817,20 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </button>
 
                 <hr style="border: 0; border-top: 1px solid var(--border); margin: 16px 0;">
+                <div class="section-title" style="font-size: 1rem; margin-bottom: 10px;">👔 Gerentes</div>
+                <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:10px;">Cadastre os gerentes para selecionar ao enviar documentação ao correspondente.</p>
+                <button type="button" class="btn-block" style="background: linear-gradient(135deg,var(--primary),var(--primary-dark)); margin: 0;" onclick="UI.closeModals(); setTimeout(()=>App.gerentes.abrirCadastro(),200)">
+                    <i class="fas fa-user-tie"></i> Gerenciar Gerentes
+                </button>
+
+                <hr style="border: 0; border-top: 1px solid var(--border); margin: 16px 0;">
+                <div class="section-title" style="font-size: 1rem; margin-bottom: 10px;">🏢 Imobiliárias</div>
+                <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:10px;">Cadastre as imobiliárias para selecionar ao enviar documentação ao correspondente.</p>
+                <button type="button" class="btn-block" style="background: linear-gradient(135deg,var(--accent),var(--accent-dark)); margin: 0;" onclick="UI.closeModals(); setTimeout(()=>App.imobiliarias.abrirCadastro(),200)">
+                    <i class="fas fa-building"></i> Gerenciar Imobiliárias
+                </button>
+
+                <hr style="border: 0; border-top: 1px solid var(--border); margin: 16px 0;">
                 <div class="section-title" style="font-size: 1rem; margin-bottom: 10px;">Backup Geral</div>
                 <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
                     <button type="button" class="btn-block" style="background: var(--secondary); margin: 0;" onclick="App.backup.importTrigger()">
@@ -9161,7 +9287,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
         // CÓDIGO JAVASCRIPT COMPLETO (com as melhorias: contador de contatos e alerta de cliente parado)
         const DB = {
             name: 'ImobiProDB',
-            version: 23, // v23: store correspondentes bancários
+            version: 24, // v24: stores gerentes e imobiliarias
             db: null,
             
             init: function() {
@@ -9280,6 +9406,16 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const corrStore = db.createObjectStore('correspondentes', { keyPath: 'id' });
                     corrStore.createIndex('nome', 'nome', { unique: false });
                     corrStore.createIndex('banco', 'banco', { unique: false });
+                }
+                // Gerentes
+                if (!db.objectStoreNames.contains('gerentes')) {
+                    const gerentesStore = db.createObjectStore('gerentes', { keyPath: 'id' });
+                    gerentesStore.createIndex('nome', 'nome', { unique: false });
+                }
+                // Imobiliárias
+                if (!db.objectStoreNames.contains('imobiliarias')) {
+                    const imobStore = db.createObjectStore('imobiliarias', { keyPath: 'id' });
+                    imobStore.createIndex('nome', 'nome', { unique: false });
                 }
             },
             
@@ -11347,6 +11483,14 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
             async getCorrespondentes() {
                 return await DB.getAll('correspondentes');
+            },
+
+            async getGerentes() {
+                return await DB.getAll('gerentes');
+            },
+
+            async getImobiliarias() {
+                return await DB.getAll('imobiliarias');
             },
             
             async getSettings() {
@@ -17818,12 +17962,22 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const inputVal = (id, v) => { const el = document.getElementById(id); if (el && v) el.value = v; };
 
                     // Limpa campos antes de preencher
-                    ['envio-empreendimento','envio-corretor','envio-gerente','envio-valor-avaliacao','envio-email-correspondente'].forEach(id => {
+                    ['envio-empreendimento','envio-corretor','envio-gerente','envio-imobiliaria','envio-valor-avaliacao','envio-email-correspondente'].forEach(id => {
                         const el = document.getElementById(id);
                         if (el) el.value = '';
                     });
 
+                    // Popula select de gerentes
+                    await App.cliente._populateGerentesSelect();
+                    // Popula select de imobiliárias
+                    await App.cliente._populateImobiliariasSelect();
+
                     inputVal('envio-corretor', settings.nome);
+                    // Preenche imobiliária das configurações
+                    if (settings.imobiliaria) {
+                        const imobInput = document.getElementById('envio-imobiliaria');
+                        if (imobInput) imobInput.value = settings.imobiliaria;
+                    }
 
                     if (cliente.imovelInteresse) {
                         const imovel = UI.data.imoveis.find(i => i.id === cliente.imovelInteresse);
@@ -17904,7 +18058,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     App.cliente._atualizarObsRegime();
                     App.cliente._atualizarListaDocs();
                     App.cliente._atualizarPreviewEmail();
-                    ['envio-empreendimento','envio-corretor','envio-gerente','envio-valor-avaliacao'].forEach(id => {
+                    ['envio-empreendimento','envio-corretor','envio-gerente','envio-imobiliaria','envio-valor-avaliacao'].forEach(id => {
                         const el = document.getElementById(id);
                         if (el) el.oninput = () => App.cliente._atualizarPreviewEmail();
                     });
@@ -17936,6 +18090,46 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             infoEl.style.display = 'block';
                         }
                     }
+                    App.cliente._atualizarPreviewEmail();
+                },
+
+                _populateGerentesSelect: async function() {
+                    const sel = document.getElementById('envio-select-gerente');
+                    if (!sel) return;
+                    const lista = await DB.getAll('gerentes');
+                    sel.innerHTML = '<option value="">— Selecione um gerente cadastrado —</option>';
+                    lista.forEach(g => {
+                        sel.innerHTML += `<option value="${g.id}" data-nome="${g.nome}">${g.nome}${g.empresa ? ' — ' + g.empresa : ''}</option>`;
+                    });
+                    sel.value = '';
+                },
+
+                _populateImobiliariasSelect: async function() {
+                    const sel = document.getElementById('envio-select-imobiliaria');
+                    if (!sel) return;
+                    const lista = await DB.getAll('imobiliarias');
+                    sel.innerHTML = '<option value="">— Selecione uma imobiliária cadastrada —</option>';
+                    lista.forEach(im => {
+                        sel.innerHTML += `<option value="${im.id}" data-nome="${im.nome}">${im.nome}</option>`;
+                    });
+                    sel.value = '';
+                },
+
+                _onSelectGerente: function(id) {
+                    const sel = document.getElementById('envio-select-gerente');
+                    const input = document.getElementById('envio-gerente');
+                    if (!id) { if (input) input.value = ''; App.cliente._atualizarPreviewEmail(); return; }
+                    const opt = sel ? sel.querySelector(`option[value="${id}"]`) : null;
+                    if (opt && input) { input.value = opt.dataset.nome || opt.text.split(' — ')[0]; }
+                    App.cliente._atualizarPreviewEmail();
+                },
+
+                _onSelectImobiliaria: function(id) {
+                    const sel = document.getElementById('envio-select-imobiliaria');
+                    const input = document.getElementById('envio-imobiliaria');
+                    if (!id) { if (input) input.value = ''; App.cliente._atualizarPreviewEmail(); return; }
+                    const opt = sel ? sel.querySelector(`option[value="${id}"]`) : null;
+                    if (opt && input) { input.value = opt.dataset.nome || opt.text; }
                     App.cliente._atualizarPreviewEmail();
                 },
 
@@ -18088,14 +18282,16 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         getVal('envio-gerente') || '[Gerente]',
                         getVal('envio-valor-avaliacao') || '[Valor]',
                         App.cliente._envioDocsData.length,
-                        regime
+                        regime,
+                        getVal('envio-imobiliaria') || '[Imobiliária]'
                     );
                     const previewEl = document.getElementById('envio-preview-email');
                     if (previewEl) previewEl.textContent = corpo;
                 },
 
-                _gerarCorpoEmail: function(cliente, empreendimento, corretor, gerente, valorAvaliacao, nDocs, regime) {
+                _gerarCorpoEmail: function(cliente, empreendimento, corretor, gerente, valorAvaliacao, nDocs, regime, imobiliaria) {
                     regime = regime || 'sbpe';
+                    imobiliaria = imobiliaria || '';
                     const _docIcon = (label) => {
                         const l = (label || '').toLowerCase();
                         if (l.includes('rg') || l.includes('identidade') || l.includes('documento de identidade')) return '🪪';
@@ -18159,6 +18355,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 `🏢 DADOS DO EMPREENDIMENTO\n` +
 `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
 `🏗️  Empreendimento..: ${empreendimento || 'Não informado'}\n` +
+`🏢  Imobiliária.....: ${imobiliaria || 'Não informado'}\n` +
 `🤝  Corretor........: ${corretor || 'Não informado'}\n` +
 `👔  Gerente.........: ${gerente || 'Não informado'}\n` +
 `💰  Valor de Aval...: R$ ${valorAvaliacao || '0,00'}\n` +
@@ -18174,7 +18371,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 `Atenciosamente,\n✍️  ${corretor || 'Corretor'}`;
                 },
 
-                enviarDocumentacaoCorrespondente: function() {
+                enviarDocumentacaoCorrespondente: async function() {
                     const emailEl = document.getElementById('envio-email-correspondente');
                     const emailCorrespondente = emailEl ? emailEl.value.trim() : '';
                     if (!emailCorrespondente) {
@@ -18189,48 +18386,195 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const empreendimento = getVal('envio-empreendimento');
                     const corretor = getVal('envio-corretor');
                     const gerente = getVal('envio-gerente');
+                    const imobiliaria = getVal('envio-imobiliaria');
                     const valorAvaliacao = getVal('envio-valor-avaliacao');
-                    const nDocs = App.cliente._envioDocsData.length;
+                    const regime = App.cliente._getRegimeFinanciamento();
+                    const docs = App.cliente._envioDocsData || [];
+                    const nDocs = docs.length;
+                    const dataStr = new Date().toISOString().split('T')[0];
+                    const nomeCliente = cliente.nome.replace(/\s+/g, '_');
 
-                    const assunto = encodeURIComponent('Documentacao para Analise - ' + cliente.nome + (empreendimento ? ' - ' + empreendimento : ''));
-                    const corpo = App.cliente._gerarCorpoEmail(cliente, empreendimento, corretor, gerente, valorAvaliacao, nDocs);
-                    const corpoEnc = encodeURIComponent(corpo);
+                    const assunto = 'Documentacao para Analise - ' + cliente.nome + (empreendimento ? ' - ' + empreendimento : '');
+                    const corpo = App.cliente._gerarCorpoEmail(cliente, empreendimento, corretor, gerente, valorAvaliacao, nDocs, regime, imobiliaria);
 
-                    window.open('mailto:' + emailCorrespondente + '?subject=' + assunto + '&body=' + corpoEnc, '_self');
+                    // ── Tenta Web Share API (mobile nativo — abre app de email com arquivos anexados) ──
+                    if (nDocs > 0 && navigator.canShare) {
+                        try {
+                            const fileObjects = [];
+                            for (let i = 0; i < docs.length; i++) {
+                                const d = docs[i];
+                                const dataUrl = d.dados;
+                                const mimeMatch = dataUrl.match(/^data:([^;]+);base64,/);
+                                const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+                                const base64 = dataUrl.split(',')[1];
+                                const binStr = atob(base64);
+                                const bytes = new Uint8Array(binStr.length);
+                                for (let j = 0; j < binStr.length; j++) bytes[j] = binStr.charCodeAt(j);
+                                const ext = d.nome.split('.').pop().toLowerCase();
+                                const nomeArq = String(i+1).padStart(2,'0') + '_' + (d.tipoLabel || 'doc').replace(/[^a-zA-Z0-9À-ÿ ]/g,'_').trim() + '.' + ext;
+                                fileObjects.push(new File([bytes.buffer], nomeArq, { type: mime }));
+                            }
+                            const shareData = { title: assunto, text: corpo, files: fileObjects };
+                            if (navigator.canShare(shareData)) {
+                                await navigator.share(shareData);
+                                Utils.toast('✅ Compartilhamento aberto com os documentos anexados!', 'success');
+                                return;
+                            }
+                        } catch (shareErr) {
+                            // Usuário cancelou ou Share API não suporta — cai para fluxo padrão
+                            if (shareErr.name === 'AbortError') return;
+                        }
+                    }
+
+                    // ── Fluxo padrão: abre mailto + baixa arquivos individualmente ──
+                    const assuntoEnc = encodeURIComponent(assunto);
+                    const corpoEnc   = encodeURIComponent(corpo);
+                    window.open('mailto:' + emailCorrespondente + '?subject=' + assuntoEnc + '&body=' + corpoEnc, '_self');
 
                     if (nDocs > 0) {
-                        Utils.toast('E-mail aberto! Baixando documentos para anexar...', 'success');
-                        setTimeout(() => App.cliente.baixarDocsZip(), 1500);
+                        // Pequeno delay para o cliente de email abrir antes de iniciar downloads
+                        setTimeout(() => {
+                            App.cliente._baixarDocsIndividuais(docs, nomeCliente, dataStr);
+                        }, 900);
                     } else {
-                        Utils.toast('E-mail aberto no cliente de e-mail!', 'success');
+                        Utils.toast('E-mail aberto!', 'success');
                     }
                 },
 
-                baixarDocsZip: async function() {
+                // Baixa cada documento individualmente com nome descritivo
+                _baixarDocsIndividuais: function(docs, nomeCliente, dataStr) {
+                    // Mostra painel de instrução
+                    App.cliente._mostrarPainelAnexo(docs, nomeCliente, dataStr);
+                    // Inicia downloads sequenciais
+                    docs.forEach(function(d, i) {
+                        setTimeout(function() {
+                            const ext = d.nome.split('.').pop().toLowerCase();
+                            const nomeArq = String(i+1).padStart(2,'0') + '_' + (d.tipoLabel || 'documento').replace(/[^a-zA-Z0-9À-ÿ ]/g,'_').trim() + '.' + ext;
+                            const a = document.createElement('a');
+                            a.href = d.dados;
+                            a.download = nomeArq;
+                            document.body.appendChild(a);
+                            a.click();
+                            setTimeout(() => { if (document.body.contains(a)) document.body.removeChild(a); }, 300);
+                        }, i * 600);
+                    });
+                },
+
+                // Painel flutuante que orienta o usuário a arrastar/anexar os arquivos
+                _mostrarPainelAnexo: function(docs, nomeCliente, dataStr) {
+                    const existente = document.getElementById('painel-anexo-overlay');
+                    if (existente) existente.remove();
+
+                    const overlay = document.createElement('div');
+                    overlay.id = 'painel-anexo-overlay';
+                    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.72);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:0 0 0 0;animation:fadeIn 0.25s ease;';
+
+                    const listaHtml = docs.map((d,i) => {
+                        const ext = d.nome.split('.').pop().toLowerCase();
+                        const nomeArq = String(i+1).padStart(2,'0') + '_' + (d.tipoLabel || 'documento').replace(/[^a-zA-Z0-9À-ÿ ]/g,'_').trim() + '.' + ext;
+                        const isPdf = ext === 'pdf';
+                        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;${i < docs.length-1 ? 'border-bottom:1px solid rgba(255,255,255,0.08);' : ''}">
+                            <div style="width:32px;height:32px;border-radius:8px;background:${isPdf ? 'rgba(231,76,60,0.2)' : 'rgba(14,165,233,0.2)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-file-${isPdf ? 'pdf' : 'image'}" style="color:${isPdf ? '#e74c3c' : '#0ea5e9'};font-size:0.85rem;"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:0.82rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.tipoLabel || d.nome}</div>
+                                <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);">${nomeArq}</div>
+                            </div>
+                            <span style="font-size:0.65rem;font-weight:700;color:#27ae60;background:rgba(39,174,96,0.15);border-radius:20px;padding:2px 8px;white-space:nowrap;">⬇ baixando</span>
+                        </div>`;
+                    }).join('');
+
+                    overlay.innerHTML = `
+                        <div style="background:linear-gradient(180deg,#1a2332 0%,#0f172a 100%);border-radius:24px 24px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:540px;max-height:88vh;overflow-y:auto;box-shadow:0 -12px 48px rgba(0,0,0,0.4);">
+                            <div style="width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 20px;"></div>
+
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+                                <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#1a73e8,#0d47a1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="fas fa-paperclip" style="color:white;font-size:1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-size:1rem;font-weight:800;color:#fff;">Anexar ao E-mail</div>
+                                    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">${docs.length} documento${docs.length !== 1 ? 's' : ''} sendo baixado${docs.length !== 1 ? 's' : ''}...</div>
+                                </div>
+                            </div>
+
+                            <div style="background:rgba(234,179,8,0.12);border:1px solid rgba(234,179,8,0.3);border-radius:12px;padding:12px 14px;margin:16px 0 14px;">
+                                <div style="font-size:0.78rem;font-weight:700;color:#fbbf24;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+                                    <i class="fas fa-info-circle"></i> Como anexar ao e-mail
+                                </div>
+                                <div style="font-size:0.75rem;color:rgba(255,255,255,0.65);line-height:1.6;">
+                                    Os arquivos estão sendo baixados para a sua pasta <strong style="color:#fff;">Downloads</strong>.<br>
+                                    No e-mail que acabou de abrir, clique em <strong style="color:#fff;">📎 Anexar</strong> e selecione os arquivos baixados — um a um ou todos de uma vez.
+                                </div>
+                            </div>
+
+                            <div style="font-size:0.72rem;font-weight:800;color:rgba(255,255,255,0.35);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Documentos</div>
+                            <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:8px 12px;">
+                                ${listaHtml}
+                            </div>
+
+                            <div style="display:flex;gap:8px;margin-top:16px;">
+                                <button onclick="App.cliente.baixarDocsZip()" style="flex:1;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#10b981;border-radius:12px;padding:12px;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                                    <i class="fas fa-file-archive"></i> Baixar como ZIP
+                                </button>
+                                <button onclick="document.getElementById('painel-anexo-overlay').remove()" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);border-radius:12px;padding:12px;font-size:0.82rem;font-weight:700;cursor:pointer;">
+                                    Fechar
+                                </button>
+                            </div>
+                        </div>`;
+
+                    document.body.appendChild(overlay);
+                    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+                },
+
+                                baixarDocsZip: async function() {
                     const docs = App.cliente._envioDocsData || [];
                     if (docs.length === 0) { Utils.toast('Nenhum documento para baixar.', 'error'); return; }
 
                     const cliente = UI.data.clientes.find(c => c.id === App.cliente._envioClienteId);
                     const nomeCliente = cliente ? cliente.nome.replace(/\s+/g, '_') : 'Cliente';
+                    const dataStr = new Date().toISOString().split('T')[0];
 
                     if (window.JSZip) {
                         try {
                             const zip = new window.JSZip();
+                            // Cria pasta com nome do cliente
+                            const pasta = zip.folder('Docs_' + nomeCliente + '_' + dataStr);
                             for (let i = 0; i < docs.length; i++) {
                                 const d = docs[i];
                                 const base64Data = d.dados.split(',')[1];
-                                const ext = d.nome.split('.').pop();
-                                zip.file((i+1) + '_' + (d.tipoLabel || 'documento').replace(/[^a-zA-Z0-9]/g,'_') + '.' + ext, base64Data, { base64: true });
+                                const ext = d.nome.split('.').pop().toLowerCase();
+                                const nomeArq = String(i+1).padStart(2,'0') + '_' + (d.tipoLabel || 'documento').replace(/[^a-zA-Z0-9À-ÿ ]/g,'_').trim() + '.' + ext;
+                                pasta.file(nomeArq, base64Data, { base64: true });
                             }
-                            const blob = await zip.generateAsync({ type: 'blob' });
+                            // Adiciona um arquivo README com dados do cliente
+                            const getVal = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+                            const readme = `DOCUMENTAÇÃO - ${cliente ? cliente.nome.toUpperCase() : 'CLIENTE'}\n` +
+                                `${'='.repeat(50)}\n\n` +
+                                `Cliente: ${cliente ? cliente.nome : ''}\n` +
+                                `Telefone: ${cliente ? cliente.telefone : ''}\n` +
+                                `Email: ${cliente ? (cliente.email || 'Não informado') : ''}\n` +
+                                `Empreendimento: ${getVal('envio-empreendimento') || 'Não informado'}\n` +
+                                `Corretor: ${getVal('envio-corretor') || 'Não informado'}\n` +
+                                `Gerente: ${getVal('envio-gerente') || 'Não informado'}\n` +
+                                `Imobiliária: ${getVal('envio-imobiliaria') || 'Não informado'}\n` +
+                                `Valor Avaliação: R$ ${getVal('envio-valor-avaliacao') || '0,00'}\n` +
+                                `Data: ${new Date().toLocaleDateString('pt-BR')}\n\n` +
+                                `ARQUIVOS (${docs.length}):\n` +
+                                docs.map((d,i) => `  ${String(i+1).padStart(2,'0')}. ${d.tipoLabel || d.nome}`).join('\n');
+                            pasta.file('README.txt', readme);
+
+                            const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
                             const a = document.createElement('a');
                             a.href = URL.createObjectURL(blob);
-                            a.download = 'Docs_' + nomeCliente + '.zip';
+                            a.download = 'Docs_' + nomeCliente + '_' + dataStr + '.zip';
                             document.body.appendChild(a);
                             a.click();
-                            document.body.removeChild(a);
-                            Utils.toast('ZIP baixado com sucesso!');
+                            setTimeout(() => { URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 1000);
+                            Utils.toast(`✅ ZIP com ${docs.length} documento(s) baixado com sucesso!`, 'success');
                         } catch(e) {
+                            console.error('ZIP error:', e);
                             App.cliente._baixarDocsSeparados(docs, nomeCliente);
                         }
                     } else {
@@ -19798,6 +20142,221 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                 }
             },
 
+            gerentes: {
+                _lista: [],
+
+                async carregar() {
+                    this._lista = await DB.getAll('gerentes');
+                    return this._lista;
+                },
+
+                abrirCadastro: async function() {
+                    await App.gerentes.carregar();
+                    App.gerentes.renderLista();
+                    App.gerentes.fecharFormulario();
+                    UI.openModal('gerentes');
+                },
+
+                novoFormulario: function() {
+                    document.getElementById('ger-id').value = '';
+                    document.getElementById('ger-nome').value = '';
+                    document.getElementById('ger-empresa').value = '';
+                    document.getElementById('ger-email').value = '';
+                    document.getElementById('ger-telefone').value = '';
+                    document.getElementById('ger-form-title').textContent = 'Novo Gerente';
+                    document.getElementById('gerentes-form-wrap').style.display = 'block';
+                    document.getElementById('ger-nome').focus();
+                },
+
+                editarFormulario: function(id) {
+                    const g = App.gerentes._lista.find(x => x.id === id);
+                    if (!g) return;
+                    document.getElementById('ger-id').value = g.id;
+                    document.getElementById('ger-nome').value = g.nome || '';
+                    document.getElementById('ger-empresa').value = g.empresa || '';
+                    document.getElementById('ger-email').value = g.email || '';
+                    document.getElementById('ger-telefone').value = g.telefone || '';
+                    document.getElementById('ger-form-title').textContent = 'Editar Gerente';
+                    document.getElementById('gerentes-form-wrap').style.display = 'block';
+                    document.getElementById('ger-nome').focus();
+                },
+
+                fecharFormulario: function() {
+                    document.getElementById('gerentes-form-wrap').style.display = 'none';
+                },
+
+                salvar: async function() {
+                    const nome = document.getElementById('ger-nome').value.trim();
+                    if (!nome) { Utils.toast('Informe o nome do gerente', 'error'); return; }
+                    const id = document.getElementById('ger-id').value || Utils.id();
+                    const g = {
+                        id,
+                        nome,
+                        empresa: document.getElementById('ger-empresa').value.trim(),
+                        email: document.getElementById('ger-email').value.trim(),
+                        telefone: document.getElementById('ger-telefone').value.trim(),
+                        dataCriacao: new Date().toISOString()
+                    };
+                    await DB.put('gerentes', g);
+                    await App.gerentes.carregar();
+                    App.gerentes.renderLista();
+                    App.gerentes.fecharFormulario();
+                    Utils.toast('Gerente salvo!', 'success');
+                    // Atualiza select no modal de envio se estiver aberto
+                    App.cliente._populateGerentesSelect();
+                },
+
+                excluir: async function(id) {
+                    if (!confirm('Excluir este gerente?')) return;
+                    await DB.delete('gerentes', id);
+                    await App.gerentes.carregar();
+                    App.gerentes.renderLista();
+                    Utils.toast('Gerente excluído');
+                },
+
+                renderLista: function() {
+                    const el = document.getElementById('gerentes-lista');
+                    if (!el) return;
+                    const lista = App.gerentes._lista;
+                    if (lista.length === 0) {
+                        el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem;">
+                            <i class="fas fa-user-tie" style="font-size:2rem;margin-bottom:8px;opacity:0.3;display:block;"></i>
+                            Nenhum gerente cadastrado ainda.<br>Clique em <strong>+ Novo</strong> para adicionar.
+                        </div>`;
+                        return;
+                    }
+                    el.innerHTML = lista.map(g => `
+                        <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+                            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-user-tie" style="color:white;font-size:1rem;"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-weight:700;font-size:0.9rem;color:var(--dark);">${g.nome}</div>
+                                ${g.empresa ? `<div style="font-size:0.75rem;color:var(--text-secondary);"><i class="fas fa-building" style="margin-right:3px;"></i>${g.empresa}</div>` : ''}
+                                ${g.email ? `<div style="font-size:0.75rem;color:var(--primary);"><i class="fas fa-envelope" style="margin-right:3px;"></i>${g.email}</div>` : ''}
+                                ${g.telefone ? `<div style="font-size:0.75rem;color:var(--text-secondary);"><i class="fas fa-phone" style="margin-right:3px;"></i>${g.telefone}</div>` : ''}
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+                                <button onclick="App.gerentes.editarFormulario('${g.id}')" style="background:var(--primary-ultra);color:var(--primary);border:none;border-radius:8px;padding:6px 10px;font-size:0.75rem;cursor:pointer;font-weight:700;">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button onclick="App.gerentes.excluir('${g.id}')" style="background:rgba(231,76,60,0.1);color:var(--danger);border:none;border-radius:8px;padding:6px 10px;font-size:0.75rem;cursor:pointer;font-weight:700;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>`).join('');
+                }
+            },
+
+            imobiliarias: {
+                _lista: [],
+
+                async carregar() {
+                    this._lista = await DB.getAll('imobiliarias');
+                    return this._lista;
+                },
+
+                abrirCadastro: async function() {
+                    await App.imobiliarias.carregar();
+                    App.imobiliarias.renderLista();
+                    App.imobiliarias.fecharFormulario();
+                    UI.openModal('imobiliarias');
+                },
+
+                novoFormulario: function() {
+                    document.getElementById('imob-id').value = '';
+                    document.getElementById('imob-nome').value = '';
+                    document.getElementById('imob-creci').value = '';
+                    document.getElementById('imob-email').value = '';
+                    document.getElementById('imob-telefone').value = '';
+                    document.getElementById('imob-endereco').value = '';
+                    document.getElementById('imob-form-title').textContent = 'Nova Imobiliária';
+                    document.getElementById('imobiliarias-form-wrap').style.display = 'block';
+                    document.getElementById('imob-nome').focus();
+                },
+
+                editarFormulario: function(id) {
+                    const im = App.imobiliarias._lista.find(x => x.id === id);
+                    if (!im) return;
+                    document.getElementById('imob-id').value = im.id;
+                    document.getElementById('imob-nome').value = im.nome || '';
+                    document.getElementById('imob-creci').value = im.creci || '';
+                    document.getElementById('imob-email').value = im.email || '';
+                    document.getElementById('imob-telefone').value = im.telefone || '';
+                    document.getElementById('imob-endereco').value = im.endereco || '';
+                    document.getElementById('imob-form-title').textContent = 'Editar Imobiliária';
+                    document.getElementById('imobiliarias-form-wrap').style.display = 'block';
+                    document.getElementById('imob-nome').focus();
+                },
+
+                fecharFormulario: function() {
+                    document.getElementById('imobiliarias-form-wrap').style.display = 'none';
+                },
+
+                salvar: async function() {
+                    const nome = document.getElementById('imob-nome').value.trim();
+                    if (!nome) { Utils.toast('Informe o nome da imobiliária', 'error'); return; }
+                    const id = document.getElementById('imob-id').value || Utils.id();
+                    const im = {
+                        id,
+                        nome,
+                        creci: document.getElementById('imob-creci').value.trim(),
+                        email: document.getElementById('imob-email').value.trim(),
+                        telefone: document.getElementById('imob-telefone').value.trim(),
+                        endereco: document.getElementById('imob-endereco').value.trim(),
+                        dataCriacao: new Date().toISOString()
+                    };
+                    await DB.put('imobiliarias', im);
+                    await App.imobiliarias.carregar();
+                    App.imobiliarias.renderLista();
+                    App.imobiliarias.fecharFormulario();
+                    Utils.toast('Imobiliária salva!', 'success');
+                    App.cliente._populateImobiliariasSelect();
+                },
+
+                excluir: async function(id) {
+                    if (!confirm('Excluir esta imobiliária?')) return;
+                    await DB.delete('imobiliarias', id);
+                    await App.imobiliarias.carregar();
+                    App.imobiliarias.renderLista();
+                    Utils.toast('Imobiliária excluída');
+                },
+
+                renderLista: function() {
+                    const el = document.getElementById('imobiliarias-lista');
+                    if (!el) return;
+                    const lista = App.imobiliarias._lista;
+                    if (lista.length === 0) {
+                        el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem;">
+                            <i class="fas fa-building" style="font-size:2rem;margin-bottom:8px;opacity:0.3;display:block;"></i>
+                            Nenhuma imobiliária cadastrada ainda.<br>Clique em <strong>+ Nova</strong> para adicionar.
+                        </div>`;
+                        return;
+                    }
+                    el.innerHTML = lista.map(im => `
+                        <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+                            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-building" style="color:white;font-size:1rem;"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-weight:700;font-size:0.9rem;color:var(--dark);">${im.nome}</div>
+                                ${im.creci ? `<div style="font-size:0.75rem;color:var(--text-secondary);"><i class="fas fa-id-card" style="margin-right:3px;"></i>${im.creci}</div>` : ''}
+                                ${im.email ? `<div style="font-size:0.75rem;color:var(--primary);"><i class="fas fa-envelope" style="margin-right:3px;"></i>${im.email}</div>` : ''}
+                                ${im.telefone ? `<div style="font-size:0.75rem;color:var(--text-secondary);"><i class="fas fa-phone" style="margin-right:3px;"></i>${im.telefone}</div>` : ''}
+                                ${im.endereco ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;"><i class="fas fa-map-marker-alt" style="margin-right:3px;"></i>${im.endereco}</div>` : ''}
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+                                <button onclick="App.imobiliarias.editarFormulario('${im.id}')" style="background:var(--primary-ultra);color:var(--primary);border:none;border-radius:8px;padding:6px 10px;font-size:0.75rem;cursor:pointer;font-weight:700;">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button onclick="App.imobiliarias.excluir('${im.id}')" style="background:rgba(231,76,60,0.1);color:var(--danger);border:none;border-radius:8px;padding:6px 10px;font-size:0.75rem;cursor:pointer;font-weight:700;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>`).join('');
+                }
+            },
+
             backup: {
                 importTrigger: function() {
                     document.getElementById('import-file').click();
@@ -19870,6 +20429,20 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                                 await DB.put('correspondentes', corr);
                             }
                         }
+
+                        if (data.gerentes && Array.isArray(data.gerentes)) {
+                            await DB.clear('gerentes');
+                            for (const g of data.gerentes) {
+                                await DB.put('gerentes', g);
+                            }
+                        }
+
+                        if (data.imobiliarias && Array.isArray(data.imobiliarias)) {
+                            await DB.clear('imobiliarias');
+                            for (const im of data.imobiliarias) {
+                                await DB.put('imobiliarias', im);
+                            }
+                        }
                         
                         Utils.toast('Dados importados com sucesso!');
                         location.reload();
@@ -19890,7 +20463,9 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                         links: await DB.getAll('links'),
                         settings: await DB.get('settings', 'main'),
                         funilEtapas: await DB.getAll('funilEtapas'),
-                        correspondentes: await DB.getAll('correspondentes')
+                        correspondentes: await DB.getAll('correspondentes'),
+                        gerentes: await DB.getAll('gerentes'),
+                        imobiliarias: await DB.getAll('imobiliarias')
                     };
                     
                     const json = JSON.stringify(data, null, 2);
