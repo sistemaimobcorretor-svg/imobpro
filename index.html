@@ -555,6 +555,11 @@
             min-height: 36px;
             transition: all 0.2s;
         }
+        /* Inside client-actions, btn-sm must conform to the unified height */
+        .client-actions .btn-sm {
+            height: 36px;
+            padding: 0;
+        }
         .btn-light { background: var(--light); color: var(--text-secondary); border: 1px solid var(--border); }
         .btn-light:active { background: var(--border); }
         .btn-primary-soft { background: var(--primary-ultra); color: var(--primary); border: 1px solid var(--border-accent); }
@@ -595,53 +600,40 @@
         .client-actions > * {
             flex: 1 1 0;
             min-width: 0;
+            min-height: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 9px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.18s, background 0.18s, opacity 0.18s;
+            font-size: 0.9rem;
             white-space: nowrap;
+        }
+
+        .client-actions > *:active {
+            transform: scale(0.92);
+            opacity: 0.85;
         }
 
         .btn-whatsapp-client {
             background: #25D366;
             color: white;
-            border: none;
-            padding: 0;
-            border-radius: 9px;
-            font-size: 1.05rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.18s, background 0.18s;
-            min-height: 36px;
-            min-width: 36px;
-            width: 36px;
-            flex-shrink: 0;
         }
         
         .btn-whatsapp-client:active {
-            transform: scale(0.92);
             background: #1da851;
         }
 
         .btn-email-client {
             background: var(--primary-ultra);
             color: var(--primary);
-            border: 1px solid var(--border-accent);
-            padding: 0;
-            border-radius: 9px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.18s, background 0.18s;
-            min-height: 36px;
-            min-width: 36px;
-            width: 36px;
-            flex-shrink: 0;
+            border: 1px solid var(--border-accent) !important;
         }
         .btn-email-client:active {
-            transform: scale(0.92);
             background: rgba(29,111,164,0.15);
         }
 
@@ -5184,14 +5176,11 @@
             gap: 10px;
             width: 100%;
         }
-        @media (min-width: 480px) {
+        @media (min-width: 600px) {
             .client-cards-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (min-width: 900px) {
             .client-cards-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (min-width: 1200px) {
-            .client-cards-grid { grid-template-columns: repeat(4, 1fr); }
         }
 
         /* Client info rows — light card */
@@ -5483,6 +5472,7 @@
         @media (min-width: 900px) {
             #nav-menu-btn { display: none; }
             #nav-drawer, #nav-drawer-overlay { display: none !important; }
+            #sidebar-toggle-btn { display: flex !important; }
 
             #nav-sidebar {
                 display: flex;
@@ -5500,6 +5490,9 @@
                 overflow-x: hidden;
                 scrollbar-width: none;
                 padding: 12px 0 24px;
+                transition: width 0.28s cubic-bezier(.4,0,.2,1),
+                            min-width 0.28s cubic-bezier(.4,0,.2,1),
+                            transform 0.28s cubic-bezier(.4,0,.2,1);
             }
             #nav-sidebar::-webkit-scrollbar { display: none; }
             body.dark-mode #nav-sidebar {
@@ -5510,6 +5503,25 @@
             main {
                 padding-left: calc(var(--sidebar-width) + 16px);
                 padding-right: 24px;
+                transition: padding-left 0.28s cubic-bezier(.4,0,.2,1);
+            }
+
+            /* ── Sidebar recolhida ── */
+            body.sidebar-collapsed #nav-sidebar {
+                width: 0;
+                min-width: 0;
+                border-right: none;
+                padding: 0;
+                overflow: hidden;
+            }
+            body.sidebar-collapsed main {
+                padding-left: 24px;
+            }
+            body.sidebar-collapsed #sidebar-toggle-btn i {
+                transform: rotate(0deg);
+            }
+            #sidebar-toggle-btn i {
+                transition: transform 0.28s cubic-bezier(.4,0,.2,1);
             }
         }
 
@@ -5939,6 +5951,9 @@
         <header>
             <div style="display:flex;align-items:center;gap:10px;">
                 <button id="nav-menu-btn" onclick="UI.openNavDrawer()" title="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <button id="sidebar-toggle-btn" onclick="UI.toggleSidebar()" title="Recolher menu" style="display:none;">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="brand">
@@ -11602,6 +11617,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         const btn = document.getElementById('dark-mode-btn');
                         if (btn) btn.innerHTML = '<i class="fas fa-sun"></i>';
                     }
+
+                    // Init sidebar collapsed state from saved preference
+                    if (localStorage.getItem('imobipro_sidebar_collapsed') === '1') {
+                        document.body.classList.add('sidebar-collapsed');
+                        const btn = document.getElementById('sidebar-toggle-btn');
+                        if (btn) btn.title = 'Expandir menu';
+                    }
                     
                     // ── Auth PRIMEIRO — decide se mostra login ou app ──
                     await Auth.init();
@@ -12156,24 +12178,36 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 container.innerHTML = clientes.map(cliente => {
                     const etapa = UI.data.funilEtapas.find(e => e.id === cliente.etapaFunil);
                     const dias = cliente.dataEntradaFunil ? Utils.calculateDaysInStage(cliente.dataEntradaFunil) : 0;
+                    const isParado = dias > 30;
+                    const etapaAbrev = {
+                        'lead':          { icon: 'fa-user-plus',      abrev: 'Lead'      },
+                        'contato':       { icon: 'fa-phone-alt',      abrev: 'Contato'   },
+                        'cpf':           { icon: 'fa-search',         abrev: 'CPF'       },
+                        'sem-restricao': { icon: 'fa-check-circle',   abrev: 'Apto'      },
+                        'documentacao':  { icon: 'fa-file-alt',       abrev: 'Docs'      },
+                        'aprovado':      { icon: 'fa-thumbs-up',      abrev: 'Aprovado'  },
+                        'contrato':      { icon: 'fa-file-signature',  abrev: 'Contrato'  },
+                        'venda':         { icon: 'fa-trophy',         abrev: 'Venda ✓'   },
+                    };
+                    const etapaInfo = etapaAbrev[cliente.etapaFunil] || { icon: 'fa-circle', abrev: etapa?.nome || 'Lead' };
                     
                     return `
                         <div class="client-card" onclick="App.cliente.showDetails('${cliente.id}')">
                             <div class="client-header">
                                 <div class="client-name">${cliente.nome} <span class="badge badge-primary contact-count">${cliente.contatos || 0}</span></div>
-                                <span class="client-type" style="background: ${etapa?.cor || '#707070'}; color: white;">
-                                    ${etapa?.nome || 'Lead'}
+                                <span style="display:inline-flex;align-items:center;gap:5px;background:${etapa?.cor || '#707070'};color:white;padding:3px 9px;border-radius:20px;font-size:0.7rem;font-weight:700;white-space:nowrap;letter-spacing:0.02em;">
+                                    <i class="fas ${etapaInfo.icon}" style="font-size:0.65rem;"></i>${etapaInfo.abrev}${dias > 0 ? `<span style="opacity:0.8;font-weight:500;">· ${dias}d</span>` : ''}${isParado ? `<span style="background:rgba(255,255,255,0.25);border-radius:10px;padding:1px 5px;font-size:0.62rem;">⚠️</span>` : ''}
                                 </span>
                             </div>
                             <div class="client-info">
                                 <div class="client-row" style="color:var(--text-secondary);"><i class="fas fa-phone" style="color:var(--primary);"></i> ${Utils.formatPhone(cliente.telefone)}</div>
                                 ${cliente.email ? `<div class="client-row"><i class="fas fa-envelope"></i> ${cliente.email}</div>` : ''}
-                                <div class="client-row"><i class="fas fa-calendar"></i> ${dias} dias nesta etapa${dias > 30 ? ' <span class="stale-badge">⚠️ Parado</span>' : ''}</div>
                                 ${cliente.faixaPreco ? `<div class="client-row"><i class="fas fa-search-dollar"></i> ${cliente.faixaPreco}</div>` : ''}
                                 ${cliente.origemLead ? `<div class="client-row"><i class="fas fa-map-signs"></i> <span class="origem-badge">${Utils.getOrigemLabel(cliente.origemLead)}</span></div>` : ''}
                                 ${cliente.profissao && App.cliente.PROF_LABELS ? `<div class="client-row"><i class="fas fa-briefcase"></i> <span class="origem-badge" style="background:rgba(196,114,74,0.12);color:var(--accent);">${App.cliente.PROF_LABELS[cliente.profissao] || cliente.profissao}</span></div>` : ''}
                             </div>
                             <div class="client-actions">
+                                ${cliente.telefone ? `<button class="btn-whatsapp-client" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${cliente.id}')" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>` : ''}
                                 <button class="btn-sm btn-primary-soft" onclick="event.stopPropagation(); App.cliente.agendarAtividade('${cliente.id}')">
                                     <i class="fas fa-calendar-plus"></i>
                                 </button>
@@ -12615,13 +12649,27 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                     const prioridade = calcPrioridade(c);
                     const prioClass = isInativo ? ' client-card-inativo' : (prioridade >= 90 ? ' client-priority-alta' : prioridade >= 60 ? ' client-priority-media' : ' client-priority-normal');
+                    // Abreviação elegante da etapa do funil
+                    const etapaAbrev = {
+                        'lead':          { icon: 'fa-user-plus',      abrev: 'Lead'       },
+                        'contato':       { icon: 'fa-phone-alt',      abrev: 'Contato'    },
+                        'cpf':           { icon: 'fa-search',         abrev: 'CPF'        },
+                        'sem-restricao': { icon: 'fa-check-circle',   abrev: 'Apto'       },
+                        'documentacao':  { icon: 'fa-file-alt',       abrev: 'Docs'       },
+                        'aprovado':      { icon: 'fa-thumbs-up',      abrev: 'Aprovado'   },
+                        'contrato':      { icon: 'fa-file-signature',  abrev: 'Contrato'   },
+                        'venda':         { icon: 'fa-trophy',         abrev: 'Venda ✓'    },
+                    };
+                    const etapaInfo = etapaAbrev[c.etapaFunil] || { icon: 'fa-circle', abrev: etapa.nome };
                     return `
                         <div class="client-card${prioClass}" onclick="App.cliente.showDetails('${c.id}')">
                             ${isAniversario ? `<div class="property-badge badge-pink" style="top: 12px; right: 12px; left: auto;">🎂</div>` : ''}
                             ${rank !== null ? `<div style="position:absolute;top:10px;left:12px;font-size:0.7rem;font-weight:800;color:var(--text-secondary);opacity:0.6;">#${rank+1}</div>` : ''}
                             <div class="client-header" style="${rank !== null ? 'padding-left:28px;' : ''}">
                                 <div class="client-name">${c.nome} ${idade ? `(${idade} anos)` : ''} <span class="badge badge-primary contact-count">${c.contatos || 0}</span>${prioIcon}</div>
-                                <span class="client-type" style="background: ${etapa.cor}; color: white;">${etapa.nome}</span>
+                                <span style="display:inline-flex;align-items:center;gap:5px;background:${etapa.cor};color:white;padding:3px 9px;border-radius:20px;font-size:0.7rem;font-weight:700;white-space:nowrap;letter-spacing:0.02em;">
+                                    <i class="fas ${etapaInfo.icon}" style="font-size:0.65rem;"></i>${etapaInfo.abrev}${diasNaEtapa > 0 ? `<span style="opacity:0.8;font-weight:500;">· ${diasNaEtapa}d</span>` : ''}${isParado ? `<span style="background:rgba(255,255,255,0.25);border-radius:10px;padding:1px 5px;font-size:0.62rem;">⚠️</span>` : ''}
+                                </span>
                             </div>
                             <div class="client-info">
                                 <div class="client-row" style="color:var(--text-secondary);"><i class="fas fa-phone" style="color:var(--primary);"></i> ${c.telefone}</div>
@@ -12632,7 +12680,6 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 ${c.faixaPreco ? `<div class="client-row"><i class="fas fa-search-dollar"></i> ${c.faixaPreco}</div>` : ''}
                                 ${c.origemLead ? `<div class="client-row"><i class="fas fa-map-signs"></i> <span class="origem-badge">${Utils.getOrigemLabel(c.origemLead)}</span></div>` : ''}
                                 ${c.profissao && App.cliente.PROF_LABELS ? `<div class="client-row"><i class="fas fa-briefcase"></i> <span class="origem-badge" style="background:rgba(196,114,74,0.12);color:var(--accent);">${App.cliente.PROF_LABELS[c.profissao] || c.profissao}</span></div>` : ''}
-                                <div class="client-row"><i class="fas fa-filter"></i> Funil: ${etapa.nome} (${diasNaEtapa} dias)${isParado ? ' <span class="stale-badge">⚠️ Parado</span>' : ''}</div>
                                 ${(() => {
                                     const pc = Utils.calcMaxImovelCliente(c);
                                     if (!pc) return '';
@@ -12643,6 +12690,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 })()}
                             </div>
                             <div class="client-actions">
+                                ${c.telefone ? `<button class="btn-whatsapp-client" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${c.id}')" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>` : ''}
                                 <button class="btn-sm btn-primary-soft" onclick="event.stopPropagation(); App.cliente.agendarAtividade('${c.id}')">
                                     <i class="fas fa-calendar-plus"></i>
                                 </button>
@@ -12767,6 +12815,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 localStorage.setItem('imobipro_dark_mode', isDark ? '1' : '0');
                 const btn = document.getElementById('dark-mode-btn');
                 if (btn) btn.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            },
+
+            toggleSidebar: function() {
+                const collapsed = document.body.classList.toggle('sidebar-collapsed');
+                localStorage.setItem('imobipro_sidebar_collapsed', collapsed ? '1' : '0');
+                const btn = document.getElementById('sidebar-toggle-btn');
+                if (btn) btn.title = collapsed ? 'Expandir menu' : 'Recolher menu';
             },
 
             renderMiniChart: function(clientes) {
@@ -16110,7 +16165,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 ${c.email ? `<div class="client-row"><i class="fas fa-envelope"></i> ${c.email}</div>` : ''}
                             </div>
                             <div class="client-actions">
-                                <button class="btn-whatsapp-client" onclick="event.stopPropagation(); UI.enviarNotificacaoIndividual('${c.id}')"><i class="fab fa-whatsapp"></i></button>
+                                <button class="btn-whatsapp-client" onclick="event.stopPropagation(); UI.enviarNotificacaoIndividual('${c.id}')"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
                             </div>
                         </div>
                     `).join('');
