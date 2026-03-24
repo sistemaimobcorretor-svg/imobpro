@@ -6178,9 +6178,6 @@
                         <button class="icon-btn" style="background: var(--success); color: white; border-radius: 8px; padding: 8px;" onclick="UI.openPortfolioSelection()">
                             <i class="fas fa-file-pdf"></i> Portfólio
                         </button>
-                        <button class="icon-btn" style="background: var(--primary); color: white; border-radius: 8px; padding: 8px;" onclick="UI.openNewImovel()">
-                            <i class="fas fa-plus"></i>
-                        </button>
                     </div>
                 </div>
                 
@@ -6223,14 +6220,9 @@
             <div id="clientes-view" class="view">
                 <div class="section-title">
                     Clientes
-                    <div style="display: flex; gap: 8px;">
-                        <button class="icon-btn" style="background: #25D366; color: white; border-radius: 8px; padding: 8px;" onclick="UI.openEnvioMassa()">
-                            <i class="fab fa-whatsapp"></i> Envio em Massa
-                        </button>
-                        <button class="icon-btn" style="background: var(--primary); color: white; border-radius: 8px; padding: 8px;" onclick="UI.openNewCliente()">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+                    <button class="icon-btn" style="background: #25D366; color: white; border-radius: 8px; padding: 8px;" onclick="UI.openEnvioMassa()">
+                        <i class="fab fa-whatsapp"></i> Envio em Massa
+                    </button>
                 </div>
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
@@ -6252,9 +6244,6 @@
             <div id="agenda-view" class="view">
                 <div class="section-title">
                     Agenda
-                    <button class="icon-btn" style="background: var(--primary); color: white; border-radius: 8px; padding: 8px;" onclick="UI.openNewVisita()">
-                        <i class="fas fa-plus"></i> Novo
-                    </button>
                 </div>
 
                 <!-- Calendar Widget -->
@@ -6355,9 +6344,6 @@
             <div id="links-view" class="view">
                 <div class="section-title">
                     Links Úteis
-                    <button class="icon-btn" style="background: var(--primary); color: white; border-radius: 8px; padding: 8px;" onclick="UI.openNewLink()">
-                        <i class="fas fa-plus"></i>
-                    </button>
                 </div>
                 
                 <div class="search-container">
@@ -11913,9 +11899,6 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                     <li>
                                         <i class="fas fa-user"></i>
                                         <span>${c.nome}${c.telefone ? ' · ' + c.telefone : ''}</span>
-                                        <button style="background:#25D366;color:white;border:none;border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;cursor:pointer;flex-shrink:0;box-shadow:0 2px 8px rgba(37,211,102,0.35);" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${c.id}')">
-                                            <i class="fab fa-whatsapp"></i>
-                                        </button>
                                     </li>
                                 `).join('')}
                             </ul>
@@ -11969,7 +11952,6 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                     ${cliente.dataNascimento ? `<div class="client-row"><i class="fas fa-birthday-cake"></i> ${Utils.formatDate(cliente.dataNascimento)}</div>` : ''}
                                 </div>
                                 <div class="client-actions">
-                                    <button class="btn-whatsapp-client" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${cliente.id}')"><i class="fab fa-whatsapp"></i></button>
                                     <button class="btn-sm btn-primary-soft" onclick="event.stopPropagation(); App.cliente.agendarAtividade('${cliente.id}')">
                                         <i class="fas fa-calendar-plus"></i>
                                     </button>
@@ -12192,7 +12174,6 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 ${cliente.profissao && App.cliente.PROF_LABELS ? `<div class="client-row"><i class="fas fa-briefcase"></i> <span class="origem-badge" style="background:rgba(196,114,74,0.12);color:var(--accent);">${App.cliente.PROF_LABELS[cliente.profissao] || cliente.profissao}</span></div>` : ''}
                             </div>
                             <div class="client-actions">
-                                <button class="btn-whatsapp-client" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${cliente.id}')"><i class="fab fa-whatsapp"></i></button>
                                 <button class="btn-sm btn-primary-soft" onclick="event.stopPropagation(); App.cliente.agendarAtividade('${cliente.id}')">
                                     <i class="fas fa-calendar-plus"></i>
                                 </button>
@@ -12458,9 +12439,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     else displayTitle = 'Agendamento';
                 }
                 
-                const whatsappBtn = cliente && cliente.telefone ? `
-                    <button class="btn-whatsapp-client" style="flex: 0; min-width: auto; padding: 8px 12px;" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${cliente.id}')"><i class="fab fa-whatsapp"></i></button>
-                ` : '';
+                const whatsappBtn = '';
                 
                 return `
                     <div class="schedule-card ${tipoClass} ${isUrgent ? 'schedule-urgent' : ''}" onclick="App.agenda.edit('${v.id}')">
@@ -12481,9 +12460,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             ${v.tipo === 'visita' ? `Visita: ${imovel.titulo.substring(0, 30)}...` : 
                              v.observacoes ? v.observacoes.substring(0, 50) + (v.observacoes.length > 50 ? '...' : '') : ''}
                         </div>
-                        <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-                            ${whatsappBtn}
-                        </div>
+
                     </div>
                 `;
             },
@@ -12554,9 +12531,6 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 <i class="fas fa-${alertaDias ? 'exclamation-triangle' : 'clock'}" style="margin-right:3px;"></i>${dias}d nesta etapa${alertaDias ? ' — seguir up!' : ''}
                             </span>
                             <div style="display:flex;gap:6px;">
-                                <button style="background:#25D366;color:white;border:none;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;cursor:pointer;box-shadow:0 2px 8px rgba(37,211,102,0.35);" onclick="event.stopPropagation();App.whatsapp.confirmOpenCliente('${cliente.id}')" title="WhatsApp">
-                                    <i class="fab fa-whatsapp"></i>
-                                </button>
                                 <button style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.60);border:none;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;cursor:pointer;" onclick="event.stopPropagation();App.cliente.edit('${cliente.id}')" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -12669,7 +12643,6 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 })()}
                             </div>
                             <div class="client-actions">
-                                <button class="btn-whatsapp-client" onclick="event.stopPropagation(); App.whatsapp.confirmOpenCliente('${c.id}')"><i class="fab fa-whatsapp"></i></button>
                                 <button class="btn-sm btn-primary-soft" onclick="event.stopPropagation(); App.cliente.agendarAtividade('${c.id}')">
                                     <i class="fas fa-calendar-plus"></i>
                                 </button>
@@ -18391,144 +18364,26 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const regime = App.cliente._getRegimeFinanciamento();
                     const docs = App.cliente._envioDocsData || [];
                     const nDocs = docs.length;
-                    const dataStr = new Date().toISOString().split('T')[0];
-                    const nomeCliente = cliente.nome.replace(/\s+/g, '_');
 
-                    const assunto = 'Documentacao para Analise - ' + cliente.nome + (empreendimento ? ' - ' + empreendimento : '');
+                    const assunto = encodeURIComponent('Documentacao para Analise - ' + cliente.nome + (empreendimento ? ' - ' + empreendimento : ''));
                     const corpo = App.cliente._gerarCorpoEmail(cliente, empreendimento, corretor, gerente, valorAvaliacao, nDocs, regime, imobiliaria);
+                    const corpoEnc = encodeURIComponent(corpo);
 
-                    // ── Tenta Web Share API (mobile nativo — abre app de email com arquivos anexados) ──
-                    if (nDocs > 0 && navigator.canShare) {
-                        try {
-                            const fileObjects = [];
-                            for (let i = 0; i < docs.length; i++) {
-                                const d = docs[i];
-                                const dataUrl = d.dados;
-                                const mimeMatch = dataUrl.match(/^data:([^;]+);base64,/);
-                                const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
-                                const base64 = dataUrl.split(',')[1];
-                                const binStr = atob(base64);
-                                const bytes = new Uint8Array(binStr.length);
-                                for (let j = 0; j < binStr.length; j++) bytes[j] = binStr.charCodeAt(j);
-                                const ext = d.nome.split('.').pop().toLowerCase();
-                                const nomeArq = String(i+1).padStart(2,'0') + '_' + (d.tipoLabel || 'doc').replace(/[^a-zA-Z0-9À-ÿ ]/g,'_').trim() + '.' + ext;
-                                fileObjects.push(new File([bytes.buffer], nomeArq, { type: mime }));
-                            }
-                            const shareData = { title: assunto, text: corpo, files: fileObjects };
-                            if (navigator.canShare(shareData)) {
-                                await navigator.share(shareData);
-                                Utils.toast('✅ Compartilhamento aberto com os documentos anexados!', 'success');
-                                return;
-                            }
-                        } catch (shareErr) {
-                            // Usuário cancelou ou Share API não suporta — cai para fluxo padrão
-                            if (shareErr.name === 'AbortError') return;
-                        }
-                    }
+                    // Abre o cliente de email com assunto e corpo
+                    window.open('mailto:' + emailCorrespondente + '?subject=' + assunto + '&body=' + corpoEnc, '_self');
 
-                    // ── Fluxo padrão: abre mailto + baixa arquivos individualmente ──
-                    const assuntoEnc = encodeURIComponent(assunto);
-                    const corpoEnc   = encodeURIComponent(corpo);
-                    window.open('mailto:' + emailCorrespondente + '?subject=' + assuntoEnc + '&body=' + corpoEnc, '_self');
-
+                    // Gera e baixa o ZIP automaticamente se houver documentos
                     if (nDocs > 0) {
-                        // Pequeno delay para o cliente de email abrir antes de iniciar downloads
-                        setTimeout(() => {
-                            App.cliente._baixarDocsIndividuais(docs, nomeCliente, dataStr);
-                        }, 900);
+                        Utils.toast('E-mail aberto! Preparando documentos para download automático...', 'success');
+                        setTimeout(async () => {
+                            await App.cliente.baixarDocsZip();
+                        }, 800);
                     } else {
-                        Utils.toast('E-mail aberto!', 'success');
+                        Utils.toast('E-mail aberto no cliente de e-mail!', 'success');
                     }
                 },
 
-                // Baixa cada documento individualmente com nome descritivo
-                _baixarDocsIndividuais: function(docs, nomeCliente, dataStr) {
-                    // Mostra painel de instrução
-                    App.cliente._mostrarPainelAnexo(docs, nomeCliente, dataStr);
-                    // Inicia downloads sequenciais
-                    docs.forEach(function(d, i) {
-                        setTimeout(function() {
-                            const ext = d.nome.split('.').pop().toLowerCase();
-                            const nomeArq = String(i+1).padStart(2,'0') + '_' + (d.tipoLabel || 'documento').replace(/[^a-zA-Z0-9À-ÿ ]/g,'_').trim() + '.' + ext;
-                            const a = document.createElement('a');
-                            a.href = d.dados;
-                            a.download = nomeArq;
-                            document.body.appendChild(a);
-                            a.click();
-                            setTimeout(() => { if (document.body.contains(a)) document.body.removeChild(a); }, 300);
-                        }, i * 600);
-                    });
-                },
-
-                // Painel flutuante que orienta o usuário a arrastar/anexar os arquivos
-                _mostrarPainelAnexo: function(docs, nomeCliente, dataStr) {
-                    const existente = document.getElementById('painel-anexo-overlay');
-                    if (existente) existente.remove();
-
-                    const overlay = document.createElement('div');
-                    overlay.id = 'painel-anexo-overlay';
-                    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.72);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:0 0 0 0;animation:fadeIn 0.25s ease;';
-
-                    const listaHtml = docs.map((d,i) => {
-                        const ext = d.nome.split('.').pop().toLowerCase();
-                        const nomeArq = String(i+1).padStart(2,'0') + '_' + (d.tipoLabel || 'documento').replace(/[^a-zA-Z0-9À-ÿ ]/g,'_').trim() + '.' + ext;
-                        const isPdf = ext === 'pdf';
-                        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;${i < docs.length-1 ? 'border-bottom:1px solid rgba(255,255,255,0.08);' : ''}">
-                            <div style="width:32px;height:32px;border-radius:8px;background:${isPdf ? 'rgba(231,76,60,0.2)' : 'rgba(14,165,233,0.2)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="fas fa-file-${isPdf ? 'pdf' : 'image'}" style="color:${isPdf ? '#e74c3c' : '#0ea5e9'};font-size:0.85rem;"></i>
-                            </div>
-                            <div style="flex:1;min-width:0;">
-                                <div style="font-size:0.82rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.tipoLabel || d.nome}</div>
-                                <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);">${nomeArq}</div>
-                            </div>
-                            <span style="font-size:0.65rem;font-weight:700;color:#27ae60;background:rgba(39,174,96,0.15);border-radius:20px;padding:2px 8px;white-space:nowrap;">⬇ baixando</span>
-                        </div>`;
-                    }).join('');
-
-                    overlay.innerHTML = `
-                        <div style="background:linear-gradient(180deg,#1a2332 0%,#0f172a 100%);border-radius:24px 24px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:540px;max-height:88vh;overflow-y:auto;box-shadow:0 -12px 48px rgba(0,0,0,0.4);">
-                            <div style="width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 20px;"></div>
-
-                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
-                                <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#1a73e8,#0d47a1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                    <i class="fas fa-paperclip" style="color:white;font-size:1.1rem;"></i>
-                                </div>
-                                <div>
-                                    <div style="font-size:1rem;font-weight:800;color:#fff;">Anexar ao E-mail</div>
-                                    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">${docs.length} documento${docs.length !== 1 ? 's' : ''} sendo baixado${docs.length !== 1 ? 's' : ''}...</div>
-                                </div>
-                            </div>
-
-                            <div style="background:rgba(234,179,8,0.12);border:1px solid rgba(234,179,8,0.3);border-radius:12px;padding:12px 14px;margin:16px 0 14px;">
-                                <div style="font-size:0.78rem;font-weight:700;color:#fbbf24;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
-                                    <i class="fas fa-info-circle"></i> Como anexar ao e-mail
-                                </div>
-                                <div style="font-size:0.75rem;color:rgba(255,255,255,0.65);line-height:1.6;">
-                                    Os arquivos estão sendo baixados para a sua pasta <strong style="color:#fff;">Downloads</strong>.<br>
-                                    No e-mail que acabou de abrir, clique em <strong style="color:#fff;">📎 Anexar</strong> e selecione os arquivos baixados — um a um ou todos de uma vez.
-                                </div>
-                            </div>
-
-                            <div style="font-size:0.72rem;font-weight:800;color:rgba(255,255,255,0.35);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Documentos</div>
-                            <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:8px 12px;">
-                                ${listaHtml}
-                            </div>
-
-                            <div style="display:flex;gap:8px;margin-top:16px;">
-                                <button onclick="App.cliente.baixarDocsZip()" style="flex:1;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#10b981;border-radius:12px;padding:12px;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-                                    <i class="fas fa-file-archive"></i> Baixar como ZIP
-                                </button>
-                                <button onclick="document.getElementById('painel-anexo-overlay').remove()" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);border-radius:12px;padding:12px;font-size:0.82rem;font-weight:700;cursor:pointer;">
-                                    Fechar
-                                </button>
-                            </div>
-                        </div>`;
-
-                    document.body.appendChild(overlay);
-                    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
-                },
-
-                                baixarDocsZip: async function() {
+                baixarDocsZip: async function() {
                     const docs = App.cliente._envioDocsData || [];
                     if (docs.length === 0) { Utils.toast('Nenhum documento para baixar.', 'error'); return; }
 
