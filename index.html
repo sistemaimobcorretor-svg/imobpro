@@ -716,6 +716,98 @@
         }
         .fab:active { transform: scale(0.90) rotate(90deg); }
 
+        /* ── Speed Dial ── */
+        #fab-container {
+            position: fixed;
+            top: calc(var(--header-height) + 12px);
+            right: 16px;
+            z-index: 49;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0;
+        }
+
+        #fab-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+        }
+
+        .fab-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            margin-bottom: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(8px) scale(0.96);
+            transition: opacity 0.22s cubic-bezier(.4,0,.2,1),
+                        transform 0.22s cubic-bezier(.4,0,.2,1);
+        }
+
+        .fab-menu.open {
+            pointer-events: auto;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .fab-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .fab-option-label {
+            background: var(--surface);
+            color: var(--dark);
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            white-space: nowrap;
+            border: 1px solid var(--border);
+            transition: transform 0.15s;
+        }
+
+        .fab-option:active .fab-option-label {
+            transform: scale(0.96);
+        }
+
+        .fab-option-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+            transition: transform 0.15s;
+        }
+
+        .fab-option:active .fab-option-icon {
+            transform: scale(0.90);
+        }
+
+        /* Quando o menu está aberto, rotaciona o + do FAB */
+        #fab-container.menu-open .fab {
+            transform: rotate(45deg);
+            background: linear-gradient(135deg, #64748B 0%, #475569 100%);
+        }
+        #fab-container.menu-open #fab-overlay {
+            display: block;
+        }
+
         .modal-overlay {
             position: fixed; inset: 0;
             background: rgba(15, 23, 42, 0.55);
@@ -7515,9 +7607,36 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
         </main>
 
-        <button class="fab" onclick="UI.openNewImovel()" id="main-fab">
-            <i class="fas fa-plus"></i>
-        </button>
+        <!-- ── FAB Speed Dial ── -->
+        <div id="fab-container">
+            <!-- Menu de opções (speed dial) -->
+            <div id="fab-menu" class="fab-menu">
+                <button class="fab-option" id="fab-opt-lead" onclick="UI.closeFabMenu(); UI.openNewCliente(false)">
+                    <span class="fab-option-label">Novo Lead</span>
+                    <div class="fab-option-icon" style="background: var(--primary);">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                </button>
+                <button class="fab-option" id="fab-opt-imovel" onclick="UI.closeFabMenu(); UI.openNewImovel()">
+                    <span class="fab-option-label">Novo Imóvel</span>
+                    <div class="fab-option-icon" style="background: var(--accent);">
+                        <i class="fas fa-home"></i>
+                    </div>
+                </button>
+                <button class="fab-option" id="fab-opt-agenda" onclick="UI.closeFabMenu(); UI.openNewVisita()">
+                    <span class="fab-option-label">Agendamento</span>
+                    <div class="fab-option-icon" style="background: var(--warning);">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                </button>
+            </div>
+            <!-- Overlay para fechar o menu -->
+            <div id="fab-overlay" onclick="UI.closeFabMenu()"></div>
+            <!-- Botão principal -->
+            <button class="fab" id="main-fab" onclick="UI.onFabClick()">
+                <i class="fas fa-plus" id="fab-icon"></i>
+            </button>
+        </div>
 
         <!-- ── Overlay do drawer (mobile) ── -->
         <div id="nav-drawer-overlay" onclick="UI.closeNavDrawer()"></div>
@@ -11633,6 +11752,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     document.getElementById('loading').style.display = 'none';
                     if (sesAtiva) {
                         document.getElementById('app').style.display = 'flex';
+                        UI.setFabSpeedDial(); // dashboard é a view inicial — speed dial
                         UI.renderDashboard();
                         UI.renderFunil();
                         UI.verificarLancamentos();
@@ -11713,32 +11833,37 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 document.querySelectorAll(`.nav-panel-item[data-target="${target}"]`).forEach(n => n.classList.add('active'));
                 document.getElementById(target).classList.add('active');
 
+                UI.closeFabMenu();
                 const fab = document.getElementById('main-fab');
-                if(target === 'dashboard-view' || target === 'imoveis-view') {
-                    fab.style.display = 'flex';
-                    fab.onclick = UI.openNewImovel;
+                const container = document.getElementById('fab-container');
+                if (target === 'dashboard-view') {
+                    container.style.display = 'flex';
+                    UI.setFabSpeedDial();
+                } else if (target === 'imoveis-view') {
+                    container.style.display = 'flex';
+                    UI.setFabDirect(UI.openNewImovel);
                 } else if (target === 'clientes-view') {
-                    fab.style.display = 'flex';
-                    fab.onclick = () => UI.openNewCliente(false);
+                    container.style.display = 'flex';
+                    UI.setFabDirect(() => UI.openNewCliente(false));
                 } else if (target === 'agenda-view') {
-                    fab.style.display = 'flex';
-                    fab.onclick = UI.openNewVisita;
+                    container.style.display = 'flex';
+                    UI.setFabDirect(UI.openNewVisita);
                 } else if (target === 'links-view') {
-                    fab.style.display = 'flex';
-                    fab.onclick = UI.openNewLink;
+                    container.style.display = 'flex';
+                    UI.setFabDirect(UI.openNewLink);
                 } else if (target === 'funil-view') {
-                    fab.style.display = 'none';
+                    container.style.display = 'none';
                     UI.renderFunil();
                 } else if (target === 'coach-view') {
-                    fab.style.display = 'none';
+                    container.style.display = 'none';
                 } else if (target === 'venda-certa-view') {
-                    fab.style.display = 'none';
+                    container.style.display = 'none';
                     VendaCerta.init();
                 } else if (target === 'simulador-view') {
-                    fab.style.display = 'none';
+                    container.style.display = 'none';
                     Simulador.init();
                 } else {
-                    fab.style.display = 'none';
+                    container.style.display = 'none';
                 }
 
                 if(target === 'dashboard-view') UI.renderDashboard();
@@ -12822,6 +12947,44 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 localStorage.setItem('imobipro_sidebar_collapsed', collapsed ? '1' : '0');
                 const btn = document.getElementById('sidebar-toggle-btn');
                 if (btn) btn.title = collapsed ? 'Expandir menu' : 'Recolher menu';
+            },
+
+            onFabClick: function() {
+                const container = document.getElementById('fab-container');
+                const isOpen = container.classList.contains('menu-open');
+                if (isOpen) {
+                    UI.closeFabMenu();
+                } else {
+                    // Verifica se o FAB está em modo speed-dial (dashboard) ou ação direta
+                    const menu = document.getElementById('fab-menu');
+                    if (menu.dataset.speedDial === '1') {
+                        container.classList.add('menu-open');
+                        menu.classList.add('open');
+                    } else {
+                        // Executa ação direta salva
+                        if (UI._fabDirectAction) UI._fabDirectAction();
+                    }
+                }
+            },
+
+            closeFabMenu: function() {
+                const container = document.getElementById('fab-container');
+                const menu = document.getElementById('fab-menu');
+                container.classList.remove('menu-open');
+                menu.classList.remove('open');
+            },
+
+            setFabSpeedDial: function() {
+                const menu = document.getElementById('fab-menu');
+                menu.dataset.speedDial = '1';
+                UI._fabDirectAction = null;
+            },
+
+            setFabDirect: function(action) {
+                const menu = document.getElementById('fab-menu');
+                menu.dataset.speedDial = '0';
+                UI._fabDirectAction = action;
+                UI.closeFabMenu();
             },
 
             renderMiniChart: function(clientes) {
