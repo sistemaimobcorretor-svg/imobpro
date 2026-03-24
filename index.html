@@ -6121,7 +6121,8 @@
                 <!-- Mini Chart de desempenho -->
                 <div class="mini-chart-container">
                     <div class="mini-chart-title">
-                        <span><i class="fas fa-chart-bar" style="color:var(--primary);margin-right:6px;"></i>Novos Clientes (últimos 6 meses)</span>
+                        <span><i class="fas fa-chart-bar" style="color:var(--primary);margin-right:6px;"></i>Desempenho (últimos 6 meses)</span>
+                        <div id="mini-chart-legend" style="display:flex;gap:10px;"></div>
                     </div>
                     <div class="bar-chart" id="mini-bar-chart">
                         <div style="color:var(--text-secondary);font-size:0.8rem;text-align:center;width:100%;padding:20px 0;">Carregando...</div>
@@ -6165,7 +6166,7 @@
                         Imobi<span class="brand-accent">Pro</span>
                     </div>
                     <div class="app-footer-text">Gestão Imobiliária Profissional</div>
-                    <span class="app-footer-version">v5.0 · 2025</span>
+                    <span class="app-footer-version">v5.1 · 2025</span>
                 </div>
 
             </div>
@@ -7563,6 +7564,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <button class="nav-panel-item" data-target="simulador-view" onclick="UI.switchTab(this);Simulador.init();UI.closeNavDrawer();return false;">
                     <i class="fas fa-calculator"></i> Simulador
                 </button>
+                <button class="nav-panel-item" onclick="UI.closeNavDrawer();setTimeout(()=>App.correspondentes.abrirCadastro(),150);return false;">
+                    <i class="fas fa-university"></i> Correspondentes
+                </button>
             </div>
 
             <div class="nav-panel-divider"></div>
@@ -7617,6 +7621,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </button>
                 <button class="nav-panel-item" data-target="simulador-view" onclick="UI.switchTab(this);Simulador.init();return false;">
                     <i class="fas fa-calculator"></i> Simulador
+                </button>
+                <button class="nav-panel-item" onclick="App.correspondentes.abrirCadastro();return false;">
+                    <i class="fas fa-university"></i> Correspondentes
                 </button>
             </div>
 
@@ -7992,8 +7999,17 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
             <!-- Campos editáveis -->
             <div class="form-group">
-                <label class="form-label">E-mail do Correspondente <span style="color:var(--danger)">*</span></label>
-                <input type="email" id="envio-email-correspondente" class="form-control" placeholder="correspondente@banco.com.br">
+                <label class="form-label">Correspondente Bancário <span style="color:var(--danger)">*</span></label>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+                    <select id="envio-select-correspondente" class="form-control" style="flex:1;" onchange="App.cliente._onSelectCorrespondente(this.value)">
+                        <option value="">— Selecione um correspondente cadastrado —</option>
+                    </select>
+                    <button type="button" onclick="App.correspondentes.abrirCadastro()" style="background:var(--accent);color:white;border:none;border-radius:10px;padding:10px 12px;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;" title="Cadastrar novo correspondente">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <input type="email" id="envio-email-correspondente" class="form-control" placeholder="ou digite o e-mail manualmente" oninput="App.cliente._atualizarPreviewEmail()">
+                <div id="envio-correspondente-info" style="display:none;margin-top:6px;background:var(--primary-ultra);border:1px solid var(--border-accent);border-radius:9px;padding:8px 12px;font-size:0.8rem;color:var(--primary);"></div>
             </div>
 
             <div class="form-group">
@@ -8048,6 +8064,55 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             </button>
             <button type="button" class="btn-block" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.60);margin-top:8px;" onclick="UI.closeModals()">Cancelar</button>
         </div>
+
+        <!-- ===== MODAL CORRESPONDENTES BANCÁRIOS ===== -->
+        <div class="modal-overlay" id="overlay-correspondentes" onclick="UI.closeModal('correspondentes')"></div>
+        <div class="modal-sheet" id="sheet-correspondentes">
+            <div class="sheet-handle"></div>
+            <h3 class="section-title">
+                <span>🏦 Correspondentes Bancários</span>
+                <button onclick="App.correspondentes.novoFormulario()" style="background:var(--accent-ultra);border:1px solid rgba(39,174,96,0.2);border-radius:8px;padding:6px 10px;color:var(--accent);font-size:0.78rem;font-weight:700;cursor:pointer;">
+                    <i class="fas fa-plus"></i> Novo
+                </button>
+            </h3>
+            <!-- Lista de correspondentes -->
+            <div id="correspondentes-lista" style="margin-bottom:16px;"></div>
+            <!-- Formulário inline -->
+            <div id="correspondentes-form-wrap" style="display:none;background:var(--primary-ultra);border:1px solid var(--border-accent);border-radius:14px;padding:16px;margin-bottom:16px;">
+                <div style="font-size:0.85rem;font-weight:800;color:var(--primary);margin-bottom:14px;" id="corr-form-title">Novo Correspondente</div>
+                <input type="hidden" id="corr-id">
+                <div class="form-group">
+                    <label class="form-label">Nome completo</label>
+                    <input type="text" id="corr-nome" class="form-control" placeholder="Nome do correspondente">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Banco / Instituição</label>
+                    <input type="text" id="corr-banco" class="form-control" placeholder="Ex: Caixa Econômica, Bradesco...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">E-mail <span style="color:var(--danger)">*</span></label>
+                    <input type="email" id="corr-email" class="form-control" placeholder="email@banco.com.br">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Telefone / WhatsApp</label>
+                    <input type="tel" id="corr-telefone" class="form-control" placeholder="(82) 99999-9999" oninput="Utils.maskPhone(this)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea id="corr-obs" class="form-control" rows="2" placeholder="Ex: especialista em MCMV, atende até R$350k..."></textarea>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button type="button" class="btn-block" style="background:var(--accent);" onclick="App.correspondentes.salvar()">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                    <button type="button" class="btn-block" style="background:var(--bg-overlay);color:var(--text-secondary);border:1px solid var(--border);" onclick="App.correspondentes.fecharFormulario()">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+            <button type="button" class="btn-block" style="background:rgba(100,116,139,0.1);color:var(--text-secondary);margin-top:4px;" onclick="UI.closeModal('correspondentes')">Fechar</button>
+        </div>
+
         <div class="modal-overlay" id="overlay-imovel"></div>
         <div class="modal-sheet" id="sheet-imovel">
             <div class="sheet-handle"></div>
@@ -8633,6 +8698,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </div>
 
                 <hr style="border: 0; border-top: 1px solid var(--border); margin: 16px 0;">
+                <div class="section-title" style="font-size: 1rem; margin-bottom: 10px;">🏦 Correspondentes Bancários</div>
+                <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:10px;">Cadastre os correspondentes bancários para usar no envio de documentação.</p>
+                <button type="button" class="btn-block" style="background: linear-gradient(135deg,#1a73e8,#0d47a1); margin: 0;" onclick="UI.closeModals(); setTimeout(()=>App.correspondentes.abrirCadastro(),200)">
+                    <i class="fas fa-university"></i> Gerenciar Correspondentes
+                </button>
+
+                <hr style="border: 0; border-top: 1px solid var(--border); margin: 16px 0;">
                 <div class="section-title" style="font-size: 1rem; margin-bottom: 10px;">Backup Geral</div>
                 <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
                     <button type="button" class="btn-block" style="background: var(--secondary); margin: 0;" onclick="App.backup.importTrigger()">
@@ -9089,7 +9161,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
         // CÓDIGO JAVASCRIPT COMPLETO (com as melhorias: contador de contatos e alerta de cliente parado)
         const DB = {
             name: 'ImobiProDB',
-            version: 22, // v22: garante store usuarios em todos os browsers
+            version: 23, // v23: store correspondentes bancários
             db: null,
             
             init: function() {
@@ -9202,6 +9274,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 if (!db.objectStoreNames.contains('usuarios')) {
                     const usuariosStore = db.createObjectStore('usuarios', { keyPath: 'id' });
                     usuariosStore.createIndex('username', 'username', { unique: false });
+                }
+                // Correspondentes Bancários
+                if (!db.objectStoreNames.contains('correspondentes')) {
+                    const corrStore = db.createObjectStore('correspondentes', { keyPath: 'id' });
+                    corrStore.createIndex('nome', 'nome', { unique: false });
+                    corrStore.createIndex('banco', 'banco', { unique: false });
                 }
             },
             
@@ -11266,6 +11344,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             async getLinks() {
                 return await DB.getAll('links');
             },
+
+            async getCorrespondentes() {
+                return await DB.getAll('correspondentes');
+            },
             
             async getSettings() {
                 const settings = await DB.get('settings', 'main');
@@ -12584,15 +12666,36 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const cd = new Date(c.dataCriacao);
                     return cd.getFullYear() === m.year && cd.getMonth() === m.month;
                 }).length);
+                const vendas = months.map(m => clientes.filter(c => {
+                    if (c.etapaFunil !== 'venda' || !c.dataEntradaFunil) return false;
+                    const cd = new Date(c.dataEntradaFunil);
+                    return cd.getFullYear() === m.year && cd.getMonth() === m.month;
+                }).length);
                 const maxVal = Math.max(...counts, 1);
                 container.innerHTML = counts.map((count, i) => {
-                    const pct = Math.max(4, Math.round((count / maxVal) * 68));
-                    return `<div class="bar-item">
-                        <div style="font-size:0.7rem;color:var(--primary);font-weight:700;">${count || ''}</div>
-                        <div class="bar-fill" style="height:${pct}px;background:var(--primary);opacity:${0.4 + (count/maxVal)*0.6};"></div>
+                    const pct = Math.max(4, Math.round((count / maxVal) * 64));
+                    const vPct = Math.max(0, Math.round((vendas[i] / maxVal) * 64));
+                    return `<div class="bar-item" title="${months[i].label}: ${count} clientes, ${vendas[i]} venda${vendas[i]!==1?'s':''}">
+                        <div style="font-size:0.65rem;color:var(--primary);font-weight:700;line-height:1;">${count || ''}</div>
+                        <div style="display:flex;align-items:flex-end;gap:2px;height:70px;">
+                            <div class="bar-fill" style="height:${pct}px;background:var(--primary);opacity:${0.4 + (count/maxVal)*0.6};width:10px;border-radius:3px 3px 0 0;"></div>
+                            ${vendas[i] > 0 ? `<div class="bar-fill" style="height:${vPct}px;background:var(--accent);opacity:0.85;width:8px;border-radius:3px 3px 0 0;"></div>` : ''}
+                        </div>
                         <div class="bar-label">${months[i].label}</div>
                     </div>`;
                 }).join('');
+
+                // Legenda
+                const legendEl = document.getElementById('mini-chart-legend');
+                if (legendEl) {
+                    legendEl.innerHTML = `
+                        <span style="display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;color:var(--text-secondary);">
+                            <span style="width:10px;height:10px;background:var(--primary);border-radius:2px;display:inline-block;"></span> Leads
+                        </span>
+                        <span style="display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;color:var(--text-secondary);">
+                            <span style="width:10px;height:10px;background:var(--accent);border-radius:2px;display:inline-block;"></span> Vendas
+                        </span>`;
+                }
             },
 
             createImovelCard: (i) => {
@@ -15392,6 +15495,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     overlay.classList.add('active');
                 }
             },
+
+            closeModal: (type) => {
+                const overlay = document.getElementById(`overlay-${type}`);
+                if (overlay) overlay.classList.remove('active');
+            },
             
             closeModals: () => {
                 document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
@@ -17691,6 +17799,21 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     setEl('envio-cliente-email', cliente.email || 'Não informado');
                     setEl('envio-docs-count', `${App.cliente._envioDocsData.length} arquivo${App.cliente._envioDocsData.length !== 1 ? 's' : ''}`);
 
+                    // Popula select de correspondentes
+                    const selectCorr = document.getElementById('envio-select-correspondente');
+                    const infoCorr = document.getElementById('envio-correspondente-info');
+                    const emailInput = document.getElementById('envio-email-correspondente');
+                    if (selectCorr) {
+                        const corrs = await Storage.getCorrespondentes();
+                        selectCorr.innerHTML = '<option value="">— Selecione um correspondente cadastrado —</option>';
+                        corrs.forEach(c => {
+                            selectCorr.innerHTML += `<option value="${c.id}" data-email="${c.email}" data-banco="${c.banco||''}" data-tel="${c.telefone||''}">${c.nome}${c.banco ? ' — ' + c.banco : ''}</option>`;
+                        });
+                        selectCorr.value = '';
+                        if (emailInput) emailInput.value = '';
+                        if (infoCorr) infoCorr.style.display = 'none';
+                    }
+
                     const settings = await Storage.getSettings();
                     const inputVal = (id, v) => { const el = document.getElementById(id); if (el && v) el.value = v; };
 
@@ -17787,6 +17910,33 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     });
 
                     UI.openModal('envio-docs');
+                },
+
+                _onSelectCorrespondente: function(id) {
+                    const selectEl = document.getElementById('envio-select-correspondente');
+                    const emailInput = document.getElementById('envio-email-correspondente');
+                    const infoEl = document.getElementById('envio-correspondente-info');
+                    if (!id) {
+                        if (emailInput) emailInput.value = '';
+                        if (infoEl) infoEl.style.display = 'none';
+                        App.cliente._atualizarPreviewEmail();
+                        return;
+                    }
+                    const opt = selectEl ? selectEl.querySelector(`option[value="${id}"]`) : null;
+                    if (opt) {
+                        if (emailInput) emailInput.value = opt.dataset.email || '';
+                        if (infoEl) {
+                            const banco = opt.dataset.banco;
+                            const tel = opt.dataset.tel;
+                            let info = `<i class="fas fa-check-circle" style="margin-right:5px;"></i><strong>${opt.text.split(' — ')[0]}</strong>`;
+                            if (banco) info += ` &nbsp;·&nbsp; <i class="fas fa-university" style="margin-right:3px;"></i>${banco}`;
+                            if (tel) info += ` &nbsp;·&nbsp; <i class="fas fa-phone" style="margin-right:3px;"></i>${tel}`;
+                            info += ` &nbsp;·&nbsp; <i class="fas fa-envelope" style="margin-right:3px;"></i>${opt.dataset.email}`;
+                            infoEl.innerHTML = info;
+                            infoEl.style.display = 'block';
+                        }
+                    }
+                    App.cliente._atualizarPreviewEmail();
                 },
 
                 _getRegimeFinanciamento: function() {
@@ -19538,6 +19688,116 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                 }
             },
             
+            correspondentes: {
+                _lista: [],
+
+                async carregar() {
+                    this._lista = await Storage.getCorrespondentes();
+                    return this._lista;
+                },
+
+                abrirCadastro: async function() {
+                    await App.correspondentes.carregar();
+                    App.correspondentes.renderLista();
+                    App.correspondentes.fecharFormulario();
+                    UI.openModal('correspondentes');
+                },
+
+                novoFormulario: function() {
+                    document.getElementById('corr-id').value = '';
+                    document.getElementById('corr-nome').value = '';
+                    document.getElementById('corr-banco').value = '';
+                    document.getElementById('corr-email').value = '';
+                    document.getElementById('corr-telefone').value = '';
+                    document.getElementById('corr-obs').value = '';
+                    document.getElementById('corr-form-title').textContent = 'Novo Correspondente';
+                    document.getElementById('correspondentes-form-wrap').style.display = 'block';
+                    document.getElementById('corr-nome').focus();
+                },
+
+                editarFormulario: function(id) {
+                    const c = App.correspondentes._lista.find(x => x.id === id);
+                    if (!c) return;
+                    document.getElementById('corr-id').value = c.id;
+                    document.getElementById('corr-nome').value = c.nome || '';
+                    document.getElementById('corr-banco').value = c.banco || '';
+                    document.getElementById('corr-email').value = c.email || '';
+                    document.getElementById('corr-telefone').value = c.telefone || '';
+                    document.getElementById('corr-obs').value = c.obs || '';
+                    document.getElementById('corr-form-title').textContent = 'Editar Correspondente';
+                    document.getElementById('correspondentes-form-wrap').style.display = 'block';
+                    document.getElementById('corr-nome').focus();
+                },
+
+                fecharFormulario: function() {
+                    document.getElementById('correspondentes-form-wrap').style.display = 'none';
+                },
+
+                salvar: async function() {
+                    const nome = document.getElementById('corr-nome').value.trim();
+                    const email = document.getElementById('corr-email').value.trim();
+                    if (!nome) { Utils.toast('Informe o nome', 'error'); return; }
+                    if (!email) { Utils.toast('Informe o e-mail', 'error'); return; }
+                    const id = document.getElementById('corr-id').value || Utils.id();
+                    const corr = {
+                        id,
+                        nome,
+                        banco: document.getElementById('corr-banco').value.trim(),
+                        email,
+                        telefone: document.getElementById('corr-telefone').value.trim(),
+                        obs: document.getElementById('corr-obs').value.trim(),
+                        dataCriacao: new Date().toISOString()
+                    };
+                    await DB.put('correspondentes', corr);
+                    await App.correspondentes.carregar();
+                    App.correspondentes.renderLista();
+                    App.correspondentes.fecharFormulario();
+                    Utils.toast('Correspondente salvo!', 'success');
+                },
+
+                excluir: async function(id) {
+                    if (!confirm('Excluir este correspondente?')) return;
+                    await DB.delete('correspondentes', id);
+                    await App.correspondentes.carregar();
+                    App.correspondentes.renderLista();
+                    Utils.toast('Correspondente excluído');
+                },
+
+                renderLista: function() {
+                    const el = document.getElementById('correspondentes-lista');
+                    if (!el) return;
+                    const lista = App.correspondentes._lista;
+                    if (lista.length === 0) {
+                        el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem;">
+                            <i class="fas fa-user-tie" style="font-size:2rem;margin-bottom:8px;opacity:0.3;display:block;"></i>
+                            Nenhum correspondente cadastrado ainda.<br>Clique em <strong>+ Novo</strong> para adicionar.
+                        </div>`;
+                        return;
+                    }
+                    el.innerHTML = lista.map(c => `
+                        <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+                            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#1a73e8,#0d47a1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-university" style="color:white;font-size:1rem;"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-weight:700;font-size:0.9rem;color:var(--dark);">${c.nome}</div>
+                                ${c.banco ? `<div style="font-size:0.75rem;color:var(--text-secondary);"><i class="fas fa-building" style="margin-right:3px;"></i>${c.banco}</div>` : ''}
+                                <div style="font-size:0.75rem;color:var(--primary);"><i class="fas fa-envelope" style="margin-right:3px;"></i>${c.email}</div>
+                                ${c.telefone ? `<div style="font-size:0.75rem;color:var(--text-secondary);"><i class="fas fa-phone" style="margin-right:3px;"></i>${c.telefone}</div>` : ''}
+                                ${c.obs ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;font-style:italic;">${c.obs}</div>` : ''}
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+                                <button onclick="App.correspondentes.editarFormulario('${c.id}')" style="background:var(--primary-ultra);color:var(--primary);border:none;border-radius:8px;padding:6px 10px;font-size:0.75rem;cursor:pointer;font-weight:700;">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button onclick="App.correspondentes.excluir('${c.id}')" style="background:rgba(231,76,60,0.1);color:var(--danger);border:none;border-radius:8px;padding:6px 10px;font-size:0.75rem;cursor:pointer;font-weight:700;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>`).join('');
+                }
+            },
+
             backup: {
                 importTrigger: function() {
                     document.getElementById('import-file').click();
@@ -19603,6 +19863,13 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                                 await DB.put('funilEtapas', etapa);
                             }
                         }
+
+                        if (data.correspondentes && Array.isArray(data.correspondentes)) {
+                            await DB.clear('correspondentes');
+                            for (const corr of data.correspondentes) {
+                                await DB.put('correspondentes', corr);
+                            }
+                        }
                         
                         Utils.toast('Dados importados com sucesso!');
                         location.reload();
@@ -19622,7 +19889,8 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                         visitas: await DB.getAll('visitas'),
                         links: await DB.getAll('links'),
                         settings: await DB.get('settings', 'main'),
-                        funilEtapas: await DB.getAll('funilEtapas')
+                        funilEtapas: await DB.getAll('funilEtapas'),
+                        correspondentes: await DB.getAll('correspondentes')
                     };
                     
                     const json = JSON.stringify(data, null, 2);
