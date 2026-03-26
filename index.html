@@ -3707,6 +3707,32 @@
         /* Notas empty */
         #notas-list .empty-state { padding: 48px 24px; }
 
+        /* ── Grid 3 colunas: Notas & Leituras ───────────────────────────── */
+        #notas-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            align-items: start;
+        }
+        #notas-list .empty-state,
+        #leitura-list .empty-state {
+            grid-column: 1 / -1;
+        }
+        #leitura-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            align-items: start;
+        }
+        .nota-card { margin-bottom: 0; }
+        .leitura-card { margin-bottom: 0; }
+        @media (max-width: 900px) {
+            #notas-list, #leitura-list { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 560px) {
+            #notas-list, #leitura-list { grid-template-columns: 1fr; }
+        }
+
         /* Viewer de arquivo */
         .file-viewer-overlay {
             position:fixed; top:0; left:0; width:100vw; height:100vh;
@@ -10777,309 +10803,517 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             generateReportPDF: async (reportData, reportType) => {
                 try {
                     const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF('p', 'mm', 'a4');
-                    const pageWidth = doc.internal.pageSize.getWidth();
-                    const margin = 15;
-                    let yPos = margin;
-                    
+                    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                    const PW = doc.internal.pageSize.getWidth();
+                    const PH = doc.internal.pageSize.getHeight();
+                    const M = 14;
+                    const CW = PW - M * 2;
                     const settings = await DB.get('settings', 'main') || {};
-                    
-                    doc.setFillColor(21, 90, 138); // --primary-dark
-                    doc.rect(0, 0, pageWidth, 25, 'F');
-                    
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(20);
-                    doc.setFont("helvetica", "bold");
-                    
-                    let reportTitle = "RELATÓRIO DE ";
-                    switch(reportType) {
-                        case 'clientes': reportTitle += "CLIENTES"; break;
-                        case 'agendamentos': reportTitle += "AGENDAMENTOS"; break;
-                        case 'vendas': reportTitle += "VENDAS"; break;
-                        case 'vendas-funil': reportTitle += "VENDAS PELO FUNIL"; break;
-                        case 'performance': reportTitle += "PERFORMANCE"; break;
-                        default: reportTitle += "GERAL";
+
+                    const TITLES = {
+                        clientes: 'RELATÓRIO DE CLIENTES',
+                        agendamentos: 'RELATÓRIO DE AGENDAMENTOS',
+                        vendas: 'RELATÓRIO DE VENDAS',
+                        'vendas-funil': 'RELATÓRIO DE VENDAS — FUNIL',
+                        performance: 'RELATÓRIO DE PERFORMANCE'
+                    };
+                    const ICONS = {
+                        clientes: '👤', agendamentos: '📅', vendas: '💰',
+                        'vendas-funil': '📊', performance: '🏆'
+                    };
+                    const C = {
+                        primary: [29,111,164], primaryDark: [21,90,138], primaryLight: [46,139,192],
+                        accent: [39,174,96], accentDark: [21,122,57],
+                        cinza: [100,116,139], cinzaClr: [226,232,240],
+                        cinzaFundo: [245,247,250], branco: [255,255,255], dark: [26,35,50],
+                        warning: [230,126,34], danger: [231,76,60],
+                        indigo: [99,102,241], violet: [124,58,237]
+                    };
+
+                    const reportTitle = TITLES[reportType] || 'RELATÓRIO GERAL';
+                    const icon = ICONS[reportType] || '📋';
+                    const imobNome = (settings.imobiliaria || 'ImobiPro').toUpperCase();
+                    const corretorNome = settings.nome || '';
+                    const creci = settings.creci ? 'CRECI ' + settings.creci : '';
+
+                    // ── Cabeçalho premium (jsPDF 2.5 compatible) ──────────────
+                    // Bloco fundo escuro
+                    doc.setFillColor(...C.primaryDark);
+                    doc.rect(0, 0, PW, 40, 'F');
+                    // Coluna accent esquerda
+                    doc.setFillColor(...C.accent);
+                    doc.rect(0, 0, 5, 40, 'F');
+                    // Bloco de cor secundária na metade direita (decorativo)
+                    doc.setFillColor(...C.primary);
+                    doc.rect(PW * 0.55, 0, PW * 0.45, 40, 'F');
+                    // Linha divisória vertical
+                    doc.setFillColor(...C.accent);
+                    doc.rect(PW * 0.55, 0, 1.5, 40, 'F');
+
+                    // Nome da imobiliária (esquerda)
+                    doc.setTextColor(...C.branco);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(16);
+                    doc.text(imobNome, M + 8, 15);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(176, 214, 236);
+                    doc.text([corretorNome, creci].filter(Boolean).join('  |  '), M + 8, 22);
+
+                    // Título do relatório (direita, na área azul)
+                    doc.setTextColor(...C.branco);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(11.5);
+                    doc.text(reportTitle, PW - M - 2, 15, { align: 'right' });
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(...C.accent);
+                    const dataGer = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+                    doc.text('Gerado em ' + dataGer, PW - M - 2, 22, { align: 'right' });
+
+                    // Linha accent inferior
+                    doc.setFillColor(...C.accent);
+                    doc.rect(0, 38, PW, 2.5, 'F');
+
+                    let y = 50;
+
+                    // ── Bloco de período e KPIs ────────────────────────────────
+                    if (reportData.periodo || reportData.total !== undefined) {
+                        doc.setFillColor(...C.cinzaFundo);
+                        doc.roundedRect(M, y, CW, 14, 2, 2, 'F');
+                        doc.setFillColor(...C.primary);
+                        doc.roundedRect(M, y, 3, 14, 1, 1, 'F');
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(8);
+                        doc.setTextColor(...C.dark);
+                        if (reportData.periodo) doc.text('Período: ' + reportData.periodo, M + 8, y + 6);
+                        if (reportData.total !== undefined) doc.text('Total de registros: ' + reportData.total, M + 8, y + 11.5);
+                        y += 20;
                     }
-                    
-                    doc.text(reportTitle, pageWidth/2, 15, {align: "center"});
-                    
-                    doc.setFontSize(10);
-                    doc.text(`${settings.imobiliaria || "Imobiliária"} | ${new Date().toLocaleDateString("pt-BR")}`, pageWidth/2, 22, {align: "center"});
-                    
-                    yPos = 35;
-                    
-                    doc.setFontSize(12);
-                    doc.setTextColor(26, 35, 50);
-                    doc.text(`Período: ${reportData.periodo}`, margin, yPos);
-                    yPos += 8;
-                    doc.text(`Total: ${reportData.total} registros`, margin, yPos);
-                    yPos += 12;
-                    
+
+                    // ── KPI Cards (resumo) ─────────────────────────────────────
+                    if (reportData.resumo && Object.keys(reportData.resumo).length > 0) {
+                        const keys = Object.keys(reportData.resumo);
+                        const nCards = Math.min(keys.length, 4);
+                        const cardW = (CW - (nCards - 1) * 4) / nCards;
+                        const CARD_COLORS = [C.primary, C.accent, C.warning, C.indigo];
+                        keys.slice(0, nCards).forEach((k, i) => {
+                            const cx = M + i * (cardW + 4);
+                            doc.setFillColor(...CARD_COLORS[i % CARD_COLORS.length]);
+                            doc.roundedRect(cx, y, cardW, 22, 3, 3, 'F');
+                            doc.roundedRect(cx, y, cardW, 22, 3, 3, 'F');
+
+                            doc.setTextColor(...C.branco);
+                            doc.setFont('helvetica', 'bold');
+                            doc.setFontSize(14);
+                            const val = String(reportData.resumo[k]);
+                            doc.text(val.length > 12 ? val.substring(0,12) : val, cx + cardW/2, y + 12, { align: 'center' });
+                            doc.setFont('helvetica', 'normal');
+                            doc.setFontSize(6.5);
+                            const label = k.length > 20 ? k.substring(0,20) : k;
+                            doc.text(label, cx + cardW/2, y + 18, { align: 'center' });
+                        });
+                        y += 30;
+                    }
+
+                    // ── Tabela de dados ────────────────────────────────────────
                     if (reportData.dados && reportData.dados.length > 0) {
-                        doc.setFontSize(14);
-                        doc.setTextColor(29, 111, 164);
-                        doc.setFont("helvetica", "bold");
-                        doc.text("DETALHES", margin, yPos);
-                        yPos += 10;
-                        
-                        doc.setFontSize(10);
-                        doc.setTextColor(26, 35, 50);
-                        doc.setFont("helvetica", "normal");
-                        
-                        const headers = reportData.headers || [];
-                        const rows = reportData.dados.map(item => 
-                            headers.map(header => item[header] || '')
-                        );
-                        
+                        // Título da seção
+                        doc.setFillColor(...C.primary);
+                        doc.roundedRect(M, y, CW, 8, 1.5, 1.5, 'F');
+                        doc.setFillColor(...C.accent);
+                        doc.roundedRect(M, y, 3, 8, 1, 1, 'F');
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(8);
+                        doc.text('DETALHAMENTO', M + 7, y + 5.5);
+                        y += 12;
+
+                        const headers = reportData.headers || Object.keys(reportData.dados[0] || {});
+                        const rows = reportData.dados.map(item => headers.map(h => {
+                            const v = item[h];
+                            return v === null || v === undefined ? '-' : String(v);
+                        }));
+
                         doc.autoTable({
-                            startY: yPos,
+                            startY: y,
                             head: [headers],
                             body: rows,
-                            margin: { left: margin, right: margin },
-                            styles: { fontSize: 9, cellPadding: 3 },
-                            headStyles: { fillColor: [29, 111, 164] }
+                            margin: { left: M, right: M },
+                            theme: 'grid',
+                            headStyles: {
+                                fillColor: C.primaryDark,
+                                textColor: C.branco,
+                                fontStyle: 'bold',
+                                fontSize: 8,
+                                cellPadding: { top: 4, bottom: 4, left: 3, right: 3 },
+                                halign: 'center',
+                                lineColor: C.primaryDark,
+                            },
+                            styles: {
+                                fontSize: 8,
+                                cellPadding: { top: 3, bottom: 3, left: 3, right: 3 },
+                                textColor: C.dark,
+                                lineColor: C.cinzaClr,
+                                lineWidth: 0.2,
+                                overflow: 'linebreak',
+                            },
+                            alternateRowStyles: { fillColor: C.cinzaFundo },
+                            didDrawPage: (data) => {
+                                // Rodapé em cada página
+                                doc.setFillColor(...C.primaryDark);
+                                doc.rect(0, PH - 10, PW, 10, 'F');
+                                doc.setFillColor(...C.accent);
+                                doc.rect(0, PH - 10, 3, 10, 'F');
+                                doc.setTextColor(...C.branco);
+                                doc.setFontSize(7);
+                                doc.setFont('helvetica', 'normal');
+                                doc.text(imobNome + (corretorNome ? ' | ' + corretorNome : '') + (creci ? ' | ' + creci : ''), M, PH - 4);
+                                const pg = doc.getCurrentPageInfo().pageNumber;
+                                doc.text('Pag. ' + pg + '  |  ' + new Date().toLocaleDateString('pt-BR'), PW - M, PH - 4, { align: 'right' });
+                            }
                         });
-                        
-                        if (doc.lastAutoTable) yPos = doc.lastAutoTable.finalY + 10;
-                        else yPos += 10;
+                        y = (doc.lastAutoTable ? doc.lastAutoTable.finalY : y) + 10;
                     }
-                    
-                    if (reportData.resumo) {
-                        if (yPos > doc.internal.pageSize.getHeight() - 20) {
-                            doc.addPage();
-                            yPos = margin;
-                        }
-                        
-                        doc.setFontSize(14);
-                        doc.setTextColor(29, 111, 164);
-                        doc.setFont("helvetica", "bold");
-                        doc.text("RESUMO ESTATÍSTICO", margin, yPos);
-                        yPos += 10;
-                        
-                        doc.setFontSize(10);
-                        doc.setTextColor(26, 35, 50);
-                        
-                        for (const [key, value] of Object.entries(reportData.resumo)) {
-                            doc.text(`${key}: ${value}`, margin, yPos);
-                            yPos += 6;
-                        }
+
+                    // ── Nota de rodapé final ────────────────────────────────────
+                    const lastPage = doc.getNumberOfPages();
+                    doc.setPage(lastPage);
+                    const footerY = PH - 22;
+                    if (y < footerY - 5) {
+                        doc.setFillColor(...C.cinzaFundo);
+                        doc.roundedRect(M, footerY - 12, CW, 8, 1.5, 1.5, 'F');
+                        doc.setFillColor(...C.cinzaClr);
+                        doc.roundedRect(M, footerY - 12, 2.5, 8, 1, 1, 'F');
+                        doc.setFontSize(6);
+                        doc.setFont('helvetica', 'italic');
+                        doc.setTextColor(...C.cinza);
+                        doc.text('Documento gerado automaticamente pelo ImobiPro. As informações apresentadas refletem os dados cadastrados até a data de geração.', M + 5, footerY - 6.5, { maxWidth: CW - 8 });
                     }
-                    
-                    const finalY = doc.internal.pageSize.getHeight() - 10;
-                    doc.setFontSize(9);
-                    doc.setTextColor(102, 116, 139);
-                    doc.text(`Gerado por ${settings.nome || "ImobiPro"} - ${settings.creci || ""}`, pageWidth/2, finalY, {align: "center"});
-                    
-                    const fileName = `relatorio_${reportType}_${new Date().toISOString().split('T')[0]}.pdf`;
+
+                    const fileName = 'relatorio_' + reportType + '_' + new Date().toISOString().split('T')[0] + '.pdf';
                     doc.save(fileName);
-                    
-                    Utils.toast("Relatório PDF gerado com sucesso!");
-                    
+                    Utils.toast('Relatório PDF gerado com sucesso!');
+
                 } catch(err) {
-                    console.error("Erro ao gerar relatório PDF:", err);
-                    Utils.toast("Erro ao gerar relatório PDF", "error");
+                    console.error('Erro ao gerar relatório PDF:', err);
+                    Utils.toast('Erro ao gerar relatório PDF', 'error');
                 }
             },
             
             generatePortfolioPDF: async function(selectedIds = null) {
                 try {
                     const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF('p', 'mm', 'a4');
-                    const pageWidth = doc.internal.pageSize.getWidth();
-                    const pageHeight = doc.internal.pageSize.getHeight();
-                    const margin = 15;
+                    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                    const PW = doc.internal.pageSize.getWidth();
+                    const PH = doc.internal.pageSize.getHeight();
+                    const M = 13;
+                    const CW = PW - M * 2;
                     const settings = await DB.get('settings', 'main') || {};
-                    
+
                     let imoveis;
                     if (selectedIds && Array.isArray(selectedIds) && selectedIds.length > 0) {
                         imoveis = UI.data.imoveis.filter(i => selectedIds.includes(i.id));
                     } else {
                         imoveis = UI.data.imoveis.filter(i => i.status !== 'vendido' && i.status !== 'alugado');
                     }
-                    
                     if (imoveis.length === 0) {
-                        Utils.toast('Nenhum imóvel selecionado ou disponível para portfólio', 'error');
+                        Utils.toast('Nenhum imóvel disponível para portfólio', 'error');
                         return;
                     }
-                    
-                    const C2 = {
-                        verde: [29,111,164], verdeEsc:[21,90,138], terra:[39,174,96],
-                        cinza:[100,116,139], cinzaFundo:[245,247,250], branco:[255,255,255], dark:[26,35,50]
+
+                    const C = {
+                        primary: [29,111,164], primaryDark: [21,90,138], primaryLight: [46,139,192],
+                        accent: [39,174,96], accentDark: [21,122,57],
+                        cinza: [100,116,139], cinzaClr: [226,232,240],
+                        cinzaFundo: [245,247,250], branco: [255,255,255], dark: [26,35,50],
+                        warning: [230,126,34]
                     };
 
-                    const addPortFooter = (pn, tot, im) => {
-                        doc.setFillColor(...C2.verdeEsc);
-                        doc.rect(0, pageHeight - 10, pageWidth, 10, 'F');
-                        doc.setFillColor(...C2.terra);
-                        doc.rect(0, pageHeight - 10, 2, 10, 'F');
-                        doc.setTextColor(...C2.branco);
-                        doc.setFontSize(7);
-                        doc.setFont('helvetica','normal');
-                        const imob = settings.imobiliaria || 'ImobiPro';
-                        const tel = settings.telefone ? ' | ' + settings.telefone : '';
-                        doc.text(imob + tel, margin, pageHeight - 4.2);
-                        doc.text('Pag. ' + pn + '/' + tot + '  |  ' + new Date().toLocaleDateString('pt-BR'), pageWidth - margin, pageHeight - 4.2, {align:'right'});
-                    };
+                    const imobNome = (settings.imobiliaria || 'ImobiPro').toUpperCase();
+                    const contato = [settings.nome, settings.telefone, settings.creci ? 'CRECI ' + settings.creci : ''].filter(Boolean).join('  ·  ');
 
+                    // ── Capa do portfólio ───────────────────────────────────────
+                    // Fundo escuro premium
+                    doc.setFillColor(...C.primaryDark);
+                    doc.rect(0, 0, PW, PH, 'F');
+                    // Degrade diagonal decorativo
+                    doc.setFillColor(...C.primary);
+                    doc.rect(0, 0, PW, PH * 0.6, 'F');
+                    doc.setFillColor(...C.accent);
+                    doc.rect(0, PH * 0.6, PW, 3, 'F');
+                    // Faixa lateral
+                    doc.setFillColor(...C.accent);
+                    doc.rect(0, 0, 5, PH, 'F');
+                    // Padrão geométrico decorativo (linhas diagonais sutis)
+                    doc.setDrawColor(255,255,255);
+                    doc.setLineWidth(0.15);
+                    for (let xi = -20; xi < PW + 20; xi += 12) {
+                        doc.line(xi, 0, xi + 40, PH * 0.6);
+                    }
+
+                    // Logo / nome grande
+                    doc.setTextColor(...C.branco);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(36);
+                    doc.text(imobNome, PW/2, PH * 0.28, { align: 'center' });
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(12);
+                    doc.setTextColor(176, 214, 236);
+                    doc.text('PORTFÓLIO DE IMÓVEIS', PW/2, PH * 0.28 + 14, { align: 'center' });
+
+                    // Badge com contagem
+                    doc.setFillColor(...C.accent);
+                    doc.roundedRect(PW/2 - 28, PH * 0.28 + 22, 56, 12, 3, 3, 'F');
+                    doc.setTextColor(...C.branco);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(8.5);
+                    doc.text(imoveis.length + ' imóv' + (imoveis.length === 1 ? 'el disponível' : 'eis disponíveis'), PW/2, PH * 0.28 + 30, { align: 'center' });
+
+                    // Contato
+                    doc.setFillColor(0,0,0);
+                    doc.setFillColor(...C.primaryDark);
+                    doc.roundedRect(M, PH * 0.7, CW, 16, 3, 3, 'F');
+                    doc.setDrawColor(...C.accent);
+                    doc.setLineWidth(0.8);
+                    doc.roundedRect(M, PH * 0.7, CW, 16, 3, 3, 'S');
+                    doc.setTextColor(...C.branco);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(9);
+                    doc.text(contato || imobNome, PW/2, PH * 0.7 + 10, { align: 'center' });
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(176, 214, 236);
+                    doc.text('Gerado em ' + new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' }), PW/2, PH - 16, { align: 'center' });
+
+                    // ── Páginas de imóveis ──────────────────────────────────────
                     for (let idx = 0; idx < imoveis.length; idx++) {
+                        doc.addPage();
                         const imovel = imoveis[idx];
-                        if (idx > 0) doc.addPage();
+                        const SAFE_BOT = PH - 13;
 
-                        // Cabecalho
-                        doc.setFillColor(...C2.verdeEsc);
-                        doc.rect(0, 0, pageWidth, 30, 'F');
-                        doc.setFillColor(...C2.terra);
-                        doc.rect(0, 0, 3, 30, 'F');
-                        doc.setTextColor(...C2.branco);
-                        doc.setFontSize(13);
-                        doc.setFont('helvetica','bold');
-                        doc.text((settings.imobiliaria || 'ImobiPro').toUpperCase(), margin+4, 11);
+                        // Header por página
+                        doc.setFillColor(...C.primaryDark);
+                        doc.rect(0, 0, PW, 28, 'F');
+                        doc.setFillColor(...C.accent);
+                        doc.rect(0, 0, 5, 28, 'F');
+                        doc.setFillColor(...C.primary);
+                        doc.rect(PW * 0.62, 0, PW * 0.38, 28, 'F');
+                        doc.setFillColor(...C.accent);
+                        doc.rect(PW * 0.62, 0, 1.5, 28, 'F');
+
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(11);
+                        doc.text(imobNome, M + 4, 11);
+                        doc.setFont('helvetica', 'normal');
                         doc.setFontSize(7);
-                        doc.setFont('helvetica','normal');
                         doc.setTextColor(176, 214, 236);
-                        doc.text('PORTFOLIO DE IMOVEIS', margin+4, 17);
+                        doc.text('PORTFÓLIO DE IMÓVEIS', M + 4, 17);
+                        if (settings.telefone) { doc.text(settings.telefone, M + 4, 22.5); }
+
                         const refDisp = Utils.formatRefNumber(imovel.refNumber || imovel.id);
-                        doc.setTextColor(...C2.branco);
-                        doc.setFontSize(8);
-                        doc.text(refDisp, pageWidth - margin, 11, {align:'right'});
-                        const stTxt = Utils.getStatusText ? Utils.getStatusText(imovel.status) : (imovel.status||'Disponivel');
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(8.5);
+                        doc.text(refDisp, PW - M, 11, { align: 'right' });
+                        const stTxt = Utils.getStatusText ? Utils.getStatusText(imovel.status) : (imovel.status || 'Disponível');
                         doc.setFontSize(7);
-                        doc.setTextColor(...C2.terra);
-                        doc.text(stTxt.toUpperCase(), pageWidth - margin, 17, {align:'right'});
-                        const contato = [settings.nome, settings.telefone].filter(Boolean).join(' | ');
-                        doc.setTextColor(176, 214, 236);
-                        doc.setFontSize(7);
-                        if (contato) doc.text(contato, margin+4, 25);
+                        doc.setTextColor(...C.accent);
+                        doc.text(stTxt.toUpperCase(), PW - M, 17, { align: 'right' });
+                        doc.text((idx+1) + '/' + imoveis.length, PW - M, 22.5, { align: 'right' });
+                        doc.setFillColor(...C.accent);
+                        doc.rect(0, 26.5, PW, 1.5, 'F');
 
-                        let y = 38;
+                        let y = 34;
 
-                        // Titulo
-                        doc.setFontSize(15);
-                        doc.setFont('helvetica','bold');
-                        doc.setTextColor(...C2.dark);
-                        const tls = doc.splitTextToSize((imovel.titulo||'').toUpperCase(), pageWidth - margin*2 - 40);
-                        doc.text(tls, margin, y);
-                        y += tls.length * 6 + 2;
-                        doc.setFontSize(8);
-                        doc.setFont('helvetica','normal');
-                        doc.setTextColor(...C2.cinza);
-                        if (imovel.endereco) doc.text(imovel.endereco.substring(0,90), margin, y);
-                        y += 6;
+                        // Título do imóvel
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(14);
+                        doc.setTextColor(...C.dark);
+                        const tituloLines = doc.splitTextToSize((imovel.titulo || 'Imóvel').toUpperCase(), CW - 42);
+                        doc.text(tituloLines, M, y);
+                        y += tituloLines.length * 6 + 1;
 
-                        // Preco
+                        if (imovel.endereco) {
+                            doc.setFont('helvetica', 'normal');
+                            doc.setFontSize(7.5);
+                            doc.setTextColor(...C.cinza);
+                            doc.text(imovel.endereco.substring(0, 90), M, y);
+                            y += 5;
+                        }
+
+                        // Badges tipo/transação
+                        let bx = M;
+                        const drawBadge = (txt, cor) => {
+                            const tw = doc.getTextWidth(txt) + 8;
+                            doc.setFillColor(...cor);
+                            doc.roundedRect(bx, y, tw, 6, 1, 1, 'F');
+                            doc.setTextColor(...C.branco);
+                            doc.setFont('helvetica', 'bold');
+                            doc.setFontSize(6.5);
+                            doc.text(txt, bx + 4, y + 4.2);
+                            bx += tw + 3;
+                        };
+                        const tipoTxt = Utils.getTipoText ? Utils.getTipoText(imovel.tipo) : (imovel.tipo || 'Imóvel');
+                        drawBadge(tipoTxt.toUpperCase(), C.primary);
+                        if (imovel.transacao === 'venda' || imovel.precoVenda) drawBadge('VENDA', C.accent);
+                        if (imovel.transacao === 'aluguel' || (imovel.precoAluguel && imovel.transacao !== 'venda')) drawBadge('ALUGUEL', C.warning);
+                        if (imovel.modalidade === 'lancamento') drawBadge('LANÇAMENTO', C.primaryLight);
+                        if (imovel.construtora) drawBadge(imovel.construtora.substring(0,15).toUpperCase(), C.cinza);
+                        y += 10;
+
+                        // Preço destaque
                         let prc = '';
                         if (imovel.precoVenda && imovel.transacao !== 'aluguel') prc = 'A partir de ' + Utils.formatCurrency(imovel.precoVenda);
-                        if (imovel.precoAluguel && imovel.transacao !== 'venda') prc += (prc?' | ':'') + Utils.formatCurrency(imovel.precoAluguel) + '/mes';
+                        if (imovel.precoAluguel && imovel.transacao !== 'venda') prc += (prc ? '   |   ' : '') + Utils.formatCurrency(imovel.precoAluguel) + '/mês';
                         if (!prc) prc = 'Consulte valores';
-                        doc.setFillColor(...C2.cinzaFundo);
-                        doc.roundedRect(margin, y, pageWidth-margin*2, 10, 2, 2, 'F');
+
+                        doc.setFillColor(235, 248, 245);
+                        doc.roundedRect(M, y, CW, 12, 2, 2, 'F');
+                        doc.setFillColor(...C.accent);
+                        doc.roundedRect(M, y, 3, 12, 1, 1, 'F');
+                        doc.setFont('helvetica', 'bold');
                         doc.setFontSize(13);
-                        doc.setFont('helvetica','bold');
-                        doc.setTextColor(...C2.verde);
-                        doc.text(prc, margin+3, y+7);
-                        y += 14;
+                        doc.setTextColor(...C.accent);
+                        doc.text(prc, M + 7, y + 8.5);
+                        if (imovel.formaPagamento) {
+                            doc.setFont('helvetica', 'normal');
+                            doc.setFontSize(6.5);
+                            doc.setTextColor(...C.cinza);
+                            doc.text(imovel.formaPagamento.substring(0,40), PW - M - 2, y + 8.5, { align: 'right' });
+                        }
+                        y += 16;
 
-                        // Caracteristicas grid 2 colunas
-                        const cW = (pageWidth - margin*2 - 6) / 2;
-                        const campos2 = [];
-                        if (imovel.area) campos2.push(['Area', imovel.area + ' m2']);
+                        // Características em grid 4 colunas
+                        const campos = [];
+                        if (imovel.area) campos.push(['Área', imovel.area + ' m²']);
                         if (imovel.tipo !== 'terreno') {
-                            if (imovel.quartos) campos2.push(['Quartos', imovel.quartos.toString()]);
-                            if (imovel.banheiros) campos2.push(['Banheiros', imovel.banheiros.toString()]);
-                            if (imovel.vagas) campos2.push(['Vagas', imovel.vagas.toString()]);
-                            if (imovel.condominio) campos2.push(['Condominio', Utils.formatCurrency(imovel.condominio) + '/mes']);
+                            if (imovel.quartos) campos.push(['Quartos', imovel.quartos.toString()]);
+                            if (imovel.banheiros) campos.push(['Banheiros', imovel.banheiros.toString()]);
+                            if (imovel.vagas) campos.push(['Garagem', imovel.vagas.toString()]);
+                            if (imovel.condominio) campos.push(['Condomínio', Utils.formatCurrency(imovel.condominio) + '/mês']);
                         }
-                        if (imovel.construtora) campos2.push(['Construtora', imovel.construtora]);
-                        if (imovel.dataEntrega) campos2.push(['Entrega', Utils.formatDate ? Utils.formatDate(imovel.dataEntrega) : imovel.dataEntrega]);
-                        if (imovel.formaPagamento) campos2.push(['Pagamento', imovel.formaPagamento]);
-                        campos2.push(['Status', stTxt]);
+                        if (imovel.construtora) campos.push(['Construtora', imovel.construtora]);
+                        if (imovel.dataEntrega) campos.push(['Entrega', Utils.formatDate ? Utils.formatDate(imovel.dataEntrega) : imovel.dataEntrega]);
+                        campos.push(['Status', stTxt]);
+                        if (imovel.numLotes) campos.push(['Lotes', imovel.numLotes.toString()]);
 
-                        const m2 = Math.ceil(campos2.length / 2);
-                        const c1 = campos2.slice(0, m2);
-                        const c2 = campos2.slice(m2);
-                        const drawCol = (lista, xb) => {
-                            let yy = y;
-                            lista.forEach((it, i) => {
-                                doc.setFillColor(...(i%2===0 ? C2.cinzaFundo : C2.branco));
-                                doc.rect(xb, yy-1, cW, 11, 'F');
-                                doc.setFontSize(6.5); doc.setFont('helvetica','bold'); doc.setTextColor(...C2.cinza);
-                                doc.text(it[0].toUpperCase(), xb+2, yy+3);
-                                doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(...C2.dark);
-                                doc.text((it[1]||'-').substring(0,28), xb+2, yy+8);
-                                yy += 12;
+                        if (campos.length > 0) {
+                            const nCols = 4;
+                            const colW = (CW - (nCols-1)*3) / nCols;
+                            const rowH = 12;
+                            campos.forEach((it, ci) => {
+                                const col = ci % nCols;
+                                const row = Math.floor(ci / nCols);
+                                const xc = M + col*(colW+3);
+                                const yc = y + row*rowH;
+                                doc.setFillColor(...(row % 2 === 0 ? C.cinzaFundo : C.branco));
+                                doc.rect(xc, yc, colW, rowH, 'F');
+                                doc.setFont('helvetica', 'bold');
+                                doc.setFontSize(6);
+                                doc.setTextColor(...C.cinza);
+                                doc.text(it[0].toUpperCase(), xc+2, yc+4);
+                                doc.setFont('helvetica', 'bold');
+                                doc.setFontSize(8);
+                                doc.setTextColor(...C.dark);
+                                doc.text((it[1]||'—').substring(0,18), xc+2, yc+9.5);
                             });
-                            return yy;
-                        };
-                        const y1 = drawCol(c1, margin);
-                        const y2 = drawCol(c2, margin + cW + 6);
-                        y = Math.max(y1, y2) + 4;
-
-                        // Descricao
-                        if (imovel.descricao) {
-                            if (y > pageHeight - 70) { doc.addPage(); y = 20; }
-                            doc.setFillColor(...C2.verde);
-                            doc.roundedRect(margin, y-4, pageWidth-margin*2, 8, 1.5, 1.5, 'F');
-                            doc.setTextColor(...C2.branco);
-                            doc.setFontSize(8); doc.setFont('helvetica','bold');
-                            doc.text('DESCRICAO', margin+4, y+1);
-                            y += 10;
-                            doc.setFont('helvetica','normal');
-                            doc.setTextColor(...C2.dark);
-                            doc.setFontSize(8);
-                            const ds = doc.splitTextToSize(imovel.descricao.substring(0, 250) + (imovel.descricao.length > 250 ? '...' : ''), pageWidth-margin*2);
-                            doc.text(ds, margin, y);
-                            y += ds.length * 4 + 6;
+                            y += Math.ceil(campos.length/nCols)*rowH + 5;
                         }
 
-                        // Fotos
-                        if (imovel.imagens && imovel.imagens.length > 0) {
-                            const fotos = imovel.imagens.slice(0, 4);
-                            const iW = (pageWidth - margin*2 - 4) / 2;
-                            const iH = iW * 0.6;
-                            if (y + iH > pageHeight - 15) { doc.addPage(); y = 20; }
-                            let col = 0;
-                            for (let fi = 0; fi < fotos.length; fi++) {
-                                if (col === 2) { col = 0; y += iH + 4; }
-                                const xf = margin + col*(iW+4);
-                                if (y + iH > pageHeight - 15) { doc.addPage(); y = 20; col = 0; }
-                                try {
-                                    doc.addImage(fotos[fi], 'JPEG', xf, y, iW, iH, undefined, 'FAST');
-                                    doc.setDrawColor(224,224,216); doc.setLineWidth(0.3);
-                                    doc.rect(xf, y, iW, iH);
-                                } catch(e) {
-                                    doc.setFillColor(...C2.cinzaFundo);
-                                    doc.rect(xf, y, iW, iH, 'F');
-                                    doc.setTextColor(...C2.cinza); doc.setFontSize(7);
-                                    doc.text('Foto indisponivel', xf+iW/2, y+iH/2, {align:'center'});
+                        // Descrição em bullets
+                        if (imovel.descricao && y < SAFE_BOT - 30) {
+                            doc.setFillColor(...C.primary);
+                            doc.roundedRect(M, y, CW, 7.5, 1.5, 1.5, 'F');
+                            doc.setFillColor(...C.accent);
+                            doc.roundedRect(M, y, 3, 7.5, 1, 1, 'F');
+                            doc.setTextColor(...C.branco);
+                            doc.setFont('helvetica', 'bold');
+                            doc.setFontSize(7.5);
+                            doc.text('DESCRIÇÃO', M + 6, y + 5);
+                            y += 10;
+                            doc.setFont('helvetica', 'normal');
+                            doc.setFontSize(8);
+                            doc.setTextColor(...C.dark);
+                            const descLines = doc.splitTextToSize(imovel.descricao.substring(0, 350) + (imovel.descricao.length > 350 ? '...' : ''), CW - 4);
+                            const maxDescLines = Math.floor((SAFE_BOT - y - 50) / 4.5);
+                            doc.text(descLines.slice(0, maxDescLines), M + 2, y);
+                            y += Math.min(descLines.length, maxDescLines) * 4.5 + 5;
+                        }
+
+                        // Galeria de fotos (até 6)
+                        if (imovel.imagens && imovel.imagens.length > 0 && y < SAFE_BOT - 35) {
+                            const fotos = imovel.imagens.slice(0, 6);
+                            const gCols = fotos.length === 1 ? 1 : fotos.length <= 4 ? 2 : 3;
+                            const gGap = 3;
+                            const imgW = (CW - (gCols-1)*gGap) / gCols;
+                            const imgH = imgW * (fotos.length === 1 ? 0.55 : 0.65);
+
+                            if (y + imgH > SAFE_BOT - 4) {
+                                // skip fotos se não couber
+                            } else {
+                                let gCol = 0;
+                                for (let fi = 0; fi < fotos.length; fi++) {
+                                    if (gCol === gCols) { gCol = 0; y += imgH + gGap; }
+                                    if (y + imgH > SAFE_BOT - 2) break;
+                                    const xf = M + gCol*(imgW+gGap);
+                                    try {
+                                        doc.addImage(fotos[fi], 'JPEG', xf, y, imgW, imgH, undefined, 'FAST');
+                                        doc.setDrawColor(...C.cinzaClr);
+                                        doc.setLineWidth(0.2);
+                                        doc.rect(xf, y, imgW, imgH);
+                                    } catch(e) {
+                                        doc.setFillColor(...C.cinzaFundo);
+                                        doc.rect(xf, y, imgW, imgH, 'F');
+                                        doc.setTextColor(...C.cinza);
+                                        doc.setFontSize(6.5);
+                                        doc.text('Foto indisponível', xf+imgW/2, y+imgH/2, { align:'center' });
+                                    }
+                                    gCol++;
                                 }
-                                col++;
                             }
                         }
+
+                        // Rodapé por página
+                        doc.setFillColor(...C.primaryDark);
+                        doc.rect(0, PH - 11, PW, 11, 'F');
+                        doc.setFillColor(...C.accent);
+                        doc.rect(0, PH - 11, 3, 11, 'F');
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(6.5);
+                        doc.text(imobNome + (settings.telefone ? '  ·  ' + settings.telefone : ''), M, PH - 4.5);
+                        doc.text('Pag. ' + (idx+2) + '/' + (imoveis.length+1) + '  ·  ' + new Date().toLocaleDateString('pt-BR'), PW - M, PH - 4.5, { align: 'right' });
                     }
 
-                    // Rodapes
-                    const totalPag2 = doc.getNumberOfPages();
-                    for (let p = 1; p <= totalPag2; p++) {
-                        doc.setPage(p);
-                        addPortFooter(p, totalPag2);
-                    }
-                    
-                    doc.save(`Portfolio_ImobiPro_${new Date().toISOString().split('T')[0]}.pdf`);
-                    Utils.toast(`Portfólio com ${imoveis.length} imóveis gerado!`);
-                    
-                } catch (err) {
+                    // Rodapé da capa
+                    doc.setPage(1);
+                    doc.setFillColor(...C.primaryDark);
+                    doc.rect(0, PH - 11, PW, 11, 'F');
+                    doc.setFillColor(...C.accent);
+                    doc.rect(0, PH - 11, 3, 11, 'F');
+                    doc.setTextColor(...C.branco);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(6.5);
+                    doc.text(imobNome, M, PH - 4.5);
+                    doc.text('Pag. 1/' + (imoveis.length+1), PW - M, PH - 4.5, { align: 'right' });
+
+                    doc.save('Portfolio_' + imobNome.replace(/\s/g,'_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
+                    Utils.toast('Portfólio com ' + imoveis.length + ' imóv' + (imoveis.length===1?'el':'eis') + ' gerado!');
+                } catch(err) {
                     console.error('Erro ao gerar portfólio:', err);
                     Utils.toast('Erro ao gerar portfólio', 'error');
                 }
             },
-            
             generateAutorizacaoPDF: async function(imovelId) {
                 const imovel = UI.data.imoveis.find(i => i.id === imovelId);
                 if (!imovel || imovel.modalidade !== 'terceiro') {
                     Utils.toast('Imóvel não encontrado ou não é de terceiro.', 'error');
                     return;
                 }
-                
                 let proprietario = UI.data.clientes.find(c => c.telefone === imovel.proprietarioTelefone);
                 if (!proprietario) {
                     proprietario = {
@@ -11089,189 +11323,294 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         email: imovel.proprietarioEmail || 'Não informado'
                     };
                 }
-                
                 const settings = await DB.get('settings', 'main') || {};
                 const dataHoje = Utils.formatDate(Utils.getToday());
-                
                 try {
                     const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF('p', 'mm', 'a4');
-                    const pageWidth = doc.internal.pageSize.getWidth();
-                    const pageHeight = doc.internal.pageSize.getHeight();
-                    const margin = 15;
-                    let yPos = 30;
+                    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                    const PW = doc.internal.pageSize.getWidth();
+                    const PH = doc.internal.pageSize.getHeight();
+                    const M = 20;
+                    const CW = PW - M * 2;
 
-                    doc.setFillColor(21, 90, 138); // --primary-dark
-                    doc.rect(0, 0, pageWidth, 25, 'F');
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(20);
-                    doc.setFont("helvetica", "bold");
-                    doc.text("CONTRATO DE AUTORIZAÇÃO DE VENDA/ALUGUEL", pageWidth/2, 15, { align: "center" });
-                    doc.setFontSize(9);
-                    doc.text(settings.imobiliaria || "ImobiPro", pageWidth/2, 22, { align: "center" });
+                    const C = {
+                        primary: [29,111,164], primaryDark: [21,90,138],
+                        accent: [39,174,96],
+                        cinza: [100,116,139], cinzaClr: [226,232,240],
+                        cinzaFundo: [245,247,250], branco: [255,255,255], dark: [26,35,50]
+                    };
 
-                    doc.setTextColor(26, 35, 50);
-                    doc.setFontSize(16);
-                    doc.setFont("helvetica", "bold");
-                    doc.text("AUTORIZAÇÃO EXCLUSIVA", margin, yPos);
-                    yPos += 10;
+                    const imobNome = (settings.imobiliaria || 'ImobiPro').toUpperCase();
+                    const SAFE_BOT = PH - 18;
 
-                    doc.setFontSize(10);
-                    doc.setFont("helvetica", "normal");
-                    doc.text(`Data: ${dataHoje}`, pageWidth - margin, yPos - 5, { align: "right" });
-                    
-                    yPos += 5;
-                    doc.setFontSize(11);
-                    doc.text("Pelo presente instrumento particular de autorização, de um lado:", margin, yPos);
-                    yPos += 8;
-                    
-                    doc.setFont("helvetica", "bold");
-                    doc.text("AUTORIZANTE (PROPRIETÁRIO):", margin, yPos);
-                    yPos += 6;
-                    doc.setFont("helvetica", "normal");
-                    doc.text(`Nome: ${proprietario.nome}`, margin+5, yPos);
-                    yPos += 5;
-                    doc.text(`CPF/CNPJ: ${proprietario.cpf}`, margin+5, yPos);
-                    yPos += 5;
-                    doc.text(`Telefone: ${proprietario.telefone}`, margin+5, yPos);
-                    yPos += 5;
-                    doc.text(`E-mail: ${proprietario.email}`, margin+5, yPos);
-                    yPos += 8;
-                    
-                    doc.setFont("helvetica", "bold");
-                    doc.text("AUTORIZADO (CORRETOR/IMOBILIÁRIA):", margin, yPos);
-                    yPos += 6;
-                    doc.setFont("helvetica", "normal");
-                    doc.text(`Corretor(a): ${settings.nome || 'Não informado'}`, margin+5, yPos);
-                    yPos += 5;
-                    doc.text(`CRECI: ${settings.creci || 'Não informado'}`, margin+5, yPos);
-                    yPos += 5;
-                    doc.text(`Imobiliária: ${settings.imobiliaria || 'Não informado'}`, margin+5, yPos);
-                    yPos += 5;
-                    doc.text(`Telefone: ${settings.telefone || 'Não informado'}`, margin+5, yPos);
-                    yPos += 10;
+                    const drawHeader = () => {
+                        // Fundo premium
+                        doc.setFillColor(...C.primaryDark);
+                        doc.rect(0, 0, PW, 40, 'F');
+                        doc.setFillColor(...C.accent);
+                        doc.rect(0, 0, 5, 40, 'F');
+                        doc.setFillColor(...C.primary);
+                        doc.rect(PW * 0.55, 0, PW * 0.45, 40, 'F');
+                        doc.setFillColor(...C.accent);
+                        doc.rect(PW * 0.55, 0, 1.5, 40, 'F');
 
-                    if (yPos > pageHeight - 60) {
-                        doc.addPage();
-                        yPos = 20;
-                    }
+                        // Nome da imobiliária
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(13);
+                        doc.text(imobNome, M, 13);
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(7);
+                        doc.setTextColor(176, 214, 236);
+                        const subInfo = [settings.nome, settings.creci ? 'CRECI ' + settings.creci : '', settings.telefone].filter(Boolean).join('  ·  ');
+                        doc.text(subInfo, M, 19);
 
-                    doc.setFont("helvetica", "bold");
-                    doc.text("IMÓVEL OBJETO DA AUTORIZAÇÃO:", margin, yPos);
-                    yPos += 6;
-                    doc.setFont("helvetica", "normal");
-                    doc.text(`Título: ${imovel.titulo}`, margin+5, yPos);
-                    yPos += 5;
-                    doc.text(`Endereço: ${imovel.endereco}`, margin+5, yPos);
-                    yPos += 5;
-                    doc.text(`Tipo: ${Utils.getTipoText(imovel.tipo)}`, margin+5, yPos);
-                    yPos += 5;
-                    if (imovel.area) {
-                        doc.text(`Área: ${imovel.area} m²`, margin+5, yPos); yPos += 5;
-                    }
-                    if (imovel.quartos) {
-                        doc.text(`Quartos: ${imovel.quartos}`, margin+5, yPos); yPos += 5;
-                    }
-                    if (imovel.banheiros) {
-                        doc.text(`Banheiros: ${imovel.banheiros}`, margin+5, yPos); yPos += 5;
-                    }
-                    if (imovel.vagas) {
-                        doc.text(`Vagas: ${imovel.vagas}`, margin+5, yPos); yPos += 5;
-                    }
-                    if (imovel.condominio) {
-                        doc.text(`Condomínio: ${Utils.formatCurrency(imovel.condominio)}/mês`, margin+5, yPos); yPos += 5;
-                    }
-                    if (imovel.gasEncanado === 'sim') {
-                        doc.text(`Gás Encanado: Sim`, margin+5, yPos); yPos += 5;
-                    }
+                        // Título do documento
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(10);
+                        doc.text('AUTORIZAÇÃO DE VENDA', PW - M, 13, { align: 'right' });
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(7);
+                        doc.setTextColor(...C.accent);
+                        doc.text('Contrato Exclusivo', PW - M, 19, { align: 'right' });
 
-                    doc.setFont("helvetica", "bold");
-                    doc.text("CONDIÇÕES DA AUTORIZAÇÃO:", margin, yPos);
-                    yPos += 6;
-                    doc.setFont("helvetica", "normal");
-                    doc.text(`Modalidade: ${imovel.transacao === 'venda' ? 'Venda' : imovel.transacao === 'aluguel' ? 'Aluguel' : 'Venda e/ou Aluguel'}`, margin+5, yPos);
-                    yPos += 5;
-                    if (imovel.precoVenda) {
-                        doc.text(`Preço de Venda (a partir de): ${Utils.formatCurrency(imovel.precoVenda)}`, margin+5, yPos);
-                        yPos += 5;
-                    }
-                    if (imovel.precoAluguel) {
-                        doc.text(`Preço de Aluguel (a partir de): ${Utils.formatCurrency(imovel.precoAluguel)}/mês`, margin+5, yPos);
-                        yPos += 5;
-                    }
-                    if (imovel.comissao) {
-                        doc.text(`Comissão do corretor: ${imovel.comissao}%`, margin+5, yPos);
-                        yPos += 5;
-                    }
-                    if (imovel.formaPagamento) {
-                        doc.text(`Forma de Pagamento: ${imovel.formaPagamento}`, margin+5, yPos);
-                        yPos += 5;
-                    }
-                    yPos += 5;
+                        // Linha de separação verde
+                        doc.setFillColor(...C.accent);
+                        doc.rect(0, 38, PW, 2.5, 'F');
 
-                    if (yPos > pageHeight - 80) {
-                        doc.addPage();
-                        yPos = 20;
-                    }
+                        // Carimbo "EXCLUSIVO"
+                        doc.setFillColor(...C.accent);
+                        doc.roundedRect(M, 26, 30, 9, 1.5, 1.5, 'F');
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(7);
+                        doc.text('EXCLUSIVIDADE', M + 15, 32, { align: 'center' });
+                    };
 
-                    doc.setFont("helvetica", "bold");
-                    doc.text("CLÁUSULAS GERAIS:", margin, yPos);
-                    yPos += 6;
-                    doc.setFont("helvetica", "normal");
-                    doc.setFontSize(9);
-                    
-                    const clauses = [
-                        "1. O AUTORIZANTE concede ao AUTORIZADO, com exclusividade, o direito de comercializar o imóvel descrito, pelo prazo de 90 (noventa) dias, contados a partir da assinatura deste contrato.",
-                        "2. O AUTORIZADO compromete-se a envidar os melhores esforços para encontrar um comprador/locatário para o imóvel, realizando ações de marketing, visitas e negociações.",
-                        "3. Em caso de concretização de negócio (venda ou locação) durante a vigência desta autorização, o AUTORIZADO fará jus à comissão estipulada, a ser paga pelo AUTORIZANTE no ato da assinatura do contrato definitivo.",
-                        "4. O AUTORIZANTE declara que o imóvel encontra-se em condições de ser negociado e que não existem pendências judiciais ou extrajudiciais que impeçam a transação.",
-                        "5. Fica eleito o foro da comarca do imóvel para dirimir quaisquer dúvidas oriundas do presente contrato."
-                    ];
-                    
-                    clauses.forEach(clause => {
-                        const splitClause = doc.splitTextToSize(clause, pageWidth - margin*2);
-                        doc.text(splitClause, margin, yPos);
-                        yPos += splitClause.length * 5 + 3;
-                        
-                        if (yPos > pageHeight - 30) {
-                            doc.addPage();
-                            yPos = 20;
+                    const drawFooter = () => {
+                        const total = doc.getNumberOfPages();
+                        for (let p = 1; p <= total; p++) {
+                            doc.setPage(p);
+                            doc.setFillColor(...C.primaryDark);
+                            doc.rect(0, PH - 10, PW, 10, 'F');
+                            doc.setFillColor(...C.accent);
+                            doc.rect(0, PH - 10, 3, 10, 'F');
+                            doc.setTextColor(...C.branco);
+                            doc.setFont('helvetica', 'normal');
+                            doc.setFontSize(6.5);
+                            doc.text(imobNome, M, PH - 4);
+                            doc.text('Pag. ' + p + '/' + total + '  |  Gerado em ' + dataHoje, PW - M, PH - 4, { align: 'right' });
                         }
-                    });
-                    
-                    yPos += 5;
+                    };
 
-                    if (yPos > pageHeight - 30) {
-                        doc.addPage();
-                        yPos = 20;
-                    }
-                    doc.setFontSize(10);
-                    doc.setFont("helvetica", "bold");
-                    doc.text("Por estarem assim justos e contratados, assinam o presente em 2 (duas) vias de igual teor e forma.", margin, yPos);
-                    yPos += 15;
-                    
-                    doc.setFontSize(10);
-                    doc.setFont("helvetica", "normal");
-                    doc.text("_________________________________________", margin+20, yPos);
-                    doc.text("_________________________________________", pageWidth/2+20, yPos);
-                    yPos += 5;
-                    doc.text("AUTORIZANTE", margin+35, yPos);
-                    doc.text("AUTORIZADO", pageWidth/2+35, yPos);
-                    
-                    const finalY = doc.internal.pageSize.getHeight() - 10;
+                    const sectionTitle = (texto, y) => {
+                        doc.setFillColor(...C.primary);
+                        doc.roundedRect(M, y, CW, 8, 1.5, 1.5, 'F');
+                        doc.setFillColor(...C.accent);
+                        doc.roundedRect(M, y, 3, 8, 1, 1, 'F');
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(8);
+                        doc.text(texto.toUpperCase(), M + 7, y + 5.5);
+                        return y + 12;
+                    };
+
+                    const infoField = (label, value, x, y, w, h) => {
+                        h = h || 12;
+                        doc.setFillColor(...C.cinzaFundo);
+                        doc.roundedRect(x, y, w, h, 1, 1, 'F');
+                        doc.setDrawColor(...C.cinzaClr);
+                        doc.setLineWidth(0.2);
+                        doc.roundedRect(x, y, w, h, 1, 1, 'S');
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(6);
+                        doc.setTextColor(...C.cinza);
+                        doc.text(label.toUpperCase(), x + 3, y + 4.5);
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(8);
+                        doc.setTextColor(...C.dark);
+                        const lines = doc.splitTextToSize(String(value || '—'), w - 6);
+                        doc.text(lines[0] || '—', x + 3, y + 9.5);
+                    };
+
+                    const clauseBox = (num, texto, y) => {
+                        if (y > SAFE_BOT - 20) { doc.addPage(); drawHeader(); y = 50; }
+                        doc.setFillColor(num % 2 === 0 ? C.cinzaFundo : C.branco);
+                        doc.setDrawColor(...C.cinzaClr);
+                        doc.setLineWidth(0.15);
+                        const lines = doc.splitTextToSize(texto, CW - 16);
+                        const h = lines.length * 4.5 + 8;
+                        doc.roundedRect(M, y, CW, h, 1.5, 1.5, 'FD');
+                        doc.setFillColor(...C.primary);
+                        doc.roundedRect(M, y, 3, h, 1, 1, 'F');
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(8);
+                        doc.setTextColor(...C.primary);
+                        doc.text('Cláusula ' + num + '.', M + 6, y + 6);
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(8);
+                        doc.setTextColor(...C.dark);
+                        doc.text(lines, M + 6, y + 11);
+                        return y + h + 4;
+                    };
+
+                    // ────────────────────────────────────────────────────────────
+                    drawHeader();
+                    let y = 48;
+
+                    // Data e número
+                    doc.setFont('helvetica', 'normal');
                     doc.setFontSize(8);
-                    doc.setTextColor(100, 116, 139);
-                    doc.text(`Gerado por ImobiPro em ${new Date().toLocaleDateString('pt-BR')}`, pageWidth/2, finalY, { align: "center" });
-                    
-                    doc.save(`Autorizacao_${imovel.titulo.substring(0, 15).replace(/[^a-z0-9]/gi, '_')}.pdf`);
-                    Utils.toast("Contrato de autorização gerado com sucesso!");
-                    
-                } catch (err) {
+                    doc.setTextColor(...C.cinza);
+                    doc.text('Local e data: _____________________________, ' + dataHoje, M, y);
+                    y += 10;
+
+                    doc.setFontSize(9);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(...C.dark);
+                    const intro = 'Pelo presente instrumento particular de autorização exclusiva de intermediação imobiliária, as partes identificadas a seguir acordam nos termos e condições estabelecidos neste contrato:';
+                    const introLines = doc.splitTextToSize(intro, CW);
+                    doc.text(introLines, M, y);
+                    y += introLines.length * 5 + 8;
+
+                    // ── PARTES ─────────────────────────────────────────────────
+                    y = sectionTitle('Partes Contratantes', y);
+                    const half = (CW - 4) / 2;
+                    const q = (CW - 8) / 3;
+
+                    // Bloco Proprietário
+                    doc.setFillColor(...C.cinzaFundo);
+                    doc.roundedRect(M, y, CW, 7, 1.5, 1.5, 'F');
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(8);
+                    doc.setTextColor(...C.primary);
+                    doc.text('AUTORIZANTE (PROPRIETÁRIO)', M + 4, y + 5);
+                    y += 9;
+                    infoField('Nome Completo', proprietario.nome, M, y, half);
+                    infoField('CPF / CNPJ', proprietario.cpf, M + half + 4, y, half);
+                    y += 14;
+                    infoField('Telefone', proprietario.telefone, M, y, q);
+                    infoField('E-mail', proprietario.email, M + q + 4, y, q * 2 + 4);
+                    y += 16;
+
+                    // Bloco Corretor
+                    doc.setFillColor(...C.cinzaFundo);
+                    doc.roundedRect(M, y, CW, 7, 1.5, 1.5, 'F');
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(8);
+                    doc.setTextColor(...C.accent);
+                    doc.text('AUTORIZADO (CORRETOR / IMOBILIÁRIA)', M + 4, y + 5);
+                    y += 9;
+                    infoField('Corretor(a)', settings.nome || '—', M, y, half);
+                    infoField('CRECI', settings.creci || '—', M + half + 4, y, half);
+                    y += 14;
+                    infoField('Imobiliária', settings.imobiliaria || '—', M, y, q);
+                    infoField('Telefone', settings.telefone || '—', M + q + 4, y, q);
+                    infoField('E-mail', settings.email || '—', M + (q+4)*2, y, q);
+                    y += 16;
+
+                    // ── IMÓVEL ─────────────────────────────────────────────────
+                    y = sectionTitle('Objeto da Autorização — Imóvel', y);
+                    infoField('Título', imovel.titulo, M, y, CW);
+                    y += 14;
+                    infoField('Endereço', imovel.endereco || '—', M, y, CW);
+                    y += 14;
+                    infoField('Tipo', Utils.getTipoText ? Utils.getTipoText(imovel.tipo) : (imovel.tipo||'—'), M, y, q);
+                    infoField('Área (m²)', imovel.area ? imovel.area + ' m²' : '—', M+q+4, y, q);
+                    infoField('Status', Utils.getStatusText ? Utils.getStatusText(imovel.status) : (imovel.status||'—'), M+(q+4)*2, y, q);
+                    y += 14;
+
+                    if (imovel.quartos || imovel.banheiros || imovel.vagas || imovel.condominio) {
+                        if (imovel.quartos) { infoField('Quartos', imovel.quartos, M, y, q); }
+                        if (imovel.banheiros) { infoField('Banheiros', imovel.banheiros, M+q+4, y, q); }
+                        if (imovel.vagas) { infoField('Vagas', imovel.vagas, M+(q+4)*2, y, q); }
+                        y += 14;
+                    }
+
+                    // ── CONDIÇÕES ──────────────────────────────────────────────
+                    y = sectionTitle('Condições Comerciais', y);
+                    const modal = imovel.transacao === 'venda' ? 'Venda' : imovel.transacao === 'aluguel' ? 'Aluguel' : 'Venda e/ou Aluguel';
+                    infoField('Modalidade', modal, M, y, q);
+                    infoField('Comissão (%)', imovel.comissao ? imovel.comissao + '%' : '—', M+q+4, y, q);
+                    infoField('Validade do Contrato', '90 dias', M+(q+4)*2, y, q);
+                    y += 14;
+                    if (imovel.precoVenda) { infoField('Preço de Venda (a partir de)', Utils.formatCurrency(imovel.precoVenda), M, y, half); }
+                    if (imovel.precoAluguel) { infoField('Preço de Aluguel (a partir de)', Utils.formatCurrency(imovel.precoAluguel) + '/mês', M + half + 4, y, half); }
+                    if (imovel.precoVenda || imovel.precoAluguel) y += 14;
+                    if (imovel.formaPagamento) { infoField('Forma de Pagamento', imovel.formaPagamento, M, y, CW); y += 14; }
+
+                    // ── CLÁUSULAS ──────────────────────────────────────────────
+                    if (y > SAFE_BOT - 40) { doc.addPage(); drawHeader(); y = 50; }
+                    y = sectionTitle('Cláusulas Contratuais', y);
+
+                    const clauses = [
+                        'O AUTORIZANTE concede ao AUTORIZADO, com exclusividade, o direito de intermediar a negociação do imóvel descrito acima, pelo prazo de 90 (noventa) dias, contados da data de assinatura deste instrumento, podendo ser prorrogado mediante acordo entre as partes.',
+                        'O AUTORIZADO se compromete a empregar os melhores esforços para viabilizar o negócio, realizando visitas, divulgação em portais e redes sociais, atendimento a interessados e apresentação de propostas.',
+                        'Em caso de êxito na intermediação, o AUTORIZANTE pagará ao AUTORIZADO a comissão estipulada nas condições comerciais acima, devida na data da assinatura do instrumento definitivo ou do recebimento do sinal de negócio.',
+                        'O AUTORIZANTE declara que o imóvel está livre e desembaraçado de quaisquer ônus, pendências judiciais ou extrajudiciais que impeçam ou dificultem a transação imobiliária objeto deste contrato.',
+                        'O AUTORIZANTE não poderá, durante a vigência deste contrato, negociar o imóvel diretamente ou através de terceiros sem a participação do AUTORIZADO, sob pena de pagamento integral da comissão.',
+                        'Fica eleito o foro da comarca onde se situa o imóvel como competente para dirimir quaisquer controvérsias oriundas do presente instrumento, com renúncia expressa a qualquer outro.'
+                    ];
+                    clauses.forEach((cl, i) => { y = clauseBox(i + 1, cl, y); });
+
+                    // ── ASSINATURAS ────────────────────────────────────────────
+                    if (y > SAFE_BOT - 45) { doc.addPage(); drawHeader(); y = 50; }
+                    y += 5;
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(8.5);
+                    doc.setTextColor(...C.dark);
+                    doc.text('Por estarem assim justos e contratados, firmam o presente em 2 (duas) vias de igual teor e forma.', M, y, { maxWidth: CW });
+                    y += 14;
+
+                    const sigW = (CW - 10) / 2;
+                    // Bloco autorizante
+                    doc.setFillColor(...C.cinzaFundo);
+                    doc.roundedRect(M, y, sigW, 32, 2, 2, 'F');
+                    doc.setDrawColor(...C.cinzaClr);
+                    doc.setLineWidth(0.3);
+                    doc.line(M + 6, y + 20, M + sigW - 6, y + 20);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(...C.primary);
+                    doc.text('AUTORIZANTE', M + sigW/2, y + 26, { align: 'center' });
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(7);
+                    doc.setTextColor(...C.cinza);
+                    doc.text(proprietario.nome, M + sigW/2, y + 30, { align: 'center' });
+
+                    // Bloco autorizado
+                    const sx2 = M + sigW + 10;
+                    doc.setFillColor(...C.cinzaFundo);
+                    doc.roundedRect(sx2, y, sigW, 32, 2, 2, 'F');
+                    doc.line(sx2 + 6, y + 20, sx2 + sigW - 6, y + 20);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(...C.accent);
+                    doc.text('AUTORIZADO', sx2 + sigW/2, y + 26, { align: 'center' });
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(7);
+                    doc.setTextColor(...C.cinza);
+                    doc.text((settings.nome || '—') + (settings.creci ? ' | ' + settings.creci : ''), sx2 + sigW/2, y + 30, { align: 'center' });
+                    y += 38;
+
+                    // Nota legal
+                    doc.setFillColor(...C.cinzaFundo);
+                    doc.roundedRect(M, y, CW, 9, 1.5, 1.5, 'F');
+                    doc.setFont('helvetica', 'italic');
+                    doc.setFontSize(6);
+                    doc.setTextColor(...C.cinza);
+                    doc.text('Documento gerado eletronicamente pelo ImobiPro. Deve ser impresso, assinado pelas partes e arquivado por ambos.', M + 4, y + 5.5, { maxWidth: CW - 8 });
+
+                    drawFooter();
+                    const nomeArq = 'Autorizacao_' + (imovel.titulo || 'imovel').substring(0,20).replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().split('T')[0] + '.pdf';
+                    doc.save(nomeArq);
+                    Utils.toast('Contrato de autorização gerado!');
+                } catch(err) {
                     console.error('Erro ao gerar contrato de autorização:', err);
-                    Utils.toast('Erro ao gerar contrato', 'error');
+                    Utils.toast("Erro ao gerar contrato", 'error');
                 }
             },
-            
             getGreeting: () => {
                 const hour = new Date().getHours();
                 if (hour >= 5 && hour < 12) return "Bom dia";
@@ -11571,128 +11910,271 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
             generateClientePDF: async (clienteId) => {
                 const cliente = UI.data.clientes.find(c => c.id === clienteId);
-                if (!cliente) {
-                    Utils.toast('Cliente não encontrado', 'error');
-                    return;
-                }
+                if (!cliente) { Utils.toast('Cliente não encontrado', 'error'); return; }
                 try {
                     const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF('p', 'mm', 'a4');
-                    const pageWidth = doc.internal.pageSize.getWidth();
-                    const margin = 15;
+                    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                    const PW = doc.internal.pageSize.getWidth();
+                    const PH = doc.internal.pageSize.getHeight();
+                    const M = 14;
+                    const CW = PW - M * 2;
                     const settings = await DB.get('settings', 'main') || {};
 
-                    doc.setFillColor(21, 90, 138);
-                    doc.rect(0, 0, pageWidth, 25, 'F');
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(20);
-                    doc.setFont("helvetica", "bold");
-                    doc.text("RELATÓRIO DO CLIENTE", pageWidth/2, 15, { align: "center" });
-                    doc.setFontSize(9);
-                    doc.text(`${settings.imobiliaria || "ImobiPro"} | ${settings.nome || ""} - ${settings.creci || ""}`, pageWidth/2, 22, { align: "center" });
+                    const C = {
+                        primary: [29,111,164], primaryDark: [21,90,138], primaryLight: [46,139,192],
+                        accent: [39,174,96], accentDark: [21,122,57],
+                        cinza: [100,116,139], cinzaClr: [226,232,240],
+                        cinzaFundo: [245,247,250], branco: [255,255,255], dark: [26,35,50],
+                        warning: [230,126,34], danger: [231,76,60], indigo: [99,102,241]
+                    };
 
-                    let yPos = 35;
+                    const imobNome = (settings.imobiliaria || 'ImobiPro').toUpperCase();
+                    const corretorNome = settings.nome || '';
+                    const creci = settings.creci ? 'CRECI ' + settings.creci : '';
+                    const tel = settings.telefone || '';
 
-                    doc.setTextColor(26, 35, 50);
-                    doc.setFontSize(14);
-                    doc.setFont("helvetica", "bold");
-                    doc.text(cliente.nome, margin, yPos);
-                    yPos += 8;
+                    const drawHeader = () => {
+                        doc.setFillColor(...C.primaryDark);
+                        doc.rect(0, 0, PW, 36, 'F');
+                        doc.setFillColor(...C.accent);
+                        doc.rect(0, 0, 5, 36, 'F');
+                        doc.setFillColor(...C.primary);
+                        doc.rect(PW * 0.58, 0, PW * 0.42, 36, 'F');
+                        doc.setFillColor(...C.accent);
+                        doc.rect(PW * 0.58, 0, 1.5, 36, 'F');
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(15);
+                        doc.text(imobNome, M + 4, 13);
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(7.5);
+                        doc.setTextColor(176, 214, 236);
+                        doc.text([corretorNome, creci, tel].filter(Boolean).join('  |  '), M + 4, 20);
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(10.5);
+                        doc.text('FICHA DO CLIENTE', PW - M, 13, { align: 'right' });
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(7);
+                        doc.setTextColor(...C.accent);
+                        doc.text(new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' }), PW - M, 20, { align: 'right' });
+                        doc.setFillColor(...C.accent);
+                        doc.rect(0, 34, PW, 2.5, 'F');
+                    };
 
-                    doc.setFontSize(10);
-                    doc.setFont("helvetica", "normal");
-                    const telefone = cliente.telefone ? Utils.formatPhone(cliente.telefone) : '-';
-                    const email = cliente.email || '-';
-                    const cpf = cliente.cpf || '-';
-                    const nascimento = cliente.dataNascimento ? Utils.formatDate(cliente.dataNascimento) : '-';
-                    const idade = cliente.dataNascimento ? Utils.calculateAge(cliente.dataNascimento) : '-';
-                    const renda = cliente.rendaMensal ? Utils.formatCurrency(cliente.rendaMensal) : '-';
-                    const tipo = Utils.getTipoClienteText(cliente.tipo);
-                    const etapa = UI.data.funilEtapas.find(e => e.id === cliente.etapaFunil)?.nome || cliente.etapaFunil;
-                    const contatos = cliente.contatos || 0;
+                    const drawFooter = () => {
+                        const totalPag = doc.getNumberOfPages();
+                        for (let p = 1; p <= totalPag; p++) {
+                            doc.setPage(p);
+                            doc.setFillColor(...C.primaryDark);
+                            doc.rect(0, PH - 10, PW, 10, 'F');
+                            doc.setFillColor(...C.accent);
+                            doc.rect(0, PH - 10, 3, 10, 'F');
+                            doc.setTextColor(...C.branco);
+                            doc.setFont('helvetica', 'normal');
+                            doc.setFontSize(6.5);
+                            doc.text(imobNome + (corretorNome ? ' | ' + corretorNome : ''), M, PH - 4);
+                            doc.text('Pag. ' + p + '/' + totalPag + '  |  ' + new Date().toLocaleDateString('pt-BR'), PW - M, PH - 4, { align: 'right' });
+                        }
+                    };
 
-                    doc.text(`Telefone: ${telefone}`, margin, yPos); yPos += 6;
-                    doc.text(`CPF/CNPJ: ${cpf}`, margin, yPos); yPos += 6;
-                    doc.text(`Email: ${email}`, margin, yPos); yPos += 6;
-                    doc.text(`Nascimento: ${nascimento} (${idade} anos)`, margin, yPos); yPos += 6;
-                    doc.text(`Renda Mensal: ${renda}`, margin, yPos); yPos += 6;
-                    doc.text(`Tipo: ${tipo} | Etapa Funil: ${etapa}`, margin, yPos); yPos += 6;
-                    doc.text(`Contatos realizados: ${contatos}`, margin, yPos); yPos += 10;
+                    const sectionTitle = (texto, y) => {
+                        doc.setFillColor(...C.primary);
+                        doc.roundedRect(M, y, CW, 8, 1.5, 1.5, 'F');
+                        doc.setFillColor(...C.accent);
+                        doc.roundedRect(M, y, 3, 8, 1, 1, 'F');
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(8);
+                        doc.text(texto.toUpperCase(), M + 7, y + 5.5);
+                        return y + 13;
+                    };
 
-                    const imovel = cliente.imovelInteresseId ? UI.data.imoveis.find(i => i.id === cliente.imovelInteresseId) : null;
-                    const taxaJuros = cliente.taxaJuros || settings.taxaJuros || 8.5;
-                    const simulacao = Utils.simulateFinancing(cliente, imovel, taxaJuros);
+                    const infoRow = (label, value, x, y, w) => {
+                        doc.setFillColor(...C.cinzaFundo);
+                        doc.rect(x, y, w, 11, 'F');
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(6.5);
+                        doc.setTextColor(...C.cinza);
+                        doc.text(label.toUpperCase(), x + 3, y + 4);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(8.5);
+                        doc.setTextColor(...C.dark);
+                        const v = doc.splitTextToSize(String(value || '—'), w - 6);
+                        doc.text(v[0], x + 3, y + 9);
+                        return y + 12;
+                    };
 
-                    doc.setFont("helvetica", "bold");
-                    doc.setTextColor(29, 111, 164);
-                    doc.setFontSize(12);
-                    doc.text("SIMULAÇÃO DE FINANCIAMENTO (Caixa Econômica)", margin, yPos);
-                    yPos += 8;
+                    drawHeader();
+                    let y = 44;
 
-                    doc.setFont("helvetica", "normal");
-                    doc.setTextColor(26, 35, 50);
-                    doc.setFontSize(10);
+                    // ── Nome + Etapa badge ─────────────────────────────────────
+                    const etapaFunilObj = UI.data.funilEtapas ? UI.data.funilEtapas.find(e => e.id === cliente.etapaFunil) : null;
+                    const etapaNome = etapaFunilObj?.nome || cliente.etapaFunil || 'Lead';
+                    const etapaCor = etapaFunilObj?.cor || '#94A3B8';
 
-                    if (simulacao.error) {
-                        doc.text(`Não foi possível simular: ${simulacao.error}`, margin, yPos);
-                    } else {
-                        doc.text(`Imóvel de interesse: ${imovel ? imovel.titulo : 'Nenhum'}`, margin, yPos); yPos += 6;
-                        if (imovel) {
-                            doc.text(`Valor do imóvel: ${Utils.formatCurrency(simulacao.valorImovel)}`, margin, yPos); yPos += 6;
-                            doc.text(`Máximo financiável (80%): ${Utils.formatCurrency(simulacao.maxFinanciamento)}`, margin, yPos); yPos += 6;
-                            doc.text(`Renda mensal: ${Utils.formatCurrency(simulacao.rendaMensal)}`, margin, yPos); yPos += 6;
-                            doc.text(`Prestação máxima (30%): ${Utils.formatCurrency(simulacao.maxPrestacao)}`, margin, yPos); yPos += 6;
-                            doc.text(`Prazo máximo permitido: ${simulacao.prazoMeses} meses`, margin, yPos); yPos += 6;
-                            doc.text(`Valor financiável pela renda: ${Utils.formatCurrency(simulacao.maxPelaRenda)}`, margin, yPos); yPos += 6;
-                            doc.text(`Valor efetivamente financiado: ${Utils.formatCurrency(simulacao.valorFinanciavel)}`, margin, yPos); yPos += 6;
-                            doc.text(`Entrada necessária: ${Utils.formatCurrency(simulacao.entradaNecessaria)}`, margin, yPos); yPos += 6;
-                            doc.text(`Prestação mensal estimada: ${Utils.formatCurrency(simulacao.prestacaoMensal)}`, margin, yPos); yPos += 6;
-                            doc.text(`Taxa de juros anual: ${simulacao.taxaAnual.toFixed(2)}%`, margin, yPos); yPos += 8;
-                            if (simulacao.valorFinanciavel < simulacao.maxFinanciamento) {
-                                doc.text("⚠️ O valor financiado está limitado pela renda do cliente.", margin, yPos); yPos += 6;
-                            } else {
-                                doc.text("✅ O cliente pode financiar até 80% do valor do imóvel.", margin, yPos); yPos += 6;
-                            }
+                    // Caixa de destaque com nome
+                    doc.setFillColor(...C.cinzaFundo);
+                    doc.roundedRect(M, y, CW, 20, 2.5, 2.5, 'F');
+                    doc.setFillColor(...C.primary);
+                    doc.roundedRect(M, y, 4, 20, 2, 2, 'F');
+
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(15);
+                    doc.setTextColor(...C.dark);
+                    doc.text(cliente.nome || 'Cliente', M + 10, y + 8);
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(8);
+                    doc.setTextColor(...C.cinza);
+                    const tipoTxt = Utils.getTipoClienteText ? Utils.getTipoClienteText(cliente.tipo) : (cliente.tipo || 'Cliente');
+                    doc.text('Tipo: ' + tipoTxt + '   |   Contatos: ' + (cliente.contatos || 0), M + 10, y + 15);
+
+                    // Badge de etapa no funil
+                    const etRgb = etapaCor.startsWith('#') ? [
+                        parseInt(etapaCor.slice(1,3),16),
+                        parseInt(etapaCor.slice(3,5),16),
+                        parseInt(etapaCor.slice(5,7),16)
+                    ] : C.cinza;
+                    doc.setFillColor(...etRgb);
+                    const etW = doc.getTextWidth(etapaNome) + 10;
+                    doc.roundedRect(PW - M - etW - 2, y + 5, etW + 4, 9, 2, 2, 'F');
+                    doc.setTextColor(255,255,255);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(7.5);
+                    doc.text(etapaNome.toUpperCase(), PW - M - etW/2, y + 11, { align: 'center' });
+                    y += 26;
+
+                    // ── Dados Pessoais ──────────────────────────────────────────
+                    y = sectionTitle('Dados Pessoais', y);
+                    const half = (CW - 4) / 2;
+                    const q = (CW - 8) / 3;
+                    infoRow('Telefone', Utils.formatPhone ? Utils.formatPhone(cliente.telefone) : (cliente.telefone || '—'), M, y, half);
+                    infoRow('E-mail', cliente.email || '—', M + half + 4, y, half);
+                    y += 13;
+                    infoRow('CPF / CNPJ', cliente.cpf || '—', M, y, half);
+                    infoRow('Data de Nascimento', cliente.dataNascimento ? Utils.formatDate(cliente.dataNascimento) + (Utils.calculateAge(cliente.dataNascimento) ? ' (' + Utils.calculateAge(cliente.dataNascimento) + ' anos)' : '') : '—', M + half + 4, y, half);
+                    y += 13;
+                    infoRow('Renda Mensal', cliente.rendaMensal ? Utils.formatCurrency(cliente.rendaMensal) : '—', M, y, q);
+                    infoRow('Origem do Lead', Utils.getOrigemLabel ? Utils.getOrigemLabel(cliente.origemLead) : (cliente.origemLead || '—'), M + q + 4, y, q);
+                    infoRow('Cadastrado em', cliente.dataCriacao ? Utils.formatDate(cliente.dataCriacao.split('T')[0]) : '—', M + (q + 4)*2, y, q);
+                    y += 15;
+
+                    // ── Interesse ───────────────────────────────────────────────
+                    const imovelInt = cliente.imovelInteresseId ? UI.data.imoveis.find(i => i.id === cliente.imovelInteresseId) : null;
+                    y = sectionTitle('Interesse & Imóvel', y);
+                    infoRow('Tipo de Interesse', cliente.tipoInteresse ? (cliente.tipoInteresse.charAt(0).toUpperCase() + cliente.tipoInteresse.slice(1)) : '—', M, y, q);
+                    infoRow('Faixa de Preço', cliente.faixaPreco || '—', M + q + 4, y, q);
+                    infoRow('Imóvel Vinculado', imovelInt ? imovelInt.titulo : '—', M + (q+4)*2, y, q);
+                    y += 15;
+
+                    // ── Simulação de Financiamento ─────────────────────────────
+                    if (cliente.rendaMensal && cliente.dataNascimento) {
+                        const taxaJuros = cliente.taxaJuros || settings.taxaJuros || 8.5;
+                        const simulacao = Utils.simulateFinancing(cliente, imovelInt, taxaJuros);
+                        y = sectionTitle('Simulação de Financiamento — Caixa Econômica Federal', y);
+
+                        if (simulacao.error) {
+                            doc.setFillColor(...C.cinzaFundo);
+                            doc.roundedRect(M, y, CW, 10, 2, 2, 'F');
+                            doc.setFont('helvetica', 'italic');
+                            doc.setFontSize(8);
+                            doc.setTextColor(...C.cinza);
+                            doc.text('Simulação indisponível: ' + simulacao.error, M + 4, y + 6.5);
+                            y += 15;
+                        } else {
+                            // 4 cards de destaque
+                            const simCards = [
+                                { label: 'Valor do Imóvel', value: Utils.formatCurrency(simulacao.valorImovel), cor: C.primary },
+                                { label: 'Valor Financiado', value: Utils.formatCurrency(simulacao.valorFinanciavel), cor: C.accent },
+                                { label: 'Entrada Necessária', value: Utils.formatCurrency(simulacao.entradaNecessaria), cor: C.warning },
+                                { label: 'Prestação Mensal', value: Utils.formatCurrency(simulacao.prestacaoMensal), cor: C.indigo },
+                            ].filter(c => c.value !== Utils.formatCurrency(0));
+
+                            const nSC = Math.min(simCards.length, 4);
+                            const scW = (CW - (nSC-1)*4) / nSC;
+                            simCards.slice(0,nSC).forEach((sc, i) => {
+                                const cx = M + i*(scW+4);
+                                doc.setFillColor(...sc.cor);
+                                doc.roundedRect(cx, y, scW, 20, 3, 3, 'F');
+                                doc.setTextColor(...C.branco);
+                                doc.setFont('helvetica', 'bold');
+                                doc.setFontSize(9.5);
+                                doc.text(sc.value, cx + scW/2, y + 11, { align: 'center' });
+                                doc.setFont('helvetica', 'normal');
+                                doc.setFontSize(6);
+                                doc.text(sc.label, cx + scW/2, y + 16.5, { align: 'center' });
+                            });
+                            y += 26;
+
+                            // Linha de detalhes da simulação
+                            infoRow('Prazo Máximo', simulacao.prazoMeses + ' meses', M, y, q);
+                            infoRow('Taxa Anual', simulacao.taxaAnual.toFixed(2) + '%', M+q+4, y, q);
+                            infoRow('Renda Comprometida', Utils.formatCurrency(simulacao.maxPrestacao) + '/mês', M+(q+4)*2, y, q);
+                            y += 15;
+
+                            // Alerta de capacidade
+                            const apto = simulacao.valorFinanciavel >= simulacao.maxFinanciamento;
+                            doc.setFillColor(...(apto ? [235,248,245] : [254,248,232]));
+                            doc.roundedRect(M, y, CW, 10, 2, 2, 'F');
+                            doc.setFillColor(...(apto ? C.accent : C.warning));
+                            doc.roundedRect(M, y, 3, 10, 1, 1, 'F');
+                            doc.setFont('helvetica', 'bold');
+                            doc.setFontSize(7.5);
+                            doc.setTextColor(...(apto ? C.accentDark : [139,69,19]));
+                            doc.text(apto ? '✔  Cliente pode financiar até 80% do valor do imóvel pela renda declarada.' : '⚠  Financiamento limitado pela renda — valor financiado menor que 80% do imóvel.', M + 6, y + 6.5);
+                            y += 15;
                         }
                     }
 
+                    // ── Observações ─────────────────────────────────────────────
                     if (cliente.observacoes) {
-                        yPos += 5;
-                        doc.setFont("helvetica", "bold");
-                        doc.text("Observações:", margin, yPos);
-                        yPos += 6;
-                        doc.setFont("helvetica", "normal");
-                        const obsSplit = doc.splitTextToSize(cliente.observacoes, pageWidth - margin*2);
-                        doc.text(obsSplit, margin, yPos);
-                        yPos += (obsSplit.length * 6) + 10;
+                        if (y > PH - 55) { doc.addPage(); drawHeader(); y = 44; }
+                        y = sectionTitle('Observações', y);
+                        doc.setFillColor(...C.cinzaFundo);
+                        doc.roundedRect(M, y, CW, 0.1, 1, 1, 'F'); // placeholder height
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(8.5);
+                        doc.setTextColor(...C.dark);
+                        const obsLines = doc.splitTextToSize(cliente.observacoes, CW - 8);
+                        const obsH = obsLines.length * 5.5 + 8;
+                        doc.setFillColor(...C.cinzaFundo);
+                        doc.roundedRect(M, y, CW, obsH, 2, 2, 'F');
+                        doc.setFillColor(...C.primary);
+                        doc.roundedRect(M, y, 3, obsH, 1, 1, 'F');
+                        doc.text(obsLines, M + 6, y + 6);
+                        y += obsH + 8;
                     }
 
+                    // ── Documentos ──────────────────────────────────────────────
                     if (cliente.documentos && cliente.documentos.length > 0) {
-                        doc.setFont("helvetica", "bold");
-                        doc.setTextColor(29, 111, 164);
-                        doc.setFontSize(12);
-                        doc.text("DOCUMENTOS ANEXADOS", margin, yPos);
-                        yPos += 8;
-
-                        doc.setFont("helvetica", "normal");
-                        doc.setTextColor(26, 35, 50);
-                        doc.setFontSize(9);
-
-                        cliente.documentos.forEach((docFile, index) => {
-                            doc.text(`${index+1}. ${docFile.tipoLabel} - ${docFile.nome} (enviado em ${Utils.formatDate(docFile.dataUpload.split('T')[0])})`, margin, yPos);
-                            yPos += 5;
+                        if (y > PH - 55) { doc.addPage(); drawHeader(); y = 44; }
+                        y = sectionTitle('Documentos Anexados', y);
+                        const SAFE_BOT = PH - 18;
+                        cliente.documentos.forEach((docFile, idx) => {
+                            if (y > SAFE_BOT) { doc.addPage(); drawHeader(); y = 44; }
+                            const even = idx % 2 === 0;
+                            doc.setFillColor(...(even ? C.cinzaFundo : C.branco));
+                            doc.rect(M, y, CW, 9, 'F');
+                            doc.setFontSize(6.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C.cinza);
+                            doc.text(String(idx+1).padStart(2,'0'), M+2, y+6);
+                            doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C.dark);
+                            doc.text((docFile.tipoLabel || docFile.nome).substring(0,50), M+8, y+6);
+                            doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(...C.cinza);
+                            if (docFile.dataUpload) doc.text('Enviado: ' + Utils.formatDate(docFile.dataUpload.split('T')[0]), PW-M-2, y+6, { align:'right' });
+                            y += 10;
                         });
-                        yPos += 5;
+                        y += 5;
                     }
 
-                    doc.save(`Cliente_${cliente.nome.replace(/\s/g, '_')}.pdf`);
-                    Utils.toast("Relatório do cliente gerado!");
-                } catch (err) {
+                    drawFooter();
+                    doc.save('Cliente_' + (cliente.nome || 'cliente').replace(/\s/g,'_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
+                    Utils.toast('Ficha do cliente gerada!');
+                } catch(err) {
                     console.error(err);
-                    Utils.toast("Erro ao gerar PDF do cliente", "error");
+                    Utils.toast('Erro ao gerar PDF do cliente', 'error');
                 }
             },
-
             getOrigemLabel: function(origem) {
                 const labels = {
                     indicacao: 'Indicação', whatsapp: 'WhatsApp', instagram: 'Instagram',
@@ -26127,35 +26609,57 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 const btn = document.getElementById('btn-corrigir-nota');
                 const conteudo = textarea ? textarea.value.trim() : '';
                 if (!conteudo) { Utils.toast('Escreva algo para corrigir', 'error'); return; }
-                if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Corrigindo...'; }
+                if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...'; }
                 try {
-                    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+                    // LanguageTool — API pública gratuita, sem chave, suporte pt-BR
+                    const params = new URLSearchParams();
+                    params.append('text', conteudo);
+                    params.append('language', 'pt-BR');
+                    const resp = await fetch('https://api.languagetool.org/v2/check', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            model: 'claude-sonnet-4-20250514',
-                            max_tokens: 1000,
-                            messages: [{
-                                role: 'user',
-                                content: `Corrija ortografia, gramática e pontuação do texto abaixo. Mantenha o estilo e significado original. Retorne APENAS o texto corrigido, sem explicações, sem aspas, sem prefixo:
-
-${conteudo}`
-                            }]
-                        })
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: params.toString()
                     });
+                    if (!resp.ok) throw new Error('LT offline');
                     const data = await resp.json();
-                    const corrigido = data?.content?.[0]?.text?.trim();
-                    if (corrigido) {
-                        textarea.value = corrigido;
-                        Utils.toast('✅ Texto corrigido!');
-                        this.onConteudoInput();
-                    } else {
-                        Utils.toast('Não foi possível corrigir o texto', 'error');
+                    const matches = data.matches || [];
+                    if (matches.length === 0) {
+                        Utils.toast('✅ Nenhum erro encontrado!');
+                        if (btn) btn.innerHTML = '<i class="fas fa-check-circle" style="color:var(--accent)"></i> Sem erros';
+                        setTimeout(() => { if (btn) btn.innerHTML = '<i class="fas fa-magic"></i> Corrigir texto'; }, 2500);
+                        return;
                     }
+                    // Aplica correções do fim para o início (mantém offsets corretos)
+                    let texto = conteudo;
+                    const sorted = [...matches].sort((a, b) => b.offset - a.offset);
+                    let corrigidos = 0;
+                    sorted.forEach(m => {
+                        if (m.replacements && m.replacements.length > 0) {
+                            const melhor = m.replacements[0].value;
+                            texto = texto.slice(0, m.offset) + melhor + texto.slice(m.offset + m.length);
+                            corrigidos++;
+                        }
+                    });
+                    textarea.value = texto;
+                    Utils.toast('\u2705 ' + corrigidos + ' corre\u00e7\u00e3o(es) aplicada(s)!');
+                    this.onConteudoInput();
                 } catch(err) {
-                    Utils.toast('Erro ao conectar ao serviço de correção', 'error');
+                    // Fallback local: corrige abreviações e erros comuns em pt-BR sem internet
+                    let texto = conteudo;
+                    const subs = [
+                        [/\bvc\b/gi,'você'],[/\btb\b/gi,'também'],[/\btbm\b/gi,'também'],
+                        [/\bpq\b/gi,'porque'],[/\bnao\b/gi,'não'],[/\bta\b/gi,'está'],
+                        [/\bpra\b/gi,'para'],[/\bmsm\b/gi,'mesmo'],[/\btdo\b/gi,'todo'],
+                        [/  +/g,' '],[/ ,/g,','],[/ \./g,'.']
+                    ];
+                    let n = 0;
+                    subs.forEach(([re, rep]) => { const a = texto; texto = texto.replace(re, rep); if (texto !== a) n++; });
+                    texto = texto.replace(/(^|[.!?]\s+)([a-záéíóúàâêôãõüç])/gi, (m,p1,p2) => p1 + p2.toUpperCase());
+                    textarea.value = texto;
+                    Utils.toast(n > 0 ? '\u26a1 ' + n + ' ajuste(s) local(is) aplicado(s)' : '\u2705 Texto verificado');
+                    this.onConteudoInput();
                 } finally {
-                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-magic"></i> Corrigir texto automaticamente'; }
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-magic"></i> Corrigir texto'; }
                 }
             },
 
