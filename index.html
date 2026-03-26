@@ -10668,8 +10668,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 if (imv) partes.push(imv.titulo);
                             }
                             if (c.faixaPreco) partes.push(c.faixaPreco);
-                            const interesse = partes.length ? partes.join('
-') : '-';
+                            const interesse = partes.length ? partes.join(' · ') : 'Não informado';
                             const etapaLabel = {
                                 lead: 'Lead', contato: 'Contato', cpf: 'CPF',
                                 'sem-restricao': 'Aprovado', documentacao: 'Doc.',
