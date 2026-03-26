@@ -1848,6 +1848,51 @@
             background: rgba(255,255,255,0.08);
         }
 
+        /* ── Layout 2 colunas para cards do relatório ── */
+        .report-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        @media (max-width: 480px) {
+            .report-cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── Cabeçalho do resultado com botão PDF inline ── */
+        .report-result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .report-result-header .report-summary {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .btn-pdf-inline {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: var(--shadow-blue);
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+        .btn-pdf-inline:hover { background: var(--primary-dark); }
+        .btn-pdf-inline i { font-size: 0.85rem; }
+
         .client-select-item {
             display: flex;
             align-items: center;
@@ -6500,26 +6545,22 @@
                         </div>
                     </div>
                     
-                    <select id="report-type" class="form-control" style="width: 100%; margin-top: 8px;" onchange="UI.toggleReportInputs(this.value)">
-                        <option value="clientes">Relatório de Clientes</option>
-                        <option value="agendamentos">Relatório de Agendamentos</option>
-                        <option value="vendas">Relatório de Vendas</option>
-                        <option value="vendas-funil">Relatório de Vendas pelo Funil</option>
-                        <option value="performance">Performance</option>
-                        <option value="plantao">Relatório de Plantão (Diário)</option>
-                        <option value="funil-travado">⚠️ Clientes Travados no Funil (+30 dias)</option>
-                        <option value="lista-ligacoes">📞 Lista Diária de Ligações</option>
-                        <option value="lista-mensagens">💬 Lista Diária de Mensagens</option>
-                    </select>
-                </div>
-                
-                <div class="report-actions">
-                    <button class="btn-block" style="background: var(--primary);" onclick="UI.generateReport()">
-                        <i class="fas fa-chart-bar"></i> Gerar Relatório
-                    </button>
-                    <button class="btn-block" style="background: var(--success);" onclick="UI.exportReport()">
-                        <i class="fas fa-file-pdf"></i> Exportar PDF
-                    </button>
+                    <div style="width: 100%; display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+                        <select id="report-type" class="form-control" style="flex: 1;" onchange="UI.toggleReportInputs(this.value)">
+                            <option value="clientes">Relatório de Clientes</option>
+                            <option value="agendamentos">Relatório de Agendamentos</option>
+                            <option value="vendas">Relatório de Vendas</option>
+                            <option value="vendas-funil">Relatório de Vendas pelo Funil</option>
+                            <option value="performance">Performance</option>
+                            <option value="plantao">Relatório de Plantão (Diário)</option>
+                            <option value="funil-travado">⚠️ Clientes Travados no Funil (+30 dias)</option>
+                            <option value="lista-ligacoes">📞 Lista Diária de Ligações</option>
+                            <option value="lista-mensagens">💬 Lista Diária de Mensagens</option>
+                        </select>
+                        <button style="display:flex;align-items:center;gap:6px;background:var(--primary);color:white;border:none;border-radius:10px;padding:9px 16px;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-blue);flex-shrink:0;" onclick="UI.generateReport()">
+                            <i class="fas fa-chart-bar"></i> Gerar
+                        </button>
+                    </div>
                 </div>
                 
                 <div id="report-content">
@@ -14808,7 +14849,16 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     return;
                 }
                 
-                container.innerHTML = UI.currentReport.html;
+                // Tipos que já têm botão PDF embutido no próprio HTML gerado
+                const temBotaoEmbutido = ['funil-travado','lista-ligacoes','lista-mensagens','plantao'];
+                const btnPdf = temBotaoEmbutido.includes(UI.currentReport.type) ? '' : `
+                    <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+                        <button class="btn-pdf-inline" onclick="UI.exportReport()">
+                            <i class="fas fa-file-pdf"></i> Baixar PDF
+                        </button>
+                    </div>`;
+                
+                container.innerHTML = btnPdf + UI.currentReport.html;
             },
 
             generateReport: () => {
@@ -15840,7 +15890,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     
                     <div class="section-title" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
                         <span>Clientes Cadastrados</span>
-                        <button class="btn-sm" style="background: var(--accent); color: white;" onclick="Utils.generatePlantaoPDF('${selectedDateStr}')">
+                        <button class="btn-pdf-inline" style="background: var(--accent); box-shadow: var(--shadow-green);" onclick="Utils.generatePlantaoPDF('${selectedDateStr}')">
                             <i class="fas fa-file-pdf"></i> Baixar PDF
                         </button>
                     </div>
@@ -15849,7 +15899,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 if (clientesPlantao.length === 0) {
                     html += `<div class="empty-state"><i class="fas fa-user-clock"></i><p>Nenhum cliente cadastrado nesta data.</p></div>`;
                 } else {
-                    html += `<div style="display: flex; flex-direction: column; gap: 10px;">`;
+                    html += `<div class="report-cards-grid">`;
                     
                     clientesPlantao.forEach(c => {
                         html += `
@@ -16012,6 +16062,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         const etapa = getEtapa(etapaId);
                         const lista = porEtapa[etapaId];
                         html += `<div class="section-title" style="margin-top:16px;"><span style="background:${etapa.cor};color:white;padding:3px 10px;border-radius:20px;font-size:0.78rem;">${etapa.nome}</span> <span style="font-size:0.82rem;color:var(--text-secondary);font-weight:500;">${lista.length} cliente(s)</span></div>`;
+                        html += `<div class="report-cards-grid">`;
                         lista.forEach(c => {
                             const urgencia = c.diasParado >= 90 ? 'var(--danger)' : c.diasParado >= 60 ? 'var(--warning)' : 'var(--accent)';
                             html += `
@@ -16033,6 +16084,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 </div>
                             </div>`;
                         });
+                        html += `</div>`;
                     });
                 }
 
@@ -16108,6 +16160,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         </div>
                     </div>`;
 
+                html += `<div class="report-cards-grid">`;
                 lista.forEach((c, idx) => {
                     const etapa = getEtapa(c.etapaFunil);
                     const urgencia = c._dias >= 30 ? '#B83030' : c._dias >= 15 ? '#B87020' : '#0369A1';
@@ -16135,6 +16188,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         </div>
                     </div>`;
                 });
+                html += `</div>`;
 
                 if (lista.length === 0) {
                     html += `<div class="empty-state"><i class="fas fa-check-circle" style="color:var(--success)"></i><p>Nenhum cliente com telefone cadastrado para ligar. Cadastre clientes primeiro!</p></div>`;
@@ -16216,6 +16270,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         </div>
                     </div>`;
 
+                html += `<div class="report-cards-grid">`;
                 lista.forEach((c, idx) => {
                     const etapa = getEtapa(c.etapaFunil);
                     const tel = c.telefone.replace(/\D/g, '');
@@ -16241,6 +16296,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         </div>
                     </div>`;
                 });
+                html += `</div>`;
 
                 if (lista.length === 0) {
                     html += `<div class="empty-state"><i class="fas fa-check-circle" style="color:var(--success)"></i><p>Nenhum cliente com telefone cadastrado. Cadastre clientes primeiro!</p></div>`;
