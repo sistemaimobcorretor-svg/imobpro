@@ -17098,15 +17098,47 @@ ${assinatura}`;
 
             filtrarClientesEmailMassa: () => {
                 const termo = (document.getElementById('filtro-clientes-email-massa')?.value || '').toLowerCase();
+                const agora = Date.now();
+                const TRINTA_DIAS_MS = 30 * 24 * 60 * 60 * 1000;
+
                 // Filtra APENAS clientes com email
-                const comEmail = (UI.data.clientes || []).filter(c =>
-                    c.email && c.email.trim() !== '' &&
-                    (c.nome.toLowerCase().includes(termo) || c.email.toLowerCase().includes(termo))
+                const todosComEmail = (UI.data.clientes || []).filter(c => c.email && c.email.trim() !== '');
+
+                // Separa os que receberam email nos últimos 30 dias
+                const ocultadosPorPrazo = todosComEmail.filter(c => {
+                    if (!c.ultimoEmailMassaEnviado) return false;
+                    const diff = agora - new Date(c.ultimoEmailMassaEnviado).getTime();
+                    return diff < TRINTA_DIAS_MS;
+                });
+
+                // Clientes elegíveis (sem envio recente)
+                const comEmail = todosComEmail.filter(c => {
+                    if (!c.ultimoEmailMassaEnviado) return true;
+                    const diff = agora - new Date(c.ultimoEmailMassaEnviado).getTime();
+                    return diff >= TRINTA_DIAS_MS;
+                }).filter(c =>
+                    c.nome.toLowerCase().includes(termo) || c.email.toLowerCase().includes(termo)
                 );
 
                 const totalTag = document.getElementById('email-massa-total-tag');
-                const totalComEmail = (UI.data.clientes || []).filter(c => c.email && c.email.trim() !== '').length;
-                if (totalTag) totalTag.textContent = `${totalComEmail} cliente(s) com e-mail`;
+                if (totalTag) totalTag.textContent = `${todosComEmail.length} cliente(s) com e-mail`;
+
+                // Banner de ocultados
+                let bannerOcultados = document.getElementById('email-massa-banner-ocultados');
+                if (!bannerOcultados) {
+                    bannerOcultados = document.createElement('div');
+                    bannerOcultados.id = 'email-massa-banner-ocultados';
+                    const listEl = document.getElementById('lista-clientes-email-massa');
+                    if (listEl && listEl.parentNode) {
+                        listEl.parentNode.insertBefore(bannerOcultados, listEl);
+                    }
+                }
+                if (ocultadosPorPrazo.length > 0) {
+                    bannerOcultados.style.cssText = 'margin-bottom:8px;padding:9px 12px;border-radius:10px;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.25);display:flex;align-items:center;gap:8px;font-size:0.8rem;color:#c0392b;';
+                    bannerOcultados.innerHTML = `<i class="fas fa-clock" style="flex-shrink:0;"></i><span><strong>${ocultadosPorPrazo.length} cliente${ocultadosPorPrazo.length !== 1 ? 's' : ''}</strong> ocultado${ocultadosPorPrazo.length !== 1 ? 's' : ''} — e-mail enviado há menos de 30 dias.</span>`;
+                } else {
+                    bannerOcultados.style.display = 'none';
+                }
 
                 const container = document.getElementById('lista-clientes-email-massa');
                 if (!container) return;
@@ -17114,7 +17146,7 @@ ${assinatura}`;
                 if (comEmail.length === 0) {
                     container.innerHTML = `<div style="padding:18px;text-align:center;color:var(--text-muted);font-size:0.85rem;">
                         <i class="fas fa-envelope-open" style="font-size:1.5rem;margin-bottom:8px;display:block;"></i>
-                        ${termo ? 'Nenhum cliente encontrado com esse filtro.' : 'Nenhum cliente com e-mail cadastrado.'}
+                        ${termo ? 'Nenhum cliente encontrado com esse filtro.' : ocultadosPorPrazo.length > 0 ? 'Todos os clientes já receberam e-mail nos últimos 30 dias.' : 'Nenhum cliente com e-mail cadastrado.'}
                     </div>`;
                     return;
                 }
@@ -17222,7 +17254,7 @@ ${assinatura}`;
                 }
             },
 
-            abrirClienteEmailMassa: () => {
+            abrirClienteEmailMassa: async () => {
                 // Adiciona email digitado no input antes de enviar
                 const inputExtra = document.getElementById('email-massa-input-extra');
                 if (inputExtra && inputExtra.value.trim()) {
@@ -17276,6 +17308,17 @@ ${assinatura}`;
                 document.body.appendChild(a);
                 a.click();
                 setTimeout(() => { if (document.body.contains(a)) document.body.removeChild(a); }, 300);
+
+                // Registra a data de envio em cada cliente para controle de 30 dias
+                const agoraIso = new Date().toISOString();
+                const clientesParaAtualizar = (UI.data.clientes || []).filter(c => emails.includes(c.email));
+                for (const cliente of clientesParaAtualizar) {
+                    cliente.ultimoEmailMassaEnviado = agoraIso;
+                    await DB.put('clientes', cliente);
+                }
+                if (clientesParaAtualizar.length > 0) {
+                    UI.data.clientes = await Storage.getClientes();
+                }
 
                 Utils.toast(`E-mail preparado para ${emails.length} destinatário${emails.length !== 1 ? 's' : ''}! Verifique seu cliente de e-mail.`, 'success');
             },
