@@ -6398,9 +6398,14 @@
             <div id="clientes-view" class="view">
                 <div class="section-title">
                     Clientes
-                    <button class="icon-btn" style="background: #25D366; color: white; border-radius: 8px; padding: 8px;" onclick="UI.openEnvioMassa()">
-                        <i class="fab fa-whatsapp"></i> Envio em Massa
-                    </button>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <button class="icon-btn" style="background: #25D366; color: white; border-radius: 8px; padding: 8px;" onclick="UI.openEnvioMassa()">
+                            <i class="fab fa-whatsapp"></i> Envio em Massa
+                        </button>
+                        <button class="icon-btn" style="background: var(--primary); color: white; border-radius: 8px; padding: 8px;" onclick="UI.openEnvioMassaEmail()">
+                            <i class="fas fa-envelope"></i> E-mail em Massa
+                        </button>
+                    </div>
                 </div>
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
@@ -9143,6 +9148,85 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <i class="fab fa-whatsapp"></i> Iniciar Envio
             </button>
             <button class="btn-block" style="background: rgba(255,255,255,0.08); color: var(--secondary); margin-top: 8px;" onclick="UI.closeModals()">Cancelar</button>
+        </div>
+
+        <!-- MODAL ENVIO EM MASSA EMAIL -->
+        <div class="modal-overlay" id="overlay-envio-massa-email" onclick="UI.closeModals()"></div>
+        <div class="modal-sheet" id="sheet-envio-massa-email">
+            <div class="sheet-handle"></div>
+            <h3 class="section-title">
+                <span><i class="fas fa-envelope" style="color:var(--primary);margin-right:6px;"></i>E-mail em Massa</span>
+                <span id="email-massa-badge" style="background:var(--primary-ultra);color:var(--primary);font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid var(--border-accent);">0 selecionados</span>
+            </h3>
+
+            <!-- Filtro e lista de clientes COM email -->
+            <div class="form-group">
+                <label class="form-label" style="display:flex;align-items:center;gap:6px;">
+                    <i class="fas fa-users" style="color:var(--primary);"></i> Clientes com e-mail cadastrado
+                    <span id="email-massa-total-tag" style="margin-left:auto;font-size:0.72rem;color:var(--text-secondary);font-weight:500;"></span>
+                </label>
+                <input type="text" class="form-control" placeholder="Filtrar por nome ou e-mail..." id="filtro-clientes-email-massa" oninput="UI.filtrarClientesEmailMassa()" style="margin-bottom:8px;">
+                <div style="max-height:240px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;" id="lista-clientes-email-massa"></div>
+                <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                    <button type="button" class="btn-sm btn-light" onclick="UI.selecionarTodosEmailMassa(true)" style="font-size:0.78rem;">
+                        <i class="fas fa-check-square"></i> Selecionar todos
+                    </button>
+                    <button type="button" class="btn-sm btn-light" onclick="UI.selecionarTodosEmailMassa(false)" style="font-size:0.78rem;">
+                        <i class="far fa-square"></i> Limpar seleção
+                    </button>
+                </div>
+            </div>
+
+            <!-- Campo Para: (destinatários) -->
+            <div class="form-group">
+                <label class="form-label" style="display:flex;align-items:center;gap:6px;">
+                    <i class="fas fa-paper-plane" style="color:var(--primary);"></i> Destinatários
+                </label>
+                <div id="email-massa-destinatarios-wrap" style="
+                    min-height:44px;
+                    border:1px solid var(--border-strong);
+                    border-radius:10px;
+                    padding:8px 10px;
+                    display:flex;
+                    flex-wrap:wrap;
+                    gap:6px;
+                    background:var(--bg-raised);
+                    cursor:text;
+                    align-items:flex-start;
+                " onclick="document.getElementById('email-massa-input-extra').focus()">
+                    <div id="email-massa-tags" style="display:flex;flex-wrap:wrap;gap:5px;width:100%;"></div>
+                    <input type="email" id="email-massa-input-extra" placeholder="Adicionar e-mail manualmente..." style="
+                        border:none;outline:none;background:transparent;
+                        font-size:0.83rem;color:var(--dark);
+                        min-width:180px;flex:1;padding:2px 4px;
+                        font-family:inherit;
+                    " onkeydown="UI.emailMassaInputKeydown(event)">
+                </div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">
+                    <i class="fas fa-info-circle"></i> Clientes selecionados são adicionados automaticamente. Pressione Enter ou vírgula para adicionar e-mails extras.
+                </div>
+            </div>
+
+            <!-- Assunto -->
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-tag" style="color:var(--primary);margin-right:4px;"></i> Assunto</label>
+                <input type="text" id="email-massa-assunto" class="form-control" placeholder="Ex: Novidades do mercado imobiliário para você!">
+            </div>
+
+            <!-- Corpo da mensagem -->
+            <div class="form-group">
+                <label class="form-label" style="display:flex;align-items:center;justify-content:space-between;">
+                    <span><i class="fas fa-align-left" style="color:var(--primary);margin-right:4px;"></i> Mensagem</span>
+                    <span style="font-size:0.72rem;color:var(--text-muted);font-weight:400;">Use {nome} para personalizar</span>
+                </label>
+                <textarea id="email-massa-corpo" class="form-control" rows="5" placeholder="Olá {nome}, tenho novidades incríveis no mercado imobiliário para você..."></textarea>
+            </div>
+
+            <!-- Botão Abrir Cliente de E-mail -->
+            <button class="btn-block" style="background:var(--primary);color:white;border:none;margin-bottom:8px;" onclick="UI.abrirClienteEmailMassa()">
+                <i class="fas fa-external-link-alt"></i> Abrir no cliente de e-mail (mailto:)
+            </button>
+            <button class="btn-block" style="background:rgba(255,255,255,0.08);color:var(--secondary);border:none;" onclick="UI.closeModals()">Cancelar</button>
         </div>
 
         <!-- MODAL NOTIFICAR LANÇAMENTO -->
@@ -16952,6 +17036,250 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     UI.enviarProximoCliente();
                 }, delay);
             },
+
+            // ═══════════════════════════════════════════════════
+            // ENVIO EM MASSA — E-MAIL
+            // ═══════════════════════════════════════════════════
+            _emailMassaEmailsSelecionados: new Set(),
+
+            openEnvioMassaEmail: async () => {
+                // Reseta estado
+                UI._emailMassaEmailsSelecionados = new Set();
+
+                // Busca dados do corretor nas configurações do sistema
+                const settings = await Storage.getSettings();
+                const nomeCorretor  = settings.nome        || 'Seu Nome';
+                const creci         = settings.creci       || '';
+                const telefone      = settings.telefone    || '';
+                const imobiliaria   = settings.imobiliaria || 'Nossa Imobiliária';
+                const emailCorretor = settings.email       || '';
+
+                // Monta assinatura com os dados reais
+                const cretiLinha  = creci     ? `🪪 CRECI: ${creci}\n`       : '';
+                const telLinha    = telefone  ? `📱 WhatsApp: ${telefone}\n`  : '';
+                const emailLinha  = emailCorretor ? `✉️ E-mail: ${emailCorretor}\n` : '';
+
+                const assinatura = [
+                    `──────────────────────`,
+                    `👤 ${nomeCorretor}`,
+                    `🏢 ${imobiliaria}`,
+                    creci     ? `🪪 CRECI: ${creci}`            : '',
+                    telefone  ? `📱 WhatsApp: ${telefone}`       : '',
+                    emailCorretor ? `✉️ ${emailCorretor}`        : '',
+                ].filter(Boolean).join('\n');
+
+                document.getElementById('email-massa-assunto').value =
+                    `🏡 Novidades do mercado imobiliário para você, {nome}!`;
+
+                document.getElementById('email-massa-corpo').value =
+`Olá {nome}! 👋
+
+Tudo bem? Espero que sim! 😊
+
+Me chamo ${nomeCorretor} e sou corretor(a) da ${imobiliaria}. Estou entrando em contato porque tenho novidades incríveis do mercado imobiliário que podem ser exatamente o que você procura! 🏠✨
+
+🔑 O que posso oferecer para você:
+• Imóveis selecionados conforme o seu perfil
+• Condições especiais de financiamento 💰
+• Atendimento personalizado e sem compromisso
+• Toda a segurança e suporte durante o processo
+
+📲 Que tal batermos um papo rápido? Estou à disposição para tirar todas as suas dúvidas e apresentar as melhores oportunidades do momento!
+
+${assinatura}`;
+
+                // Renderiza lista apenas com clientes que têm email
+                UI.filtrarClientesEmailMassa();
+                UI._renderTagsEmailMassa();
+                UI._atualizarBadgeEmailMassa();
+
+                UI.openModal('envio-massa-email');
+            },
+
+            filtrarClientesEmailMassa: () => {
+                const termo = (document.getElementById('filtro-clientes-email-massa')?.value || '').toLowerCase();
+                // Filtra APENAS clientes com email
+                const comEmail = (UI.data.clientes || []).filter(c =>
+                    c.email && c.email.trim() !== '' &&
+                    (c.nome.toLowerCase().includes(termo) || c.email.toLowerCase().includes(termo))
+                );
+
+                const totalTag = document.getElementById('email-massa-total-tag');
+                const totalComEmail = (UI.data.clientes || []).filter(c => c.email && c.email.trim() !== '').length;
+                if (totalTag) totalTag.textContent = `${totalComEmail} cliente(s) com e-mail`;
+
+                const container = document.getElementById('lista-clientes-email-massa');
+                if (!container) return;
+
+                if (comEmail.length === 0) {
+                    container.innerHTML = `<div style="padding:18px;text-align:center;color:var(--text-muted);font-size:0.85rem;">
+                        <i class="fas fa-envelope-open" style="font-size:1.5rem;margin-bottom:8px;display:block;"></i>
+                        ${termo ? 'Nenhum cliente encontrado com esse filtro.' : 'Nenhum cliente com e-mail cadastrado.'}
+                    </div>`;
+                    return;
+                }
+
+                container.innerHTML = comEmail.map(c => {
+                    const sel = UI._emailMassaEmailsSelecionados.has(c.email);
+                    return `<label class="client-select-item" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);" for="cb-email-massa-${c.id}">
+                        <input type="checkbox" id="cb-email-massa-${c.id}" class="cliente-email-checkbox"
+                            data-id="${c.id}" data-nome="${c.nome}" data-email="${c.email}"
+                            ${sel ? 'checked' : ''}
+                            onchange="UI._onEmailMassaCheckChange(this)"
+                            style="width:16px;height:16px;accent-color:var(--primary);flex-shrink:0;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:600;font-size:0.88rem;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nome}</div>
+                            <div style="font-size:0.78rem;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><i class="fas fa-envelope" style="margin-right:3px;"></i>${c.email}</div>
+                        </div>
+                    </label>`;
+                }).join('');
+            },
+
+            _onEmailMassaCheckChange: (cb) => {
+                const email = cb.dataset.email;
+                if (cb.checked) {
+                    UI._emailMassaEmailsSelecionados.add(email);
+                } else {
+                    UI._emailMassaEmailsSelecionados.delete(email);
+                }
+                UI._renderTagsEmailMassa();
+                UI._atualizarBadgeEmailMassa();
+            },
+
+            selecionarTodosEmailMassa: (selecionar) => {
+                document.querySelectorAll('#lista-clientes-email-massa .cliente-email-checkbox').forEach(cb => {
+                    cb.checked = selecionar;
+                    const email = cb.dataset.email;
+                    if (selecionar) {
+                        UI._emailMassaEmailsSelecionados.add(email);
+                    } else {
+                        UI._emailMassaEmailsSelecionados.delete(email);
+                    }
+                });
+                UI._renderTagsEmailMassa();
+                UI._atualizarBadgeEmailMassa();
+            },
+
+            _renderTagsEmailMassa: () => {
+                const tagsContainer = document.getElementById('email-massa-tags');
+                if (!tagsContainer) return;
+                // Agrupa: emails de clientes selecionados + extras digitados manualmente
+                const allEmails = Array.from(UI._emailMassaEmailsSelecionados);
+                tagsContainer.innerHTML = allEmails.map(email => {
+                    // Tenta achar o nome do cliente
+                    const cliente = (UI.data.clientes || []).find(c => c.email === email);
+                    const label = cliente ? `${cliente.nome.split(' ')[0]} <${email}>` : email;
+                    return `<span style="
+                        display:inline-flex;align-items:center;gap:5px;
+                        background:var(--primary-ultra);color:var(--primary);
+                        border:1px solid var(--border-accent);
+                        border-radius:99px;padding:3px 10px 3px 10px;
+                        font-size:0.76rem;font-weight:600;white-space:nowrap;
+                    ">
+                        <i class="fas fa-user" style="font-size:0.65rem;opacity:0.7;"></i>
+                        ${label}
+                        <button onclick="UI._removerTagEmail('${email}')" style="
+                            background:none;border:none;cursor:pointer;color:var(--primary);
+                            font-size:0.85rem;padding:0 2px;line-height:1;margin-left:2px;
+                        " title="Remover">×</button>
+                    </span>`;
+                }).join('');
+            },
+
+            _removerTagEmail: (email) => {
+                UI._emailMassaEmailsSelecionados.delete(email);
+                // Desmarca checkbox se existir
+                const cbs = document.querySelectorAll('#lista-clientes-email-massa .cliente-email-checkbox');
+                cbs.forEach(cb => { if (cb.dataset.email === email) cb.checked = false; });
+                UI._renderTagsEmailMassa();
+                UI._atualizarBadgeEmailMassa();
+            },
+
+            emailMassaInputKeydown: (e) => {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    const input = document.getElementById('email-massa-input-extra');
+                    const val = input.value.trim().replace(/,$/, '');
+                    if (val && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+                        UI._emailMassaEmailsSelecionados.add(val);
+                        UI._renderTagsEmailMassa();
+                        UI._atualizarBadgeEmailMassa();
+                        input.value = '';
+                    } else if (val) {
+                        Utils.toast('E-mail inválido', 'error');
+                    }
+                }
+            },
+
+            _atualizarBadgeEmailMassa: () => {
+                const badge = document.getElementById('email-massa-badge');
+                if (badge) {
+                    const n = UI._emailMassaEmailsSelecionados.size;
+                    badge.textContent = `${n} selecionado${n !== 1 ? 's' : ''}`;
+                    badge.style.background = n > 0 ? 'var(--accent-ultra)' : 'var(--primary-ultra)';
+                    badge.style.color = n > 0 ? 'var(--accent-dark)' : 'var(--primary)';
+                    badge.style.borderColor = n > 0 ? 'var(--accent)' : 'var(--border-accent)';
+                }
+            },
+
+            abrirClienteEmailMassa: () => {
+                // Adiciona email digitado no input antes de enviar
+                const inputExtra = document.getElementById('email-massa-input-extra');
+                if (inputExtra && inputExtra.value.trim()) {
+                    const val = inputExtra.value.trim();
+                    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+                        UI._emailMassaEmailsSelecionados.add(val);
+                        inputExtra.value = '';
+                    }
+                }
+
+                if (UI._emailMassaEmailsSelecionados.size === 0) {
+                    Utils.toast('Selecione pelo menos um cliente ou adicione um e-mail', 'error');
+                    return;
+                }
+
+                const assunto = document.getElementById('email-massa-assunto').value.trim() || 'Novidades para você!';
+                const corpo = document.getElementById('email-massa-corpo').value.trim();
+                const emails = Array.from(UI._emailMassaEmailsSelecionados);
+
+                // Monta mailto: com BCC para não expor os contatos
+                // Para personalização com {nome} usamos o primeiro email como "to" e os restantes em BCC
+                // Se só 1 cliente, personaliza {nome}
+                let corpoFinal = corpo;
+                let assuntoFinal = assunto;
+                if (emails.length === 1) {
+                    const c = (UI.data.clientes || []).find(cl => cl.email === emails[0]);
+                    if (c) {
+                        const primeiro = c.nome.split(' ')[0];
+                        corpoFinal   = corpo.replace(/{nome}/g, primeiro);
+                        assuntoFinal = assunto.replace(/{nome}/g, primeiro);
+                    }
+                } else {
+                    corpoFinal   = corpo.replace(/{nome}/g, 'cliente');
+                    assuntoFinal = assunto.replace(/{nome}/g, 'você');
+                }
+
+                const to = emails[0];
+                const bcc = emails.slice(1).join(',');
+                const params = [
+                    `subject=${encodeURIComponent(assuntoFinal)}`,
+                    `body=${encodeURIComponent(corpoFinal)}`,
+                    bcc ? `bcc=${encodeURIComponent(bcc)}` : ''
+                ].filter(Boolean).join('&');
+
+                const mailto = `mailto:${to}?${params}`;
+
+                // Abre o cliente de email
+                const a = document.createElement('a');
+                a.href = mailto;
+                a.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => { if (document.body.contains(a)) document.body.removeChild(a); }, 300);
+
+                Utils.toast(`E-mail preparado para ${emails.length} destinatário${emails.length !== 1 ? 's' : ''}! Verifique seu cliente de e-mail.`, 'success');
+            },
+            // ═══════════════════════════════════════════════════
 
             verificarLancamentos: () => {
                 const hoje = Utils.getToday();
