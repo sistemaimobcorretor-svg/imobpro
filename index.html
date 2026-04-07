@@ -2505,6 +2505,168 @@
         }
         .schedule-card:active { transform: scale(0.97); box-shadow: var(--shadow-md); }
 
+        /* ===== EVENTOS ATRASADOS ===== */
+        .schedule-card.schedule-overdue {
+            border-left-color: #E74C3C !important;
+            background: #FFF8F7 !important;
+            border-top-color: rgba(231,76,60,0.15) !important;
+            border-right-color: rgba(231,76,60,0.15) !important;
+            border-bottom-color: rgba(231,76,60,0.15) !important;
+            animation: overduePulse 2.5s ease-in-out infinite;
+        }
+        @keyframes overduePulse {
+            0%, 100% { box-shadow: 0 4px 16px rgba(231,76,60,0.10); }
+            50%       { box-shadow: 0 4px 22px rgba(231,76,60,0.28); }
+        }
+        .badge-overdue {
+            background: #E74C3C;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 99px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            animation: blinkBadge 1.4s step-start infinite;
+        }
+        @keyframes blinkBadge { 0%,100%{opacity:1} 50%{opacity:0.55} }
+
+        /* Banner de alertas atrasados no topo da agenda */
+        .agenda-overdue-banner {
+            background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(231,76,60,0.30);
+            transition: transform 0.18s;
+        }
+        .agenda-overdue-banner:active { transform: scale(0.98); }
+        .agenda-overdue-banner-icon {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0;
+        }
+        .agenda-overdue-banner-text { flex: 1; }
+        .agenda-overdue-banner-title { font-size: 0.88rem; font-weight: 800; color: #fff; margin-bottom: 2px; }
+        .agenda-overdue-banner-sub   { font-size: 0.75rem; color: rgba(255,255,255,0.80); }
+        .agenda-overdue-banner-count {
+            font-size: 1.6rem; font-weight: 900; color: #fff;
+            background: rgba(255,255,255,0.20);
+            border-radius: 10px;
+            width: 46px; height: 46px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ===== PAINEL MERCADO IMOBILIÁRIO ===== */
+        .market-panel {
+            background: #FFFFFF;
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+        }
+        .market-panel-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .market-panel-title {
+            font-size: 0.92rem; font-weight: 800; color: var(--dark);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .market-panel-title .live-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent);
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+        @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.55;transform:scale(1.3)} }
+        .market-panel-refresh {
+            background: none; border: none; cursor: pointer;
+            color: var(--text-muted); font-size: 0.85rem; padding: 6px;
+            border-radius: 8px; transition: 0.2s;
+        }
+        .market-panel-refresh:hover { background: var(--primary-ultra); color: var(--primary); }
+        .market-panel-refresh.spinning i { animation: spin 1s linear infinite; }
+        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        .market-panel-updated {
+            font-size: 0.68rem; color: var(--text-muted); margin-bottom: 12px;
+        }
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .market-item {
+            background: var(--bg-base);
+            border-radius: var(--radius-sm);
+            padding: 12px 10px;
+            display: flex; flex-direction: column; gap: 3px;
+            border: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+        .market-item:hover { background: var(--primary-ultra); }
+        .market-item-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .market-item-value { font-size: 1.05rem; font-weight: 900; color: var(--dark); }
+        .market-item-sub   { font-size: 0.7rem; color: var(--text-secondary); display: flex; align-items: center; gap: 3px; }
+        .market-item-sub.up   { color: var(--success); }
+        .market-item-sub.down { color: var(--danger); }
+        .market-ticker {
+            background: var(--primary-ultra);
+            border-radius: 8px;
+            padding: 10px 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        .market-ticker-inner {
+            display: flex; gap: 24px;
+            animation: ticker 30s linear infinite;
+            white-space: nowrap;
+        }
+        @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+        .market-ticker-item {
+            font-size: 0.75rem; font-weight: 600; color: var(--primary);
+            display: inline-flex; align-items: center; gap: 5px;
+            flex-shrink: 0;
+        }
+        .market-ticker-item .t-val { font-weight: 800; color: var(--dark); }
+        .market-ticker-item .t-up  { color: var(--success); }
+        .market-ticker-item .t-dn  { color: var(--danger); }
+        .market-loading {
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 20px; color: var(--text-muted); font-size: 0.85rem;
+        }
+        .market-loading i { animation: spin 1s linear infinite; }
+        .market-error {
+            text-align: center; padding: 16px; color: var(--text-muted); font-size: 0.82rem;
+        }
+        .market-selic-highlight {
+            background: linear-gradient(135deg, var(--primary-ultra) 0%, #EBF4FB 100%);
+            border: 1px solid var(--border-accent);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 10px;
+        }
+        .market-selic-icon {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; flex-shrink: 0;
+        }
+        .market-selic-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .market-selic-value { font-size: 1.35rem; font-weight: 900; color: var(--primary); line-height: 1; }
+        .market-selic-sub   { font-size: 0.7rem; color: var(--text-secondary); margin-top: 1px; }
+
         /* ===== COACH PANEL STYLES ===== */
         .coach-hero {
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
@@ -5039,6 +5201,7 @@
         .dash-nav-card.c-agenda   { background: linear-gradient(135deg, #7C3AED 0%, #9D5CEA 100%); box-shadow: 0 4px 16px rgba(124,58,237,0.28); }
         .dash-nav-card.c-links    { background: linear-gradient(135deg, #0E7490 0%, #0891B2 100%); box-shadow: 0 4px 16px rgba(8,145,178,0.28); }
         .dash-nav-card.c-relat    { background: linear-gradient(135deg, #065F46 0%, #059669 100%); box-shadow: 0 4px 16px rgba(5,150,105,0.28); }
+        .dash-nav-card.c-mercado  { background: linear-gradient(135deg, #155A8A 0%, #1D6FA4 100%); box-shadow: 0 4px 16px rgba(29,111,164,0.30); }
         .dash-nav-card.c-leitura  { background: linear-gradient(135deg, #92400E 0%, #D97706 100%); box-shadow: 0 4px 16px rgba(217,119,6,0.28); }
         .dash-nav-card.c-notas    { background: linear-gradient(135deg, #831843 0%, #DB2777 100%); box-shadow: 0 4px 16px rgba(219,39,119,0.28); }
 
@@ -6374,6 +6537,15 @@
                         <i class="fas fa-chevron-right dash-nav-arrow"></i>
                     </div>
 
+                    <div class="dash-nav-card c-mercado" onclick="UI.navigate('mercado')">
+                        <div class="dash-nav-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Mercado</span>
+                            <span class="dash-nav-sub">Indicadores em tempo real</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
                     <div class="dash-nav-card c-leitura" onclick="UI.navigateLeitura()">
                         <div class="dash-nav-icon"><i class="fas fa-book-open"></i></div>
                         <div class="dash-nav-text">
@@ -6527,6 +6699,9 @@
                     Agenda
                 </div>
 
+                <!-- Banner de eventos atrasados -->
+                <div id="agenda-overdue-banner" style="display:none" onclick="UI.scrollToOverdue()"></div>
+
                 <!-- Calendar Widget -->
                 <div class="calendar-container">
                     <div class="calendar-header">
@@ -6621,6 +6796,21 @@
                 </div>
                 <div id="funil-clientes-list"></div>
             </div>
+
+            <!-- ===== MERCADO IMOBILIÁRIO VIEW ===== -->
+            <div id="mercado-view" class="view">
+                <div class="section-title">
+                    <span><i class="fas fa-chart-line" style="color:var(--primary);margin-right:8px;"></i>Mercado Imobiliário</span>
+                    <button class="market-panel-refresh" id="market-refresh-btn" onclick="MarketPanel.load(true)" title="Atualizar dados">
+                        <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                </div>
+
+                <div id="market-panel-body">
+                    <div class="market-loading"><i class="fas fa-circle-notch"></i> Carregando dados...</div>
+                </div>
+            </div>
+
 
             <div id="links-view" class="view">
                 <div class="section-title">
@@ -7975,6 +8165,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <button class="nav-panel-item" data-target="financeiro-view" onclick="UI.switchTab(this);Financeiro.init();UI.closeNavDrawer();return false;">
                     <i class="fas fa-wallet"></i> Financeiro
                 </button>
+                <button class="nav-panel-item" data-target="mercado-view" onclick="UI.switchTab(this);MarketPanel.load(false);UI.closeNavDrawer();return false;">
+                    <i class="fas fa-chart-line"></i> Mercado
+                </button>
             </div>
         </div>
 
@@ -8041,6 +8234,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </button>
                 <button class="nav-panel-item" data-target="financeiro-view" onclick="UI.switchTab(this);Financeiro.init();return false;">
                     <i class="fas fa-wallet"></i> Financeiro
+                </button>
+                <button class="nav-panel-item" data-target="mercado-view" onclick="UI.switchTab(this);MarketPanel.load(false);return false;">
+                    <i class="fas fa-chart-line"></i> Mercado
                 </button>
             </div>
         </nav>
@@ -13116,6 +13312,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 } else if (target === 'simulador-view') {
                     container.style.display = 'none';
                     Simulador.init();
+                } else if (target === 'mercado-view') {
+                    container.style.display = 'none';
+                    MarketPanel.load(false);
                 } else {
                     container.style.display = 'none';
                 }
@@ -13823,21 +14022,26 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             createVisitaCard: (v) => {
                 const cliente = UI.data.clientes.find(c => c.id === v.clienteId);
                 const clienteNome = cliente ? cliente.nome : '';
-                const telefoneCliente = cliente ? cliente.telefone : '';
                 const imovel = UI.data.imoveis.find(i => i.id === v.imovelId) || { titulo: 'Imóvel não especificado' };
-                
-                const isUrgent = v.status === 'agendado' && v.data === Utils.getToday();
+
+                const _today = Utils.getToday();
+                const _nowStr = new Date().toTimeString().slice(0,5);
+                const isOverdue = v.status === 'agendado' && (
+                    v.data < _today ||
+                    (v.data === _today && v.horario && v.horario < _nowStr)
+                );
+                const isUrgent = v.status === 'agendado' && v.data === _today && !isOverdue;
                 const tipoClass = v.tipo || 'visita';
-                
+
                 let additionalInfo = '';
-                if(v.tipo === 'plantao' && v.detalhesPlantoes) {
-                    additionalInfo = `<div class="plantoes-summary">${v.detalhesPlantoes.substring(0, 60)}${v.detalhesPlantoes.length > 60 ? '...' : ''}</div>`;
-                } else if(v.tipo === 'reuniao-construtor' && v.construtorNome) {
-                    additionalInfo = `<div class="schedule-notes">Com: ${v.construtorNome}</div>`;
-                } else if(v.tipo === 'reuniao-equipe' && v.equipeTipo) {
-                    additionalInfo = `<div class="schedule-notes">${v.equipeTipo}</div>`;
+                if (v.tipo === 'plantao' && v.detalhesPlantoes) {
+                    additionalInfo = '<div class="plantoes-summary">' + v.detalhesPlantoes.substring(0, 60) + (v.detalhesPlantoes.length > 60 ? '...' : '') + '</div>';
+                } else if (v.tipo === 'reuniao-construtor' && v.construtorNome) {
+                    additionalInfo = '<div class="schedule-notes">Com: ' + v.construtorNome + '</div>';
+                } else if (v.tipo === 'reuniao-equipe' && v.equipeTipo) {
+                    additionalInfo = '<div class="schedule-notes">' + v.equipeTipo + '</div>';
                 }
-                
+
                 let displayTitle = '';
                 if (cliente) {
                     displayTitle = clienteNome;
@@ -13852,31 +14056,51 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     else if (v.tipo === 'documentacao') displayTitle = 'Documentação';
                     else displayTitle = 'Agendamento';
                 }
-                
-                const whatsappBtn = '';
-                
-                return `
-                    <div class="schedule-card ${tipoClass} ${isUrgent ? 'schedule-urgent' : ''}" onclick="App.agenda.edit('${v.id}')">
-                        <div class="schedule-header">
-                            <div class="schedule-type ${tipoClass}">${Utils.getTipoVisitaText(v.tipo)}</div>
-                            <span class="badge ${v.status === 'realizado' ? 'badge-success' : v.status === 'cancelado' ? 'badge-danger' : v.status === 'confirmado' ? 'badge-cyan' : 'badge-primary'}">
-                                ${Utils.getStatusVisitaText(v.status)}
-                            </span>
-                        </div>
-                        <div class="schedule-time">
-                            <i class="far fa-calendar"></i> ${Utils.formatDate(v.data)} <i class="far fa-clock"></i> ${v.horario}
-                        </div>
-                        <div class="schedule-title">
-                            ${displayTitle}
-                        </div>
-                        ${additionalInfo}
-                        <div class="schedule-notes">
-                            ${v.tipo === 'visita' ? `Visita: ${imovel.titulo.substring(0, 30)}...` : 
-                             v.observacoes ? v.observacoes.substring(0, 50) + (v.observacoes.length > 50 ? '...' : '') : ''}
-                        </div>
 
-                    </div>
-                `;
+                // Badge de status — sem template aninhada
+                let statusBadge;
+                if (isOverdue) {
+                    statusBadge = '<span class="badge-overdue"><i class="fas fa-exclamation-triangle"></i> ATRASADO</span>';
+                } else {
+                    let badgeCls = 'badge-primary';
+                    if (v.status === 'realizado')  badgeCls = 'badge-success';
+                    else if (v.status === 'cancelado') badgeCls = 'badge-danger';
+                    else if (v.status === 'confirmado') badgeCls = 'badge-cyan';
+                    statusBadge = '<span class="badge ' + badgeCls + '">' + Utils.getStatusVisitaText(v.status) + '</span>';
+                }
+
+                // Aviso de atraso
+                const overdueWarning = isOverdue
+                    ? '<div style="font-size:0.72rem;color:#E74C3C;font-weight:700;margin-bottom:4px;"><i class="fas fa-clock"></i> Previsto: ' + Utils.formatDate(v.data) + ' às ' + v.horario + ' — não realizado</div>'
+                    : '';
+
+                // Tempo riscado se atrasado
+                const timeStyle = isOverdue ? ' style="text-decoration:line-through;opacity:0.6;"' : '';
+
+                // Nota do card
+                let cardNote = '';
+                if (v.tipo === 'visita') {
+                    cardNote = 'Visita: ' + imovel.titulo.substring(0, 30) + (imovel.titulo.length > 30 ? '...' : '');
+                } else if (v.observacoes) {
+                    cardNote = v.observacoes.substring(0, 50) + (v.observacoes.length > 50 ? '...' : '');
+                }
+
+                const cardClass = 'schedule-card ' + tipoClass + (isOverdue ? ' schedule-overdue' : isUrgent ? ' schedule-urgent' : '');
+                const overdueAttr = isOverdue ? ' data-overdue="true"' : '';
+
+                return `<div class="${cardClass}"${overdueAttr} onclick="App.agenda.edit('${v.id}')">` +
+                    `<div class="schedule-header">` +
+                    `<div class="schedule-type ${tipoClass}">${Utils.getTipoVisitaText(v.tipo)}</div>` +
+                    statusBadge +
+                    `</div>` +
+                    overdueWarning +
+                    `<div class="schedule-time"${timeStyle}>` +
+                    `<i class="far fa-calendar"></i> ${Utils.formatDate(v.data)} <i class="far fa-clock"></i> ${v.horario}` +
+                    `</div>` +
+                    `<div class="schedule-title">${displayTitle}</div>` +
+                    additionalInfo +
+                    `<div class="schedule-notes">${cardNote}</div>` +
+                    `</div>`;
             },
 
             createNegociacaoCard: (i) => {
@@ -15313,10 +15537,43 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 
                 const selectedDate = UI.calendarSelectedDate;
                 const ft = UI.currentAgendaFilter;
+                const todayStr = Utils.getToday();
+                const nowStr = new Date().toTimeString().slice(0,5);
                 
                 let visitasFiltradas = UI.data.visitas;
                 if(ft && ft !== 'todos') {
                     visitasFiltradas = visitasFiltradas.filter(v => v.tipo === ft);
+                }
+
+                // ── Banner de eventos atrasados (TODOS os agendamentos, não só o dia selecionado) ──
+                const atrasados = UI.data.visitas.filter(v =>
+                    v.status === 'agendado' && (
+                        v.data < todayStr ||
+                        (v.data === todayStr && v.horario && v.horario < nowStr)
+                    )
+                );
+                const banner = document.getElementById('agenda-overdue-banner');
+                if (banner) {
+                    if (atrasados.length > 0) {
+                        const oldest = atrasados.reduce((a, b) => a.data < b.data ? a : b);
+                        const diasAtraso = Math.max(0, Math.floor((new Date(todayStr) - new Date(oldest.data + 'T00:00:00')) / 86400000));
+                        banner.innerHTML = `
+                            <div class="agenda-overdue-banner">
+                                <div class="agenda-overdue-banner-icon">⚠️</div>
+                                <div class="agenda-overdue-banner-text">
+                                    <div class="agenda-overdue-banner-title">Eventos não realizados</div>
+                                    <div class="agenda-overdue-banner-sub">
+                                        ${atrasados.length === 1 ? '1 agendamento atrasado' : atrasados.length + ' agendamentos atrasados'}
+                                        ${diasAtraso > 0 ? '· mais antigo há ' + diasAtraso + ' dia' + (diasAtraso > 1 ? 's' : '') : '· hoje'}
+                                    </div>
+                                </div>
+                                <div class="agenda-overdue-banner-count">${atrasados.length}</div>
+                            </div>
+                        `;
+                        banner.style.display = 'block';
+                    } else {
+                        banner.style.display = 'none';
+                    }
                 }
                 
                 // Show events for the selected day
@@ -15327,7 +15584,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 const dateLabel = new Date(selectedDate + 'T12:00:00').toLocaleDateString('pt-BR', { 
                     weekday: 'long', day: 'numeric', month: 'long' 
                 });
-                const isToday = selectedDate === Utils.getToday();
+                const isToday = selectedDate === todayStr;
 
                 let html = `
                     <div class="calendar-selected-date">
@@ -15351,6 +15608,30 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 }
 
                 list.innerHTML = html;
+            },
+
+            scrollToOverdue: () => {
+                // Encontra o primeiro evento atrasado e navega ao dia
+                const todayStr = Utils.getToday();
+                const nowStr = new Date().toTimeString().slice(0,5);
+                const atrasados = UI.data.visitas.filter(v =>
+                    v.status === 'agendado' && (
+                        v.data < todayStr ||
+                        (v.data === todayStr && v.horario && v.horario < nowStr)
+                    )
+                ).sort((a,b) => a.data.localeCompare(b.data) || a.horario.localeCompare(b.horario));
+                if (atrasados.length > 0) {
+                    UI.calendarSelectedDate = atrasados[0].data;
+                    // Ajusta mês/ano do calendário se necessário
+                    const d = new Date(atrasados[0].data + 'T12:00:00');
+                    UI.calendarMonth = d.getMonth();
+                    UI.calendarYear = d.getFullYear();
+                    UI.renderAgenda();
+                    setTimeout(() => {
+                        const first = document.querySelector('[data-overdue="true"]');
+                        if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 180);
+                }
             },
 
             renderCalendar: () => {
@@ -29877,6 +30158,262 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
         };
 
         </script>
+
+    <!-- ===== MARKET PANEL — Mercado Imobiliário em Tempo Real ===== -->
+    <script>
+    const MarketPanel = (() => {
+        // Cache em memória
+        let _cache = null;
+        let _cacheTs = 0;
+        const CACHE_TTL = 10 * 60 * 1000; // 10 minutos
+
+        // APIs públicas gratuitas:
+        // 1. BACEN SGS — Selic, IPCA, TR (Banco Central do Brasil)
+        // 2. AwesomeAPI — cotações de moedas em tempo real (CORS livre)
+        // 3. BACEN SGS — INCC (Índice Nacional de Custo da Construção)
+
+        const BACEN_URL = id =>
+            `https://api.bcb.gov.br/dados/serie/bcdata.sgs.${id}/dados/ultimos/2?formato=json`;
+
+        const CURRENCY_URL =
+            'https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL';
+
+        // Séries SGS do Banco Central
+        const SGS = {
+            SELIC_META : 432,   // Taxa Selic meta (% a.a.)
+            IPCA_MES   : 433,   // IPCA variação mensal
+            TR_MES     : 226,   // TR mensal
+            INCC_MES   : 192,   // INCC mensal
+            IGPM_MES   : 189,   // IGP-M mensal
+        };
+
+        async function fetchSGS(id) {
+            try {
+                const r = await fetch(BACEN_URL(id), { signal: AbortSignal.timeout(8000) });
+                if (!r.ok) throw new Error('status ' + r.status);
+                const data = await r.json();
+                // Retorna último e penúltimo valor
+                return {
+                    last: parseFloat(data[data.length - 1]?.valor?.replace(',', '.') ?? '0'),
+                    prev: parseFloat(data[data.length - 2]?.valor?.replace(',', '.') ?? '0'),
+                    date: data[data.length - 1]?.data ?? ''
+                };
+            } catch {
+                return null;
+            }
+        }
+
+        async function fetchCurrency() {
+            try {
+                const r = await fetch(CURRENCY_URL, { signal: AbortSignal.timeout(8000) });
+                if (!r.ok) throw new Error('status ' + r.status);
+                return await r.json();
+            } catch {
+                return null;
+            }
+        }
+
+        async function loadData() {
+            const [selic, ipca, tr, incc, igpm, fx] = await Promise.all([
+                fetchSGS(SGS.SELIC_META),
+                fetchSGS(SGS.IPCA_MES),
+                fetchSGS(SGS.TR_MES),
+                fetchSGS(SGS.INCC_MES),
+                fetchSGS(SGS.IGPM_MES),
+                fetchCurrency()
+            ]);
+            return { selic, ipca, tr, incc, igpm, fx };
+        }
+
+        function fmt(v, dec = 2) {
+            if (v === null || v === undefined || isNaN(v)) return '—';
+            return v.toFixed(dec).replace('.', ',');
+        }
+
+        function trend(last, prev) {
+            if (last === null || prev === null) return { icon: '', cls: '' };
+            if (last > prev) return { icon: '▲', cls: 'up' };
+            if (last < prev) return { icon: '▼', cls: 'down' };
+            return { icon: '→', cls: '' };
+        }
+
+        function renderPanel(data, forceRefresh) {
+            const body = document.getElementById('market-panel-body');
+            if (!body) return;
+
+            const { selic, ipca, tr, incc, igpm, fx } = data;
+            const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            const usd = fx?.USDBRL;
+            const eur = fx?.EURBRL;
+
+            const selicTrend  = trend(selic?.last, selic?.prev);
+            const ipcaTrend   = trend(ipca?.last,  ipca?.prev);
+            const inccTrend   = trend(incc?.last,  incc?.prev);
+            const igpmTrend   = trend(igpm?.last,  igpm?.prev);
+
+            // Cálculo simplificado de parcela SAC para financiamento típico
+            // R$300.000 / 360 meses, taxa = Selic + spread bancário típico ~3,5% a.a.
+            const selicVal = selic?.last ?? 13.75;
+            const taxaFin  = (selicVal + 3.5) / 100 / 12;
+            const saldo    = 300000;
+            const parcelas = 360;
+            const primeiraParc = saldo / parcelas + saldo * taxaFin;
+
+            // Índice de aquecimento do mercado (heurística baseada em Selic e IPCA)
+            let heatScore = 50;
+            if (selicVal < 10) heatScore += 20;
+            else if (selicVal < 13) heatScore += 10;
+            else if (selicVal > 14) heatScore -= 15;
+            if (ipca?.last < 0.5) heatScore += 10;
+            else if (ipca?.last > 1) heatScore -= 10;
+            heatScore = Math.max(0, Math.min(100, heatScore));
+            const heatLabel = heatScore >= 65 ? 'Aquecido 🔥' : heatScore >= 40 ? 'Estável 📊' : 'Retraído ❄️';
+            const heatColor = heatScore >= 65 ? 'var(--success)' : heatScore >= 40 ? 'var(--warning)' : 'var(--danger)';
+
+            // Ticker data — duplicado para loop contínuo
+            const tickerItems = [
+                usd  ? `💵 USD/BRL <span class="t-val">R$ ${parseFloat(usd.bid).toFixed(4).replace('.',',')}</span>` : null,
+                eur  ? `💶 EUR/BRL <span class="t-val">R$ ${parseFloat(eur.bid).toFixed(4).replace('.',',')}</span>` : null,
+                selic ? `🏦 Selic <span class="t-val">${fmt(selic.last)}% a.a.</span>` : null,
+                ipca  ? `📈 IPCA/mês <span class="t-val">${fmt(ipca.last)}%</span>` : null,
+                incc  ? `🏗️ INCC/mês <span class="t-val">${fmt(incc.last)}%</span>` : null,
+                igpm  ? `📉 IGP-M/mês <span class="t-val">${fmt(igpm.last)}%</span>` : null,
+                tr    ? `📊 TR/mês <span class="t-val">${fmt(tr.last, 4)}%</span>` : null,
+            ].filter(Boolean);
+            const tickerHTML = [...tickerItems, ...tickerItems]
+                .map(t => `<span class="market-ticker-item">${t}</span>`)
+                .join('<span class="market-ticker-item" style="opacity:0.3">|</span>');
+
+            body.innerHTML = `
+                <div class="market-panel-updated">
+                    <i class="fas fa-satellite-dish" style="color:var(--accent);margin-right:4px;"></i>
+                    Atualizado às ${now} · Fontes: Banco Central do Brasil · AwesomeAPI
+                </div>
+
+                <!-- Selic destaque -->
+                <div class="market-selic-highlight">
+                    <div class="market-selic-icon"><i class="fas fa-landmark"></i></div>
+                    <div>
+                        <div class="market-selic-label">Taxa Selic (meta) — Banco Central</div>
+                        <div class="market-selic-value">${selic ? fmt(selic.last) + '% a.a.' : '—'}</div>
+                        <div class="market-selic-sub">
+                            ${selic ? ('Mês anterior: ' + fmt(selic.prev) + '% · Tendência: <span class="' + selicTrend.cls + '" style="font-weight:700;">' + selicTrend.icon + '</span>') : 'Indisponível'}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid indicadores -->
+                <div class="market-grid">
+                    <div class="market-item">
+                        <div class="market-item-label">IPCA mensal</div>
+                        <div class="market-item-value">${ipca ? fmt(ipca.last) + '%' : '—'}</div>
+                        <div class="market-item-sub ${ipcaTrend.cls}">${ipcaTrend.icon} ref. ${ipca?.date ?? ''}</div>
+                    </div>
+                    <div class="market-item">
+                        <div class="market-item-label">INCC mensal</div>
+                        <div class="market-item-value">${incc ? fmt(incc.last) + '%' : '—'}</div>
+                        <div class="market-item-sub ${inccTrend.cls}">${inccTrend.icon} ref. ${incc?.date ?? ''}</div>
+                    </div>
+                    <div class="market-item">
+                        <div class="market-item-label">IGP-M mensal</div>
+                        <div class="market-item-value">${igpm ? fmt(igpm.last) + '%' : '—'}</div>
+                        <div class="market-item-sub ${igpmTrend.cls}">${igpmTrend.icon} ref. ${igpm?.date ?? ''}</div>
+                    </div>
+                    <div class="market-item">
+                        <div class="market-item-label">TR mensal</div>
+                        <div class="market-item-value">${tr ? fmt(tr.last, 4) + '%' : '—'}</div>
+                        <div class="market-item-sub">Base FGTS / Poupança</div>
+                    </div>
+                    <div class="market-item">
+                        <div class="market-item-label">Dólar (USD/BRL)</div>
+                        <div class="market-item-value">${usd ? 'R$ ' + parseFloat(usd.bid).toFixed(2).replace('.',',') : '—'}</div>
+                        <div class="market-item-sub ${parseFloat(usd?.varBid??0) >= 0 ? 'up':'down'}">
+                            ${usd ? (parseFloat(usd.varBid) >= 0 ? '▲' : '▼') + ' ' + parseFloat(usd.varBid).toFixed(2).replace('.',',') + '%' : ''}
+                        </div>
+                    </div>
+                    <div class="market-item">
+                        <div class="market-item-label">Euro (EUR/BRL)</div>
+                        <div class="market-item-value">${eur ? 'R$ ' + parseFloat(eur.bid).toFixed(2).replace('.',',') : '—'}</div>
+                        <div class="market-item-sub ${parseFloat(eur?.varBid??0) >= 0 ? 'up':'down'}">
+                            ${eur ? (parseFloat(eur.varBid) >= 0 ? '▲' : '▼') + ' ' + parseFloat(eur.varBid).toFixed(2).replace('.',',') + '%' : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financiamento estimado -->
+                <div class="market-item" style="margin-bottom:10px;background:var(--primary-ultra);border-color:var(--border-accent);">
+                    <div class="market-item-label">💰 Financiamento estimado R$ 300 mil / 360 meses</div>
+                    <div class="market-item-value" style="color:var(--primary);">R$ ${primeiraParc.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})} <span style="font-size:0.75rem;font-weight:500;color:var(--text-secondary)">/mês (1ª parcela SAC)</span></div>
+                    <div class="market-item-sub">Taxa estimada: Selic ${fmt(selicVal)}% + spread 3,5% = ${fmt(selicVal + 3.5)}% a.a.</div>
+                </div>
+
+                <!-- Termômetro do mercado -->
+                <div class="market-item" style="margin-bottom:10px;">
+                    <div class="market-item-label">🌡️ Termômetro do mercado</div>
+                    <div style="margin:6px 0 4px;">
+                        <div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden;">
+                            <div style="height:100%;width:${heatScore}%;background:${heatColor};border-radius:99px;transition:width 0.8s;"></div>
+                        </div>
+                    </div>
+                    <div class="market-item-sub" style="font-weight:700;color:${heatColor};">${heatLabel} · ${heatScore}/100</div>
+                </div>
+
+                <!-- Ticker -->
+                <div class="market-ticker">
+                    <div class="market-ticker-inner">${tickerHTML}</div>
+                </div>
+            `;
+        }
+
+        async function load(forceRefresh = false) {
+            const body = document.getElementById('market-panel-body');
+            const btn  = document.getElementById('market-refresh-btn');
+            if (!body) return;
+
+            const now = Date.now();
+            if (!forceRefresh && _cache && (now - _cacheTs) < CACHE_TTL) {
+                renderPanel(_cache, false);
+                return;
+            }
+
+            // Spinner
+            body.innerHTML = '<div class="market-loading"><i class="fas fa-circle-notch"></i> Buscando dados em tempo real...</div>';
+            if (btn) btn.classList.add('spinning');
+
+            try {
+                const data = await loadData();
+                _cache   = data;
+                _cacheTs = Date.now();
+                renderPanel(data, forceRefresh);
+            } catch (e) {
+                body.innerHTML = `<div class="market-error"><i class="fas fa-wifi" style="margin-right:6px;"></i>Não foi possível carregar os dados.<br><button onclick="MarketPanel.load(true)" style="margin-top:8px;padding:6px 14px;background:var(--primary);color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.8rem;">Tentar novamente</button></div>`;
+            } finally {
+                if (btn) btn.classList.remove('spinning');
+            }
+        }
+
+        // Auto-refresh a cada 10 minutos quando o painel mercado estiver visível
+        setInterval(() => {
+            const mv = document.getElementById('mercado-view');
+            if (mv && mv.classList.contains('active')) load(false);
+        }, CACHE_TTL);
+
+        return { load };
+    })();
+
+    window.MarketPanel = MarketPanel;
+
+    // Dispara carregamento quando mercado-view é aberto
+    document.addEventListener('DOMContentLoaded', () => {
+        const mv = document.getElementById('mercado-view');
+        if (!mv) return;
+        const obs = new MutationObserver(() => {
+            if (mv.classList.contains('active')) MarketPanel.load(false);
+        });
+        obs.observe(mv, { attributes: true, attributeFilter: ['class'] });
+    });
+    </script>
 
     <!-- ===== MODAL GERENCIAR USUÁRIOS ===== -->
     <div class="modal-overlay" id="overlay-usuarios" onclick="Auth.closeUserMenu()"></div>
