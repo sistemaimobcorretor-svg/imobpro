@@ -16,6 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/dist/face-api.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
@@ -29614,137 +29615,150 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 loadLoginBg(); showLogin();
             }
 
-            // ── Biometria (câmera + WebAuthn) ──────────────────────────────
-            const BIO_STORE = 'imobipro_biometric_cred';
-            let _bioStream  = null;   // MediaStream ativo
-            let _bioPhase   = 'idle'; // idle | camera | scanning | mapping | confirm | success | error
+            // ── Biometria — Reconhecimento Facial Real (face-api.js) ────────
+            const BIO_STORE   = 'imobipro_biometric_cred';
+            const MATCH_DIST  = 0.48;
+            const MODELS_URL  = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/model';
+            let _bioStream    = null;
+            let _bioPhase     = 'idle';
+            let _faceApiReady = false;
+            let _faceApiLoading = false;
 
-            function bioSupported() {
-                return !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.create && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+            function bioSupported(){
+                return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
             }
-            function getBioCredential(userId) {
-                try { const r = localStorage.getItem(BIO_STORE+'_'+userId); return r ? JSON.parse(r) : null; } catch(e){ return null; }
+            function getBioCredential(userId){
+                try{ const r=localStorage.getItem(BIO_STORE+'_'+userId); return r?JSON.parse(r):null; }catch(e){return null;}
             }
-            function saveBioCredential(userId, data) {
-                try { localStorage.setItem(BIO_STORE+'_'+userId, JSON.stringify(data)); } catch(e){}
+            function saveBioCredential(userId,data){
+                try{ localStorage.setItem(BIO_STORE+'_'+userId,JSON.stringify(data)); }catch(e){}
             }
-            function removeBioCredential(userId) {
-                try { localStorage.removeItem(BIO_STORE+'_'+userId); } catch(e){}
+            function removeBioCredential(userId){
+                try{ localStorage.removeItem(BIO_STORE+'_'+userId); }catch(e){}
             }
-            function bufToB64(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))); }
-            function b64ToBuf(b64){ const bin=atob(b64),buf=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i); return buf.buffer; }
 
-            // ── Helpers UI modal ─────────────────────────────────────────
+            async function _loadFaceModels(){
+                if(_faceApiReady) return true;
+                if(_faceApiLoading){
+                    await new Promise(r=>{ const iv=setInterval(()=>{ if(!_faceApiLoading){clearInterval(iv);r();} },150); });
+                    return _faceApiReady;
+                }
+                if(typeof faceapi==='undefined') return false;
+                _faceApiLoading=true;
+                try{
+                    await Promise.all([
+                        faceapi.nets.tinyFaceDetector.loadFromUri(MODELS_URL),
+                        faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODELS_URL),
+                        faceapi.nets.faceRecognitionNet.loadFromUri(MODELS_URL)
+                    ]);
+                    _faceApiReady=true;
+                }catch(e){
+                    console.warn('face-api load error:',e);
+                    _faceApiReady=false;
+                }finally{ _faceApiLoading=false; }
+                return _faceApiReady;
+            }
+
+            async function _detectDescriptor(source){
+                const opts=new faceapi.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:0.45});
+                return await faceapi.detectSingleFace(source,opts).withFaceLandmarks(true).withFaceDescriptor()||null;
+            }
+
+            function _euclidean(d1,d2){
+                let s=0; for(let i=0;i<d1.length;i++) s+=(d1[i]-d2[i])**2; return Math.sqrt(s);
+            }
+
+            // ── UI helpers ───────────────────────────────────────────────
             function _setStep(n){
                 for(let i=0;i<3;i++){
-                    const d=document.getElementById('bio-step-'+i);
-                    if(!d) continue;
+                    const d=document.getElementById('bio-step-'+i); if(!d) continue;
                     d.classList.remove('active','done');
-                    if(i<n) d.classList.add('done');
-                    else if(i===n) d.classList.add('active');
+                    if(i<n) d.classList.add('done'); else if(i===n) d.classList.add('active');
                 }
             }
-            function _setCamStatus(txt){
-                const el=document.getElementById('bio-camera-status');
-                if(el) el.innerHTML = txt ? `<span>${txt}</span>` : '';
+            function _setCamStatus(txt,color){
+                const el=document.getElementById('bio-camera-status'); if(!el) return;
+                if(!txt){el.innerHTML='';return;}
+                const col=color==='green'?'#27AE60':color==='red'?'#E74C3C':color==='yellow'?'#F59E0B':'white';
+                el.innerHTML=`<span style="color:${col}">${txt}</span>`;
             }
             function _setTitle(t){ const el=document.getElementById('bio-enroll-title'); if(el) el.textContent=t; }
-            function _setSub(s){   const el=document.getElementById('bio-enroll-subtitle'); if(el) el.innerHTML=s; }
-            function _setStartBtn(html, disabled, onclick){
-                const b=document.getElementById('bio-enroll-start-btn');
-                if(!b) return;
+            function _setSub(s){ const el=document.getElementById('bio-enroll-subtitle'); if(el) el.innerHTML=s; }
+            function _setStartBtn(html,disabled,onclick){
+                const b=document.getElementById('bio-enroll-start-btn'); if(!b) return;
                 b.innerHTML=html; b.disabled=!!disabled;
-                if(onclick) b.onclick=onclick; else b.onclick=()=>Auth.executarCadastroBio();
+                b.onclick=onclick||(()=>Auth.executarCadastroBio());
             }
-            function _setOvalColor(color){ // 'blue'|'green'|'red'
-                const ring=document.getElementById('bio-oval-ring');
-                if(!ring) return;
+            function _setOvalColor(color){
+                const ring=document.getElementById('bio-oval-ring'); if(!ring) return;
                 ring.classList.remove('ok','error');
                 if(color==='green') ring.classList.add('ok');
                 if(color==='red')   ring.classList.add('error');
             }
             function _showScanBar(on){
-                const b=document.getElementById('bio-scan-bar');
-                if(b) b.classList.toggle('active',!!on);
+                const b=document.getElementById('bio-scan-bar'); if(b) b.classList.toggle('active',!!on);
             }
-            function _spawnLandmarks(ok){
-                const container=document.getElementById('bio-landmark-dots');
-                if(!container) return;
+            function _spawnLandmarks(detection, vidW, vidH){
+                const container=document.getElementById('bio-landmark-dots'); if(!container) return;
                 container.innerHTML='';
-                // 24 pontos distribuídos em elipse facial proporcional ao container
-                const pts=[
-                    [37,30],[50,26],[63,26],[76,27],[50,36],[63,36],[44,44],[56,44],[68,44],[80,44],
-                    [50,53],[63,53],[44,60],[56,58],[68,58],[80,60],[56,68],[63,68],[50,75],[63,75],[76,75],
-                    [47,82],[63,83],[79,82]
-                ];
-                pts.forEach(([lp,tp],i)=>{
+                const pts=detection.landmarks.positions;
+                pts.forEach((pt,i)=>{
                     const dot=document.createElement('div');
-                    dot.className='bio-ldot'+(ok?' ok':'');
-                    dot.style.left=lp+'%'; dot.style.top=tp+'%';
+                    dot.className='bio-ldot';
+                    dot.style.left=(pt.x/vidW*100)+'%';
+                    dot.style.top =(pt.y/vidH*100)+'%';
                     container.appendChild(dot);
-                    setTimeout(()=>dot.classList.add('show'), i*35);
+                    setTimeout(()=>dot.classList.add('show'),i*10);
                 });
             }
-            function _clearLandmarks(){
-                const c=document.getElementById('bio-landmark-dots'); if(c) c.innerHTML='';
-            }
+            function _markLandmarksOk(){ document.querySelectorAll('.bio-ldot').forEach(d=>d.classList.add('ok')); }
+            function _clearLandmarks(){ const c=document.getElementById('bio-landmark-dots'); if(c) c.innerHTML=''; }
 
-            // ── Abre o modal e inicia câmera ──────────────────────────────
+            // ── Abre modal + inicia câmera ────────────────────────────────
             async function abrirModalBiometria(){
-                const overlay=document.getElementById('bio-enroll-overlay');
-                if(!overlay) return;
+                const overlay=document.getElementById('bio-enroll-overlay'); if(!overlay) return;
                 overlay.classList.add('show');
                 _bioPhase='camera';
                 _resetEnrollUI();
                 const session=getSession();
-                if(session) _refreshEnrollState(session.id);
-
                 if(!bioSupported()){
-                    document.getElementById('bio-not-supported').classList.add('visible');
-                    _setStartBtn('<i class="fas fa-ban" style="margin-right:6px"></i> Não suportado', true);
+                    document.getElementById('bio-not-supported')?.classList.add('visible');
+                    _setStartBtn('<i class="fas fa-ban"></i> Não suportado',true);
                     return;
                 }
+                if(session) _refreshEnrollState(session.id);
+                _loadFaceModels().catch(()=>{});
                 await _iniciarCamera();
             }
 
             async function _iniciarCamera(){
-                const video=document.getElementById('bio-video');
-                if(!video) return;
+                const video=document.getElementById('bio-video'); if(!video) return;
                 _setCamStatus('Iniciando câmera...');
-                try {
-                    _bioStream = await navigator.mediaDevices.getUserMedia({
-                        video:{ facingMode:'user', width:{ideal:640}, height:{ideal:480} },
-                        audio:false
+                try{
+                    _bioStream=await navigator.mediaDevices.getUserMedia({
+                        video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false
                     });
                     video.srcObject=_bioStream;
                     await new Promise(res=>{ video.onloadedmetadata=res; });
                     video.play();
                     _setCamStatus('Posicione seu rosto na moldura');
                     _setOvalColor('blue');
-                    _setStartBtn('<i class="fas fa-camera" style="margin-right:6px"></i> Capturar', false);
-                } catch(e){
-                    console.warn('Câmera falhou:',e);
+                    _setStartBtn('<i class="fas fa-camera" style="margin-right:6px"></i> Capturar',false);
+                }catch(e){
+                    const ns=document.getElementById('bio-not-supported');
+                    if(ns){ ns.classList.add('visible'); ns.textContent='⚠️ '+(e.name==='NotAllowedError'?'Permissão de câmera negada.':'Câmera não encontrada.'); }
+                    _setStartBtn('<i class="fas fa-redo" style="margin-right:6px"></i> Tentar novamente',false,()=>Auth.abrirModalBiometria());
                     _setCamStatus('');
-                    let msg='Câmera não acessível.';
-                    if(e.name==='NotAllowedError') msg='Permissão de câmera negada. Permita nas configurações do navegador.';
-                    if(e.name==='NotFoundError')   msg='Câmera frontal não encontrada neste dispositivo.';
-                    document.getElementById('bio-not-supported').classList.add('visible');
-                    document.getElementById('bio-not-supported').textContent='⚠️ '+msg;
-                    _setStartBtn('<i class="fas fa-redo" style="margin-right:6px"></i> Tentar novamente', false, ()=>Auth.abrirModalBiometria());
                 }
             }
 
             function _pararCamera(){
                 if(_bioStream){ _bioStream.getTracks().forEach(t=>t.stop()); _bioStream=null; }
-                const video=document.getElementById('bio-video');
-                if(video){ video.srcObject=null; }
+                const video=document.getElementById('bio-video'); if(video) video.srcObject=null;
             }
 
             function fecharModalBiometria(){
-                _pararCamera();
-                _clearLandmarks();
-                _showScanBar(false);
-                _bioPhase='idle';
+                _pararCamera(); _clearLandmarks(); _showScanBar(false); _bioPhase='idle';
                 const overlay=document.getElementById('bio-enroll-overlay');
                 if(overlay) overlay.classList.remove('show');
             }
@@ -29753,16 +29767,13 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 _setStep(0);
                 _setTitle('Cadastro de Face ID');
                 _setSub('Posicione seu rosto dentro da moldura e toque em <strong>Capturar</strong>.');
-                _setStartBtn('<i class="fas fa-camera" style="margin-right:6px"></i> Capturar', false);
-                _setOvalColor('blue');
-                _showScanBar(false);
-                _clearLandmarks();
+                _setStartBtn('<i class="fas fa-camera" style="margin-right:6px"></i> Capturar',false);
+                _setOvalColor('blue'); _showScanBar(false); _clearLandmarks();
                 const ns=document.getElementById('bio-not-supported');
-                if(ns){ ns.classList.remove('visible'); ns.textContent='⚠️ Câmera ou biometria não disponível.'; }
-                // Oculta foto capturada, mostra vídeo
+                if(ns){ ns.classList.remove('visible'); ns.textContent='⚠️ Câmera não disponível.'; }
                 const img=document.getElementById('bio-captured-img');
                 const video=document.getElementById('bio-video');
-                if(img)   img.style.display='none';
+                if(img) img.style.display='none';
                 if(video) video.style.display='block';
                 _setCamStatus('');
             }
@@ -29773,137 +29784,135 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 if(hasCred){
                     if(removeBtn) removeBtn.classList.add('visible');
                     _setTitle('Atualizar Face ID');
-                    _setSub('Você já possui biometria cadastrada. Capture novamente para atualizar ou remova abaixo.');
-                } else {
+                    _setSub('Biometria já cadastrada. Capture novamente para atualizar.');
+                }else{
                     if(removeBtn) removeBtn.classList.remove('visible');
                 }
             }
 
-            // ── Captura + scan + WebAuthn ─────────────────────────────────
+            // ── CADASTRO com reconhecimento facial real ───────────────────
             async function executarCadastroBio(){
                 const session=getSession();
                 if(!session){ fecharModalBiometria(); return; }
-                if(_bioPhase==='scanning'||_bioPhase==='mapping'||_bioPhase==='confirm') return;
+                if(['scanning','mapping','confirm'].includes(_bioPhase)) return;
 
-                const video  = document.getElementById('bio-video');
-                const canvas = document.getElementById('bio-canvas');
-                const img    = document.getElementById('bio-captured-img');
-                const btn    = document.getElementById('bio-enroll-start-btn');
+                const video =document.getElementById('bio-video');
+                const canvas=document.getElementById('bio-canvas');
+                const img   =document.getElementById('bio-captured-img');
 
-                // ── FASE 1: captura do frame da câmera ────────────────────
                 _bioPhase='scanning';
                 _setStep(0);
-                _setTitle('Analisando rosto...');
-                _setSub('Aguarde enquanto seu rosto é detectado e mapeado.');
-                _setStartBtn('<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i> Analisando...', true);
-                _setOvalColor('blue');
+                _setTitle('Carregando modelos...');
+                _setSub('Aguarde o motor de reconhecimento facial ser carregado.');
+                _setStartBtn('<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i> Carregando...',true);
                 _showScanBar(true);
-                _clearLandmarks();
 
-                // Captura frame do vídeo
-                if(canvas && video){
-                    canvas.width  = video.videoWidth  || 640;
-                    canvas.height = video.videoHeight || 480;
+                const modelsOk=await _loadFaceModels();
+                if(!modelsOk){
+                    _bioPhase='camera'; _showScanBar(false);
+                    _setTitle('Erro ao carregar modelos');
+                    _setSub('Verifique sua conexão com a internet e tente novamente.');
+                    _setStartBtn('<i class="fas fa-redo" style="margin-right:6px"></i> Tentar novamente',false);
+                    return;
+                }
+
+                _setTitle('Detectando rosto...');
+                _setSub('Mantenha o rosto centralizado e olhando para a câmera.');
+                _setCamStatus('Detectando...');
+
+                // Captura frame
+                if(canvas&&video){
+                    canvas.width=video.videoWidth||640;
+                    canvas.height=video.videoHeight||480;
                     const ctx=canvas.getContext('2d');
                     ctx.save(); ctx.scale(-1,1); ctx.drawImage(video,-canvas.width,0); ctx.restore();
                 }
 
-                await new Promise(r=>setTimeout(r,900)); // simula detecção
+                let detection=null;
+                try{ detection=await _detectDescriptor(canvas); }catch(e){ console.warn('detect:',e); }
 
-                // ── FASE 2: exibe foto capturada + pontos ─────────────────
-                _bioPhase='mapping';
-                _setStep(1);
+                if(!detection){
+                    _bioPhase='camera'; _showScanBar(false); _setOvalColor('red');
+                    _setCamStatus('Rosto não detectado','red');
+                    _setTitle('Rosto não encontrado');
+                    _setSub('Certifique-se de estar em boa iluminação, com o rosto centralizado na moldura.');
+                    _setStartBtn('<i class="fas fa-redo" style="margin-right:6px"></i> Tentar novamente',false);
+                    setTimeout(()=>{ _setOvalColor('blue'); _setCamStatus('Posicione seu rosto na moldura'); },2000);
+                    return;
+                }
+
+                // ── Rosto detectado: mostra foto + landmarks reais ────────
+                _setStep(1); _showScanBar(false);
                 _setTitle('Mapeando pontos faciais...');
-                _setSub('Pontos de referência sendo identificados...');
-                _showScanBar(false);
+                _setSub('Analisando as características únicas do seu rosto.');
 
-                // Mostra snapshot no lugar do vídeo
-                if(canvas && img){
-                    img.src=canvas.toDataURL('image/jpeg',0.85);
+                if(canvas&&img){
+                    img.src=canvas.toDataURL('image/jpeg',0.9);
                     img.style.display='block';
                     if(video) video.style.display='none';
                 }
-                _setCamStatus('Mapeando...');
-                _spawnLandmarks(false);
 
-                await new Promise(r=>setTimeout(r,1400));
+                _spawnLandmarks(detection, canvas?.width||640, canvas?.height||480);
+                _setCamStatus(`Mapeando ${detection.landmarks.positions.length} pontos...`,'yellow');
 
-                // Pontos ficam verdes
-                document.querySelectorAll('.bio-ldot').forEach(d=>d.classList.add('ok'));
+                await new Promise(r=>setTimeout(r,1200));
+                _markLandmarksOk();
                 _setOvalColor('green');
-                _setCamStatus('✓ Rosto detectado');
-
+                _setCamStatus('✓ Rosto mapeado','green');
                 await new Promise(r=>setTimeout(r,600));
 
-                // ── FASE 3: WebAuthn ──────────────────────────────────────
-                _bioPhase='confirm';
+                // ── Salva descritor real ──────────────────────────────────
                 _setStep(2);
-                _setTitle('Confirme sua identidade');
-                _setSub('Use o <strong>Face ID, Touch ID ou PIN</strong> do dispositivo para concluir o cadastro.');
-                _setStartBtn('<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i> Aguardando...', true);
+                _setTitle('Salvando biometria...');
+                _setSub('Protegendo seus dados biométricos...');
+                _setStartBtn('<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i> Salvando...',true);
 
-                try {
-                    const challenge=crypto.getRandomValues(new Uint8Array(32));
-                    const userIdBuf=new TextEncoder().encode(session.id);
-                    const credential=await navigator.credentials.create({
-                        publicKey:{
-                            challenge,
-                            rp:{ name:'ImobiPro', id: location.hostname||'localhost' },
-                            user:{ id:userIdBuf, name:session.username||session.nome, displayName:session.nome||session.username },
-                            pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
-                            authenticatorSelection:{ authenticatorAttachment:'platform', userVerification:'required', residentKey:'preferred' },
-                            timeout:60000, attestation:'none'
-                        }
-                    });
-
-                    // Salva credId + snapshot (thumbnail 60px para exibição)
-                    let thumb='';
-                    if(canvas){
-                        const tc=document.createElement('canvas'); tc.width=60; tc.height=80;
-                        tc.getContext('2d').drawImage(canvas,0,0,60,80);
-                        thumb=tc.toDataURL('image/jpeg',0.5);
-                    }
-                    saveBioCredential(session.id,{ credId:bufToB64(credential.rawId), thumb });
-
-                    // ── SUCESSO ───────────────────────────────────────────
-                    _bioPhase='success';
-                    _pararCamera();
-                    _setCamStatus('✅ Face ID cadastrado!');
-                    _setOvalColor('green');
-                    document.querySelectorAll('.bio-ldot').forEach(d=>d.classList.add('ok'));
-                    _setTitle('✅ Face ID cadastrado!');
-                    _setSub('Biometria salva. Agora você pode entrar e desbloquear o sistema com o rosto.');
-                    _setStartBtn('<i class="fas fa-check" style="margin-right:6px"></i> Concluir', false, ()=>Auth.fecharModalBiometria());
-                    document.getElementById('bio-enroll-remove-btn')?.classList.add('visible');
-                    updateBioRegisterUI(session.id);
-                    updateBioLoginBtn();
-
-                } catch(e){
-                    console.warn('WebAuthn enroll error:',e);
-                    _bioPhase='error';
-                    _setOvalColor('red');
-                    _setCamStatus('');
-                    // Volta a mostrar vídeo
-                    if(img)   img.style.display='none';
-                    if(video) video.style.display='block';
-                    _clearLandmarks();
-                    let errMsg='Tente novamente.';
-                    if(e.name==='NotAllowedError')   errMsg='Permissão negada ou cancelado pelo usuário.';
-                    if(e.name==='InvalidStateError') errMsg='Credencial já existe. Remova e recadastre.';
-                    if(e.name==='NotSupportedError') errMsg='Autenticador não suportado neste dispositivo.';
-                    _setTitle('Falha no cadastro');
-                    _setSub(errMsg);
-                    _setStep(0);
-                    _setOvalColor('blue');
-                    _setStartBtn('<i class="fas fa-redo" style="margin-right:6px"></i> Tentar novamente', false, ()=>{ _bioPhase='camera'; _resetEnrollUI(); const session=getSession(); if(session) _refreshEnrollState(session.id); });
-                    _bioPhase='camera';
+                let thumb='';
+                if(canvas){
+                    const tc=document.createElement('canvas'); tc.width=80; tc.height=100;
+                    tc.getContext('2d').drawImage(canvas,0,0,80,100);
+                    thumb=tc.toDataURL('image/jpeg',0.6);
                 }
+
+                saveBioCredential(session.id,{
+                    descriptor: Array.from(detection.descriptor),
+                    thumb, savedAt:Date.now(), userId:session.id
+                });
+
+                _bioPhase='success';
+                _pararCamera();
+                _setCamStatus('✅ Face ID cadastrado!','green');
+                _setTitle('✅ Face ID cadastrado!');
+                _setSub('Biometria salva! Agora você pode entrar e desbloquear o sistema com o rosto.');
+                _setStartBtn('<i class="fas fa-check" style="margin-right:6px"></i> Concluir',false,()=>Auth.fecharModalBiometria());
+                document.getElementById('bio-enroll-remove-btn')?.classList.add('visible');
+                updateBioRegisterUI(session.id);
+                updateBioLoginBtn();
+            }
+
+            // ── Captura ao vivo para verificação ─────────────────────────
+            async function _capturarEDetectar(){
+                const stream=await navigator.mediaDevices.getUserMedia({
+                    video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false
+                });
+                const tmpV=document.createElement('video');
+                tmpV.autoplay=true; tmpV.muted=true; tmpV.playsInline=true;
+                tmpV.srcObject=stream;
+                await new Promise(r=>{ tmpV.onloadedmetadata=r; });
+                tmpV.play();
+                await new Promise(r=>setTimeout(r,800)); // estabiliza
+                const canvas=document.createElement('canvas');
+                canvas.width=tmpV.videoWidth||640;
+                canvas.height=tmpV.videoHeight||480;
+                const ctx=canvas.getContext('2d');
+                ctx.save(); ctx.scale(-1,1); ctx.drawImage(tmpV,-canvas.width,0); ctx.restore();
+                stream.getTracks().forEach(t=>t.stop());
+                return await _detectDescriptor(canvas);
             }
 
             async function removerBiometria(){
-                const session=getSession();
-                if(!session) return;
-                if(!confirm('Remover o Face ID desta conta? Você precisará usar senha para entrar.')) return;
+                const session=getSession(); if(!session) return;
+                if(!confirm('Remover o Face ID desta conta?')) return;
                 removeBioCredential(session.id);
                 updateBioRegisterUI(session.id);
                 updateBioLoginBtn();
@@ -29918,26 +29927,24 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 const btn =document.getElementById('bio-toggle-btn');
                 const cred=getBioCredential(userId);
                 if(cred){
-                    if(icon) icon.innerHTML = cred.thumb ? `<img src="${cred.thumb}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '🔒';
-                    if(ttl)  ttl.textContent ='Face ID ativo';
+                    if(icon) icon.innerHTML=cred.thumb?`<img src="${cred.thumb}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">`:'🔒';
+                    if(ttl)  ttl.textContent='Face ID ativo';
                     if(desc) desc.textContent='Desbloqueio biométrico ativado para esta conta';
                     if(btn){  btn.style.background='rgba(39,174,96,0.10)'; btn.style.color='var(--success)'; btn.style.border='1px solid rgba(39,174,96,0.25)'; btn.innerHTML='<i class="fas fa-pen" style="margin-right:6px"></i> Gerenciar Face ID'; }
-                } else {
+                }else{
                     if(icon) icon.textContent='🔓';
-                    if(ttl)  ttl.textContent ='Biometria não cadastrada';
+                    if(ttl)  ttl.textContent='Biometria não cadastrada';
                     if(desc) desc.textContent='Cadastre seu rosto para desbloquear sem senha';
                     if(btn){  btn.style.background='var(--primary)'; btn.style.color='white'; btn.style.border='none'; btn.innerHTML='<i class="fas fa-face-smile" style="margin-right:6px"></i> Cadastrar Face ID'; }
                 }
             }
 
             async function updateBioLoginBtn(){
-                const row=document.getElementById('biometric-login-row');
-                if(!row) return;
+                const row=document.getElementById('biometric-login-row'); if(!row) return;
                 if(!bioSupported()){ row.style.display='none'; return; }
                 let todos=[];
-                try{ todos=await DB.getAll('usuarios'); } catch(e){}
-                const hasBio=todos.some(u=>!!getBioCredential(u.id));
-                row.style.display=hasBio?'block':'none';
+                try{ todos=await DB.getAll('usuarios'); }catch(e){}
+                row.style.display=todos.some(u=>!!getBioCredential(u.id))?'block':'none';
             }
 
             async function openUserMenu(){
@@ -29954,50 +29961,95 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 if(session) updateBioRegisterUI(session.id);
             }
 
+            // ── Login com câmera + reconhecimento real ────────────────────
             async function loginBiometrico(){
                 const btn  =document.getElementById('biometric-login-btn');
                 const label=document.getElementById('biometric-login-label');
-                if(!bioSupported()){ Utils?.toast('Biometria não suportada','error'); return; }
+                if(!bioSupported()){ Utils?.toast('Câmera não disponível','error'); return; }
                 let todos=[];
-                try{ await ensureDB(); todos=await DB.getAll('usuarios'); } catch(e){}
-                const candidatos=todos.filter(u=>!!getBioCredential(u.id));
+                try{ await ensureDB(); todos=await DB.getAll('usuarios'); }catch(e){}
+                const candidatos=todos.filter(u=>!!getBioCredential(u.id)&&getBioCredential(u.id).descriptor);
                 if(!candidatos.length){ Utils?.toast('Nenhuma biometria cadastrada','error'); return; }
+
                 if(btn) btn.classList.add('scanning');
-                if(label) label.textContent='Verificando...';
-                const challenge =crypto.getRandomValues(new Uint8Array(32));
-                const allowList =candidatos.map(u=>({type:'public-key',id:b64ToBuf(getBioCredential(u.id).credId)}));
+                if(label) label.textContent='Carregando...';
+
+                const modelsOk=await _loadFaceModels();
+                if(!modelsOk){
+                    if(btn) btn.classList.remove('scanning');
+                    if(label) label.textContent='Entrar com Face ID / Biometria';
+                    Utils?.toast('Erro ao carregar reconhecimento facial','error'); return;
+                }
+
+                if(label) label.textContent='Abrindo câmera...';
+
                 try{
-                    const assertion=await navigator.credentials.get({ publicKey:{challenge,rpId:location.hostname||'localhost',allowCredentials:allowList,userVerification:'required',timeout:60000} });
-                    const usedId   =bufToB64(assertion.rawId);
-                    const user     =candidatos.find(u=>getBioCredential(u.id)?.credId===usedId);
-                    if(user){
-                        if(btn)  { btn.classList.remove('scanning'); btn.classList.add('success'); }
-                        if(label) label.textContent='✅ Identificado!';
-                        setTimeout(()=>{ if(btn) btn.classList.remove('success'); if(label) label.textContent='Entrar com Face ID / Biometria'; },1500);
-                        setSession(user); showApp(user);
-                    } else throw new Error('Usuário não identificado.');
-                } catch(e){
+                    const detection=await _capturarEDetectar();
+                    if(!detection) throw Object.assign(new Error('Rosto não detectado — melhore a iluminação'),{code:'NO_FACE'});
+
+                    if(label) label.textContent='Verificando rosto...';
+
+                    let melhor=null, melhorDist=Infinity;
+                    for(const u of candidatos){
+                        const cred=getBioCredential(u.id);
+                        const saved=new Float32Array(cred.descriptor);
+                        const dist=_euclidean(detection.descriptor,saved);
+                        console.log(`Dist ${u.username}:`,dist.toFixed(4));
+                        if(dist<melhorDist){ melhorDist=dist; melhor=u; }
+                    }
+
+                    if(melhorDist>MATCH_DIST){
+                        throw Object.assign(new Error(`Rosto não reconhecido (dist: ${melhorDist.toFixed(3)})`),{code:'MISMATCH'});
+                    }
+
+                    if(btn)  { btn.classList.remove('scanning'); btn.classList.add('success'); }
+                    if(label) label.textContent='✅ Identificado!';
+                    setTimeout(()=>{ if(btn) btn.classList.remove('success'); if(label) label.textContent='Entrar com Face ID / Biometria'; },1500);
+                    setSession(melhor); showApp(melhor);
+
+                }catch(e){
+                    console.warn('Login facial falhou:',e);
                     if(btn)  { btn.classList.remove('scanning'); btn.classList.add('error'); }
-                    if(label) label.textContent=e.name==='NotAllowedError'?'Cancelado':'Falha na verificação';
-                    setTimeout(()=>{ if(btn) btn.classList.remove('error'); if(label) label.textContent='Entrar com Face ID / Biometria'; },2000);
+                    if(label) label.textContent=e.name==='NotAllowedError'?'Câmera negada':(e.message||'Rosto não reconhecido');
+                    setTimeout(()=>{ if(btn) btn.classList.remove('error'); if(label) label.textContent='Entrar com Face ID / Biometria'; },3000);
                 }
             }
 
+            // ── Desbloqueio por inatividade ───────────────────────────────
             async function idleUnlockBio(){
                 const session=getSession(); if(!session) return;
                 const bioBtn=document.querySelector('.idle-btn-bio');
-                if(bioBtn){ bioBtn.disabled=true; bioBtn.innerHTML='<span style="font-size:1.2rem">🪪</span> Verificando...'; }
+                if(bioBtn){ bioBtn.disabled=true; bioBtn.innerHTML='<span style="font-size:1.2rem">📷</span> Abrindo câmera...'; }
                 try{
                     const cred=getBioCredential(session.id);
-                    if(!cred) throw new Error('Sem credencial');
-                    const challenge=crypto.getRandomValues(new Uint8Array(32));
-                    const assertion=await navigator.credentials.get({ publicKey:{challenge,rpId:location.hostname||'localhost',allowCredentials:[{type:'public-key',id:b64ToBuf(cred.credId)}],userVerification:'required',timeout:60000} });
-                    if(assertion){
-                        if(bioBtn) bioBtn.innerHTML='<span style="font-size:1.2rem">✅</span> Desbloqueado!';
-                        setTimeout(()=>{ hideIdleWarning(); resetIdle(); if(bioBtn){ bioBtn.disabled=false; bioBtn.innerHTML='<span style="font-size:1.2rem">🪪</span> Desbloquear com Face ID / Biometria'; } },700);
+                    if(!cred?.descriptor) throw new Error('Sem biometria cadastrada');
+
+                    const modelsOk=await _loadFaceModels();
+                    if(!modelsOk) throw new Error('Motor facial não disponível');
+
+                    if(bioBtn) bioBtn.innerHTML='<span style="font-size:1.2rem">🔍</span> Verificando rosto...';
+
+                    const detection=await _capturarEDetectar();
+                    if(!detection) throw new Error('Rosto não detectado — melhore a iluminação');
+
+                    const saved=new Float32Array(cred.descriptor);
+                    const dist=_euclidean(detection.descriptor,saved);
+                    console.log('Idle unlock dist:',dist.toFixed(4));
+                    if(dist>MATCH_DIST) throw new Error(`Rosto não reconhecido`);
+
+                    if(bioBtn) bioBtn.innerHTML='<span style="font-size:1.2rem">✅</span> Rosto reconhecido!';
+                    setTimeout(()=>{
+                        hideIdleWarning(); resetIdle();
+                        if(bioBtn){ bioBtn.disabled=false; bioBtn.innerHTML='<span style="font-size:1.2rem">🪪</span> Desbloquear com Face ID / Biometria'; }
+                    },700);
+
+                }catch(e){
+                    console.warn('Idle unlock:',e);
+                    if(bioBtn){
+                        bioBtn.disabled=false;
+                        bioBtn.innerHTML=`<span style="font-size:1.2rem">❌</span> ${e.message||'Falha'}`;
+                        setTimeout(()=>{ bioBtn.innerHTML='<span style="font-size:1.2rem">🪪</span> Desbloquear com Face ID / Biometria'; },2500);
                     }
-                } catch(e){
-                    if(bioBtn){ bioBtn.disabled=false; bioBtn.innerHTML='<span style="font-size:1.2rem">❌</span> Tente novamente'; setTimeout(()=>{ bioBtn.innerHTML='<span style="font-size:1.2rem">🪪</span> Desbloquear com Face ID / Biometria'; },2000); }
                 }
             }
 
@@ -30005,19 +30057,15 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
 
             function showIdleWarning(){
                 if(!getSession()) return;
-                const overlay=document.getElementById('idle-warning-overlay');
-                if(!overlay) return;
+                const overlay=document.getElementById('idle-warning-overlay'); if(!overlay) return;
                 overlay.classList.add('show');
                 const session=getSession();
                 const idleBioRow=document.getElementById('idle-bio-row');
-                if(idleBioRow&&session&&bioSupported()&&getBioCredential(session.id)){
-                    idleBioRow.classList.add('visible');
-                } else if(idleBioRow){
-                    idleBioRow.classList.remove('visible');
-                }
+                const hasBio=session&&bioSupported()&&getBioCredential(session.id)?.descriptor;
+                if(idleBioRow) idleBioRow.classList.toggle('visible',!!hasBio);
                 warnCount=5; updateRing(5);
                 clearInterval(countInterval);
-                countInterval=setInterval(()=>{ warnCount--; updateRing(warnCount); if(warnCount<=0){ clearInterval(countInterval); idleLogout(); } },1000);
+                countInterval=setInterval(()=>{ warnCount--; updateRing(warnCount); if(warnCount<=0){clearInterval(countInterval);idleLogout();} },1000);
                 clearTimeout(warnTimer);
                 warnTimer=setTimeout(idleLogout,WARN_TIMEOUT+200);
             }
