@@ -175,7 +175,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            opacity: var(--bg-opacity, 0.12);
+            opacity: var(--bg-opacity, 0.45);
             pointer-events: none;
         }
 
@@ -187,7 +187,7 @@
             right: 0;
             bottom: var(--nav-height);
             z-index: 0;
-            background: linear-gradient(160deg, rgba(245,247,250,0.88) 0%, rgba(240,244,248,0.85) 100%);
+            background: linear-gradient(160deg, rgba(245,247,250,0.45) 0%, rgba(240,244,248,0.40) 100%);
             pointer-events: none;
             opacity: var(--bg-overlay-opacity, 0);
         }
@@ -810,7 +810,7 @@
 
         .modal-overlay {
             position: fixed; inset: 0;
-            background: rgba(15, 23, 42, 0.55);
+            background: linear-gradient(160deg, rgba(12,74,110,0.75) 0%, rgba(29,111,164,0.70) 50%, rgba(41,128,185,0.72) 100%);
             backdrop-filter: blur(4px);
             z-index: 100;
             display: none; opacity: 0;
@@ -3753,7 +3753,85 @@
             height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 6px;
         }
         .leitura-card-progress-fill { height:100%; border-radius:2px; background: linear-gradient(90deg, var(--indigo), var(--violet)); transition: width 0.5s; }
-        .leitura-card-actions {
+        /* ===== FRASE MOTIVACIONAL DIÁRIA ===== */
+        .frase-card {
+            background: linear-gradient(135deg, #6366F1 0%, #7C3AED 100%);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 18px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 6px 24px rgba(99,102,241,0.30);
+        }
+        .frase-card::before {
+            content: '"';
+            position: absolute;
+            top: -10px; left: 12px;
+            font-size: 7rem;
+            color: rgba(255,255,255,0.10);
+            font-family: Georgia, serif;
+            line-height: 1;
+            pointer-events: none;
+        }
+        .frase-card-eyebrow {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.60);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .frase-card-eyebrow .frase-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: rgba(255,255,255,0.50);
+            animation: livePulse 1.6s ease-in-out infinite;
+        }
+        .frase-card-text {
+            font-size: 1.02rem;
+            font-weight: 600;
+            color: #FFFFFF;
+            line-height: 1.55;
+            margin-bottom: 12px;
+            min-height: 48px;
+        }
+        .frase-card-autor {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.70);
+            font-style: italic;
+        }
+        .frase-card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .frase-card-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 7px 12px;
+            cursor: pointer;
+            display: flex; align-items: center; gap: 5px;
+            transition: background 0.18s;
+        }
+        .frase-card-btn:hover { background: rgba(255,255,255,0.25); }
+        .frase-card-btn:active { transform: scale(0.96); }
+        .frase-loading {
+            display: flex; align-items: center; gap: 8px;
+            color: rgba(255,255,255,0.80); font-size: 0.85rem;
+        }
+        .frase-loading i { animation: spin 1s linear infinite; }
+        body.has-bg-image .frase-card {
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+        }
+
+                .leitura-card-actions {
             display:flex; gap:8px; padding: 10px 16px;
             border-top: 1px solid var(--border);
             background: var(--light);
@@ -4083,18 +4161,38 @@
         body.has-bg-image .estrategia-card,
         body.has-bg-image .leitura-card,
         body.has-bg-image .rotina-block {
-            background: rgba(255,255,255,0.95) !important;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+            background: rgba(255,255,255,0.72) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.10) !important;
+            border-color: rgba(255,255,255,0.55) !important;
         }
 
         body.has-bg-image .waiting-item {
-            background: rgba(255,255,255,0.95) !important;
+            background: rgba(255,255,255,0.72) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
         }
 
         body.has-bg-image header {
-            background: rgba(255,255,255,0.97) !important;
-            box-shadow: none !important;
+            background: rgba(255,255,255,0.82) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            box-shadow: 0 1px 12px rgba(0,0,0,0.10) !important;
+        }
+
+        body.has-bg-image main {
+            background: transparent !important;
+        }
+
+        body.has-bg-image .market-panel,
+        body.has-bg-image .market-item,
+        body.has-bg-image .market-selic-highlight {
+            background: rgba(255,255,255,0.72) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border-color: rgba(255,255,255,0.55) !important;
         }
 
         /* Textos e fontes: garante que sempre sejam totalmente opacos */
@@ -4548,7 +4646,7 @@
             position: fixed;
             inset: 0;
             z-index: 99000;
-            background: rgba(0,0,0,0.55);
+            background: linear-gradient(160deg, rgba(12,74,110,0.82) 0%, rgba(29,111,164,0.78) 50%, rgba(41,128,185,0.80) 100%);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             display: none;
@@ -4913,7 +5011,7 @@
         }
 
         /* ── Idle warning box ────────────────────────────────────── */
-        #idle-warning-overlay { background: rgba(0,0,0,0.70) !important; }
+        #idle-warning-overlay { background: linear-gradient(160deg, rgba(8,50,78,0.88) 0%, rgba(21,90,138,0.85) 50%, rgba(29,111,164,0.87) 100%) !important; }
         #idle-warning-box {
             background: #142218 !important;
             border: 1px solid rgba(255,255,255,0.12) !important;
@@ -7562,6 +7660,17 @@
                     </button>
                 </div>
 
+                <!-- Frase Motivacional Diária -->
+                <div id="frase-do-dia-card" class="frase-card">
+                    <div class="frase-card-eyebrow">
+                        <div class="frase-dot"></div>
+                        Frase do Dia
+                    </div>
+                    <div id="frase-do-dia-body" class="frase-loading">
+                        <i class="fas fa-circle-notch"></i> Gerando sua frase do dia...
+                    </div>
+                </div>
+
                 <!-- Stats -->
                 <div class="leitura-stats-row">
                     <div class="leitura-stat">
@@ -9361,9 +9470,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <input type="hidden" id="s-background-image" value="">
                     <div style="margin-top:10px;">
                         <label style="font-size:0.82rem;font-weight:600;color:var(--dark);display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                            Opacidade da imagem: <span id="s-bg-opacity-label" style="color:var(--primary);font-weight:700;">18%</span>
+                            Opacidade da imagem: <span id="s-bg-opacity-label" style="color:var(--primary);font-weight:700;">45%</span>
                         </label>
-                        <input type="range" id="s-bg-opacity" min="5" max="60" value="18" step="1"
+                        <input type="range" id="s-bg-opacity" min="5" max="90" value="45" step="1"
                             style="width:100%;accent-color:var(--primary);height:6px;"
                             oninput="document.getElementById('s-bg-opacity-label').textContent=this.value+'%'; document.body.style.setProperty('--bg-opacity', this.value/100);">
                     </div>
@@ -17689,7 +17798,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 if (s.backgroundImage) {
                     document.getElementById('s-bg-preview').style.backgroundImage = `url('${s.backgroundImage}')`;  
                     const opSlider = document.getElementById('s-bg-opacity');
-                    if (opSlider) { opSlider.value = s.bgOpacity || 18; document.getElementById('s-bg-opacity-label').textContent = (s.bgOpacity || 18) + '%'; }
+                    if (opSlider) { opSlider.value = s.bgOpacity || 45; document.getElementById('s-bg-opacity-label').textContent = (s.bgOpacity || 45) + '%'; }
                     document.getElementById('btn-remove-bg').style.display = 'inline-block';
                 } else {
                     document.getElementById('s-bg-preview').style.backgroundImage = '';
@@ -26711,6 +26820,8 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             async init() {
                 await this.load();
                 this.render();
+                // Frase motivacional diária (usa cache do dia — 1 chamada/dia)
+                FraseDoDia.load(false);
             },
 
             async load() {
@@ -30401,6 +30512,127 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
 
         return { load };
     })();
+
+    // ===== FRASE DO DIA — Claude API =====
+    const FraseDoDia = (() => {
+        const STORE_KEY = 'frase_do_dia';
+
+        function todayKey() {
+            return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+        }
+
+        async function getSaved() {
+            try {
+                const raw = localStorage.getItem(STORE_KEY);
+                if (!raw) return null;
+                const obj = JSON.parse(raw);
+                if (obj.date === todayKey()) return obj;
+                return null;
+            } catch (_) { return null; }
+        }
+
+        function save(data) {
+            try {
+                localStorage.setItem(STORE_KEY, JSON.stringify({ ...data, date: todayKey() }));
+            } catch (_) {}
+        }
+
+        async function fetchFromClaude() {
+            const today = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+            const prompt = `Hoje é ${today}. Gere UMA frase motivacional poderosa para um corretor de imóveis brasileiro que está começando o dia de trabalho. A frase deve ser inspiradora, relacionada a vendas, persistência, atendimento ao cliente ou sucesso profissional. Responda APENAS com JSON no formato: {"frase": "texto da frase aqui", "autor": "Nome do Autor ou Desconhecido"}. Sem markdown, sem explicações, apenas o JSON.`;
+
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'claude-sonnet-4-20250514',
+                    max_tokens: 200,
+                    messages: [{ role: 'user', content: prompt }]
+                })
+            });
+
+            if (!response.ok) throw new Error('API error ' + response.status);
+            const data = await response.json();
+            const text = (data.content || []).map(b => b.text || '').join('').trim();
+            const clean = text.replace(/```json|```/g, '').trim();
+            return JSON.parse(clean);
+        }
+
+        function render(frase, autor, loading = false) {
+            const body = document.getElementById('frase-do-dia-body');
+            if (!body) return;
+
+            if (loading) {
+                body.className = 'frase-loading';
+                body.innerHTML = '<i class="fas fa-circle-notch"></i> Gerando sua frase do dia...';
+                return;
+            }
+
+            const card = document.getElementById('frase-do-dia-card');
+            body.className = '';
+            body.innerHTML =
+                '<div class="frase-card-text">' + (frase || '—') + '</div>' +
+                '<div class="frase-card-autor">— ' + (autor || 'Desconhecido') + '</div>' +
+                '<div class="frase-card-actions">' +
+                  '<button class="frase-card-btn" onclick="FraseDoDia.copiar()" title="Copiar frase"><i class="fas fa-copy"></i> Copiar</button>' +
+                  '<button class="frase-card-btn" onclick="FraseDoDia.compartilhar()" title="Compartilhar"><i class="fas fa-share-alt"></i> Compartilhar</button>' +
+                  '<button class="frase-card-btn" onclick="FraseDoDia.nova()" title="Nova frase"><i class="fas fa-redo"></i> Nova</button>' +
+                '</div>';
+        }
+
+        async function load(force = false) {
+            if (!force) {
+                const saved = await getSaved();
+                if (saved) { render(saved.frase, saved.autor); return; }
+            }
+            render(null, null, true);
+            try {
+                const result = await fetchFromClaude();
+                save(result);
+                render(result.frase, result.autor);
+            } catch (e) {
+                // Fallback: frases locais para quando a API falhar
+                const fallback = [
+                    { frase: 'O sucesso não é final, o fracasso não é fatal. O que conta é a coragem de continuar.', autor: 'Winston Churchill' },
+                    { frase: 'Cada imóvel que você vende não é apenas uma transação — é o sonho de uma família se tornando real.', autor: 'Desconhecido' },
+                    { frase: 'A persistência é o caminho mais curto para o sucesso.', autor: 'Charlie Chaplin' },
+                    { frase: 'Não espere por oportunidades extraordinárias. Aproveite as ocasiões comuns e torne-as grandiosas.', autor: 'Orison Swett Marden' },
+                    { frase: 'O seu cliente mais insatisfeito é a sua maior fonte de aprendizado.', autor: 'Bill Gates' },
+                    { frase: 'Acredite que você pode, e você já está no meio do caminho.', autor: 'Theodore Roosevelt' },
+                    { frase: 'Venda com paixão, atenda com excelência, cresça com propósito.', autor: 'Desconhecido' },
+                ];
+                const day = new Date().getDate() % fallback.length;
+                const fb = fallback[day];
+                save(fb);
+                render(fb.frase, fb.autor);
+            }
+        }
+
+        function copiar() {
+            const saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+            const txt = '"' + (saved.frase || '') + '" — ' + (saved.autor || '');
+            navigator.clipboard?.writeText(txt).then(() => Utils.toast('Frase copiada! ✅')).catch(() => Utils.toast('Não foi possível copiar', 'error'));
+        }
+
+        function compartilhar() {
+            const saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+            const txt = '"' + (saved.frase || '') + '" — ' + (saved.autor || '');
+            if (navigator.share) {
+                navigator.share({ title: 'Frase do Dia — ImobiPro', text: txt }).catch(() => {});
+            } else {
+                navigator.clipboard?.writeText(txt).then(() => Utils.toast('Frase copiada para compartilhar! ✅'));
+            }
+        }
+
+        async function nova() {
+            localStorage.removeItem(STORE_KEY);
+            await load(true);
+        }
+
+        return { load, copiar, compartilhar, nova };
+    })();
+
+    window.FraseDoDia = FraseDoDia;
 
     window.MarketPanel = MarketPanel;
 
