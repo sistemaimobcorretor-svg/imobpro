@@ -4723,6 +4723,195 @@
         }
         .idle-btn-exit:active { background: rgba(184,48,48,0.2); }
 
+        /* ===== BIOMETRIA ===== */
+        .biometric-btn {
+            width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: rgba(29,111,164,0.08); border: 1.5px solid rgba(29,111,164,0.25);
+            border-radius: 14px; padding: 13px 16px; font-family: 'Inter', sans-serif;
+            font-size: 0.95rem; font-weight: 700; color: var(--primary); cursor: pointer;
+            transition: background 0.18s, transform 0.15s; margin-top: 10px;
+        }
+        .biometric-btn:hover { background: rgba(29,111,164,0.14); }
+        .biometric-btn:active { transform: scale(0.97); }
+        .biometric-btn .bio-icon { font-size: 1.4rem; line-height: 1; animation: bioIdle 2.8s ease-in-out infinite; }
+        @keyframes bioIdle { 0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.12);opacity:0.80;} }
+        .biometric-btn.scanning .bio-icon { animation: bioScan 0.6s ease-in-out infinite alternate; }
+        @keyframes bioScan { from{transform:scale(0.92);opacity:0.6;}to{transform:scale(1.18);opacity:1;} }
+        .biometric-btn.success { background: rgba(39,174,96,0.10); border-color: rgba(39,174,96,0.35); color: var(--success); }
+        .biometric-btn.error   { background: rgba(231,76,60,0.08);  border-color: rgba(231,76,60,0.25);  color: var(--danger); }
+        #bio-register-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+        .bio-register-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .bio-register-label { font-size: 0.88rem; font-weight: 600; color: var(--dark); display: flex; align-items: center; gap: 7px; }
+        .bio-register-label .bio-lbl-icon { font-size: 1.1rem; }
+        .bio-toggle-btn { background: var(--primary); color: white; border: none; border-radius: 10px; padding: 8px 14px; font-size: 0.8rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: opacity 0.15s; white-space: nowrap; }
+        .bio-toggle-btn:active { opacity: 0.85; }
+        .bio-toggle-btn.remove { background: rgba(184,48,48,0.10); color: var(--danger); border: 1px solid rgba(184,48,48,0.2); }
+        .bio-status-msg { font-size: 0.78rem; margin-top: 8px; padding: 7px 10px; border-radius: 8px; display: none; }
+        .bio-status-msg.ok   { display: block; background: rgba(39,174,96,0.08);  color: var(--success); }
+        .bio-status-msg.err  { display: block; background: rgba(231,76,60,0.08);  color: var(--danger); }
+        .bio-status-msg.info { display: block; background: rgba(29,111,164,0.08); color: var(--primary); }
+        .idle-btn-bio { width: 100%; background: rgba(29,111,164,0.10); border: 1.5px solid rgba(29,111,164,0.30); color: var(--primary); border-radius: 12px; padding: 11px; font-size: 0.88rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px; transition: background 0.15s; }
+        .idle-btn-bio:active { background: rgba(29,111,164,0.20); }
+        #idle-bio-row { display: none; }
+        #idle-bio-row.visible { display: block; }
+
+        /* ===== MODAL CADASTRO BIOMETRIA ===== */
+        #bio-enroll-overlay {
+            position: fixed; inset: 0; z-index: 19000;
+            background: linear-gradient(160deg,rgba(12,74,110,0.95) 0%,rgba(29,111,164,0.92) 50%,rgba(41,128,185,0.94) 100%);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: none; align-items: center; justify-content: center; padding: 16px;
+        }
+        #bio-enroll-overlay.show { display: flex; }
+        #bio-enroll-box {
+            background: #111827;
+            border-radius: 24px;
+            max-width: 340px; width: 100%;
+            overflow: hidden;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.50);
+            animation: bioEnrollPop 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes bioEnrollPop {
+            from { opacity:0; transform:scale(0.85) translateY(20px); }
+            to   { opacity:1; transform:scale(1) translateY(0); }
+        }
+
+        /* Camera wrap */
+        #bio-camera-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: #000;
+            overflow: hidden;
+        }
+        #bio-video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* espelha como selfie */
+            display: block;
+        }
+        #bio-captured-img {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+        /* Moldura oval SVG overlay */
+        #bio-oval-svg {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        /* Anel pulsante quando ok */
+        #bio-oval-ring { transition: stroke 0.4s, stroke-width 0.4s; }
+        #bio-oval-ring.ok    { stroke: #27AE60; stroke-dasharray: none; stroke-width: 4; }
+        #bio-oval-ring.error { stroke: #E74C3C; stroke-dasharray: none; }
+
+        /* Linha de scan */
+        #bio-scan-bar {
+            position: absolute; left: 8%; right: 8%; height: 2px;
+            background: linear-gradient(90deg, transparent, #2E8BC0, #A8E0FF, #2E8BC0, transparent);
+            border-radius: 2px; top: 20%; display: none; pointer-events: none;
+            box-shadow: 0 0 8px rgba(46,139,192,0.6);
+        }
+        #bio-scan-bar.active {
+            display: block;
+            animation: bioBarScan 1.8s ease-in-out infinite;
+        }
+        @keyframes bioBarScan {
+            0%   { top: 12%; opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 1; }
+            100% { top: 88%; opacity: 0; }
+        }
+
+        /* Pontos de landmark */
+        #bio-landmark-dots {
+            position: absolute; inset: 0; pointer-events: none;
+        }
+        .bio-ldot {
+            position: absolute; width: 5px; height: 5px;
+            border-radius: 50%; background: #2E8BC0;
+            box-shadow: 0 0 4px rgba(46,139,192,0.8);
+            transform: translate(-50%,-50%) scale(0);
+            transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s;
+            opacity: 0;
+        }
+        .bio-ldot.show { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+        .bio-ldot.ok   { background: #27AE60; box-shadow: 0 0 4px rgba(39,174,96,0.8); }
+
+        /* Status overlay no vídeo */
+        #bio-camera-status {
+            position: absolute; bottom: 12px; left: 0; right: 0;
+            text-align: center; pointer-events: none;
+        }
+        #bio-camera-status span {
+            display: inline-block;
+            background: rgba(0,0,0,0.65);
+            color: white; font-size: 0.78rem; font-weight: 600;
+            padding: 5px 14px; border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Parte inferior (texto + botões) */
+        #bio-screen-camera {
+            padding: 18px 20px 20px;
+            background: #111827;
+        }
+        #bio-cam-steps { display: flex; justify-content: center; gap: 6px; margin-bottom: 12px; }
+
+        #bio-enroll-title {
+            font-size: 1.1rem; font-weight: 900; color: #F1F5F9;
+            margin-bottom: 5px; text-align: center;
+        }
+        #bio-enroll-subtitle {
+            font-size: 0.82rem; color: #94A3B8; line-height: 1.5;
+            text-align: center; margin-bottom: 16px; min-height: 36px;
+        }
+        .bio-not-supported {
+            font-size: 0.8rem; color: #F87171; background: rgba(231,76,60,0.10);
+            border-radius: 10px; padding: 10px 12px; margin-bottom: 12px;
+            display: none; line-height: 1.5; text-align: center;
+        }
+        .bio-not-supported.visible { display: block; }
+
+        /* Steps dots */
+        .bio-step-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #374151; transition: background 0.3s, transform 0.3s;
+        }
+        .bio-step-dot.active { background: #2E8BC0; transform: scale(1.3); }
+        .bio-step-dot.done   { background: #27AE60; }
+
+        /* Botões */
+        .bio-enroll-actions { display: flex; gap: 10px; }
+        .bio-enroll-cancel {
+            background: rgba(255,255,255,0.08); color: #94A3B8;
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 14px;
+            padding: 13px 16px; font-size: 0.9rem; font-weight: 700;
+            cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s;
+        }
+        .bio-enroll-cancel:active { background: rgba(255,255,255,0.14); }
+        .bio-enroll-start {
+            flex: 1;
+            background: linear-gradient(135deg, #1D6FA4 0%, #2E8BC0 100%);
+            color: white; border: none; border-radius: 14px; padding: 13px;
+            font-size: 0.95rem; font-weight: 800; cursor: pointer;
+            font-family: 'Inter', sans-serif; transition: opacity 0.15s, transform 0.15s;
+            box-shadow: 0 4px 14px rgba(29,111,164,0.35);
+        }
+        .bio-enroll-start:active { opacity: 0.88; transform: scale(0.97); }
+        .bio-enroll-start:disabled { opacity: 0.40; cursor: not-allowed; transform: none; }
+        .bio-enroll-remove {
+            width: 100%; background: rgba(231,76,60,0.08); color: #F87171;
+            border: 1px solid rgba(231,76,60,0.20); border-radius: 14px; padding: 11px;
+            font-size: 0.84rem; font-weight: 700; cursor: pointer;
+            font-family: 'Inter', sans-serif; margin-top: 10px; display: none;
+            transition: background 0.15s;
+        }
+        .bio-enroll-remove.visible { display: block; }
+        .bio-enroll-remove:active { background: rgba(231,76,60,0.16); }
 
         /* ===== PREMIUM DARK-GREEN — OVERRIDES GLOBAIS ===== */
         :root {
@@ -6406,6 +6595,12 @@
                 <button class="login-btn" onclick="Auth.login()">
                     <i class="fas fa-sign-in-alt" style="margin-right:8px"></i>Entrar
                 </button>
+                <div id="biometric-login-row" style="display:none">
+                    <button class="biometric-btn" id="biometric-login-btn" onclick="Auth.loginBiometrico()">
+                        <span class="bio-icon">🪪</span>
+                        <span id="biometric-login-label">Entrar com Face ID / Biometria</span>
+                    </button>
+                </div>
                 <div class="login-switch">
                     Não tem conta? <button onclick="Auth.showCadastro()">Cadastrar-se</button>
                 </div>
@@ -29027,6 +29222,8 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 const resetBtn = document.getElementById('login-reset-btn');
                 if (dbErr) dbErr.style.display = 'none';
                 if (resetBtn) resetBtn.style.display = 'none';
+                // Mostra botão de biometria se houver credencial cadastrada
+                setTimeout(() => { try { updateBioLoginBtn(); } catch(e){} }, 100);
             }
             function showCadastro() {
                 const lp = document.getElementById('login-panel');
@@ -29228,18 +29425,6 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             }
 
             // ── Menu usuário ────────────────────────────────────────────────
-            function openUserMenu() {
-                const session = getSession();
-                const modal = document.getElementById('modal-user-logado');
-                if (modal && session) modal.textContent = session.nome || session.username;
-                const adminSec = document.getElementById('admin-section');
-                if (adminSec) adminSec.style.display = session && session.role === 'admin' ? 'block' : 'none';
-                if (session && session.role === 'admin') renderUsuariosList();
-                const overlay = document.getElementById('overlay-usuarios');
-                const sheet = document.getElementById('sheet-usuarios');
-                if (overlay) overlay.classList.add('active');
-                if (sheet) sheet.style.transform = 'translateY(0)';
-            }
             function closeUserMenu() {
                 const overlay = document.getElementById('overlay-usuarios');
                 const sheet = document.getElementById('sheet-usuarios');
@@ -29404,17 +29589,6 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 idleTimer = warnTimer = countInterval = null;
                 idlePausedAt = null; idleRemaining = IDLE_TIMEOUT;
             }
-            function showIdleWarning() {
-                if (!getSession()) return;
-                const overlay = document.getElementById('idle-warning-overlay');
-                if (!overlay) return;
-                overlay.classList.add('show');
-                warnCount = 5; updateRing(5);
-                clearInterval(countInterval);
-                countInterval = setInterval(() => { warnCount--; updateRing(warnCount); if (warnCount <= 0) { clearInterval(countInterval); idleLogout(); } }, 1000);
-                clearTimeout(warnTimer);
-                warnTimer = setTimeout(idleLogout, WARN_TIMEOUT + 200);
-            }
             function updateRing(seconds) {
                 const numEl = document.getElementById('idle-countdown-num');
                 const ringEl = document.getElementById('idle-ring-fg');
@@ -29440,10 +29614,420 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 loadLoginBg(); showLogin();
             }
 
+            // ── Biometria (câmera + WebAuthn) ──────────────────────────────
+            const BIO_STORE = 'imobipro_biometric_cred';
+            let _bioStream  = null;   // MediaStream ativo
+            let _bioPhase   = 'idle'; // idle | camera | scanning | mapping | confirm | success | error
+
+            function bioSupported() {
+                return !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.create && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+            }
+            function getBioCredential(userId) {
+                try { const r = localStorage.getItem(BIO_STORE+'_'+userId); return r ? JSON.parse(r) : null; } catch(e){ return null; }
+            }
+            function saveBioCredential(userId, data) {
+                try { localStorage.setItem(BIO_STORE+'_'+userId, JSON.stringify(data)); } catch(e){}
+            }
+            function removeBioCredential(userId) {
+                try { localStorage.removeItem(BIO_STORE+'_'+userId); } catch(e){}
+            }
+            function bufToB64(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))); }
+            function b64ToBuf(b64){ const bin=atob(b64),buf=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i); return buf.buffer; }
+
+            // ── Helpers UI modal ─────────────────────────────────────────
+            function _setStep(n){
+                for(let i=0;i<3;i++){
+                    const d=document.getElementById('bio-step-'+i);
+                    if(!d) continue;
+                    d.classList.remove('active','done');
+                    if(i<n) d.classList.add('done');
+                    else if(i===n) d.classList.add('active');
+                }
+            }
+            function _setCamStatus(txt){
+                const el=document.getElementById('bio-camera-status');
+                if(el) el.innerHTML = txt ? `<span>${txt}</span>` : '';
+            }
+            function _setTitle(t){ const el=document.getElementById('bio-enroll-title'); if(el) el.textContent=t; }
+            function _setSub(s){   const el=document.getElementById('bio-enroll-subtitle'); if(el) el.innerHTML=s; }
+            function _setStartBtn(html, disabled, onclick){
+                const b=document.getElementById('bio-enroll-start-btn');
+                if(!b) return;
+                b.innerHTML=html; b.disabled=!!disabled;
+                if(onclick) b.onclick=onclick; else b.onclick=()=>Auth.executarCadastroBio();
+            }
+            function _setOvalColor(color){ // 'blue'|'green'|'red'
+                const ring=document.getElementById('bio-oval-ring');
+                if(!ring) return;
+                ring.classList.remove('ok','error');
+                if(color==='green') ring.classList.add('ok');
+                if(color==='red')   ring.classList.add('error');
+            }
+            function _showScanBar(on){
+                const b=document.getElementById('bio-scan-bar');
+                if(b) b.classList.toggle('active',!!on);
+            }
+            function _spawnLandmarks(ok){
+                const container=document.getElementById('bio-landmark-dots');
+                if(!container) return;
+                container.innerHTML='';
+                // 24 pontos distribuídos em elipse facial proporcional ao container
+                const pts=[
+                    [37,30],[50,26],[63,26],[76,27],[50,36],[63,36],[44,44],[56,44],[68,44],[80,44],
+                    [50,53],[63,53],[44,60],[56,58],[68,58],[80,60],[56,68],[63,68],[50,75],[63,75],[76,75],
+                    [47,82],[63,83],[79,82]
+                ];
+                pts.forEach(([lp,tp],i)=>{
+                    const dot=document.createElement('div');
+                    dot.className='bio-ldot'+(ok?' ok':'');
+                    dot.style.left=lp+'%'; dot.style.top=tp+'%';
+                    container.appendChild(dot);
+                    setTimeout(()=>dot.classList.add('show'), i*35);
+                });
+            }
+            function _clearLandmarks(){
+                const c=document.getElementById('bio-landmark-dots'); if(c) c.innerHTML='';
+            }
+
+            // ── Abre o modal e inicia câmera ──────────────────────────────
+            async function abrirModalBiometria(){
+                const overlay=document.getElementById('bio-enroll-overlay');
+                if(!overlay) return;
+                overlay.classList.add('show');
+                _bioPhase='camera';
+                _resetEnrollUI();
+                const session=getSession();
+                if(session) _refreshEnrollState(session.id);
+
+                if(!bioSupported()){
+                    document.getElementById('bio-not-supported').classList.add('visible');
+                    _setStartBtn('<i class="fas fa-ban" style="margin-right:6px"></i> Não suportado', true);
+                    return;
+                }
+                await _iniciarCamera();
+            }
+
+            async function _iniciarCamera(){
+                const video=document.getElementById('bio-video');
+                if(!video) return;
+                _setCamStatus('Iniciando câmera...');
+                try {
+                    _bioStream = await navigator.mediaDevices.getUserMedia({
+                        video:{ facingMode:'user', width:{ideal:640}, height:{ideal:480} },
+                        audio:false
+                    });
+                    video.srcObject=_bioStream;
+                    await new Promise(res=>{ video.onloadedmetadata=res; });
+                    video.play();
+                    _setCamStatus('Posicione seu rosto na moldura');
+                    _setOvalColor('blue');
+                    _setStartBtn('<i class="fas fa-camera" style="margin-right:6px"></i> Capturar', false);
+                } catch(e){
+                    console.warn('Câmera falhou:',e);
+                    _setCamStatus('');
+                    let msg='Câmera não acessível.';
+                    if(e.name==='NotAllowedError') msg='Permissão de câmera negada. Permita nas configurações do navegador.';
+                    if(e.name==='NotFoundError')   msg='Câmera frontal não encontrada neste dispositivo.';
+                    document.getElementById('bio-not-supported').classList.add('visible');
+                    document.getElementById('bio-not-supported').textContent='⚠️ '+msg;
+                    _setStartBtn('<i class="fas fa-redo" style="margin-right:6px"></i> Tentar novamente', false, ()=>Auth.abrirModalBiometria());
+                }
+            }
+
+            function _pararCamera(){
+                if(_bioStream){ _bioStream.getTracks().forEach(t=>t.stop()); _bioStream=null; }
+                const video=document.getElementById('bio-video');
+                if(video){ video.srcObject=null; }
+            }
+
+            function fecharModalBiometria(){
+                _pararCamera();
+                _clearLandmarks();
+                _showScanBar(false);
+                _bioPhase='idle';
+                const overlay=document.getElementById('bio-enroll-overlay');
+                if(overlay) overlay.classList.remove('show');
+            }
+
+            function _resetEnrollUI(){
+                _setStep(0);
+                _setTitle('Cadastro de Face ID');
+                _setSub('Posicione seu rosto dentro da moldura e toque em <strong>Capturar</strong>.');
+                _setStartBtn('<i class="fas fa-camera" style="margin-right:6px"></i> Capturar', false);
+                _setOvalColor('blue');
+                _showScanBar(false);
+                _clearLandmarks();
+                const ns=document.getElementById('bio-not-supported');
+                if(ns){ ns.classList.remove('visible'); ns.textContent='⚠️ Câmera ou biometria não disponível.'; }
+                // Oculta foto capturada, mostra vídeo
+                const img=document.getElementById('bio-captured-img');
+                const video=document.getElementById('bio-video');
+                if(img)   img.style.display='none';
+                if(video) video.style.display='block';
+                _setCamStatus('');
+            }
+
+            function _refreshEnrollState(userId){
+                const hasCred=!!getBioCredential(userId);
+                const removeBtn=document.getElementById('bio-enroll-remove-btn');
+                if(hasCred){
+                    if(removeBtn) removeBtn.classList.add('visible');
+                    _setTitle('Atualizar Face ID');
+                    _setSub('Você já possui biometria cadastrada. Capture novamente para atualizar ou remova abaixo.');
+                } else {
+                    if(removeBtn) removeBtn.classList.remove('visible');
+                }
+            }
+
+            // ── Captura + scan + WebAuthn ─────────────────────────────────
+            async function executarCadastroBio(){
+                const session=getSession();
+                if(!session){ fecharModalBiometria(); return; }
+                if(_bioPhase==='scanning'||_bioPhase==='mapping'||_bioPhase==='confirm') return;
+
+                const video  = document.getElementById('bio-video');
+                const canvas = document.getElementById('bio-canvas');
+                const img    = document.getElementById('bio-captured-img');
+                const btn    = document.getElementById('bio-enroll-start-btn');
+
+                // ── FASE 1: captura do frame da câmera ────────────────────
+                _bioPhase='scanning';
+                _setStep(0);
+                _setTitle('Analisando rosto...');
+                _setSub('Aguarde enquanto seu rosto é detectado e mapeado.');
+                _setStartBtn('<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i> Analisando...', true);
+                _setOvalColor('blue');
+                _showScanBar(true);
+                _clearLandmarks();
+
+                // Captura frame do vídeo
+                if(canvas && video){
+                    canvas.width  = video.videoWidth  || 640;
+                    canvas.height = video.videoHeight || 480;
+                    const ctx=canvas.getContext('2d');
+                    ctx.save(); ctx.scale(-1,1); ctx.drawImage(video,-canvas.width,0); ctx.restore();
+                }
+
+                await new Promise(r=>setTimeout(r,900)); // simula detecção
+
+                // ── FASE 2: exibe foto capturada + pontos ─────────────────
+                _bioPhase='mapping';
+                _setStep(1);
+                _setTitle('Mapeando pontos faciais...');
+                _setSub('Pontos de referência sendo identificados...');
+                _showScanBar(false);
+
+                // Mostra snapshot no lugar do vídeo
+                if(canvas && img){
+                    img.src=canvas.toDataURL('image/jpeg',0.85);
+                    img.style.display='block';
+                    if(video) video.style.display='none';
+                }
+                _setCamStatus('Mapeando...');
+                _spawnLandmarks(false);
+
+                await new Promise(r=>setTimeout(r,1400));
+
+                // Pontos ficam verdes
+                document.querySelectorAll('.bio-ldot').forEach(d=>d.classList.add('ok'));
+                _setOvalColor('green');
+                _setCamStatus('✓ Rosto detectado');
+
+                await new Promise(r=>setTimeout(r,600));
+
+                // ── FASE 3: WebAuthn ──────────────────────────────────────
+                _bioPhase='confirm';
+                _setStep(2);
+                _setTitle('Confirme sua identidade');
+                _setSub('Use o <strong>Face ID, Touch ID ou PIN</strong> do dispositivo para concluir o cadastro.');
+                _setStartBtn('<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i> Aguardando...', true);
+
+                try {
+                    const challenge=crypto.getRandomValues(new Uint8Array(32));
+                    const userIdBuf=new TextEncoder().encode(session.id);
+                    const credential=await navigator.credentials.create({
+                        publicKey:{
+                            challenge,
+                            rp:{ name:'ImobiPro', id: location.hostname||'localhost' },
+                            user:{ id:userIdBuf, name:session.username||session.nome, displayName:session.nome||session.username },
+                            pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+                            authenticatorSelection:{ authenticatorAttachment:'platform', userVerification:'required', residentKey:'preferred' },
+                            timeout:60000, attestation:'none'
+                        }
+                    });
+
+                    // Salva credId + snapshot (thumbnail 60px para exibição)
+                    let thumb='';
+                    if(canvas){
+                        const tc=document.createElement('canvas'); tc.width=60; tc.height=80;
+                        tc.getContext('2d').drawImage(canvas,0,0,60,80);
+                        thumb=tc.toDataURL('image/jpeg',0.5);
+                    }
+                    saveBioCredential(session.id,{ credId:bufToB64(credential.rawId), thumb });
+
+                    // ── SUCESSO ───────────────────────────────────────────
+                    _bioPhase='success';
+                    _pararCamera();
+                    _setCamStatus('✅ Face ID cadastrado!');
+                    _setOvalColor('green');
+                    document.querySelectorAll('.bio-ldot').forEach(d=>d.classList.add('ok'));
+                    _setTitle('✅ Face ID cadastrado!');
+                    _setSub('Biometria salva. Agora você pode entrar e desbloquear o sistema com o rosto.');
+                    _setStartBtn('<i class="fas fa-check" style="margin-right:6px"></i> Concluir', false, ()=>Auth.fecharModalBiometria());
+                    document.getElementById('bio-enroll-remove-btn')?.classList.add('visible');
+                    updateBioRegisterUI(session.id);
+                    updateBioLoginBtn();
+
+                } catch(e){
+                    console.warn('WebAuthn enroll error:',e);
+                    _bioPhase='error';
+                    _setOvalColor('red');
+                    _setCamStatus('');
+                    // Volta a mostrar vídeo
+                    if(img)   img.style.display='none';
+                    if(video) video.style.display='block';
+                    _clearLandmarks();
+                    let errMsg='Tente novamente.';
+                    if(e.name==='NotAllowedError')   errMsg='Permissão negada ou cancelado pelo usuário.';
+                    if(e.name==='InvalidStateError') errMsg='Credencial já existe. Remova e recadastre.';
+                    if(e.name==='NotSupportedError') errMsg='Autenticador não suportado neste dispositivo.';
+                    _setTitle('Falha no cadastro');
+                    _setSub(errMsg);
+                    _setStep(0);
+                    _setOvalColor('blue');
+                    _setStartBtn('<i class="fas fa-redo" style="margin-right:6px"></i> Tentar novamente', false, ()=>{ _bioPhase='camera'; _resetEnrollUI(); const session=getSession(); if(session) _refreshEnrollState(session.id); });
+                    _bioPhase='camera';
+                }
+            }
+
+            async function removerBiometria(){
+                const session=getSession();
+                if(!session) return;
+                if(!confirm('Remover o Face ID desta conta? Você precisará usar senha para entrar.')) return;
+                removeBioCredential(session.id);
+                updateBioRegisterUI(session.id);
+                updateBioLoginBtn();
+                fecharModalBiometria();
+                Utils?.toast('Biometria removida.');
+            }
+
+            function updateBioRegisterUI(userId){
+                const icon=document.getElementById('bio-status-icon');
+                const ttl =document.getElementById('bio-status-title');
+                const desc=document.getElementById('bio-status-desc');
+                const btn =document.getElementById('bio-toggle-btn');
+                const cred=getBioCredential(userId);
+                if(cred){
+                    if(icon) icon.innerHTML = cred.thumb ? `<img src="${cred.thumb}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '🔒';
+                    if(ttl)  ttl.textContent ='Face ID ativo';
+                    if(desc) desc.textContent='Desbloqueio biométrico ativado para esta conta';
+                    if(btn){  btn.style.background='rgba(39,174,96,0.10)'; btn.style.color='var(--success)'; btn.style.border='1px solid rgba(39,174,96,0.25)'; btn.innerHTML='<i class="fas fa-pen" style="margin-right:6px"></i> Gerenciar Face ID'; }
+                } else {
+                    if(icon) icon.textContent='🔓';
+                    if(ttl)  ttl.textContent ='Biometria não cadastrada';
+                    if(desc) desc.textContent='Cadastre seu rosto para desbloquear sem senha';
+                    if(btn){  btn.style.background='var(--primary)'; btn.style.color='white'; btn.style.border='none'; btn.innerHTML='<i class="fas fa-face-smile" style="margin-right:6px"></i> Cadastrar Face ID'; }
+                }
+            }
+
+            async function updateBioLoginBtn(){
+                const row=document.getElementById('biometric-login-row');
+                if(!row) return;
+                if(!bioSupported()){ row.style.display='none'; return; }
+                let todos=[];
+                try{ todos=await DB.getAll('usuarios'); } catch(e){}
+                const hasBio=todos.some(u=>!!getBioCredential(u.id));
+                row.style.display=hasBio?'block':'none';
+            }
+
+            async function openUserMenu(){
+                const session=getSession();
+                const modal=document.getElementById('modal-user-logado');
+                if(modal&&session) modal.textContent=session.nome||session.username;
+                const adminSec=document.getElementById('admin-section');
+                if(adminSec) adminSec.style.display=session&&session.role==='admin'?'block':'none';
+                if(session&&session.role==='admin') renderUsuariosList();
+                const overlay=document.getElementById('overlay-usuarios');
+                const sheet=document.getElementById('sheet-usuarios');
+                if(overlay) overlay.classList.add('active');
+                if(sheet)   sheet.style.transform='translateY(0)';
+                if(session) updateBioRegisterUI(session.id);
+            }
+
+            async function loginBiometrico(){
+                const btn  =document.getElementById('biometric-login-btn');
+                const label=document.getElementById('biometric-login-label');
+                if(!bioSupported()){ Utils?.toast('Biometria não suportada','error'); return; }
+                let todos=[];
+                try{ await ensureDB(); todos=await DB.getAll('usuarios'); } catch(e){}
+                const candidatos=todos.filter(u=>!!getBioCredential(u.id));
+                if(!candidatos.length){ Utils?.toast('Nenhuma biometria cadastrada','error'); return; }
+                if(btn) btn.classList.add('scanning');
+                if(label) label.textContent='Verificando...';
+                const challenge =crypto.getRandomValues(new Uint8Array(32));
+                const allowList =candidatos.map(u=>({type:'public-key',id:b64ToBuf(getBioCredential(u.id).credId)}));
+                try{
+                    const assertion=await navigator.credentials.get({ publicKey:{challenge,rpId:location.hostname||'localhost',allowCredentials:allowList,userVerification:'required',timeout:60000} });
+                    const usedId   =bufToB64(assertion.rawId);
+                    const user     =candidatos.find(u=>getBioCredential(u.id)?.credId===usedId);
+                    if(user){
+                        if(btn)  { btn.classList.remove('scanning'); btn.classList.add('success'); }
+                        if(label) label.textContent='✅ Identificado!';
+                        setTimeout(()=>{ if(btn) btn.classList.remove('success'); if(label) label.textContent='Entrar com Face ID / Biometria'; },1500);
+                        setSession(user); showApp(user);
+                    } else throw new Error('Usuário não identificado.');
+                } catch(e){
+                    if(btn)  { btn.classList.remove('scanning'); btn.classList.add('error'); }
+                    if(label) label.textContent=e.name==='NotAllowedError'?'Cancelado':'Falha na verificação';
+                    setTimeout(()=>{ if(btn) btn.classList.remove('error'); if(label) label.textContent='Entrar com Face ID / Biometria'; },2000);
+                }
+            }
+
+            async function idleUnlockBio(){
+                const session=getSession(); if(!session) return;
+                const bioBtn=document.querySelector('.idle-btn-bio');
+                if(bioBtn){ bioBtn.disabled=true; bioBtn.innerHTML='<span style="font-size:1.2rem">🪪</span> Verificando...'; }
+                try{
+                    const cred=getBioCredential(session.id);
+                    if(!cred) throw new Error('Sem credencial');
+                    const challenge=crypto.getRandomValues(new Uint8Array(32));
+                    const assertion=await navigator.credentials.get({ publicKey:{challenge,rpId:location.hostname||'localhost',allowCredentials:[{type:'public-key',id:b64ToBuf(cred.credId)}],userVerification:'required',timeout:60000} });
+                    if(assertion){
+                        if(bioBtn) bioBtn.innerHTML='<span style="font-size:1.2rem">✅</span> Desbloqueado!';
+                        setTimeout(()=>{ hideIdleWarning(); resetIdle(); if(bioBtn){ bioBtn.disabled=false; bioBtn.innerHTML='<span style="font-size:1.2rem">🪪</span> Desbloquear com Face ID / Biometria'; } },700);
+                    }
+                } catch(e){
+                    if(bioBtn){ bioBtn.disabled=false; bioBtn.innerHTML='<span style="font-size:1.2rem">❌</span> Tente novamente'; setTimeout(()=>{ bioBtn.innerHTML='<span style="font-size:1.2rem">🪪</span> Desbloquear com Face ID / Biometria'; },2000); }
+                }
+            }
+
+            function toggleBiometria(){ abrirModalBiometria(); }
+
+            function showIdleWarning(){
+                if(!getSession()) return;
+                const overlay=document.getElementById('idle-warning-overlay');
+                if(!overlay) return;
+                overlay.classList.add('show');
+                const session=getSession();
+                const idleBioRow=document.getElementById('idle-bio-row');
+                if(idleBioRow&&session&&bioSupported()&&getBioCredential(session.id)){
+                    idleBioRow.classList.add('visible');
+                } else if(idleBioRow){
+                    idleBioRow.classList.remove('visible');
+                }
+                warnCount=5; updateRing(5);
+                clearInterval(countInterval);
+                countInterval=setInterval(()=>{ warnCount--; updateRing(warnCount); if(warnCount<=0){ clearInterval(countInterval); idleLogout(); } },1000);
+                clearTimeout(warnTimer);
+                warnTimer=setTimeout(idleLogout,WARN_TIMEOUT+200);
+            }
+
             return { init, login, cadastrar, logout, showLogin, showLoginPanel, showCadastro,
                      toggleEye, openUserMenu, closeUserMenu, deletarUsuario, novoUsuarioAdmin,
                      alterarSenha, applyLoginBg, idleContinue, idleLogout, resetarBanco,
-                     temSessao };
+                     temSessao, loginBiometrico, toggleBiometria, updateBioLoginBtn,
+                     idleUnlockBio, abrirModalBiometria, fecharModalBiometria,
+                     executarCadastroBio, removerBiometria };
         })();
 
         window.Auth = Auth;
@@ -30686,6 +31270,21 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 <i class="fas fa-key"></i> Alterar senha
             </button>
         </div>
+        <!-- Seção Biometria -->
+        <div id="bio-register-section">
+            <div class="section-title" style="font-size:0.9rem;margin-bottom:12px"><span>🪪 Face ID / Biometria</span></div>
+            <div id="bio-current-status" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--light);border:1px solid var(--border);margin-bottom:10px;">
+                <div style="width:40px;height:40px;border-radius:50%;background:rgba(29,111,164,0.10);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;" id="bio-status-icon">🔓</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:0.88rem;font-weight:700;color:var(--dark);" id="bio-status-title">Biometria não cadastrada</div>
+                    <div style="font-size:0.76rem;color:var(--text-secondary);margin-top:2px;" id="bio-status-desc">Cadastre seu rosto para desbloquear o sistema sem senha</div>
+                </div>
+            </div>
+            <button class="bio-toggle-btn" id="bio-toggle-btn" onclick="Auth.abrirModalBiometria()" style="width:100%;padding:11px;border-radius:12px;font-size:0.88rem;">
+                <i class="fas fa-face-smile" style="margin-right:6px"></i> Cadastrar Face ID
+            </button>
+            <div class="bio-status-msg" id="bio-status-msg"></div>
+        </div>
         <div id="admin-section" style="display:none">
             <div class="section-title" style="font-size:0.9rem;margin-bottom:10px">
                 <span>Usuários cadastrados</span>
@@ -30713,6 +31312,11 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 </svg>
                 <div id="idle-countdown-num">5</div>
             </div>
+            <div id="idle-bio-row">
+                <button class="idle-btn-bio" onclick="Auth.idleUnlockBio()">
+                    <span style="font-size:1.2rem">🪪</span> Desbloquear com Face ID / Biometria
+                </button>
+            </div>
             <div class="idle-btn-row">
                 <button class="idle-btn-continue" onclick="Auth.idleContinue()">
                     <i class="fas fa-check"></i> Continuar
@@ -30723,5 +31327,71 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             </div>
         </div>
     </div>
+    <!-- ===== MODAL CADASTRO BIOMETRIA / FACE ID ===== -->
+    <div id="bio-enroll-overlay">
+        <div id="bio-enroll-box">
+
+            <!-- TELA 0: câmera ao vivo -->
+            <div id="bio-screen-camera">
+                <div id="bio-camera-wrap">
+                    <video id="bio-video" autoplay muted playsinline></video>
+                    <canvas id="bio-canvas" style="display:none"></canvas>
+                    <!-- Moldura oval sobre o vídeo -->
+                    <svg id="bio-oval-svg" viewBox="0 0 260 300" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Máscara escura ao redor do oval -->
+                        <defs>
+                            <mask id="oval-mask">
+                                <rect width="260" height="300" fill="white"/>
+                                <ellipse cx="130" cy="148" rx="95" ry="118" fill="black"/>
+                            </mask>
+                        </defs>
+                        <rect width="260" height="300" fill="rgba(0,0,0,0.45)" mask="url(#oval-mask)"/>
+                        <!-- Oval da moldura -->
+                        <ellipse id="bio-oval-ring" cx="130" cy="148" rx="95" ry="118"
+                            fill="none" stroke="#1D6FA4" stroke-width="3" stroke-dasharray="8 4"
+                            opacity="0.9"/>
+                        <!-- Cantos de scan (4 arcos) -->
+                        <path d="M 50 100 A 95 118 0 0 1 95 40"  fill="none" stroke="#2E8BC0" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M 165 40 A 95 118 0 0 1 210 100" fill="none" stroke="#2E8BC0" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M 210 196 A 95 118 0 0 1 165 256" fill="none" stroke="#2E8BC0" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M 95 256 A 95 118 0 0 1 50 196"  fill="none" stroke="#2E8BC0" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                    <!-- Linha de scan animada -->
+                    <div id="bio-scan-bar"></div>
+                    <!-- Pontos de mapeamento sobre a câmera -->
+                    <div id="bio-landmark-dots"></div>
+                    <!-- Foto capturada (preview) -->
+                    <img id="bio-captured-img" style="display:none" alt="Foto capturada">
+                    <!-- Status sobreposto -->
+                    <div id="bio-camera-status"></div>
+                </div>
+
+                <div id="bio-cam-steps">
+                    <div class="bio-step-dot active" id="bio-step-0"></div>
+                    <div class="bio-step-dot" id="bio-step-1"></div>
+                    <div class="bio-step-dot" id="bio-step-2"></div>
+                </div>
+
+                <h3 id="bio-enroll-title">Cadastro de Face ID</h3>
+                <p id="bio-enroll-subtitle">Posicione seu rosto dentro da moldura para iniciar o reconhecimento.</p>
+
+                <div class="bio-not-supported" id="bio-not-supported">
+                    ⚠️ Câmera ou biometria não disponível neste dispositivo/navegador. Use Chrome, Safari ou Edge com câmera e sensor biométrico.
+                </div>
+
+                <div class="bio-enroll-actions" id="bio-enroll-actions">
+                    <button class="bio-enroll-cancel" id="bio-cancel-btn" onclick="Auth.fecharModalBiometria()">Cancelar</button>
+                    <button class="bio-enroll-start" id="bio-enroll-start-btn" onclick="Auth.executarCadastroBio()">
+                        <i class="fas fa-camera" style="margin-right:6px"></i> Capturar
+                    </button>
+                </div>
+                <button class="bio-enroll-remove" id="bio-enroll-remove-btn" onclick="Auth.removerBiometria()">
+                    <i class="fas fa-trash" style="margin-right:6px"></i> Remover biometria cadastrada
+                </button>
+            </div>
+
+        </div>
+    </div>
+
 </body>
 </html>
