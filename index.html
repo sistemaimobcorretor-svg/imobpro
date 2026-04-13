@@ -6969,6 +6969,9 @@
                         <button class="icon-btn" style="background: var(--primary); color: white; border-radius: 8px; padding: 8px;" onclick="UI.openEnvioMassaEmail()">
                             <i class="fas fa-envelope"></i> E-mail em Massa
                         </button>
+                        <button class="icon-btn" style="background: linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%); color: white; border-radius: 8px; padding: 8px;" onclick="UI.openInformativoMassa()">
+                            <i class="fas fa-newspaper"></i> Informativo
+                        </button>
                     </div>
                 </div>
                 <div class="search-container">
@@ -9932,6 +9935,187 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <i class="fas fa-external-link-alt"></i> Abrir no cliente de e-mail (mailto:)
             </button>
             <button class="btn-block" style="background:rgba(255,255,255,0.08);color:var(--secondary);border:none;" onclick="UI.closeModals()">Cancelar</button>
+        </div>
+
+        <!-- MODAL INFORMATIVO EM MASSA -->
+        <div class="modal-overlay" id="overlay-informativo-massa" onclick="UI.closeModals()"></div>
+        <div class="modal-sheet" id="sheet-informativo-massa" style="max-height:92vh;overflow-y:auto;">
+            <div class="sheet-handle"></div>
+            <h3 class="section-title" style="margin-bottom:12px;">
+                <span><i class="fas fa-newspaper" style="color:var(--primary);margin-right:6px;"></i>Informativo em Massa</span>
+                <span id="informativo-badge" style="background:var(--primary-ultra);color:var(--primary);font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid var(--border-accent);">0 destinatários</span>
+            </h3>
+
+            <!-- Abas: Template / Destinatários / Preview -->
+            <div style="display:flex;gap:4px;margin-bottom:14px;background:var(--bg-overlay);border-radius:10px;padding:4px;">
+                <button id="inf-tab-template" onclick="UI.informativoSwitchTab('template')" style="flex:1;padding:8px 4px;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;background:var(--primary);color:white;transition:0.2s;">
+                    <i class="fas fa-palette"></i> Template
+                </button>
+                <button id="inf-tab-destinatarios" onclick="UI.informativoSwitchTab('destinatarios')" style="flex:1;padding:8px 4px;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;background:transparent;color:var(--text-secondary);transition:0.2s;">
+                    <i class="fas fa-users"></i> Destinatários
+                </button>
+                <button id="inf-tab-preview" onclick="UI.informativoSwitchTab('preview')" style="flex:1;padding:8px 4px;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;background:transparent;color:var(--text-secondary);transition:0.2s;">
+                    <i class="fas fa-eye"></i> Preview
+                </button>
+            </div>
+
+            <!-- ABA: Template -->
+            <div id="inf-panel-template">
+                <!-- Tipo de template -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-layer-group" style="color:var(--primary);margin-right:4px;"></i> Tipo de Informativo</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <button class="inf-tipo-btn active" data-tipo="newsletter" onclick="UI.informativoSelectTipo(this)" style="padding:10px 8px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-ultra);color:var(--primary);font-size:0.78rem;font-weight:700;cursor:pointer;transition:0.2s;">
+                            <i class="fas fa-newspaper" style="display:block;font-size:1.2rem;margin-bottom:4px;"></i> Newsletter
+                        </button>
+                        <button class="inf-tipo-btn" data-tipo="lancamento" onclick="UI.informativoSelectTipo(this)" style="padding:10px 8px;border-radius:10px;border:2px solid var(--border);background:white;color:var(--text-secondary);font-size:0.78rem;font-weight:700;cursor:pointer;transition:0.2s;">
+                            <i class="fas fa-rocket" style="display:block;font-size:1.2rem;margin-bottom:4px;"></i> Lançamento
+                        </button>
+                        <button class="inf-tipo-btn" data-tipo="mercado" onclick="UI.informativoSelectTipo(this)" style="padding:10px 8px;border-radius:10px;border:2px solid var(--border);background:white;color:var(--text-secondary);font-size:0.78rem;font-weight:700;cursor:pointer;transition:0.2s;">
+                            <i class="fas fa-chart-line" style="display:block;font-size:1.2rem;margin-bottom:4px;"></i> Dica de Mercado
+                        </button>
+                        <button class="inf-tipo-btn" data-tipo="promocao" onclick="UI.informativoSelectTipo(this)" style="padding:10px 8px;border-radius:10px;border:2px solid var(--border);background:white;color:var(--text-secondary);font-size:0.78rem;font-weight:700;cursor:pointer;transition:0.2s;">
+                            <i class="fas fa-tag" style="display:block;font-size:1.2rem;margin-bottom:4px;"></i> Promoção
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Assunto -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-tag" style="color:var(--primary);margin-right:4px;"></i> Assunto do E-mail</label>
+                    <input type="text" id="inf-assunto" class="form-control" placeholder="Ex: 🏡 Novidades do mercado imobiliário!" oninput="UI.informativoAtualizarPreview()">
+                </div>
+
+                <!-- Título do informativo -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-heading" style="color:var(--primary);margin-right:4px;"></i> Título Principal</label>
+                    <input type="text" id="inf-titulo" class="form-control" placeholder="Ex: Oportunidades imperdíveis do mês!" oninput="UI.informativoAtualizarPreview()">
+                </div>
+
+                <!-- Subtítulo -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-align-left" style="color:var(--primary);margin-right:4px;"></i> Subtítulo / Chamada</label>
+                    <input type="text" id="inf-subtitulo" class="form-control" placeholder="Ex: Confira as melhores opções selecionadas para você" oninput="UI.informativoAtualizarPreview()">
+                </div>
+
+                <!-- Corpo da mensagem -->
+                <div class="form-group">
+                    <label class="form-label" style="display:flex;align-items:center;justify-content:space-between;">
+                        <span><i class="fas fa-align-left" style="color:var(--primary);margin-right:4px;"></i> Mensagem Principal</span>
+                        <span style="font-size:0.72rem;color:var(--text-muted);">Use {nome} para personalizar</span>
+                    </label>
+                    <textarea id="inf-corpo" class="form-control" rows="5" placeholder="Olá {nome}! &#10;&#10;Temos novidades incríveis para você no mercado imobiliário..." oninput="UI.informativoAtualizarPreview()"></textarea>
+                </div>
+
+                <!-- Destaques (imóveis/oportunidades) -->
+                <div class="form-group">
+                    <label class="form-label" style="display:flex;align-items:center;justify-content:space-between;">
+                        <span><i class="fas fa-star" style="color:var(--primary);margin-right:4px;"></i> Destaques (opcional)</span>
+                        <button onclick="UI.informativoAdicionarDestaque()" style="background:var(--primary-ultra);border:1px solid var(--border-accent);color:var(--primary);border-radius:8px;padding:4px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;">
+                            <i class="fas fa-plus"></i> Adicionar
+                        </button>
+                    </label>
+                    <div id="inf-destaques-lista" style="display:flex;flex-direction:column;gap:8px;"></div>
+                </div>
+
+                <!-- CTA (call to action) -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-mouse-pointer" style="color:var(--primary);margin-right:4px;"></i> Botão de Ação (Call to Action)</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <input type="text" id="inf-cta-texto" class="form-control" placeholder="Ex: Ver imóveis" oninput="UI.informativoAtualizarPreview()">
+                        <input type="text" id="inf-cta-link" class="form-control" placeholder="Ex: https://..." oninput="UI.informativoAtualizarPreview()">
+                    </div>
+                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;"><i class="fas fa-info-circle"></i> Deixe o link vazio para omitir o botão.</div>
+                </div>
+
+                <!-- Rodapé personalizado -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-signature" style="color:var(--primary);margin-right:4px;"></i> Rodapé / Assinatura</label>
+                    <textarea id="inf-rodape" class="form-control" rows="3" placeholder="Assinatura automática baseada nas suas configurações..."></textarea>
+                </div>
+            </div>
+
+            <!-- ABA: Destinatários -->
+            <div id="inf-panel-destinatarios" style="display:none;">
+                <!-- Filtro rápido por perfil -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-filter" style="color:var(--primary);margin-right:4px;"></i> Filtrar por Perfil</label>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+                        <button class="inf-perfil-btn active" data-perfil="todos" onclick="UI.informativoFiltrarPerfil(this)" style="padding:6px 12px;border-radius:99px;border:1.5px solid var(--primary);background:var(--primary);color:white;font-size:0.75rem;font-weight:700;cursor:pointer;transition:0.2s;">
+                            Todos
+                        </button>
+                        <button class="inf-perfil-btn" data-perfil="comprador" onclick="UI.informativoFiltrarPerfil(this)" style="padding:6px 12px;border-radius:99px;border:1.5px solid var(--border);background:white;color:var(--text-secondary);font-size:0.75rem;font-weight:700;cursor:pointer;transition:0.2s;">
+                            Compradores
+                        </button>
+                        <button class="inf-perfil-btn" data-perfil="locatario" onclick="UI.informativoFiltrarPerfil(this)" style="padding:6px 12px;border-radius:99px;border:1.5px solid var(--border);background:white;color:var(--text-secondary);font-size:0.75rem;font-weight:700;cursor:pointer;transition:0.2s;">
+                            Locatários
+                        </button>
+                        <button class="inf-perfil-btn" data-perfil="posvenda" onclick="UI.informativoFiltrarPerfil(this)" style="padding:6px 12px;border-radius:99px;border:1.5px solid var(--border);background:white;color:var(--text-secondary);font-size:0.75rem;font-weight:700;cursor:pointer;transition:0.2s;">
+                            Pós-Venda
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Busca -->
+                <div class="form-group">
+                    <label class="form-label" style="display:flex;align-items:center;gap:6px;">
+                        <i class="fas fa-users" style="color:var(--primary);"></i> Clientes com e-mail
+                        <span id="inf-total-tag" style="margin-left:auto;font-size:0.72rem;color:var(--text-secondary);font-weight:500;"></span>
+                    </label>
+                    <input type="text" class="form-control" placeholder="Buscar por nome ou e-mail..." id="inf-filtro-busca" oninput="UI.informativoRenderLista()" style="margin-bottom:8px;">
+                    <div style="max-height:260px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;" id="inf-lista-clientes"></div>
+                    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                        <button type="button" class="btn-sm btn-light" onclick="UI.informativoSelecionarTodos(true)" style="font-size:0.78rem;">
+                            <i class="fas fa-check-square"></i> Selecionar todos
+                        </button>
+                        <button type="button" class="btn-sm btn-light" onclick="UI.informativoSelecionarTodos(false)" style="font-size:0.78rem;">
+                            <i class="far fa-square"></i> Limpar seleção
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Adicionar e-mail extra -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-plus-circle" style="color:var(--primary);margin-right:4px;"></i> Adicionar e-mail extra</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="email" id="inf-email-extra" class="form-control" placeholder="outro@email.com">
+                        <button onclick="UI.informativoAdicionarExtra()" style="background:var(--primary);color:white;border:none;border-radius:10px;padding:0 16px;font-weight:700;cursor:pointer;white-space:nowrap;font-size:0.85rem;">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tags de destinatários selecionados -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-paper-plane" style="color:var(--primary);margin-right:4px;"></i> Lista de envio</label>
+                    <div id="inf-tags-container" style="min-height:44px;border:1px solid var(--border-strong);border-radius:10px;padding:8px 10px;background:var(--bg-raised);display:flex;flex-wrap:wrap;gap:5px;"></div>
+                </div>
+            </div>
+
+            <!-- ABA: Preview -->
+            <div id="inf-panel-preview" style="display:none;">
+                <div style="background:var(--bg-overlay);border-radius:12px;padding:10px;margin-bottom:12px;">
+                    <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;font-weight:600;">ASSUNTO:</div>
+                    <div id="inf-preview-assunto" style="font-size:0.88rem;font-weight:700;color:var(--dark);"></div>
+                </div>
+                <div id="inf-preview-html" style="border:1px solid var(--border);border-radius:12px;overflow:hidden;background:white;max-height:420px;overflow-y:auto;"></div>
+                <div style="margin-top:10px;display:flex;gap:8px;">
+                    <button onclick="UI.informativoCopiarTexto()" style="flex:1;background:var(--bg-overlay);border:1px solid var(--border);color:var(--dark);border-radius:10px;padding:10px;font-weight:700;font-size:0.82rem;cursor:pointer;">
+                        <i class="fas fa-copy"></i> Copiar Texto
+                    </button>
+                    <button onclick="UI.informativoCopiarHTML()" style="flex:1;background:var(--primary-ultra);border:1px solid var(--border-accent);color:var(--primary);border-radius:10px;padding:10px;font-weight:700;font-size:0.82rem;cursor:pointer;">
+                        <i class="fas fa-code"></i> Copiar HTML
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botões de ação -->
+            <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+                <button class="btn-block" style="background:var(--primary);color:white;border:none;" onclick="UI.informativoEnviar()">
+                    <i class="fas fa-paper-plane"></i> Enviar Informativo
+                </button>
+                <button class="btn-block" style="background:rgba(255,255,255,0.08);color:var(--secondary);border:none;" onclick="UI.closeModals()">Cancelar</button>
+            </div>
         </div>
 
         <!-- MODAL NOTIFICAR LANÇAMENTO -->
@@ -18427,6 +18611,525 @@ ${assinatura}`;
 
                 Utils.toast(`E-mail preparado para ${emails.length} destinatário${emails.length !== 1 ? 's' : ''}! Verifique seu cliente de e-mail.`, 'success');
             },
+            // ═══════════════════════════════════════════════════
+            // ═══ INFORMATIVO EM MASSA ════════════════════════
+            // ═══════════════════════════════════════════════════
+
+            _informativoDestSelecionados: new Set(),
+            _informativoTipo: 'newsletter',
+            _informativoPerfilFiltro: 'todos',
+            _informativoDestaques: [],
+
+            openInformativoMassa: async () => {
+                UI._informativoDestSelecionados = new Set();
+                UI._informativoTipo = 'newsletter';
+                UI._informativoPerfilFiltro = 'todos';
+                UI._informativoDestaques = [];
+
+                const settings = await Storage.getSettings();
+                const nomeCorretor  = settings.nome        || 'Corretor(a)';
+                const creci         = settings.creci       || '';
+                const telefone      = settings.telefone    || '';
+                const imobiliaria   = settings.imobiliaria || 'Imobiliária';
+                const emailCorretor = settings.email       || '';
+
+                const linhasAssinatura = [
+                    `──────────────────────`,
+                    `👤 ${nomeCorretor}`,
+                    `🏢 ${imobiliaria}`,
+                    creci         ? `🪪 CRECI: ${creci}` : '',
+                    telefone      ? `📱 WhatsApp: ${telefone}` : '',
+                    emailCorretor ? `✉️ ${emailCorretor}` : '',
+                ].filter(Boolean).join('\n');
+
+                document.getElementById('inf-assunto').value  = `🏡 Informativo Imobiliário — Novidades para você!`;
+                document.getElementById('inf-titulo').value   = `Novidades Selecionadas para Você!`;
+                document.getElementById('inf-subtitulo').value= `Confira as melhores oportunidades do mercado imobiliário`;
+                document.getElementById('inf-corpo').value    =
+`Olá {nome}! 👋
+
+Espero que esteja tudo bem! Preparei este informativo especialmente para você com as novidades mais interessantes do mercado imobiliário.
+
+📌 Se tiver alguma dúvida ou quiser conversar sobre oportunidades, é só me chamar. Estou à disposição para ajudar você a encontrar o imóvel ideal!`;
+                document.getElementById('inf-cta-texto').value = 'Ver Oportunidades';
+                document.getElementById('inf-cta-link').value  = '';
+                document.getElementById('inf-rodape').value    = linhasAssinatura;
+                document.getElementById('inf-destaques-lista').innerHTML = '';
+                document.getElementById('inf-filtro-busca').value = '';
+
+                // Reset abas
+                UI.informativoSwitchTab('template');
+                // Reset tipo buttons
+                document.querySelectorAll('.inf-tipo-btn').forEach(b => {
+                    b.style.border = '2px solid var(--border)';
+                    b.style.background = 'white';
+                    b.style.color = 'var(--text-secondary)';
+                });
+                const btnNewsletter = document.querySelector('.inf-tipo-btn[data-tipo="newsletter"]');
+                if (btnNewsletter) {
+                    btnNewsletter.style.border = '2px solid var(--primary)';
+                    btnNewsletter.style.background = 'var(--primary-ultra)';
+                    btnNewsletter.style.color = 'var(--primary)';
+                }
+                // Reset perfil buttons
+                document.querySelectorAll('.inf-perfil-btn').forEach(b => {
+                    b.style.border = '1.5px solid var(--border)';
+                    b.style.background = 'white';
+                    b.style.color = 'var(--text-secondary)';
+                });
+                const btnTodos = document.querySelector('.inf-perfil-btn[data-perfil="todos"]');
+                if (btnTodos) {
+                    btnTodos.style.border = '1.5px solid var(--primary)';
+                    btnTodos.style.background = 'var(--primary)';
+                    btnTodos.style.color = 'white';
+                }
+
+                UI.informativoRenderLista();
+                UI.informativoAtualizarBadge();
+                UI.openModal('informativo-massa');
+            },
+
+            informativoSwitchTab: (tab) => {
+                ['template','destinatarios','preview'].forEach(t => {
+                    const panel = document.getElementById(`inf-panel-${t}`);
+                    const btn   = document.getElementById(`inf-tab-${t}`);
+                    if (!panel || !btn) return;
+                    if (t === tab) {
+                        panel.style.display = 'block';
+                        btn.style.background = 'var(--primary)';
+                        btn.style.color = 'white';
+                    } else {
+                        panel.style.display = 'none';
+                        btn.style.background = 'transparent';
+                        btn.style.color = 'var(--text-secondary)';
+                    }
+                });
+                if (tab === 'preview') UI.informativoAtualizarPreview();
+            },
+
+            informativoSelectTipo: (btn) => {
+                document.querySelectorAll('.inf-tipo-btn').forEach(b => {
+                    b.style.border = '2px solid var(--border)';
+                    b.style.background = 'white';
+                    b.style.color = 'var(--text-secondary)';
+                });
+                btn.style.border = '2px solid var(--primary)';
+                btn.style.background = 'var(--primary-ultra)';
+                btn.style.color = 'var(--primary)';
+                UI._informativoTipo = btn.dataset.tipo;
+
+                // Preenche sugestões para cada tipo
+                const assuntos = {
+                    newsletter: '🏡 Informativo Imobiliário — Novidades para você!',
+                    lancamento: '🚀 LANÇAMENTO: Novo Empreendimento Chegou!',
+                    mercado:    '📈 Dica do Mercado Imobiliário para Você!',
+                    promocao:   '🎁 Oportunidade Especial — Condições Exclusivas!'
+                };
+                const titulos = {
+                    newsletter: 'Novidades Selecionadas para Você!',
+                    lancamento: '🚀 Lançamento Exclusivo — Seja o Primeiro!',
+                    mercado:    '📊 O Que Está Acontecendo no Mercado',
+                    promocao:   '🎁 Condições Especiais Por Tempo Limitado'
+                };
+                const subtitulos = {
+                    newsletter: 'Confira as melhores oportunidades do mercado imobiliário',
+                    lancamento: 'Um novo empreendimento chegou e você precisa conhecer',
+                    mercado:    'Informações estratégicas para ajudar na sua decisão',
+                    promocao:   'Aproveite condições exclusivas antes que acabe!'
+                };
+                const corpos = {
+                    newsletter: 'Olá {nome}! 👋\n\nEspero que esteja tudo bem! Preparei este informativo especialmente para você com as novidades mais interessantes do mercado imobiliário.\n\n📌 Se tiver alguma dúvida ou quiser conversar sobre oportunidades, é só me chamar!',
+                    lancamento: 'Olá {nome}! 👋\n\n🚀 Grandes novidades! Um novo empreendimento chegou ao mercado e eu pensei imediatamente em você!\n\nEsta é uma oportunidade única de adquirir um imóvel em um lançamento com condições especiais. As unidades são limitadas e a procura está alta!\n\n⚡ Não perca essa chance — entre em contato agora mesmo!',
+                    mercado:    'Olá {nome}! 👋\n\n📊 Olha só o que está acontecendo no mercado imobiliário e como isso pode impactar você!\n\nEstou sempre de olho nas tendências para trazer as melhores informações e oportunidades para os meus clientes. Qualquer dúvida, pode me chamar!',
+                    promocao:   'Olá {nome}! 👋\n\n🎁 Tenho uma novidade incrível para compartilhar com você: condições especiais por tempo limitado!\n\nEsta é uma oportunidade exclusiva que preparei pensando especialmente no seu perfil. As condições são diferenciadas e o prazo é curto, então entre em contato logo!'
+                };
+
+                if (document.getElementById('inf-assunto').value.trim() === '' || 
+                    document.getElementById('inf-assunto').value.includes('Informativo') ||
+                    document.getElementById('inf-assunto').value.includes('LANÇAMENTO') ||
+                    document.getElementById('inf-assunto').value.includes('Dica') ||
+                    document.getElementById('inf-assunto').value.includes('Oportunidade')) {
+                    document.getElementById('inf-assunto').value   = assuntos[UI._informativoTipo];
+                    document.getElementById('inf-titulo').value    = titulos[UI._informativoTipo];
+                    document.getElementById('inf-subtitulo').value = subtitulos[UI._informativoTipo];
+                    document.getElementById('inf-corpo').value     = corpos[UI._informativoTipo];
+                }
+            },
+
+            informativoAdicionarDestaque: () => {
+                const id = Date.now();
+                UI._informativoDestaques.push({ id, titulo: '', descricao: '', preco: '' });
+                UI._informativoRenderDestaques();
+            },
+
+            _informativoRenderDestaques: () => {
+                const container = document.getElementById('inf-destaques-lista');
+                if (!container) return;
+                container.innerHTML = UI._informativoDestaques.map((d, i) => `
+                    <div style="border:1px solid var(--border);border-radius:10px;padding:12px;background:var(--light);position:relative;">
+                        <button onclick="UI._informativoRemoverDestaque(${d.id})" style="position:absolute;top:8px;right:8px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;">×</button>
+                        <div style="font-size:0.75rem;font-weight:700;color:var(--primary);margin-bottom:8px;">⭐ Destaque ${i+1}</div>
+                        <input type="text" placeholder="Título do imóvel / oportunidade" class="form-control" style="margin-bottom:6px;font-size:0.83rem;"
+                            value="${d.titulo}" oninput="UI._informativoUpdateDestaque(${d.id},'titulo',this.value)">
+                        <input type="text" placeholder="Descrição breve (ex: 3 quartos, 90m², Ponta Verde)" class="form-control" style="margin-bottom:6px;font-size:0.83rem;"
+                            value="${d.descricao}" oninput="UI._informativoUpdateDestaque(${d.id},'descricao',this.value)">
+                        <input type="text" placeholder="Valor (ex: R$ 350.000)" class="form-control" style="font-size:0.83rem;"
+                            value="${d.preco}" oninput="UI._informativoUpdateDestaque(${d.id},'preco',this.value)">
+                    </div>
+                `).join('');
+            },
+
+            _informativoUpdateDestaque: (id, campo, valor) => {
+                const d = UI._informativoDestaques.find(x => x.id === id);
+                if (d) d[campo] = valor;
+            },
+
+            _informativoRemoverDestaque: (id) => {
+                UI._informativoDestaques = UI._informativoDestaques.filter(x => x.id !== id);
+                UI._informativoRenderDestaques();
+            },
+
+            informativoFiltrarPerfil: (btn) => {
+                document.querySelectorAll('.inf-perfil-btn').forEach(b => {
+                    b.style.border = '1.5px solid var(--border)';
+                    b.style.background = 'white';
+                    b.style.color = 'var(--text-secondary)';
+                });
+                btn.style.border = '1.5px solid var(--primary)';
+                btn.style.background = 'var(--primary)';
+                btn.style.color = 'white';
+                UI._informativoPerfilFiltro = btn.dataset.perfil;
+                UI.informativoRenderLista();
+            },
+
+            informativoRenderLista: () => {
+                const termo   = (document.getElementById('inf-filtro-busca')?.value || '').toLowerCase();
+                const perfil  = UI._informativoPerfilFiltro;
+                const agora   = Date.now();
+                const TRINTA  = 30 * 24 * 60 * 60 * 1000;
+
+                let lista = (UI.data.clientes || []).filter(c => c.email && c.email.trim() !== '');
+
+                // filtro de perfil
+                if (perfil === 'comprador') {
+                    lista = lista.filter(c => {
+                        const tipo = (c.tipo || '').toLowerCase();
+                        return tipo.includes('comprador') || tipo.includes('compra') || tipo.includes('interessado');
+                    });
+                } else if (perfil === 'locatario') {
+                    lista = lista.filter(c => {
+                        const tipo = (c.tipo || '').toLowerCase();
+                        return tipo.includes('locatário') || tipo.includes('locação') || tipo.includes('aluguel') || tipo.includes('inquilino');
+                    });
+                } else if (perfil === 'posvenda') {
+                    lista = lista.filter(c => c.ativo === false || c.vendaConcluida === true || c.statusFunil === 'venda');
+                }
+
+                // filtro de busca
+                lista = lista.filter(c =>
+                    c.nome.toLowerCase().includes(termo) || c.email.toLowerCase().includes(termo)
+                );
+
+                const totalTag = document.getElementById('inf-total-tag');
+                if (totalTag) totalTag.textContent = `${lista.length} cliente(s)`;
+
+                const container = document.getElementById('inf-lista-clientes');
+                if (!container) return;
+
+                if (lista.length === 0) {
+                    container.innerHTML = `<div style="padding:18px;text-align:center;color:var(--text-muted);font-size:0.85rem;">
+                        <i class="fas fa-envelope-open" style="font-size:1.5rem;margin-bottom:8px;display:block;"></i>
+                        Nenhum cliente encontrado com e-mail.
+                    </div>`;
+                    return;
+                }
+
+                container.innerHTML = lista.map(c => {
+                    const sel = UI._informativoDestSelecionados.has(c.email);
+                    const diasSemEmail = c.ultimoEmailMassaEnviado
+                        ? Math.floor((agora - new Date(c.ultimoEmailMassaEnviado).getTime()) / (1000*60*60*24))
+                        : null;
+                    const ultimoInfo = diasSemEmail !== null
+                        ? `<span style="font-size:0.7rem;color:${diasSemEmail < 30 ? 'var(--warning)' : 'var(--accent)'};margin-left:4px;">${diasSemEmail < 30 ? `⏱ ${diasSemEmail}d atrás` : '✓ ok'}</span>`
+                        : '';
+                    return `<label style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);" for="cb-inf-${c.id}">
+                        <input type="checkbox" id="cb-inf-${c.id}" class="inf-cliente-checkbox"
+                            data-id="${c.id}" data-nome="${c.nome}" data-email="${c.email}"
+                            ${sel ? 'checked' : ''}
+                            onchange="UI._informativoOnCheck(this)"
+                            style="width:16px;height:16px;accent-color:var(--primary);flex-shrink:0;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:600;font-size:0.88rem;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                ${c.nome} ${ultimoInfo}
+                            </div>
+                            <div style="font-size:0.78rem;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                <i class="fas fa-envelope" style="margin-right:3px;"></i>${c.email}
+                                ${c.tipo ? `<span style="margin-left:6px;color:var(--text-muted);font-size:0.72rem;">${c.tipo}</span>` : ''}
+                            </div>
+                        </div>
+                    </label>`;
+                }).join('');
+            },
+
+            _informativoOnCheck: (cb) => {
+                if (cb.checked) {
+                    UI._informativoDestSelecionados.add(cb.dataset.email);
+                } else {
+                    UI._informativoDestSelecionados.delete(cb.dataset.email);
+                }
+                UI._informativoRenderTags();
+                UI.informativoAtualizarBadge();
+            },
+
+            informativoSelecionarTodos: (sel) => {
+                document.querySelectorAll('#inf-lista-clientes .inf-cliente-checkbox').forEach(cb => {
+                    cb.checked = sel;
+                    if (sel) UI._informativoDestSelecionados.add(cb.dataset.email);
+                    else UI._informativoDestSelecionados.delete(cb.dataset.email);
+                });
+                UI._informativoRenderTags();
+                UI.informativoAtualizarBadge();
+            },
+
+            informativoAdicionarExtra: () => {
+                const input = document.getElementById('inf-email-extra');
+                const val = (input?.value || '').trim();
+                if (!val) return;
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+                    Utils.toast('E-mail inválido', 'error');
+                    return;
+                }
+                UI._informativoDestSelecionados.add(val);
+                input.value = '';
+                UI._informativoRenderTags();
+                UI.informativoAtualizarBadge();
+            },
+
+            _informativoRenderTags: () => {
+                const container = document.getElementById('inf-tags-container');
+                if (!container) return;
+                const emails = Array.from(UI._informativoDestSelecionados);
+                if (emails.length === 0) {
+                    container.innerHTML = `<span style="color:var(--text-muted);font-size:0.82rem;padding:4px;">Nenhum destinatário selecionado ainda.</span>`;
+                    return;
+                }
+                container.innerHTML = emails.map(email => {
+                    const c = (UI.data.clientes || []).find(x => x.email === email);
+                    const label = c ? `${c.nome.split(' ')[0]} <${email}>` : email;
+                    return `<span style="display:inline-flex;align-items:center;gap:5px;background:var(--primary-ultra);color:var(--primary);border:1px solid var(--border-accent);border-radius:99px;padding:3px 10px;font-size:0.76rem;font-weight:600;">
+                        <i class="fas fa-user" style="font-size:0.65rem;opacity:0.7;"></i>
+                        ${label}
+                        <button onclick="UI._informativoRemoverTag('${email}')" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:0.85rem;padding:0 2px;line-height:1;">×</button>
+                    </span>`;
+                }).join('');
+            },
+
+            _informativoRemoverTag: (email) => {
+                UI._informativoDestSelecionados.delete(email);
+                document.querySelectorAll('#inf-lista-clientes .inf-cliente-checkbox').forEach(cb => {
+                    if (cb.dataset.email === email) cb.checked = false;
+                });
+                UI._informativoRenderTags();
+                UI.informativoAtualizarBadge();
+            },
+
+            informativoAtualizarBadge: () => {
+                const badge = document.getElementById('informativo-badge');
+                if (!badge) return;
+                const n = UI._informativoDestSelecionados.size;
+                badge.textContent = `${n} destinatário${n !== 1 ? 's' : ''}`;
+                badge.style.background   = n > 0 ? 'var(--accent-ultra)' : 'var(--primary-ultra)';
+                badge.style.color        = n > 0 ? 'var(--accent-dark)'  : 'var(--primary)';
+                badge.style.borderColor  = n > 0 ? 'var(--accent)'       : 'var(--border-accent)';
+            },
+
+            informativoAtualizarPreview: () => {
+                const assunto   = document.getElementById('inf-assunto')?.value    || '';
+                const titulo    = document.getElementById('inf-titulo')?.value     || 'Informativo';
+                const subtitulo = document.getElementById('inf-subtitulo')?.value  || '';
+                const corpo     = document.getElementById('inf-corpo')?.value      || '';
+                const ctaTexto  = document.getElementById('inf-cta-texto')?.value  || '';
+                const ctaLink   = document.getElementById('inf-cta-link')?.value   || '';
+                const rodape    = document.getElementById('inf-rodape')?.value     || '';
+
+                const corpoHtml = corpo.replace(/\n/g, '<br>').replace(/{nome}/g, '<strong style="color:#1D6FA4">[Nome do Cliente]</strong>');
+
+                const destaquesHtml = UI._informativoDestaques.length > 0
+                    ? `<div style="margin:20px 0;">
+                        <p style="font-weight:700;color:#1A2332;font-size:14px;margin-bottom:12px;">⭐ Destaques:</p>
+                        ${UI._informativoDestaques.map(d => `
+                            <div style="border:1px solid #E2E8F0;border-radius:10px;padding:14px;margin-bottom:10px;background:#F8FAFC;">
+                                <p style="font-weight:700;color:#1D6FA4;margin-bottom:4px;">${d.titulo || 'Imóvel em Destaque'}</p>
+                                ${d.descricao ? `<p style="color:#64748B;font-size:13px;margin-bottom:4px;">${d.descricao}</p>` : ''}
+                                ${d.preco     ? `<p style="font-weight:800;color:#27AE60;font-size:15px;">${d.preco}</p>` : ''}
+                            </div>`).join('')}
+                    </div>` : '';
+
+                const ctaHtml = ctaTexto && ctaLink
+                    ? `<div style="text-align:center;margin:24px 0;">
+                        <a href="${ctaLink}" style="display:inline-block;background:#1D6FA4;color:white;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;">${ctaTexto}</a>
+                    </div>` : ctaTexto
+                    ? `<div style="text-align:center;margin:24px 0;">
+                        <span style="display:inline-block;background:#1D6FA4;color:white;padding:12px 28px;border-radius:10px;font-weight:700;font-size:14px;">${ctaTexto}</span>
+                    </div>` : '';
+
+                const rodapeHtml = rodape ? `<div style="margin-top:24px;padding-top:16px;border-top:1px solid #E2E8F0;font-size:12px;color:#94A3B8;white-space:pre-line;">${rodape}</div>` : '';
+
+                const tipoCorBand = { newsletter: '#1D6FA4', lancamento: '#7C3AED', mercado: '#27AE60', promocao: '#E67E22' };
+                const corBand = tipoCorBand[UI._informativoTipo] || '#1D6FA4';
+
+                const html = `
+                <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#FFFFFF;">
+                    <!-- Header banda de cor -->
+                    <div style="background:${corBand};height:6px;border-radius:4px 4px 0 0;"></div>
+                    <!-- Cabeçalho -->
+                    <div style="background:linear-gradient(135deg,#0C4A6E 0%,${corBand} 100%);padding:28px 28px 22px;border-radius:0 0 0 0;">
+                        <h1 style="color:#FFFFFF;font-size:22px;font-weight:900;margin:0 0 6px;letter-spacing:-0.3px;">${titulo}</h1>
+                        ${subtitulo ? `<p style="color:rgba(255,255,255,0.75);font-size:14px;margin:0;">${subtitulo}</p>` : ''}
+                    </div>
+                    <!-- Corpo -->
+                    <div style="padding:24px 28px;">
+                        <div style="font-size:14px;line-height:1.7;color:#1A2332;">${corpoHtml}</div>
+                        ${destaquesHtml}
+                        ${ctaHtml}
+                    </div>
+                    <!-- Rodapé -->
+                    <div style="background:#F5F7FA;padding:16px 28px 20px;border-top:1px solid #E2E8F0;">
+                        ${rodapeHtml}
+                        <p style="font-size:11px;color:#94A3B8;margin-top:12px;margin-bottom:0;">Este informativo foi enviado exclusivamente para você. Para cancelar o recebimento, entre em contato conosco.</p>
+                    </div>
+                </div>`;
+
+                const previewAssunto = document.getElementById('inf-preview-assunto');
+                if (previewAssunto) previewAssunto.textContent = assunto || '(sem assunto)';
+                const previewHtml = document.getElementById('inf-preview-html');
+                if (previewHtml) previewHtml.innerHTML = html;
+            },
+
+            informativoCopiarTexto: () => {
+                const titulo    = document.getElementById('inf-titulo')?.value    || '';
+                const subtitulo = document.getElementById('inf-subtitulo')?.value || '';
+                const corpo     = document.getElementById('inf-corpo')?.value     || '';
+                const ctaTexto  = document.getElementById('inf-cta-texto')?.value || '';
+                const ctaLink   = document.getElementById('inf-cta-link')?.value  || '';
+                const rodape    = document.getElementById('inf-rodape')?.value    || '';
+                const destaques = UI._informativoDestaques.map(d =>
+                    `⭐ ${d.titulo}${d.descricao ? '\n   ' + d.descricao : ''}${d.preco ? '\n   ' + d.preco : ''}`
+                ).join('\n');
+
+                const texto = [
+                    titulo,
+                    subtitulo,
+                    '',
+                    corpo,
+                    destaques ? '\n' + destaques : '',
+                    ctaTexto && ctaLink ? `\n👉 ${ctaTexto}: ${ctaLink}` : ctaTexto ? `\n👉 ${ctaTexto}` : '',
+                    rodape ? '\n' + rodape : ''
+                ].filter(x => x !== undefined && x !== null).join('\n').trim();
+
+                navigator.clipboard.writeText(texto).then(() => {
+                    Utils.toast('Texto copiado!', 'success');
+                }).catch(() => {
+                    Utils.toast('Erro ao copiar. Selecione manualmente.', 'error');
+                });
+            },
+
+            informativoCopiarHTML: () => {
+                const previewHtml = document.getElementById('inf-preview-html');
+                if (!previewHtml) return;
+                const html = previewHtml.innerHTML;
+                navigator.clipboard.writeText(html).then(() => {
+                    Utils.toast('HTML copiado! Cole no seu cliente de e-mail.', 'success');
+                }).catch(() => {
+                    Utils.toast('Erro ao copiar HTML.', 'error');
+                });
+            },
+
+            informativoEnviar: async () => {
+                // Garante que preview está atualizado
+                UI.informativoAtualizarPreview();
+
+                // Captura input extra de e-mail (se hover algum digitado)
+                const inputExtra = document.getElementById('inf-email-extra');
+                if (inputExtra && inputExtra.value.trim()) {
+                    const val = inputExtra.value.trim();
+                    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+                        UI._informativoDestSelecionados.add(val);
+                        inputExtra.value = '';
+                    }
+                }
+
+                if (UI._informativoDestSelecionados.size === 0) {
+                    Utils.toast('Selecione ao menos um destinatário', 'error');
+                    UI.informativoSwitchTab('destinatarios');
+                    return;
+                }
+
+                const assunto   = document.getElementById('inf-assunto')?.value.trim() || 'Informativo Imobiliário';
+                const corpo     = document.getElementById('inf-corpo')?.value.trim()   || '';
+                const emails    = Array.from(UI._informativoDestSelecionados);
+
+                // Personalização (se 1 cliente, usa nome; senão usa "cliente")
+                let corpoFinal   = corpo;
+                let assuntoFinal = assunto;
+                if (emails.length === 1) {
+                    const c = (UI.data.clientes || []).find(cl => cl.email === emails[0]);
+                    if (c) {
+                        const primeiro = c.nome.split(' ')[0];
+                        corpoFinal   = corpo.replace(/{nome}/g, primeiro);
+                        assuntoFinal = assunto.replace(/{nome}/g, primeiro);
+                    }
+                } else {
+                    corpoFinal   = corpo.replace(/{nome}/g, 'cliente');
+                    assuntoFinal = assunto.replace(/{nome}/g, 'você');
+                }
+
+                // Adiciona destaques e rodapé ao corpo do texto
+                const destaquesTexto = UI._informativoDestaques.map(d =>
+                    `⭐ ${d.titulo}${d.descricao ? ' — ' + d.descricao : ''}${d.preco ? ' | ' + d.preco : ''}`
+                ).join('\n');
+                const ctaTexto = document.getElementById('inf-cta-texto')?.value || '';
+                const ctaLink  = document.getElementById('inf-cta-link')?.value  || '';
+                const rodape   = document.getElementById('inf-rodape')?.value    || '';
+                const titulo   = document.getElementById('inf-titulo')?.value    || '';
+                const subtit   = document.getElementById('inf-subtitulo')?.value || '';
+
+                let corpoMailto = `${titulo}\n${subtit}\n\n${corpoFinal}`;
+                if (destaquesTexto) corpoMailto += `\n\n${destaquesTexto}`;
+                if (ctaTexto && ctaLink) corpoMailto += `\n\n👉 ${ctaTexto}: ${ctaLink}`;
+                else if (ctaTexto)       corpoMailto += `\n\n👉 ${ctaTexto}`;
+                if (rodape)              corpoMailto += `\n\n${rodape}`;
+
+                const to  = emails[0];
+                const bcc = emails.slice(1).join(',');
+                const params = [
+                    `subject=${encodeURIComponent(assuntoFinal)}`,
+                    `body=${encodeURIComponent(corpoMailto)}`,
+                    bcc ? `bcc=${encodeURIComponent(bcc)}` : ''
+                ].filter(Boolean).join('&');
+                const mailto = `mailto:${to}?${params}`;
+
+                const a = document.createElement('a');
+                a.href = mailto;
+                a.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => { if (document.body.contains(a)) document.body.removeChild(a); }, 300);
+
+                // Registra data de envio em cada cliente
+                const agoraIso = new Date().toISOString();
+                const clientesParaAtualizar = (UI.data.clientes || []).filter(c => emails.includes(c.email));
+                for (const cliente of clientesParaAtualizar) {
+                    cliente.ultimoEmailMassaEnviado = agoraIso;
+                    await DB.put('clientes', cliente);
+                }
+                if (clientesParaAtualizar.length > 0) {
+                    UI.data.clientes = await Storage.getClientes();
+                }
+
+                Utils.toast(`Informativo preparado para ${emails.length} destinatário${emails.length !== 1 ? 's' : ''}! Confira seu cliente de e-mail.`, 'success');
+            },
+
             // ═══════════════════════════════════════════════════
 
             verificarLancamentos: () => {
