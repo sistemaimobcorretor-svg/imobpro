@@ -6079,9 +6079,6 @@
         }
 
         /* ── Sidebar (desktop ≥ 900px) ── */
-        /* ── Sidebar icon-only (desktop) ─────────────────────── */
-        :root { --sidebar-width: 56px; }
-
         #nav-sidebar {
             display: none;
         }
@@ -6089,42 +6086,60 @@
         @media (min-width: 900px) {
             #nav-menu-btn { display: none; }
             #nav-drawer, #nav-drawer-overlay { display: none !important; }
-            #sidebar-toggle-btn { display: none !important; }
+            #sidebar-toggle-btn { display: flex !important; }
 
             #nav-sidebar {
                 display: flex;
                 flex-direction: column;
-                align-items: center;
                 width: var(--sidebar-width);
                 min-width: var(--sidebar-width);
-                background: #0F1923;
-                border-right: none;
+                background: #FFFFFF;
+                border-right: 1px solid #E2E8F0;
                 position: fixed;
-                top: 0;
+                top: var(--header-height);
                 left: 0;
                 bottom: 0;
-                z-index: 60;
+                z-index: 40;
                 overflow-y: auto;
                 overflow-x: hidden;
                 scrollbar-width: none;
-                padding: 0 0 16px;
-                gap: 0;
-                box-shadow: 2px 0 12px rgba(0,0,0,0.18);
+                padding: 12px 0 24px;
+                transition: width 0.28s cubic-bezier(.4,0,.2,1),
+                            min-width 0.28s cubic-bezier(.4,0,.2,1),
+                            transform 0.28s cubic-bezier(.4,0,.2,1);
             }
             #nav-sidebar::-webkit-scrollbar { display: none; }
+            body.dark-mode #nav-sidebar {
+                background: #1E293B;
+                border-right-color: rgba(255,255,255,0.07);
+            }
 
             main {
                 padding-left: calc(var(--sidebar-width) + 16px);
                 padding-right: 24px;
-                padding-top: calc(var(--header-height) + 12px);
+                transition: padding-left 0.28s cubic-bezier(.4,0,.2,1);
             }
 
-            header {
-                left: var(--sidebar-width);
+            /* ── Sidebar recolhida ── */
+            body.sidebar-collapsed #nav-sidebar {
+                width: 0;
+                min-width: 0;
+                border-right: none;
+                padding: 0;
+                overflow: hidden;
+            }
+            body.sidebar-collapsed main {
+                padding-left: 24px;
+            }
+            body.sidebar-collapsed #sidebar-toggle-btn i {
+                transform: rotate(0deg);
+            }
+            #sidebar-toggle-btn i {
+                transition: transform 0.28s cubic-bezier(.4,0,.2,1);
             }
         }
 
-        /* ── Drawer: mantém estilo original no mobile ── */
+        /* ── Conteúdo interno do drawer/sidebar ── */
         .nav-panel-header {
             padding: 20px 20px 12px;
             border-bottom: 1px solid #F1F5F9;
@@ -6157,7 +6172,6 @@
         .nav-panel-close:active { background: var(--primary-ultra); }
         @media (min-width: 900px) { .nav-panel-close { display: none; } }
 
-        /* ── Seções e labels: visíveis só no drawer mobile ── */
         .nav-panel-section {
             padding: 10px 12px 4px;
         }
@@ -6171,7 +6185,6 @@
             margin-bottom: 4px;
         }
 
-        /* ── Item: no drawer mobile = texto + ícone; no sidebar desktop = só ícone ── */
         .nav-panel-item {
             display: flex;
             align-items: center;
@@ -6197,7 +6210,10 @@
             flex-shrink: 0;
             transition: transform 0.15s;
         }
-        .nav-panel-item:hover { background: var(--primary-ultra); color: var(--primary); }
+        .nav-panel-item:hover {
+            background: var(--primary-ultra);
+            color: var(--primary);
+        }
         .nav-panel-item:hover i { transform: translateX(1px); }
         .nav-panel-item.active {
             background: var(--primary-ultra);
@@ -6225,105 +6241,6 @@
             margin: 8px 12px;
         }
         body.dark-mode .nav-panel-divider { background: rgba(255,255,255,0.06); }
-
-        /* ══ SIDEBAR DESKTOP: icon-only override ══════════════════ */
-        @media (min-width: 900px) {
-            /* Logo/brand no topo da sidebar */
-            #nav-sidebar .nav-sidebar-brand {
-                width: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 14px 0 10px;
-                margin-bottom: 6px;
-                border-bottom: 1px solid rgba(255,255,255,0.08);
-                flex-shrink: 0;
-            }
-            #nav-sidebar .nav-sidebar-brand-icon {
-                width: 34px; height: 34px;
-                background: #1D6FA4;
-                border-radius: 10px;
-                display: flex; align-items: center; justify-content: center;
-                font-size: 1rem; color: white;
-                box-shadow: 0 2px 8px rgba(29,111,164,0.45);
-            }
-
-            /* Seções viram apenas separadores */
-            #nav-sidebar .nav-panel-section {
-                padding: 4px 0;
-                width: 100%;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 2px;
-            }
-            #nav-sidebar .nav-panel-section-label { display: none; }
-            #nav-sidebar .nav-panel-divider {
-                width: 28px;
-                height: 1px;
-                background: rgba(255,255,255,0.10);
-                margin: 4px auto;
-            }
-
-            /* Items: botão quadrado de ícone com tooltip */
-            #nav-sidebar .nav-panel-item {
-                width: 40px;
-                height: 40px;
-                padding: 0;
-                border-radius: 10px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0;
-                color: rgba(255,255,255,0.40);
-                background: none;
-                position: relative;
-                overflow: visible;
-            }
-            /* Esconde texto, mostra só ícone */
-            #nav-sidebar .nav-panel-item > *:not(i) { display: none; }
-            #nav-sidebar .nav-panel-item i {
-                font-size: 1.05rem;
-                width: auto;
-            }
-            #nav-sidebar .nav-panel-item:hover {
-                background: rgba(255,255,255,0.08);
-                color: #FFFFFF;
-            }
-            #nav-sidebar .nav-panel-item:hover i { transform: none; }
-            #nav-sidebar .nav-panel-item.active {
-                background: #1D6FA4;
-                color: #FFFFFF;
-            }
-            #nav-sidebar .nav-panel-item.active::before { display: none; }
-
-            /* Tooltip ao passar o mouse */
-            #nav-sidebar .nav-panel-item::after {
-                content: attr(data-label);
-                position: absolute;
-                left: calc(100% + 10px);
-                top: 50%;
-                transform: translateY(-50%);
-                background: #1E293B;
-                color: #F1F5F9;
-                font-size: 0.72rem;
-                font-weight: 600;
-                white-space: nowrap;
-                padding: 5px 10px;
-                border-radius: 7px;
-                pointer-events: none;
-                opacity: 0;
-                transition: opacity 0.15s;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-                z-index: 9999;
-            }
-            #nav-sidebar .nav-panel-item:hover::after { opacity: 1; }
-
-            /* Spacer empurra ícones de config para o fundo */
-            #nav-sidebar .nav-sidebar-spacer {
-                flex: 1;
-            }
-        }
 
         /* ===== FINANCEIRO ===== */
         .fin-cor-btn {
@@ -8561,63 +8478,70 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
         <!-- ── Sidebar desktop (espelha o drawer) ── -->
         <nav id="nav-sidebar">
-            <!-- Brand/logo no topo -->
-            <div class="nav-sidebar-brand">
-                <div class="nav-sidebar-brand-icon">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-            </div>
-
-            <!-- Principal -->
             <div class="nav-panel-section">
                 <div class="nav-panel-section-label">Principal</div>
-                <button class="nav-panel-item active" data-label="Início" data-target="dashboard-view" onclick="UI.switchTab(this);return false;">
-                    <i class="fas fa-home"></i> <span>Início</span>
+                <button class="nav-panel-item active" data-target="dashboard-view" onclick="UI.switchTab(this);return false;">
+                    <i class="fas fa-home"></i> Início
                 </button>
-                <button class="nav-panel-item" data-label="Relatórios" data-target="relatorios-view" onclick="UI.switchTab(this);return false;">
-                    <i class="fas fa-chart-line"></i> <span>Relatórios</span>
+                <button class="nav-panel-item" data-target="imoveis-view" onclick="UI.switchTab(this);return false;">
+                    <i class="fas fa-building"></i> Imóveis
                 </button>
-                <button class="nav-panel-item" data-label="Imóveis" data-target="imoveis-view" onclick="UI.switchTab(this);return false;">
-                    <i class="fas fa-building"></i> <span>Imóveis</span>
+                <button class="nav-panel-item" data-target="clientes-view" onclick="UI.switchTab(this);return false;">
+                    <i class="fas fa-users"></i> Clientes
                 </button>
-                <button class="nav-panel-item" data-label="Agenda" data-target="agenda-view" onclick="UI.switchTab(this);return false;">
-                    <i class="fas fa-calendar-alt"></i> <span>Agenda</span>
+                <button class="nav-panel-item" data-target="agenda-view" onclick="UI.switchTab(this);return false;">
+                    <i class="fas fa-calendar-alt"></i> Agenda
                 </button>
-                <button class="nav-panel-item" data-label="Histórico" data-target="funil-view" onclick="UI.switchTab(this);return false;">
-                    <i class="fas fa-history"></i> <span>Histórico</span>
-                </button>
-                <button class="nav-panel-item" data-label="Clientes" data-target="clientes-view" onclick="UI.switchTab(this);return false;">
-                    <i class="fas fa-list-ul"></i> <span>Clientes</span>
+                <button class="nav-panel-item" data-target="funil-view" onclick="UI.switchTab(this);return false;">
+                    <i class="fas fa-filter"></i> Funil
                 </button>
             </div>
 
             <div class="nav-panel-divider"></div>
 
-            <!-- Ferramentas -->
             <div class="nav-panel-section">
                 <div class="nav-panel-section-label">Ferramentas</div>
-                <button class="nav-panel-item" data-label="Notas" data-target="notas-view" onclick="UI.switchTab(this);Notas.init();return false;">
-                    <i class="fas fa-sticky-note"></i> <span>Notas</span>
+                <button class="nav-panel-item" data-target="relatorios-view" onclick="UI.switchTab(this);return false;">
+                    <i class="fas fa-chart-bar"></i> Relatórios
                 </button>
-                <button class="nav-panel-item" data-label="Leitura" data-target="leitura-view" onclick="UI.switchTab(this);Leitura.init();return false;">
-                    <i class="fas fa-book-open"></i> <span>Leitura</span>
+                <button class="nav-panel-item" data-target="venda-certa-view" onclick="UI.switchTab(this);VendaCerta.init();return false;">
+                    <i class="fas fa-bullseye"></i> Venda Certa
                 </button>
-                <button class="nav-panel-item" data-label="Vídeos" data-target="venda-certa-view" onclick="UI.switchTab(this);VendaCerta.init();return false;">
-                    <i class="fas fa-video"></i> <span>Vídeos</span>
+                <button class="nav-panel-item" data-target="coach-view" onclick="UI.switchTab(this);Coach.init();return false;">
+                    <i class="fas fa-trophy"></i> Coach
+                </button>
+                <button class="nav-panel-item" data-target="simulador-view" onclick="UI.switchTab(this);Simulador.init();return false;">
+                    <i class="fas fa-calculator"></i> Simulador
+                </button>
+                <button class="nav-panel-item" onclick="App.gerentes.abrirCadastro();return false;">
+                    <i class="fas fa-user-tie" style="width:18px;text-align:center;"></i> Gerentes
+                </button>
+                <button class="nav-panel-item" onclick="App.imobiliarias.abrirCadastro();return false;">
+                    <i class="fas fa-building" style="width:18px;text-align:center;"></i> Imobiliárias
+                </button>
+                <button class="nav-panel-item" onclick="App.correspondentes.abrirCadastro();return false;">
+                    <i class="fas fa-university"></i> Correspondentes
                 </button>
             </div>
 
-            <!-- Spacer empurra itens de baixo para o fundo -->
-            <div class="nav-sidebar-spacer"></div>
+            <div class="nav-panel-divider"></div>
 
-            <!-- Configurações no rodapé -->
             <div class="nav-panel-section">
-                <div class="nav-panel-section-label">Config</div>
-                <button class="nav-panel-item" data-label="Simulador" data-target="simulador-view" onclick="UI.switchTab(this);Simulador.init();return false;">
-                    <i class="fas fa-calculator"></i> <span>Simulador</span>
+                <div class="nav-panel-section-label">Outros</div>
+                <button class="nav-panel-item" data-target="links-view" onclick="UI.switchTab(this);return false;">
+                    <i class="fas fa-link"></i> Links
                 </button>
-                <button class="nav-panel-item" data-label="Links" data-target="links-view" onclick="UI.switchTab(this);return false;">
-                    <i class="fas fa-link"></i> <span>Links</span>
+                <button class="nav-panel-item" data-target="notas-view" onclick="UI.switchTab(this);Notas.init();return false;">
+                    <i class="fas fa-sticky-note"></i> Notas
+                </button>
+                <button class="nav-panel-item" data-target="leitura-view" onclick="UI.switchTab(this);Leitura.init();return false;">
+                    <i class="fas fa-book-open"></i> Leitura
+                </button>
+                <button class="nav-panel-item" data-target="financeiro-view" onclick="UI.switchTab(this);Financeiro.init();return false;">
+                    <i class="fas fa-wallet"></i> Financeiro
+                </button>
+                <button class="nav-panel-item" data-target="mercado-view" onclick="UI.switchTab(this);MarketPanel.load(false);return false;">
+                    <i class="fas fa-chart-line"></i> Mercado
                 </button>
             </div>
         </nav>
@@ -9905,14 +9829,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </div>
             </div>
             <div class="form-group">
-                <label class="form-label">Mensagem personalizada</label>
+                <label class="form-label">Mensagem (use {nome} para o nome do cliente)</label>
                 <textarea id="msg-envio" class="form-control" rows="4"></textarea>
-                <small class="form-text text-muted" style="display:block;margin-top:5px;font-size:0.75rem;color:var(--text-secondary);">
-                    Variáveis: <strong>{nome}</strong> — primeiro nome &nbsp;|&nbsp;
-                    <strong>{saudacao}</strong> — Bom dia/tarde/noite &nbsp;|&nbsp;
-                    <strong>{cumprimento}</strong> — Tudo bem? / Como vai? &nbsp;|&nbsp;
-                    <strong>{emoji}</strong> — emoji único por cliente
-                </small>
             </div>
             <div class="form-group">
                 <label class="form-label">Delay aleatório entre envios (segundos)</label>
@@ -12841,17 +12759,16 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 if (hour >= 12 && hour < 18) return "Boa tarde";
                 return "Boa noite";
             },
-            // Alias para compatibilidade
-            getSaudacaoHorario: () => Utils.getGreeting(),
             
             generateWhatsAppMessage: async (cliente, imovel = null) => {
-                const greeting = App.whatsapp.getSaudacaoHorario();
-                const cumprimento = App.whatsapp.getCumprimento(cliente.id);
-                const emojiCliente = App.whatsapp.getEmojiCliente(cliente.id);
+                const hour = new Date().getHours();
+                let greeting = "Boa noite";
+                if (hour >= 5 && hour < 12) greeting = "Bom dia";
+                if (hour >= 12 && hour < 18) greeting = "Boa tarde";
                 
                 const clienteFirstName = cliente.nome.split(' ')[0];
                 const settings = await DB.get('settings', 'main');
-                let message = `${greeting}, ${clienteFirstName}! ${cumprimento} ${emojiCliente}\n\n`;
+                let message = `${greeting}, ${clienteFirstName}! Tudo bem? \u{1F60A}\n\n`;
                 message += `Me chamo ${settings?.nome || 'seu corretor(a)'} sou do time de vendas da ${settings?.imobiliaria || 'nossa imobiliária'}.\n\n`;
                 
                 if (imovel) {
@@ -18112,7 +18029,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
             openEnvioMassa: async () => {
                 const settings = await Storage.getSettings();
-                document.getElementById('msg-envio').value = settings.msgPadrao || '{saudacao}, {nome}! {cumprimento} {emoji}\nMe chamo [Seu Nome] e sou corretor da [Imobiliária]. Gostaria de saber se ainda tem interesse em adquirir um imóvel. Fico à disposição!';
+                document.getElementById('msg-envio').value = settings.msgPadrao || '{nome}, tudo bem? Me chamo [Seu Nome] e sou corretor da [Imobiliária]. Gostaria de saber se ainda tem interesse em adquirir um imóvel. Fico à disposição! \u{1F3E1}';
                 document.getElementById('delay-min').value = 3;
                 document.getElementById('delay-max').value = 8;
                 document.getElementById('progresso-envio').style.display = 'none';
@@ -18171,14 +18088,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     
                     for (const cliente of UI.envioMassaList) {
                         const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
-                        const _s = App.whatsapp.getSaudacaoHorario();
-                        const _c = App.whatsapp.getCumprimento(cliente.id || cliente.nome);
-                        const _e = App.whatsapp.getEmojiCliente(cliente.id || cliente.nome);
-                        let mensagem = UI.envioMassaMsg
-                            .replace(/{nome}/g, cliente.nome.split(' ')[0])
-                            .replace(/{saudacao}/g, _s)
-                            .replace(/{cumprimento}/g, _c)
-                            .replace(/{emoji}/g, _e);
+                        const mensagem = UI.envioMassaMsg.replace(/{nome}/g, cliente.nome.split(' ')[0]);
                         const encodedMsg = encodeURIComponent(mensagem);
                         const url = `https://wa.me/${phoneNumber}?text=${encodedMsg}`;
                         linksList.innerHTML += `<div class="whatsapp-link-item"><a href="${url}" target="_blank">${cliente.nome}</a></div>`;
@@ -18209,16 +18119,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                 const cliente = UI.envioMassaList[UI.envioMassaIndex];
                 const settings = await Storage.getSettings();
-                const _saud = App.whatsapp.getSaudacaoHorario();
-                const _cumpr = App.whatsapp.getCumprimento(cliente.id || String(UI.envioMassaIndex));
-                const _emj = App.whatsapp.getEmojiCliente(cliente.id || String(UI.envioMassaIndex));
-                let mensagem = UI.envioMassaMsg
-                    .replace(/{nome}/g, cliente.nome.split(' ')[0])
-                    .replace(/{saudacao}/g, _saud)
-                    .replace(/{cumprimento}/g, _cumpr)
-                    .replace(/{emoji}/g, _emj);
-                if (!/[\u{1F000}-\u{1FFFF}]/u.test(mensagem) && !/[\u2600-\u27FF]/.test(mensagem)) {
-                    mensagem += ' ' + _emj;
+                let mensagem = UI.envioMassaMsg.replace(/{nome}/g, cliente.nome.split(' ')[0]);
+                if (!mensagem.includes('\u{1F3E1}') && !mensagem.includes('\u{1F3E0}') && !mensagem.includes('\u{1F511}')) {
+                    mensagem += ' \u{1F3E1}';
                 }
 
                 const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
@@ -19088,14 +18991,17 @@ ${assinatura}`;
                     DB.put('clientes', cliente);
                     UI.data.clientes = Storage.getClientes();
                     
+                    const hour = new Date().getHours();
+                    let greeting = "Boa noite";
+                    if (hour >= 5 && hour < 12) greeting = "Bom dia";
+                    if (hour >= 12 && hour < 18) greeting = "Boa tarde";
+                    
                     const clienteFirstName = cliente.nome.split(' ')[0];
                     const imovel = cliente.imovelInteresseId ? 
                         UI.data.imoveis.find(i => i.id === cliente.imovelInteresseId) : null;
-                    const greeting = App.whatsapp.getSaudacaoHorario();
-                    const cumprEmail = App.whatsapp.getCumprimento(cliente.id);
                     
                     let subject = `ImobiPro - ${imovel ? `Informações sobre ${imovel.titulo.substring(0, 30)}...` : 'Contato Imobiliário'}`;
-                    let body = `${greeting}, ${clienteFirstName}! ${cumprEmail}\n\n`;
+                    let body = `${greeting}, ${clienteFirstName}!\n\n`;
                     
                     if (imovel) {
                         body += `Segue mais informações sobre o imóvel de seu interesse:\n\n`;
@@ -21899,69 +21805,45 @@ ${assinatura}`;
                 },
 
                 // ── SCRIPTS DE FOLLOW-UP POR NÚMERO DE CONTATO ──────────
-                // ── Saudação por horário ─────────────────────────────────
-                getSaudacaoHorario: () => {
-                    const h = new Date().getHours();
-                    if (h >= 5 && h < 12) return 'Bom dia';
-                    if (h >= 12 && h < 18) return 'Boa tarde';
-                    return 'Boa noite';
-                },
-
-                // ── Cumprimento alternado (sem "Olá") por clienteId ─────
-                getCumprimento: (clienteId) => {
-                    // Usa hash simples do id para alternar de forma consistente por cliente
-                    let hash = 0;
-                    const str = String(clienteId || Math.random());
-                    for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) | 0;
-                    const opcoes = ['Tudo bem?', 'Como vai?'];
-                    return opcoes[Math.abs(hash) % opcoes.length];
-                },
-
-                // ── Emoji único por clienteId (conjunto imobiliário) ────
-                getEmojiCliente: (clienteId) => {
-                    const emojis = ['🏡','🔑','🏠','🏢','🏗️','🌟','💫','✨','🎯','🤝','🌈','💎','🏆','🎉','🌺','🌻','🍀','⭐','🔥','💪'];
-                    let hash = 0;
-                    const str = String(clienteId || Math.random());
-                    for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) | 0;
-                    return emojis[Math.abs(hash) % emojis.length];
-                },
-
                 SCRIPTS_FOLLOWUP: {
                     1: {
                         label: '1º Contato',
                         icon: 'fas fa-handshake',
                         cor: '#3DAA6E',
                         badge: '1ª vez',
-                        texto: (nome, clienteId) => {
-                            const saudacao = App.whatsapp.getSaudacaoHorario();
-                            const cumprimento = App.whatsapp.getCumprimento(clienteId);
-                            const emoji = App.whatsapp.getEmojiCliente(clienteId);
-                            return `${saudacao}, ${nome}! ${cumprimento} ${emoji}\nSou corretor de imóveis e estou à disposição para te ajudar a encontrar o imóvel ideal.\n\nGostaria de entender melhor o que você procura: qual região, tipo de imóvel e faixa de preço está considerando? 🏡\n\nPodemos conversar por aqui mesmo, sem compromisso!`;
-                        }
+                        texto: (nome) =>
+`Olá, ${nome}! \u{1F60A}
+Sou corretor de imóveis e estou à disposição para te ajudar a encontrar o imóvel ideal.
+
+Gostaria de entender melhor o que você procura: qual região, tipo de imóvel e faixa de preço está considerando? \u{1F3E1}
+
+Podemos conversar por aqui mesmo, sem compromisso!`
                     },
                     2: {
                         label: '2º Contato',
                         icon: 'fas fa-redo-alt',
                         cor: '#B87020',
                         badge: '2ª tentativa',
-                        texto: (nome, clienteId) => {
-                            const saudacao = App.whatsapp.getSaudacaoHorario();
-                            const cumprimento = App.whatsapp.getCumprimento(clienteId);
-                            const emoji = App.whatsapp.getEmojiCliente(clienteId);
-                            return `${saudacao}, ${nome}! ${cumprimento} ${emoji}\nTentei entrar em contato antes, mas talvez não tenha sido um bom momento.\n\nQuero garantir que você não perca as oportunidades que surgem por aqui — às vezes aparecem opções exclusivas que combinam exatamente com o perfil de quem busca! 🔑\n\nSe puder me dar um retorno, fico grato. Estarei por aqui!`;
-                        }
+                        texto: (nome) =>
+`Olá, ${nome}! \u{1F44B}
+Tentei entrar em contato antes, mas talvez não tenha sido um bom momento.
+
+Quero garantir que você não perca as oportunidades que surgem por aqui — às vezes aparecem opções exclusivas que combinam exatamente com o perfil de quem busca! \u{1F511}
+
+Se puder me dar um retorno, fico grato. Estarei por aqui! \u{1F60A}`
                     },
                     3: {
                         label: '3º Contato — Último',
                         icon: 'fas fa-flag-checkered',
                         cor: '#B83030',
                         badge: '3ª e última',
-                        texto: (nome, clienteId) => {
-                            const saudacao = App.whatsapp.getSaudacaoHorario();
-                            const cumprimento = App.whatsapp.getCumprimento(clienteId);
-                            const emoji = App.whatsapp.getEmojiCliente(clienteId);
-                            return `${saudacao}, ${nome}! ${cumprimento} ${emoji}\nEsta será minha última mensagem para não ser inconveniente. Fico por aqui caso precise de mim no futuro!\n\nMas antes de encerrar, gostaria de saber: posso continuar te enviando oportunidades de imóveis que se encaixem no seu perfil? Muitas vezes surgem opções exclusivas que podem te interessar. 🏆\n\nSe quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
-                        }
+                        texto: (nome) =>
+`Olá, ${nome}! \u{1F64F}
+Esta será minha última mensagem para não ser inconveniente. Fico por aqui caso precise de mim no futuro!
+
+Mas antes de encerrar, gostaria de saber: posso continuar te enviando oportunidades de imóveis que se encaixem no seu perfil? Muitas vezes surgem opções exclusivas que podem te interessar. \u{1F511}
+
+Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`
                     }
                 },
 
@@ -21971,8 +21853,8 @@ ${assinatura}`;
                     const proximoContato = (cliente.contatos || 0) + 1;
                     const scripts = App.whatsapp.SCRIPTS_FOLLOWUP;
                     const primeiroNome = (cliente.nome || 'Cliente').split(' ')[0];
-                    if (proximoContato >= 3) return { ...scripts[3], texto: scripts[3].texto(primeiroNome, cliente.id) };
-                    return { ...scripts[proximoContato] || scripts[1], texto: (scripts[proximoContato] || scripts[1]).texto(primeiroNome, cliente.id) };
+                    if (proximoContato >= 3) return { ...scripts[3], texto: scripts[3].texto(primeiroNome) };
+                    return { ...scripts[proximoContato] || scripts[1], texto: (scripts[proximoContato] || scripts[1]).texto(primeiroNome) };
                 },
 
                 // Copia o script atual para a área de transferência
@@ -22028,18 +21910,28 @@ ${assinatura}`;
 
                     // ── Gera mensagem de aniversário ────────────────────────
                     function msgAniversario() {
-                        const saudacao = App.whatsapp.getSaudacaoHorario();
-                        const cumprimento = App.whatsapp.getCumprimento(clienteId);
-                        const emoji = App.whatsapp.getEmojiCliente(clienteId);
+                        const hora = new Date().getHours();
+                        const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
                         const idade = Utils.calculateAge(cliente.dataNascimento);
-                        return `${saudacao}, ${primeiroNome}! ${cumprimento} ${emoji}\n\nMe chamo ${settings.nome || 'seu corretor(a)'}, sou do time de vendas da ${settings.imobiliaria || 'nossa imobiliária'}.\nGostaria de parabenizá-lo(a) pelos seus ${idade} anos! 🎉\n\nDesejo muita saúde, felicidade e sucesso! ✨\nQue este novo ano de vida seja repleto de conquistas! 🏆\n\nFico à disposição para ajudá-lo(a) na realização do sonho da casa própria! 🏡\n\n📞 Contato: ${settings.telefone || ''}\n🏢 ${settings.imobiliaria || ''}`;
+                        return `${saudacao}, ${primeiroNome}! \u{1F389}\u{1F382}
+
+Me chamo ${settings.nome || 'seu corretor(a)'}, sou do time de vendas da ${settings.imobiliaria || 'nossa imobiliária'}.
+Gostaria de parabenizá-lo(a) pelos seus ${idade} anos! \u{1F38A}
+
+Desejo muita saúde, felicidade e sucesso! ✨
+Que este novo ano de vida seja repleto de conquistas! \u{1F3C6}
+
+Fico à disposição para ajudá-lo(a) na realização do sonho da casa própria! \u{1F3E0}
+
+\u{1F4DE} Contato: ${settings.telefone || ''}
+\u{1F3E2} ${settings.imobiliaria || ''}`;
                     }
 
                     // ── Gera mensagem de follow-up por número de contato ────
                     const SCRIPTS = App.whatsapp.SCRIPTS_FOLLOWUP;
                     function msgFollowup(n) {
                         const s = SCRIPTS[n] || SCRIPTS[3];
-                        return s.texto(primeiroNome, clienteId);
+                        return s.texto(primeiroNome);
                     }
 
                     // ── Monta os cards ──────────────────────────────────────
@@ -22141,31 +22033,28 @@ ${assinatura}`;
                     const phoneNumber    = Utils.formatPhoneForWhatsApp(cliente.telefone);
 
                     let mensagem = '';
-                    const saudacaoNow = App.whatsapp.getSaudacaoHorario();
-                    const cumprimentoNow = App.whatsapp.getCumprimento(cliente.id);
-                    const emojiNow = App.whatsapp.getEmojiCliente(cliente.id);
                     if (proximoContato === 1) {
                         mensagem =
-`${saudacaoNow}, ${primeiroNome}! ${cumprimentoNow} ${emojiNow}
+`Olá, ${primeiroNome}! \u{1F60A}
 Sou corretor de imóveis e estou à disposição para te ajudar a encontrar o imóvel ideal.
 
-Gostaria de entender melhor o que você procura: qual região, tipo de imóvel e faixa de preço está considerando? 🏡
+Gostaria de entender melhor o que você procura: qual região, tipo de imóvel e faixa de preço está considerando? \u{1F3E1}
 
 Podemos conversar por aqui mesmo, sem compromisso!`;
                     } else if (proximoContato === 2) {
                         mensagem =
-`${saudacaoNow}, ${primeiroNome}! ${cumprimentoNow} ${emojiNow}
+`Olá, ${primeiroNome}! \u{1F44B}
 Tentei entrar em contato antes, mas talvez não tenha sido um bom momento.
 
-Quero garantir que você não perca as oportunidades que surgem por aqui — às vezes aparecem opções exclusivas que combinam exatamente com o perfil de quem busca! 🔑
+Quero garantir que você não perca as oportunidades que surgem por aqui — às vezes aparecem opções exclusivas que combinam exatamente com o perfil de quem busca! \u{1F511}
 
-Se puder me dar um retorno, fico grato. Estarei por aqui!`;
+Se puder me dar um retorno, fico grato. Estarei por aqui! \u{1F60A}`;
                     } else if (proximoContato === 3) {
                         mensagem =
-`${saudacaoNow}, ${primeiroNome}! ${cumprimentoNow} ${emojiNow}
+`Olá, ${primeiroNome}! \u{1F64F}
 Esta será minha última mensagem para não ser inconveniente. Fico por aqui caso precise de mim no futuro!
 
-Mas antes de encerrar, gostaria de saber: posso continuar te enviando oportunidades de imóveis que se encaixem no seu perfil? Muitas vezes surgem opções exclusivas que podem te interessar. 🏆
+Mas antes de encerrar, gostaria de saber: posso continuar te enviando oportunidades de imóveis que se encaixem no seu perfil? Muitas vezes surgem opções exclusivas que podem te interessar. \u{1F511}
 
 Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     }
@@ -23134,9 +23023,7 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                 const dateStr = `${diasSemana[now.getDay()]}, ${now.getDate()} de ${meses[now.getMonth()]} de ${now.getFullYear()}`;
 
                 const el = document.getElementById('coach-hero-name');
-                const _h = new Date().getHours();
-                const _heroGreeting = _h >= 5 && _h < 12 ? 'Bom dia' : _h < 18 ? 'Boa tarde' : 'Boa noite';
-                if (el) el.textContent = _heroGreeting + ', ' + name + '! 👋';
+                if (el) el.textContent = 'Olá, ' + name + '! \u{1F44B}';
                 const elDate = document.getElementById('coach-hero-date');
                 if (elDate) elDate.textContent = dateStr;
 
@@ -24319,17 +24206,17 @@ Para cada objeção: a causa-raiz + o script exato em português + a técnica ps
                     {
                         cor: '#3DAA6E',
                         title: '\u{1F4AC} 1º Contato WhatsApp',
-                        body: 'Bom dia/Boa tarde, [Nome]! Tudo bem? 🏡\nSou corretor de imóveis e estou à disposição para te ajudar a encontrar o imóvel ideal.\n\nGostaria de entender melhor o que você procura: qual região, tipo de imóvel e faixa de preço está considerando?\n\nPodemos conversar por aqui mesmo, sem compromisso!'
+                        body: 'Olá, [Nome]! \u{1F60A}\nSou corretor de imóveis e estou à disposição para te ajudar a encontrar o imóvel ideal.\n\nGostaria de entender melhor o que você procura: qual região, tipo de imóvel e faixa de preço está considerando? \u{1F3E1}\n\nPodemos conversar por aqui mesmo, sem compromisso!'
                     },
                     {
                         cor: '#B87020',
                         title: '\u{1F504} 2º Contato WhatsApp — Follow-up',
-                        body: 'Boa tarde, [Nome]! Como vai? 🔑\nTentei entrar em contato antes, mas talvez não tenha sido um bom momento.\n\nQuero garantir que você não perca as oportunidades que surgem por aqui — às vezes aparecem opções exclusivas que combinam exatamente com o perfil de quem busca!\n\nSe puder me dar um retorno, fico grato. Estarei por aqui!'
+                        body: 'Olá, [Nome]! \u{1F44B}\nTentei entrar em contato antes, mas talvez não tenha sido um bom momento.\n\nQuero garantir que você não perca as oportunidades que surgem por aqui — às vezes aparecem opções exclusivas que combinam exatamente com o perfil de quem busca! \u{1F511}\n\nSe puder me dar um retorno, fico grato. Estarei por aqui! \u{1F60A}'
                     },
                     {
                         cor: '#B83030',
                         title: '\u{1F3C1} 3º Contato WhatsApp — Último',
-                        body: 'Boa noite, [Nome]! Tudo bem? 🏆\nEsta será minha última mensagem para não ser inconveniente. Fico por aqui caso precise de mim no futuro!\n\nMas antes de encerrar, gostaria de saber: posso continuar te enviando oportunidades de imóveis que se encaixem no seu perfil? Muitas vezes surgem opções exclusivas que podem te interessar.\n\nSe quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!'
+                        body: 'Olá, [Nome]! \u{1F64F}\nEsta será minha última mensagem para não ser inconveniente. Fico por aqui caso precise de mim no futuro!\n\nMas antes de encerrar, gostaria de saber: posso continuar te enviando oportunidades de imóveis que se encaixem no seu perfil? Muitas vezes surgem opções exclusivas que podem te interessar. \u{1F511}\n\nSe quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!'
                     },
                 ];
                 el.innerHTML = SCRIPTS.map(s => `
