@@ -6565,6 +6565,7 @@
     <!-- ===== TELA DE LOGIN ===== -->
     <div id="login-screen">
         <div id="login-bg-layer"></div>
+        <video id="login-bg-video" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;display:none;" muted loop autoplay playsinline></video>
         <div id="login-bg-overlay"></div>
         <div class="login-logo">
             <div class="logo-icon"><i class="fas fa-home"></i></div>
@@ -6664,6 +6665,9 @@
         </div>
         <div class="loading-msg"><i class="fas fa-spinner" style="margin-right:6px;animation:spin 1s linear infinite;"></i> Carregando dados...</div>
     </div>
+
+    <!-- Vídeo de fundo do sistema -->
+    <video id="sys-bg-video" style="position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;display:none;pointer-events:none;" muted loop autoplay playsinline></video>
 
     <div id="app" style="display: none; width: 100%; height: 100%;">
         <header>
@@ -7971,11 +7975,16 @@
                         <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(196,114,74,0.15);"></div>
                         <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
                             <div style="width:44px;height:44px;background:linear-gradient(135deg,#C4724A,#D98A62);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 4px 12px rgba(196,114,74,0.4);">🏦</div>
-                            <div>
+                            <div style="flex:1;">
                                 <div style="font-size:1rem;font-weight:800;letter-spacing:-0.3px;">Simulador CEF</div>
                                 <div style="font-size:0.72rem;opacity:0.7;margin-top:1px;">MCMV · SBPE · SAC · Price · Regra dos 30%</div>
                             </div>
+                            <button onclick="Simulador.atualizarTaxasAPI()" id="btn-atualizar-taxas" title="Buscar taxas reais via API do Banco Central" style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:white;border-radius:10px;padding:7px 10px;font-size:0.72rem;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;">
+                                <i class="fas fa-sync-alt" id="icon-atualizar-taxas"></i> Taxas reais
+                            </button>
                         </div>
+                        <!-- Status da última atualização de taxas -->
+                        <div id="sim-taxa-status" style="display:none;background:rgba(255,255,255,0.13);border-radius:8px;padding:7px 10px;font-size:0.72rem;margin-top:6px;line-height:1.5;"></div>
                     </div>
 
                     <!-- Dados do imóvel -->
@@ -9653,60 +9662,108 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <small class="form-text text-muted">Use {nome} para inserir o nome do cliente. O emoji será adicionado automaticamente se não houver.</small>
                 </div>
 
-                <!-- NOVA SEÇÃO: Imagem de Fundo -->
+                <!-- FUNDO DO SISTEMA (imagem ou vídeo) -->
                 <div class="form-group">
-                    <label class="form-label">Imagem de Fundo</label>
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <button type="button" class="btn-sm btn-light" onclick="document.getElementById('s-bg-input').click()">
-                            <i class="fas fa-image"></i> Selecionar imagem
+                    <label class="form-label" style="display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-desktop" style="color:var(--primary)"></i> Fundo do Sistema
+                    </label>
+                    <!-- Abas tipo/modo -->
+                    <div style="display:flex;gap:4px;background:var(--bg-overlay);border-radius:10px;padding:4px;margin-bottom:10px;">
+                        <button id="sys-bg-tab-img" onclick="App.settings.sysBgTab('img')" style="flex:1;padding:7px;border:none;border-radius:7px;font-size:0.78rem;font-weight:700;cursor:pointer;background:var(--primary);color:white;transition:0.2s;">
+                            <i class="fas fa-image"></i> Imagem
                         </button>
-                        <button type="button" class="btn-sm btn-light" onclick="App.settings.removeBackground()" id="btn-remove-bg" style="display: none;">
-                            <i class="fas fa-trash"></i> Remover
+                        <button id="sys-bg-tab-vid" onclick="App.settings.sysBgTab('vid')" style="flex:1;padding:7px;border:none;border-radius:7px;font-size:0.78rem;font-weight:700;cursor:pointer;background:transparent;color:var(--text-secondary);transition:0.2s;">
+                            <i class="fas fa-film"></i> Vídeo
                         </button>
                     </div>
-                    <input type="file" id="s-bg-input" accept="image/*" style="display: none;" onchange="App.settings.handleBackgroundUpload(this)">
-                    <div id="s-bg-preview" style="margin-top: 10px; width: 100%; height: 120px; background-size: cover; background-position: center; border-radius: 8px; border: 1px solid var(--border);"></div>
-                    <input type="hidden" id="s-background-image" value="">
+                    <!-- Painel imagem -->
+                    <div id="sys-bg-panel-img">
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button type="button" class="btn-sm btn-light" onclick="document.getElementById('s-bg-input').click()"><i class="fas fa-image"></i> Selecionar imagem</button>
+                            <button type="button" class="btn-sm btn-light" onclick="App.settings.removeBackground()" id="btn-remove-bg" style="display:none;"><i class="fas fa-trash"></i> Remover</button>
+                        </div>
+                        <input type="file" id="s-bg-input" accept="image/*" style="display:none;" onchange="App.settings.handleBackgroundUpload(this)">
+                        <div id="s-bg-preview" style="margin-top:10px;width:100%;height:110px;background-size:cover;background-position:center;border-radius:8px;border:1px solid var(--border);"></div>
+                        <input type="hidden" id="s-background-image" value="">
+                    </div>
+                    <!-- Painel vídeo -->
+                    <div id="sys-bg-panel-vid" style="display:none;">
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button type="button" class="btn-sm btn-light" onclick="document.getElementById('s-bg-video-input').click()"><i class="fas fa-film"></i> Selecionar vídeo</button>
+                            <button type="button" class="btn-sm btn-light" id="btn-remove-sys-video" onclick="App.settings.removeSysVideo()" style="display:none;"><i class="fas fa-trash"></i> Remover</button>
+                        </div>
+                        <input type="file" id="s-bg-video-input" accept="video/mp4,video/webm,video/ogg" style="display:none;" onchange="App.settings.handleSysVideoUpload(this)">
+                        <div id="s-bg-video-preview" style="margin-top:10px;width:100%;height:110px;border-radius:8px;border:1px solid var(--border);overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;">
+                            <span style="color:var(--text-muted);font-size:0.8rem;" id="s-bg-video-hint"><i class="fas fa-play-circle" style="margin-right:6px;"></i>Nenhum vídeo selecionado</span>
+                            <video id="s-bg-video-prev-el" style="width:100%;height:100%;object-fit:cover;display:none;" muted loop autoplay playsinline></video>
+                        </div>
+                        <input type="hidden" id="s-background-video" value="">
+                        <small style="color:var(--secondary);display:block;margin-top:6px;">Formatos aceitos: MP4, WebM, OGG. Recomendado: até 20 MB para melhor desempenho.</small>
+                    </div>
+                    <!-- Opacidade (compartilhada) -->
                     <div style="margin-top:10px;">
                         <label style="font-size:0.82rem;font-weight:600;color:var(--dark);display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                            Opacidade da imagem: <span id="s-bg-opacity-label" style="color:var(--primary);font-weight:700;">45%</span>
+                            Opacidade do fundo: <span id="s-bg-opacity-label" style="color:var(--primary);font-weight:700;">45%</span>
                         </label>
                         <input type="range" id="s-bg-opacity" min="5" max="90" value="45" step="1"
                             style="width:100%;accent-color:var(--primary);height:6px;"
                             oninput="document.getElementById('s-bg-opacity-label').textContent=this.value+'%'; document.body.style.setProperty('--bg-opacity', this.value/100);">
                     </div>
-                    <small style="color: var(--secondary);">A imagem é aplicada como camada transparente — cards, botões e textos mantêm qualidade total.</small>
+                    <small style="color:var(--secondary);">O fundo é aplicado como camada transparente — cards e textos mantêm qualidade total.</small>
                 </div>
 
-                <!-- FUNDO DA TELA DE LOGIN -->
+                <!-- FUNDO DA TELA DE LOGIN (imagem ou vídeo) -->
                 <div class="form-group">
                     <label class="form-label" style="display:flex;align-items:center;gap:8px;">
-                        <i class="fas fa-sign-in-alt" style="color:var(--accent)"></i> Imagem de Fundo — Tela de Login
+                        <i class="fas fa-sign-in-alt" style="color:var(--accent)"></i> Fundo da Tela de Login
                     </label>
-                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                        <button type="button" class="btn-sm btn-light" onclick="document.getElementById('s-login-bg-input').click()">
-                            <i class="fas fa-image"></i> Selecionar imagem
+                    <!-- Abas -->
+                    <div style="display:flex;gap:4px;background:var(--bg-overlay);border-radius:10px;padding:4px;margin-bottom:10px;">
+                        <button id="login-bg-tab-img" onclick="App.settings.loginBgTab('img')" style="flex:1;padding:7px;border:none;border-radius:7px;font-size:0.78rem;font-weight:700;cursor:pointer;background:var(--accent);color:white;transition:0.2s;">
+                            <i class="fas fa-image"></i> Imagem
                         </button>
-                        <button type="button" class="btn-sm btn-light" onclick="App.settings.removeLoginBg()" id="btn-remove-login-bg" style="display:none;">
-                            <i class="fas fa-trash"></i> Remover
+                        <button id="login-bg-tab-vid" onclick="App.settings.loginBgTab('vid')" style="flex:1;padding:7px;border:none;border-radius:7px;font-size:0.78rem;font-weight:700;cursor:pointer;background:transparent;color:var(--text-secondary);transition:0.2s;">
+                            <i class="fas fa-film"></i> Vídeo
                         </button>
                     </div>
-                    <input type="file" id="s-login-bg-input" accept="image/*" style="display:none;" onchange="App.settings.handleLoginBgUpload(this)">
-                    <div id="s-login-bg-preview" style="margin-top:10px;width:100%;height:120px;background-size:cover;background-position:center;border-radius:8px;border:1px solid var(--border);position:relative;overflow:hidden;">
-                        <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(26,43,28,0.7) 0%,rgba(46,74,49,0.6) 100%);display:flex;align-items:center;justify-content:center;" id="s-login-bg-overlay-demo">
-                            <span style="color:white;font-size:0.8rem;font-weight:700;opacity:0.7">Pré-visualização do login</span>
+                    <!-- Painel imagem login -->
+                    <div id="login-bg-panel-img">
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button type="button" class="btn-sm btn-light" onclick="document.getElementById('s-login-bg-input').click()"><i class="fas fa-image"></i> Selecionar imagem</button>
+                            <button type="button" class="btn-sm btn-light" onclick="App.settings.removeLoginBg()" id="btn-remove-login-bg" style="display:none;"><i class="fas fa-trash"></i> Remover</button>
                         </div>
+                        <input type="file" id="s-login-bg-input" accept="image/*" style="display:none;" onchange="App.settings.handleLoginBgUpload(this)">
+                        <div id="s-login-bg-preview" style="margin-top:10px;width:100%;height:110px;background-size:cover;background-position:center;border-radius:8px;border:1px solid var(--border);position:relative;overflow:hidden;">
+                            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(12,74,110,0.7) 0%,rgba(29,111,164,0.6) 100%);display:flex;align-items:center;justify-content:center;" id="s-login-bg-overlay-demo">
+                                <span style="color:white;font-size:0.8rem;font-weight:700;opacity:0.7">Pré-visualização do login</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="s-login-bg-image" value="">
                     </div>
-                    <input type="hidden" id="s-login-bg-image" value="">
+                    <!-- Painel vídeo login -->
+                    <div id="login-bg-panel-vid" style="display:none;">
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button type="button" class="btn-sm btn-light" onclick="document.getElementById('s-login-video-input').click()"><i class="fas fa-film"></i> Selecionar vídeo</button>
+                            <button type="button" class="btn-sm btn-light" id="btn-remove-login-video" onclick="App.settings.removeLoginVideo()" style="display:none;"><i class="fas fa-trash"></i> Remover</button>
+                        </div>
+                        <input type="file" id="s-login-video-input" accept="video/mp4,video/webm,video/ogg" style="display:none;" onchange="App.settings.handleLoginVideoUpload(this)">
+                        <div id="s-login-video-preview" style="margin-top:10px;width:100%;height:110px;border-radius:8px;border:1px solid var(--border);overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;">
+                            <span style="color:var(--text-muted);font-size:0.8rem;" id="s-login-video-hint"><i class="fas fa-play-circle" style="margin-right:6px;"></i>Nenhum vídeo selecionado</span>
+                            <video id="s-login-video-prev-el" style="width:100%;height:100%;object-fit:cover;display:none;" muted loop autoplay playsinline></video>
+                        </div>
+                        <input type="hidden" id="s-login-video" value="">
+                        <small style="color:var(--secondary);display:block;margin-top:6px;">Formatos aceitos: MP4, WebM, OGG.</small>
+                    </div>
+                    <!-- Opacidade login -->
                     <div style="margin-top:10px;">
                         <label style="font-size:0.82rem;font-weight:600;color:var(--dark);display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                            Opacidade da imagem: <span id="s-login-bg-opacity-label" style="color:var(--accent);font-weight:700;">40%</span>
+                            Opacidade do fundo: <span id="s-login-bg-opacity-label" style="color:var(--accent);font-weight:700;">40%</span>
                         </label>
                         <input type="range" id="s-login-bg-opacity" min="10" max="100" value="40" step="5"
                             style="width:100%;accent-color:var(--accent);height:6px;"
                             oninput="document.getElementById('s-login-bg-opacity-label').textContent=this.value+'%'; Auth.applyLoginBg(document.getElementById('s-login-bg-image').value, this.value/100);">
                     </div>
-                    <small style="color:var(--secondary);">Esta imagem aparece apenas na tela de login do sistema.</small>
+                    <small style="color:var(--secondary);">Aparece apenas na tela de login.</small>
                 </div>
 
                 <hr style="border: 0; border-top: 1px solid var(--border); margin: 16px 0;">
@@ -9826,9 +9883,16 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <input type="text" class="form-control" placeholder="Filtrar clientes..." id="filtro-clientes-envio" oninput="UI.filtrarClientesEnvio()">
                 <div style="max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-top: 8px;" id="lista-clientes-envio">
                 </div>
-                <div style="margin-top: 8px; display: flex; gap: 8px;">
+                <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap:wrap;">
                     <button type="button" class="btn-sm btn-light" onclick="UI.selecionarTodosClientesEnvio(true)">Selecionar todos</button>
                     <button type="button" class="btn-sm btn-light" onclick="UI.selecionarTodosClientesEnvio(false)">Limpar todos</button>
+                    <button type="button" class="btn-sm btn-light" onclick="UI.importarListaWhatsappMassa()" style="background:rgba(37,211,102,0.12);color:#1a7a3e;border-color:#25D366;font-size:0.78rem;">
+                        <i class="fas fa-file-import"></i> Importar contatos
+                    </button>
+                    <input type="file" id="import-wpp-massa-file" accept=".csv,.txt" style="display:none" onchange="UI._processarImportacaoWhatsappMassa(this)">
+                </div>
+                <div id="import-wpp-massa-info" style="display:none;margin-top:8px;padding:8px 12px;border-radius:9px;background:rgba(37,211,102,0.10);border:1px solid #25D366;font-size:0.78rem;color:#1a7a3e;">
+                    <i class="fas fa-check-circle"></i> <span id="import-wpp-massa-msg"></span>
                 </div>
             </div>
             <div class="form-group">
@@ -9882,6 +9946,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <button type="button" class="btn-sm btn-light" onclick="UI.selecionarTodosEmailMassa(false)" style="font-size:0.78rem;">
                         <i class="far fa-square"></i> Limpar seleção
                     </button>
+                    <button type="button" class="btn-sm btn-light" onclick="UI.importarListaEmailMassa()" style="font-size:0.78rem;background:var(--accent-ultra);color:var(--accent-dark);border-color:var(--accent);">
+                        <i class="fas fa-file-import"></i> Importar lista
+                    </button>
+                    <input type="file" id="import-email-massa-file" accept=".csv,.txt" style="display:none" onchange="UI._processarImportacaoEmailMassa(this)">
+                </div>
+                <div id="import-email-massa-info" style="display:none;margin-top:8px;padding:8px 12px;border-radius:9px;background:var(--accent-ultra);border:1px solid var(--accent);font-size:0.78rem;color:var(--accent-dark);">
+                    <i class="fas fa-check-circle"></i> <span id="import-email-massa-msg"></span>
                 </div>
             </div>
 
@@ -9953,6 +10024,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </button>
                 <button id="inf-tab-destinatarios" onclick="UI.informativoSwitchTab('destinatarios')" style="flex:1;padding:8px 4px;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;background:transparent;color:var(--text-secondary);transition:0.2s;">
                     <i class="fas fa-users"></i> Destinatários
+                </button>
+                <button id="inf-tab-whatsapp" onclick="UI.informativoSwitchTab('whatsapp')" style="flex:1;padding:8px 4px;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;background:transparent;color:var(--text-secondary);transition:0.2s;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
                 </button>
                 <button id="inf-tab-preview" onclick="UI.informativoSwitchTab('preview')" style="flex:1;padding:8px 4px;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;background:transparent;color:var(--text-secondary);transition:0.2s;">
                     <i class="fas fa-eye"></i> Preview
@@ -10071,6 +10145,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         <button type="button" class="btn-sm btn-light" onclick="UI.informativoSelecionarTodos(false)" style="font-size:0.78rem;">
                             <i class="far fa-square"></i> Limpar seleção
                         </button>
+                        <button type="button" class="btn-sm btn-light" onclick="UI.informativoImportarLista()" style="font-size:0.78rem;background:var(--accent-ultra);color:var(--accent-dark);border-color:var(--accent);">
+                            <i class="fas fa-file-import"></i> Importar lista
+                        </button>
+                        <input type="file" id="inf-import-file" accept=".csv,.txt" style="display:none" onchange="UI._processarImportacaoInformativo(this)">
+                    </div>
+                    <div id="inf-import-info" style="display:none;margin-top:8px;padding:8px 12px;border-radius:9px;background:var(--accent-ultra);border:1px solid var(--accent);font-size:0.78rem;color:var(--accent-dark);">
+                        <i class="fas fa-check-circle"></i> <span id="inf-import-msg"></span>
                     </div>
                 </div>
 
@@ -10090,6 +10171,88 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <label class="form-label"><i class="fas fa-paper-plane" style="color:var(--primary);margin-right:4px;"></i> Lista de envio</label>
                     <div id="inf-tags-container" style="min-height:44px;border:1px solid var(--border-strong);border-radius:10px;padding:8px 10px;background:var(--bg-raised);display:flex;flex-wrap:wrap;gap:5px;"></div>
                 </div>
+            </div>
+
+            <!-- ABA: WhatsApp em Massa -->
+            <div id="inf-panel-whatsapp" style="display:none;">
+                <!-- Aviso informativo -->
+                <div style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.3);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:0.82rem;color:#1a7a3e;line-height:1.6;">
+                    <div style="font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;"><i class="fab fa-whatsapp" style="font-size:1rem;"></i> Envio do informativo pelo WhatsApp</div>
+                    Selecione clientes ou importe contatos. A mensagem será gerada a partir do template e aberta no WhatsApp para cada destinatário.
+                </div>
+
+                <!-- Filtro de clientes com telefone -->
+                <div class="form-group">
+                    <label class="form-label" style="display:flex;align-items:center;gap:6px;">
+                        <i class="fab fa-whatsapp" style="color:#25D366;"></i> Clientes com telefone cadastrado
+                        <span id="inf-wpp-total-tag" style="margin-left:auto;font-size:0.72rem;color:var(--text-secondary);font-weight:500;"></span>
+                    </label>
+                    <input type="text" class="form-control" placeholder="Buscar por nome ou telefone..." id="inf-wpp-filtro-busca" oninput="UI.informativoRenderListaWpp()" style="margin-bottom:8px;">
+                    <div style="max-height:240px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;" id="inf-wpp-lista-clientes"></div>
+                    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                        <button type="button" class="btn-sm btn-light" onclick="UI.informativoSelecionarTodosWpp(true)" style="font-size:0.78rem;">
+                            <i class="fas fa-check-square"></i> Selecionar todos
+                        </button>
+                        <button type="button" class="btn-sm btn-light" onclick="UI.informativoSelecionarTodosWpp(false)" style="font-size:0.78rem;">
+                            <i class="far fa-square"></i> Limpar seleção
+                        </button>
+                        <button type="button" class="btn-sm btn-light" onclick="UI.informativoImportarContatosWpp()" style="font-size:0.78rem;background:rgba(37,211,102,0.12);color:#1a7a3e;border-color:#25D366;">
+                            <i class="fas fa-file-import"></i> Importar contatos
+                        </button>
+                        <input type="file" id="inf-wpp-import-file" accept=".csv,.txt" style="display:none" onchange="UI._processarImportacaoInformativoWpp(this)">
+                    </div>
+                    <div id="inf-wpp-import-info" style="display:none;margin-top:8px;padding:8px 12px;border-radius:9px;background:rgba(37,211,102,0.10);border:1px solid #25D366;font-size:0.78rem;color:#1a7a3e;">
+                        <i class="fas fa-check-circle"></i> <span id="inf-wpp-import-msg"></span>
+                    </div>
+                </div>
+
+                <!-- Adicionar número extra -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-plus-circle" style="color:#25D366;margin-right:4px;"></i> Adicionar número extra</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="tel" id="inf-wpp-tel-extra" class="form-control" placeholder="(00) 00000-0000" oninput="Utils.maskPhone(this)">
+                        <button onclick="UI.informativoAdicionarExtraWpp()" style="background:#25D366;color:white;border:none;border-radius:10px;padding:0 16px;font-weight:700;cursor:pointer;white-space:nowrap;font-size:0.85rem;">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Destinatários selecionados -->
+                <div class="form-group">
+                    <label class="form-label" style="display:flex;align-items:center;gap:6px;">
+                        <i class="fab fa-whatsapp" style="color:#25D366;"></i> Para enviar
+                        <span id="inf-wpp-badge" style="background:rgba(37,211,102,0.15);color:#1a7a3e;font-size:0.72rem;font-weight:700;padding:2px 10px;border-radius:99px;border:1px solid #25D366;">0 selecionados</span>
+                    </label>
+                    <div id="inf-wpp-tags-container" style="min-height:44px;border:1px solid var(--border-strong);border-radius:10px;padding:8px 10px;background:var(--bg-raised);display:flex;flex-wrap:wrap;gap:5px;"></div>
+                </div>
+
+                <!-- Delay -->
+                <div class="form-group">
+                    <label class="form-label">Delay entre envios (segundos)</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="number" id="inf-wpp-delay-min" class="form-control" value="3" min="1" max="30" placeholder="Mín">
+                        <input type="number" id="inf-wpp-delay-max" class="form-control" value="8" min="1" max="30" placeholder="Máx">
+                    </div>
+                </div>
+
+                <!-- Progresso -->
+                <div id="inf-wpp-progresso" style="display:none;margin-bottom:12px;">
+                    <div class="progress-envio">
+                        <div>Enviando... <span id="inf-wpp-enviados">0</span> de <span id="inf-wpp-total">0</span></div>
+                        <div class="progress-bar-envio"><div class="progress-fill" id="inf-wpp-fill"></div></div>
+                    </div>
+                </div>
+
+                <!-- Links iOS -->
+                <div id="inf-wpp-links" style="display:none;">
+                    <label class="form-label">Links gerados (clique para abrir)</label>
+                    <div class="whatsapp-links-list" id="inf-wpp-links-list"></div>
+                </div>
+
+                <!-- Botão enviar -->
+                <button class="btn-block" style="background:#25D366;color:white;border:none;font-weight:700;" onclick="UI.informativoEnviarWpp()">
+                    <i class="fab fa-whatsapp"></i> Iniciar Envio pelo WhatsApp
+                </button>
             </div>
 
             <!-- ABA: Preview -->
@@ -10112,7 +10275,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <!-- Botões de ação -->
             <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
                 <button class="btn-block" style="background:var(--primary);color:white;border:none;" onclick="UI.informativoEnviar()">
-                    <i class="fas fa-paper-plane"></i> Enviar Informativo
+                    <i class="fas fa-envelope"></i> Enviar por E-mail
+                </button>
+                <button class="btn-block" style="background:#25D366;color:white;border:none;" onclick="UI.informativoSwitchTab('whatsapp')">
+                    <i class="fab fa-whatsapp"></i> Enviar pelo WhatsApp
                 </button>
                 <button class="btn-block" style="background:rgba(255,255,255,0.08);color:var(--secondary);border:none;" onclick="UI.closeModals()">Cancelar</button>
             </div>
@@ -18174,24 +18340,41 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 document.getElementById('s-ref-counter').value = s.refCounter || 0;
                 document.getElementById('s-msg-padrao').value = s.msgPadrao || '{nome}, tudo bem? Me chamo [Seu Nome] e sou corretor da [Imobiliária]. Gostaria de saber se ainda tem interesse em adquirir um imóvel. Fico à disposição! \u{1F3E1}';
                 
+                // Sistema bg
                 document.getElementById('s-background-image').value = s.backgroundImage || '';
-                if (s.backgroundImage) {
-                    document.getElementById('s-bg-preview').style.backgroundImage = `url('${s.backgroundImage}')`;  
-                    const opSlider = document.getElementById('s-bg-opacity');
-                    if (opSlider) { opSlider.value = s.bgOpacity || 45; document.getElementById('s-bg-opacity-label').textContent = (s.bgOpacity || 45) + '%'; }
+                const opSlider = document.getElementById('s-bg-opacity');
+                if (opSlider) { opSlider.value = s.bgOpacity || 45; document.getElementById('s-bg-opacity-label').textContent = (s.bgOpacity || 45) + '%'; }
+                if (s.backgroundVideo) {
+                    App.settings.sysBgTab('vid');
+                    document.getElementById('s-background-video').value = s.backgroundVideo;
+                    const prev = document.getElementById('s-bg-video-prev-el');
+                    if (prev) { prev.src = s.backgroundVideo; prev.style.display = 'block'; document.getElementById('s-bg-video-hint').style.display = 'none'; }
+                    document.getElementById('btn-remove-sys-video').style.display = 'inline-block';
+                } else if (s.backgroundImage) {
+                    App.settings.sysBgTab('img');
+                    document.getElementById('s-bg-preview').style.backgroundImage = `url('${s.backgroundImage}')`;
                     document.getElementById('btn-remove-bg').style.display = 'inline-block';
                 } else {
+                    App.settings.sysBgTab('img');
                     document.getElementById('s-bg-preview').style.backgroundImage = '';
                     document.getElementById('btn-remove-bg').style.display = 'none';
                 }
-                // Login background
+                // Login bg
                 document.getElementById('s-login-bg-image').value = s.loginBgImage || '';
-                if (s.loginBgImage) {
+                const loginOpSlider = document.getElementById('s-login-bg-opacity');
+                if (loginOpSlider) { loginOpSlider.value = s.loginBgOpacity || 40; document.getElementById('s-login-bg-opacity-label').textContent = (s.loginBgOpacity || 40) + '%'; }
+                if (s.loginVideo) {
+                    App.settings.loginBgTab('vid');
+                    document.getElementById('s-login-video').value = s.loginVideo;
+                    const prev2 = document.getElementById('s-login-video-prev-el');
+                    if (prev2) { prev2.src = s.loginVideo; prev2.style.display = 'block'; document.getElementById('s-login-video-hint').style.display = 'none'; }
+                    document.getElementById('btn-remove-login-video').style.display = 'inline-block';
+                } else if (s.loginBgImage) {
+                    App.settings.loginBgTab('img');
                     document.getElementById('s-login-bg-preview').style.backgroundImage = `url('${s.loginBgImage}')`;
-                    const loginOpSlider = document.getElementById('s-login-bg-opacity');
-                    if (loginOpSlider) { loginOpSlider.value = s.loginBgOpacity || 40; document.getElementById('s-login-bg-opacity-label').textContent = (s.loginBgOpacity || 40) + '%'; }
                     document.getElementById('btn-remove-login-bg').style.display = 'inline-block';
                 } else {
+                    App.settings.loginBgTab('img');
                     document.getElementById('s-login-bg-preview').style.backgroundImage = '';
                     document.getElementById('btn-remove-login-bg').style.display = 'none';
                 }
@@ -18543,6 +18726,124 @@ ${assinatura}`;
                 }
             },
 
+            // ── Importação de lista de e-mails ──────────────────────────
+            importarListaEmailMassa: () => {
+                const input = document.getElementById('import-email-massa-file');
+                if (input) { input.value = ''; input.click(); }
+            },
+
+            _processarImportacaoEmailMassa: (inputEl) => {
+                const file = inputEl.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const texto = e.target.result;
+                    // Extrai todos os e-mails válidos do arquivo (CSV, TXT, qualquer separador)
+                    const regex = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+                    const encontrados = texto.match(regex) || [];
+                    const unicos = [...new Set(encontrados.map(em => em.toLowerCase().trim()))];
+                    let adicionados = 0;
+                    unicos.forEach(email => {
+                        if (!UI._emailMassaEmailsSelecionados.has(email)) {
+                            UI._emailMassaEmailsSelecionados.add(email);
+                            adicionados++;
+                        }
+                    });
+                    UI._renderTagsEmailMassa();
+                    UI._atualizarBadgeEmailMassa();
+                    const info = document.getElementById('import-email-massa-info');
+                    const msg  = document.getElementById('import-email-massa-msg');
+                    if (info && msg) {
+                        msg.textContent = `${unicos.length} e-mail(s) encontrado(s) no arquivo — ${adicionados} novo(s) adicionado(s).`;
+                        info.style.display = 'block';
+                        setTimeout(() => { info.style.display = 'none'; }, 6000);
+                    }
+                    if (adicionados === 0 && unicos.length === 0) Utils.toast('Nenhum e-mail válido encontrado no arquivo.', 'error');
+                };
+                reader.readAsText(file);
+            },
+
+            // ── Importação de contatos para WhatsApp em Massa ───────────
+            importarListaWhatsappMassa: () => {
+                const input = document.getElementById('import-wpp-massa-file');
+                if (input) { input.value = ''; input.click(); }
+            },
+
+            _wppMassaContatosImportados: [],
+
+            _processarImportacaoWhatsappMassa: (inputEl) => {
+                const file = inputEl.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const texto = e.target.result;
+                    const linhas = texto.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+                    const contatos = [];
+                    const telRegex = /[\d\s\(\)\-\+]{8,}/g;
+
+                    linhas.forEach(linha => {
+                        // Tenta detectar CSV: "Nome,Telefone" ou "Telefone,Nome" ou só telefone
+                        const partes = linha.split(/[;,\t]/).map(p => p.trim().replace(/^"+|"+$/g, ''));
+                        let nome = '';
+                        let telefone = '';
+                        if (partes.length >= 2) {
+                            // Detecta qual parte é telefone
+                            const idx0digits = (partes[0].replace(/\D/g,'').length);
+                            const idx1digits = (partes[1].replace(/\D/g,'').length);
+                            if (idx0digits >= 8 && idx1digits < 8) {
+                                telefone = partes[0].replace(/\D/g,'');
+                                nome = partes[1] || 'Contato Importado';
+                            } else {
+                                nome = partes[0] || 'Contato Importado';
+                                telefone = partes[1].replace(/\D/g,'');
+                            }
+                        } else {
+                            // Linha única: extrai número
+                            const nums = linha.replace(/\D/g,'');
+                            if (nums.length >= 8) { telefone = nums; nome = 'Contato Importado'; }
+                        }
+                        if (telefone && telefone.length >= 8) {
+                            contatos.push({ id: 'imp_' + telefone, nome: nome || 'Contato Importado', telefone });
+                        }
+                    });
+
+                    const unicos = contatos.filter((c, i, arr) => arr.findIndex(x => x.telefone === c.telefone) === i);
+                    UI._wppMassaContatosImportados = unicos;
+
+                    // Adiciona à lista existente no container
+                    const container = document.getElementById('lista-clientes-envio');
+                    if (container) {
+                        // Remove entradas importadas anteriores para evitar duplicatas
+                        container.querySelectorAll('.imported-wpp-item').forEach(el => el.remove());
+                        unicos.forEach(c => {
+                            const div = document.createElement('div');
+                            div.className = 'client-select-item imported-wpp-item';
+                            div.style.background = 'rgba(37,211,102,0.05)';
+                            div.innerHTML = `
+                                <input type="checkbox" class="cliente-checkbox" checked
+                                    data-id="${c.id}" data-nome="${c.nome}" data-telefone="${c.telefone}">
+                                <div class="client-select-info">
+                                    <div class="client-select-name">${c.nome} <span style="font-size:0.7rem;background:rgba(37,211,102,0.15);color:#1a7a3e;border-radius:4px;padding:1px 6px;margin-left:4px;">importado</span></div>
+                                    <div class="client-select-phone">${c.telefone}</div>
+                                </div>
+                            `;
+                            container.appendChild(div);
+                        });
+                    }
+
+                    const info = document.getElementById('import-wpp-massa-info');
+                    const msg  = document.getElementById('import-wpp-massa-msg');
+                    if (info && msg) {
+                        msg.textContent = `${unicos.length} contato(s) importado(s) e já selecionado(s) para envio.`;
+                        info.style.display = 'block';
+                        setTimeout(() => { info.style.display = 'none'; }, 6000);
+                    }
+                    if (unicos.length === 0) Utils.toast('Nenhum número válido encontrado no arquivo.', 'error');
+                    else Utils.toast(`${unicos.length} contato(s) importado(s) com sucesso!`, 'success');
+                };
+                reader.readAsText(file);
+            },
+
             abrirClienteEmailMassa: async () => {
                 // Adiciona email digitado no input antes de enviar
                 const inputExtra = document.getElementById('email-massa-input-extra');
@@ -18625,6 +18926,8 @@ ${assinatura}`;
                 UI._informativoTipo = 'newsletter';
                 UI._informativoPerfilFiltro = 'todos';
                 UI._informativoDestaques = [];
+                UI._informativoWppSelecionados = new Set();
+                UI._informativoWppContatosImportados = [];
 
                 const settings = await Storage.getSettings();
                 const nomeCorretor  = settings.nome        || 'Corretor(a)';
@@ -18690,13 +18993,13 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
             },
 
             informativoSwitchTab: (tab) => {
-                ['template','destinatarios','preview'].forEach(t => {
+                ['template','destinatarios','whatsapp','preview'].forEach(t => {
                     const panel = document.getElementById(`inf-panel-${t}`);
                     const btn   = document.getElementById(`inf-tab-${t}`);
                     if (!panel || !btn) return;
                     if (t === tab) {
                         panel.style.display = 'block';
-                        btn.style.background = 'var(--primary)';
+                        btn.style.background = t === 'whatsapp' ? '#25D366' : 'var(--primary)';
                         btn.style.color = 'white';
                     } else {
                         panel.style.display = 'none';
@@ -18705,6 +19008,7 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                     }
                 });
                 if (tab === 'preview') UI.informativoAtualizarPreview();
+                if (tab === 'whatsapp') { UI.informativoRenderListaWpp(); UI._informativoRenderTagsWpp(); }
             },
 
             informativoSelectTipo: (btn) => {
@@ -19128,6 +19432,286 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                 }
 
                 Utils.toast(`Informativo preparado para ${emails.length} destinatário${emails.length !== 1 ? 's' : ''}! Confira seu cliente de e-mail.`, 'success');
+            },
+
+            // ═══════════════════════════════════════════════════
+            // INFORMATIVO — IMPORTAR LISTA DE E-MAILS
+            // ═══════════════════════════════════════════════════
+
+            informativoImportarLista: () => {
+                const input = document.getElementById('inf-import-file');
+                if (input) { input.value = ''; input.click(); }
+            },
+
+            _processarImportacaoInformativo: (inputEl) => {
+                const file = inputEl.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const texto = e.target.result;
+                    const regex = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+                    const encontrados = [...new Set((texto.match(regex) || []).map(em => em.toLowerCase().trim()))];
+                    let adicionados = 0;
+                    encontrados.forEach(email => {
+                        if (!UI._informativoDestSelecionados.has(email)) {
+                            UI._informativoDestSelecionados.add(email);
+                            adicionados++;
+                        }
+                    });
+                    UI.informativoRenderTags();
+                    UI.informativoAtualizarBadge();
+                    const info = document.getElementById('inf-import-info');
+                    const msg  = document.getElementById('inf-import-msg');
+                    if (info && msg) {
+                        msg.textContent = `${encontrados.length} e-mail(s) encontrado(s) — ${adicionados} novo(s) adicionado(s).`;
+                        info.style.display = 'block';
+                        setTimeout(() => { info.style.display = 'none'; }, 6000);
+                    }
+                    if (encontrados.length === 0) Utils.toast('Nenhum e-mail válido encontrado no arquivo.', 'error');
+                };
+                reader.readAsText(file);
+            },
+
+            // ═══════════════════════════════════════════════════
+            // INFORMATIVO — WHATSAPP EM MASSA
+            // ═══════════════════════════════════════════════════
+
+            _informativoWppSelecionados: new Set(),
+            _informativoWppContatosImportados: [],
+            _informativoWppEnvioIndex: 0,
+            _informativoWppEnvioList: [],
+
+            informativoRenderListaWpp: () => {
+                const termo = (document.getElementById('inf-wpp-filtro-busca')?.value || '').toLowerCase();
+                const clientes = (UI.data.clientes || []).filter(c =>
+                    c.telefone && c.telefone.trim() !== '' &&
+                    (c.nome.toLowerCase().includes(termo) || c.telefone.includes(termo))
+                );
+                const totalTag = document.getElementById('inf-wpp-total-tag');
+                if (totalTag) totalTag.textContent = `${clientes.length} cliente(s) com telefone`;
+
+                const container = document.getElementById('inf-wpp-lista-clientes');
+                if (!container) return;
+                if (clientes.length === 0) {
+                    container.innerHTML = `<div style="padding:18px;text-align:center;color:var(--text-muted);font-size:0.85rem;"><i class="fab fa-whatsapp" style="font-size:1.5rem;margin-bottom:8px;display:block;"></i>Nenhum cliente com telefone${termo ? ' encontrado.' : ' cadastrado.'}</div>`;
+                    return;
+                }
+                container.innerHTML = clientes.map(c => {
+                    const sel = UI._informativoWppSelecionados.has(c.telefone);
+                    return `<label class="client-select-item" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);" for="inf-wpp-cb-${c.id}">
+                        <input type="checkbox" id="inf-wpp-cb-${c.id}" class="inf-wpp-checkbox"
+                            data-id="${c.id}" data-nome="${c.nome}" data-tel="${c.telefone}"
+                            ${sel ? 'checked' : ''}
+                            onchange="UI._onInfWppCheckChange(this)"
+                            style="width:16px;height:16px;accent-color:#25D366;flex-shrink:0;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:600;font-size:0.88rem;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nome}</div>
+                            <div style="font-size:0.78rem;color:#25D366;"><i class="fab fa-whatsapp" style="margin-right:3px;"></i>${c.telefone}</div>
+                        </div>
+                    </label>`;
+                }).join('');
+
+                // Adiciona os importados no final
+                UI._informativoWppContatosImportados.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'client-select-item imported-wpp-item';
+                    div.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);background:rgba(37,211,102,0.04);';
+                    div.innerHTML = `
+                        <input type="checkbox" class="inf-wpp-checkbox" checked
+                            data-id="${c.id}" data-nome="${c.nome}" data-tel="${c.telefone}"
+                            onchange="UI._onInfWppCheckChange(this)"
+                            style="width:16px;height:16px;accent-color:#25D366;flex-shrink:0;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:600;font-size:0.88rem;color:var(--dark);">${c.nome} <span style="font-size:0.68rem;background:rgba(37,211,102,0.15);color:#1a7a3e;border-radius:4px;padding:1px 6px;margin-left:4px;">importado</span></div>
+                            <div style="font-size:0.78rem;color:#25D366;"><i class="fab fa-whatsapp" style="margin-right:3px;"></i>${c.telefone}</div>
+                        </div>`;
+                    container.appendChild(div);
+                });
+            },
+
+            _onInfWppCheckChange: (cb) => {
+                const tel = cb.dataset.tel;
+                const nome = cb.dataset.nome;
+                if (cb.checked) UI._informativoWppSelecionados.add(JSON.stringify({tel, nome}));
+                else {
+                    // remove pelo telefone
+                    for (const entry of UI._informativoWppSelecionados) {
+                        try { if (JSON.parse(entry).tel === tel) { UI._informativoWppSelecionados.delete(entry); break; } } catch(e) {}
+                    }
+                }
+                UI._informativoRenderTagsWpp();
+            },
+
+            informativoSelecionarTodosWpp: (selecionar) => {
+                document.querySelectorAll('#inf-wpp-lista-clientes .inf-wpp-checkbox').forEach(cb => {
+                    cb.checked = selecionar;
+                    UI._onInfWppCheckChange(cb);
+                });
+            },
+
+            informativoAdicionarExtraWpp: () => {
+                const input = document.getElementById('inf-wpp-tel-extra');
+                const raw = (input?.value || '').replace(/\D/g,'');
+                if (raw.length < 8) { Utils.toast('Número inválido', 'error'); return; }
+                UI._informativoWppSelecionados.add(JSON.stringify({tel: raw, nome: 'Contato Extra'}));
+                UI._informativoRenderTagsWpp();
+                if (input) input.value = '';
+            },
+
+            informativoImportarContatosWpp: () => {
+                const input = document.getElementById('inf-wpp-import-file');
+                if (input) { input.value = ''; input.click(); }
+            },
+
+            _processarImportacaoInformativoWpp: (inputEl) => {
+                const file = inputEl.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const texto = e.target.result;
+                    const linhas = texto.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+                    const contatos = [];
+                    linhas.forEach(linha => {
+                        const partes = linha.split(/[;,\t]/).map(p => p.trim().replace(/^"+|"+$/g,''));
+                        let nome = '', telefone = '';
+                        if (partes.length >= 2) {
+                            const d0 = partes[0].replace(/\D/g,'').length;
+                            const d1 = partes[1].replace(/\D/g,'').length;
+                            if (d0 >= 8 && d1 < 8) { telefone = partes[0].replace(/\D/g,''); nome = partes[1] || 'Importado'; }
+                            else { nome = partes[0] || 'Importado'; telefone = partes[1].replace(/\D/g,''); }
+                        } else {
+                            const nums = linha.replace(/\D/g,'');
+                            if (nums.length >= 8) { telefone = nums; nome = 'Importado'; }
+                        }
+                        if (telefone && telefone.length >= 8) contatos.push({id:'imp_'+telefone, nome, telefone});
+                    });
+                    const unicos = contatos.filter((c,i,arr) => arr.findIndex(x=>x.telefone===c.telefone)===i);
+                    UI._informativoWppContatosImportados = unicos;
+                    unicos.forEach(c => UI._informativoWppSelecionados.add(JSON.stringify({tel: c.telefone, nome: c.nome})));
+                    UI.informativoRenderListaWpp();
+                    UI._informativoRenderTagsWpp();
+                    const info = document.getElementById('inf-wpp-import-info');
+                    const msg  = document.getElementById('inf-wpp-import-msg');
+                    if (info && msg) {
+                        msg.textContent = `${unicos.length} contato(s) importado(s) e selecionado(s).`;
+                        info.style.display = 'block';
+                        setTimeout(() => { info.style.display = 'none'; }, 6000);
+                    }
+                    if (unicos.length === 0) Utils.toast('Nenhum número válido encontrado.', 'error');
+                    else Utils.toast(`${unicos.length} contato(s) importado(s)!`, 'success');
+                };
+                reader.readAsText(file);
+            },
+
+            _informativoRenderTagsWpp: () => {
+                const container = document.getElementById('inf-wpp-tags-container');
+                const badge     = document.getElementById('inf-wpp-badge');
+                if (!container) return;
+                const entries = Array.from(UI._informativoWppSelecionados);
+                container.innerHTML = entries.map(entry => {
+                    let label = entry, tel = entry;
+                    try { const p = JSON.parse(entry); label = `${p.nome.split(' ')[0]} (${p.tel})`; tel = p.tel; } catch(e) {}
+                    return `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(37,211,102,0.12);color:#1a7a3e;border:1px solid #25D366;border-radius:99px;padding:3px 10px 3px 10px;font-size:0.76rem;font-weight:600;white-space:nowrap;">
+                        <i class="fab fa-whatsapp" style="font-size:0.7rem;"></i>
+                        ${label}
+                        <button onclick="UI._removeInfWppTag('${entry.replace(/'/g,"\\'")}')" style="background:none;border:none;cursor:pointer;color:#1a7a3e;font-size:0.9rem;padding:0 2px;line-height:1;margin-left:2px;">×</button>
+                    </span>`;
+                }).join('');
+                if (badge) {
+                    badge.textContent = `${entries.length} selecionado${entries.length!==1?'s':''}`;
+                    badge.style.background = entries.length>0 ? 'rgba(37,211,102,0.15)' : 'rgba(200,200,200,0.15)';
+                }
+            },
+
+            _removeInfWppTag: (entry) => {
+                UI._informativoWppSelecionados.delete(entry);
+                // Desmarca checkbox se existir
+                document.querySelectorAll('#inf-wpp-lista-clientes .inf-wpp-checkbox').forEach(cb => {
+                    try { if (JSON.parse(entry).tel === cb.dataset.tel) cb.checked = false; } catch(e) {}
+                });
+                UI._informativoRenderTagsWpp();
+            },
+
+            _informativoGerarMensagemWpp: (nome) => {
+                const titulo   = document.getElementById('inf-titulo')?.value   || '';
+                const corpo    = document.getElementById('inf-corpo')?.value    || '';
+                const ctaTxt   = document.getElementById('inf-cta-texto')?.value || '';
+                const ctaLink  = document.getElementById('inf-cta-link')?.value  || '';
+                const rodape   = document.getElementById('inf-rodape')?.value    || '';
+                const primeiro = nome ? nome.split(' ')[0] : 'cliente';
+                const destaques = UI._informativoDestaques.map(d =>
+                    `⭐ *${d.titulo}*${d.descricao?' — '+d.descricao:''}${d.preco?' | '+d.preco:''}`
+                ).join('\n');
+
+                let msg = '';
+                if (titulo) msg += `*${titulo}*\n\n`;
+                msg += corpo.replace(/{nome}/g, primeiro);
+                if (destaques) msg += `\n\n${destaques}`;
+                if (ctaTxt && ctaLink) msg += `\n\n👉 *${ctaTxt}*: ${ctaLink}`;
+                else if (ctaTxt)       msg += `\n\n👉 *${ctaTxt}*`;
+                if (rodape) msg += `\n\n${rodape}`;
+                return msg;
+            },
+
+            informativoEnviarWpp: async () => {
+                if (UI._informativoWppSelecionados.size === 0) {
+                    Utils.toast('Selecione ao menos um destinatário', 'error');
+                    return;
+                }
+                const lista = Array.from(UI._informativoWppSelecionados).map(entry => {
+                    try { return JSON.parse(entry); } catch(e) { return {tel: entry, nome: 'Cliente'}; }
+                });
+
+                const delayMin = parseInt(document.getElementById('inf-wpp-delay-min')?.value || '3') * 1000;
+                const delayMax = parseInt(document.getElementById('inf-wpp-delay-max')?.value || '8') * 1000;
+
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                if (isIOS) {
+                    const linksContainer = document.getElementById('inf-wpp-links');
+                    const linksList      = document.getElementById('inf-wpp-links-list');
+                    linksList.innerHTML  = '';
+                    lista.forEach(c => {
+                        const msg = UI._informativoGerarMensagemWpp(c.nome);
+                        const phone = '55' + c.tel.replace(/\D/g,'');
+                        const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+                        linksList.innerHTML += `<div class="whatsapp-link-item"><a href="${url}" target="_blank">${c.nome} (${c.tel})</a></div>`;
+                    });
+                    linksContainer.style.display = 'block';
+                    Utils.toast('Links gerados. Clique em cada um para enviar.');
+                    return;
+                }
+
+                const progresso = document.getElementById('inf-wpp-progresso');
+                const totalEl   = document.getElementById('inf-wpp-total');
+                const enviadosEl= document.getElementById('inf-wpp-enviados');
+                const fillEl    = document.getElementById('inf-wpp-fill');
+                progresso.style.display = 'block';
+                totalEl.textContent     = lista.length;
+                enviadosEl.textContent  = '0';
+                fillEl.style.width      = '0%';
+
+                UI._informativoWppEnvioList  = lista;
+                UI._informativoWppEnvioIndex = 0;
+
+                const enviarProximo = () => {
+                    if (UI._informativoWppEnvioIndex >= UI._informativoWppEnvioList.length) {
+                        Utils.toast('Envio via WhatsApp concluído!', 'success');
+                        progresso.style.display = 'none';
+                        return;
+                    }
+                    const c = UI._informativoWppEnvioList[UI._informativoWppEnvioIndex];
+                    const msg = UI._informativoGerarMensagemWpp(c.nome);
+                    const phone = '55' + c.tel.replace(/\D/g,'');
+                    const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+                    Utils.openWhatsApp ? Utils.openWhatsApp(url) : window.open(url, '_blank');
+                    UI._informativoWppEnvioIndex++;
+                    const enviados = UI._informativoWppEnvioIndex;
+                    enviadosEl.textContent = enviados;
+                    fillEl.style.width = (enviados / lista.length * 100) + '%';
+                    const delay = Math.floor(Math.random() * (delayMax - delayMin + 1) + delayMin);
+                    setTimeout(enviarProximo, delay);
+                };
+                enviarProximo();
             },
 
             // ═══════════════════════════════════════════════════
@@ -22892,8 +23476,10 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                         refCounter: UI.data.settings?.refCounter || 0,
                         msgPadrao: document.getElementById('s-msg-padrao').value,
                         backgroundImage: document.getElementById('s-background-image').value,
+                        backgroundVideo: document.getElementById('s-background-video')?.value || '',
                         bgOpacity: parseInt(document.getElementById('s-bg-opacity')?.value || '18'),
                         loginBgImage: document.getElementById('s-login-bg-image').value,
+                        loginVideo: document.getElementById('s-login-video')?.value || '',
                         loginBgOpacity: parseInt(document.getElementById('s-login-bg-opacity')?.value || '40')
                     };
                     
@@ -22902,6 +23488,8 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     UI.data.settings = settings;
                     UI.applyBackground();
                     Auth.applyLoginBg(settings.loginBgImage || '', (settings.loginBgOpacity || 40) / 100);
+                    App.settings._applySysVideo(settings.backgroundVideo || '');
+                    App.settings._applyLoginVideo(settings.loginVideo || '');
                     
                     Utils.toast('Configurações salvas!');
                     
@@ -22911,16 +23499,18 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                 handleBackgroundUpload: async function(input) {
                     const file = input.files[0];
                     if (!file) return;
-                    
                     try {
                         const base64 = await Utils.readImage(file);
                         const compressed = await Utils.compressImage(base64, 0.8, 1920);
                         document.getElementById('s-background-image').value = compressed;
-                        document.getElementById('s-bg-preview').style.backgroundImage = `url('${compressed}')`;  
-                    document.body.style.setProperty('--bg-image', `url('${compressed}')`);
-                    document.body.style.setProperty('--bg-opacity', (parseInt(document.getElementById('s-bg-opacity')?.value || '18')) / 100);
-                    document.body.classList.add('has-bg-image');
+                        document.getElementById('s-bg-preview').style.backgroundImage = `url('${compressed}')`;
+                        document.body.style.setProperty('--bg-image', `url('${compressed}')`);
+                        document.body.style.setProperty('--bg-opacity', (parseInt(document.getElementById('s-bg-opacity')?.value || '45')) / 100);
+                        document.body.classList.add('has-bg-image');
                         document.getElementById('btn-remove-bg').style.display = 'inline-block';
+                        // Se havia vídeo, limpa
+                        App.settings._applySysVideo('');
+                        document.getElementById('s-background-video').value = '';
                     } catch (error) {
                         console.error(error);
                         Utils.toast('Erro ao carregar imagem', 'error');
@@ -22936,6 +23526,55 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     document.body.classList.remove('has-bg-image');
                 },
 
+                handleSysVideoUpload: function(input) {
+                    const file = input.files[0];
+                    if (!file) return;
+                    if (file.size > 80 * 1024 * 1024) { Utils.toast('Vídeo muito grande. Máximo recomendado: 80 MB.', 'error'); input.value=''; return; }
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const dataUrl = e.target.result;
+                        document.getElementById('s-background-video').value = dataUrl;
+                        const prev = document.getElementById('s-bg-video-prev-el');
+                        if (prev) { prev.src = dataUrl; prev.style.display = 'block'; document.getElementById('s-bg-video-hint').style.display = 'none'; }
+                        document.getElementById('btn-remove-sys-video').style.display = 'inline-block';
+                        // Aplica ao vivo
+                        App.settings._applySysVideo(dataUrl);
+                        // Limpa imagem
+                        document.getElementById('s-background-image').value = '';
+                        document.getElementById('s-bg-preview').style.backgroundImage = '';
+                        document.getElementById('btn-remove-bg').style.display = 'none';
+                        document.body.style.setProperty('--bg-image', 'none');
+                        document.body.classList.remove('has-bg-image');
+                    };
+                    reader.readAsDataURL(file);
+                    input.value = '';
+                },
+
+                removeSysVideo: function() {
+                    document.getElementById('s-background-video').value = '';
+                    const prev = document.getElementById('s-bg-video-prev-el');
+                    if (prev) { prev.src = ''; prev.style.display = 'none'; }
+                    document.getElementById('s-bg-video-hint').style.display = 'block';
+                    document.getElementById('btn-remove-sys-video').style.display = 'none';
+                    App.settings._applySysVideo('');
+                },
+
+                _applySysVideo: function(src) {
+                    const vid = document.getElementById('sys-bg-video');
+                    if (!vid) return;
+                    if (src) {
+                        vid.src = src;
+                        vid.style.display = 'block';
+                        vid.play().catch(()=>{});
+                        const op = (parseInt(document.getElementById('s-bg-opacity')?.value || '45')) / 100;
+                        vid.style.opacity = op;
+                    } else {
+                        vid.pause();
+                        vid.src = '';
+                        vid.style.display = 'none';
+                    }
+                },
+
                 handleLoginBgUpload: async function(input) {
                     const file = input.files[0];
                     if (!file) return;
@@ -22947,6 +23586,9 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                         document.getElementById('btn-remove-login-bg').style.display = 'inline-block';
                         const op = parseInt(document.getElementById('s-login-bg-opacity')?.value || '40') / 100;
                         Auth.applyLoginBg(compressed, op);
+                        // Limpa vídeo login
+                        App.settings._applyLoginVideo('');
+                        document.getElementById('s-login-video').value = '';
                     } catch(e) {
                         console.error(e);
                         Utils.toast('Erro ao carregar imagem', 'error');
@@ -22959,6 +23601,87 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     document.getElementById('s-login-bg-preview').style.backgroundImage = '';
                     document.getElementById('btn-remove-login-bg').style.display = 'none';
                     Auth.applyLoginBg('', 0);
+                },
+
+                handleLoginVideoUpload: function(input) {
+                    const file = input.files[0];
+                    if (!file) return;
+                    if (file.size > 80 * 1024 * 1024) { Utils.toast('Vídeo muito grande. Máximo recomendado: 80 MB.', 'error'); input.value=''; return; }
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const dataUrl = e.target.result;
+                        document.getElementById('s-login-video').value = dataUrl;
+                        const prev = document.getElementById('s-login-video-prev-el');
+                        if (prev) { prev.src = dataUrl; prev.style.display = 'block'; document.getElementById('s-login-video-hint').style.display = 'none'; }
+                        document.getElementById('btn-remove-login-video').style.display = 'inline-block';
+                        App.settings._applyLoginVideo(dataUrl);
+                        // Limpa imagem login
+                        document.getElementById('s-login-bg-image').value = '';
+                        document.getElementById('s-login-bg-preview').style.backgroundImage = '';
+                        document.getElementById('btn-remove-login-bg').style.display = 'none';
+                        Auth.applyLoginBg('', 0);
+                    };
+                    reader.readAsDataURL(file);
+                    input.value = '';
+                },
+
+                removeLoginVideo: function() {
+                    document.getElementById('s-login-video').value = '';
+                    const prev = document.getElementById('s-login-video-prev-el');
+                    if (prev) { prev.src = ''; prev.style.display = 'none'; }
+                    document.getElementById('s-login-video-hint').style.display = 'block';
+                    document.getElementById('btn-remove-login-video').style.display = 'none';
+                    App.settings._applyLoginVideo('');
+                },
+
+                _applyLoginVideo: function(src) {
+                    const vid = document.getElementById('login-bg-video');
+                    if (!vid) return;
+                    if (src) {
+                        vid.src = src;
+                        vid.style.display = 'block';
+                        const op = (parseInt(document.getElementById('s-login-bg-opacity')?.value || '40')) / 100;
+                        vid.style.opacity = op;
+                        vid.play().catch(()=>{});
+                    } else {
+                        vid.pause();
+                        vid.src = '';
+                        vid.style.display = 'none';
+                    }
+                },
+
+                sysBgTab: function(tab) {
+                    const imgP = document.getElementById('sys-bg-panel-img');
+                    const vidP = document.getElementById('sys-bg-panel-vid');
+                    const btnI = document.getElementById('sys-bg-tab-img');
+                    const btnV = document.getElementById('sys-bg-tab-vid');
+                    if (!imgP) return;
+                    if (tab === 'img') {
+                        imgP.style.display = ''; vidP.style.display = 'none';
+                        btnI.style.background = 'var(--primary)'; btnI.style.color = 'white';
+                        btnV.style.background = 'transparent'; btnV.style.color = 'var(--text-secondary)';
+                    } else {
+                        imgP.style.display = 'none'; vidP.style.display = '';
+                        btnV.style.background = 'var(--primary)'; btnV.style.color = 'white';
+                        btnI.style.background = 'transparent'; btnI.style.color = 'var(--text-secondary)';
+                    }
+                },
+
+                loginBgTab: function(tab) {
+                    const imgP = document.getElementById('login-bg-panel-img');
+                    const vidP = document.getElementById('login-bg-panel-vid');
+                    const btnI = document.getElementById('login-bg-tab-img');
+                    const btnV = document.getElementById('login-bg-tab-vid');
+                    if (!imgP) return;
+                    if (tab === 'img') {
+                        imgP.style.display = ''; vidP.style.display = 'none';
+                        btnI.style.background = 'var(--accent)'; btnI.style.color = 'white';
+                        btnV.style.background = 'transparent'; btnV.style.color = 'var(--text-secondary)';
+                    } else {
+                        imgP.style.display = 'none'; vidP.style.display = '';
+                        btnV.style.background = 'var(--accent)'; btnV.style.color = 'white';
+                        btnI.style.background = 'transparent'; btnI.style.color = 'var(--text-secondary)';
+                    }
                 }
             },
             
@@ -29803,7 +30526,105 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 if (window.UI && UI.showToast) UI.showToast('✅ Dados de ' + cliente.nome + ' carregados no simulador!');
             }
 
-            return { init, switchTab, setDep, nascUpdate, prazoUpdate, entrUpdate, entrPct, entrVal, calcSimular, calcRenda, calcImovel, gerarPDF, prefillFromCliente };
+            // ═══════════════════════════════════════════════════════════════
+            // BUSCA DE TAXAS REAIS — API PÚBLICA DO BANCO CENTRAL DO BRASIL
+            // Série 432  = Taxa SELIC Meta (% a.a.)
+            // Série 4390 = Taxa de Juros SFH/SBPE (% a.a.) — referência CEF
+            // Série 11426= TR acumulada 12 meses
+            // Série 13522= IPCA acumulado 12 meses
+            // ═══════════════════════════════════════════════════════════════
+            async function atualizarTaxasAPI() {
+                const btn  = document.getElementById('btn-atualizar-taxas');
+                const icon = document.getElementById('icon-atualizar-taxas');
+                const statusEl = document.getElementById('sim-taxa-status');
+                if (btn) btn.disabled = true;
+                if (icon) icon.className = 'fas fa-spinner fa-spin';
+                if (statusEl) { statusEl.style.display='block'; statusEl.innerHTML='⏳ Consultando Banco Central do Brasil...'; }
+
+                const hoje = new Date();
+                const fmt = d => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+                const d2 = fmt(hoje);
+                const d1Obj = new Date(hoje); d1Obj.setDate(d1Obj.getDate()-45);
+                const d1 = fmt(d1Obj);
+
+                async function fetchSerie(cod) {
+                    try {
+                        const url = `https://api.bcb.gov.br/dados/serie/bcdata.sgs.${cod}/dados?formato=json&dataInicial=${d1}&dataFinal=${d2}`;
+                        const r = await fetch(url, {cache:'no-cache'});
+                        if (!r.ok) throw new Error('HTTP '+r.status);
+                        const arr = await r.json();
+                        if (!arr || !arr.length) return null;
+                        const last = arr[arr.length-1];
+                        return { valor: parseFloat(last.valor.replace ? last.valor.replace(',','.') : last.valor), data: last.data };
+                    } catch(e) { return null; }
+                }
+
+                const [resSelic, resSFH, resTR, resIPCA] = await Promise.all([
+                    fetchSerie(432),   // SELIC meta
+                    fetchSerie(4390),  // Taxa média SFH contratada
+                    fetchSerie(11426), // TR acumulada
+                    fetchSerie(13522), // IPCA acumulado
+                ]);
+
+                // Taxa SBPE CEF = referência SFH + spread conservador (+0.20 p.p.)
+                // Correntista: -0.90 p.p. sobre balcão (desconto oficial CEF)
+                let sbpeNovo = TAXAS.sbpe;
+                let sbpeRelNovo = TAXAS.sbpe_rel;
+                let fonteStr = 'Tabela interna (API indisponível)';
+                let dataStr = '';
+
+                if (resSFH && !isNaN(resSFH.valor)) {
+                    sbpeNovo    = Math.round((resSFH.valor / 100 + 0.0020) * 10000) / 10000;
+                    sbpeRelNovo = Math.round((resSFH.valor / 100 - 0.0090) * 10000) / 10000;
+                    sbpeNovo    = Math.max(0.08, Math.min(0.18, sbpeNovo));
+                    sbpeRelNovo = Math.max(0.07, Math.min(0.17, sbpeRelNovo));
+                    fonteStr = 'BCB — Série 4390 (SFH média contratada)';
+                    dataStr  = resSFH.data;
+                    TAXAS.sbpe     = sbpeNovo;
+                    TAXAS.sbpe_rel = sbpeRelNovo;
+                }
+
+                const linhas = [
+                    { nome:'SELIC Meta',          val: resSelic ? resSelic.valor.toFixed(2)+'% a.a.' : '—', data: resSelic?.data||'' },
+                    { nome:'SFH média (BCB)',      val: resSFH   ? resSFH.valor.toFixed(2)+'% a.a.'   : '—', data: resSFH?.data||'' },
+                    { nome:'SBPE CEF balcão',      val: (sbpeNovo*100).toFixed(2)+'% a.a.',  data: dataStr },
+                    { nome:'SBPE CEF correntista', val: (sbpeRelNovo*100).toFixed(2)+'% a.a.', data: dataStr },
+                    { nome:'TR 12m',               val: resTR   ? resTR.valor.toFixed(4)+'%'    : '—', data: resTR?.data||'' },
+                    { nome:'IPCA 12m',             val: resIPCA ? resIPCA.valor.toFixed(2)+'%'  : '—', data: resIPCA?.data||'' },
+                ];
+
+                const linhasHTML = linhas.map(l =>
+                    `<span style="display:inline-flex;gap:4px;align-items:center;background:rgba(255,255,255,0.15);border-radius:6px;padding:3px 8px;font-size:0.68rem;white-space:nowrap;">
+                        <b>${l.nome}:</b> ${l.val}${l.data ? ' <span style="opacity:0.65;">('+l.data+')</span>' : ''}
+                    </span>`
+                ).join('');
+
+                if (statusEl) {
+                    statusEl.innerHTML = `
+                        <div style="font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap:6px;">
+                            <i class="fas fa-check-circle" style="color:#A8E0FF;"></i> Taxas atualizadas via API BCB
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:4px;">${linhasHTML}</div>
+                        <div style="opacity:0.6;font-size:0.65rem;margin-top:5px;">Fonte: ${fonteStr}. MCMV é tabelado em lei — não varia pelo mercado.</div>
+                    `;
+                }
+
+                // Atualiza os textos dos selects com as taxas novas
+                [document.getElementById('s-modal'), document.getElementById('r-modal'), document.getElementById('i-modal')].forEach(sel => {
+                    if (!sel) return;
+                    sel.querySelectorAll('option').forEach(opt => {
+                        if (opt.value === 'sbpe')     opt.textContent = `SBPE / SFH — balcão · ${(sbpeNovo*100).toFixed(2)}% a.a. + TR`;
+                        if (opt.value === 'sbpe_rel') opt.textContent = `SBPE correntista · ${(sbpeRelNovo*100).toFixed(2)}% a.a. + TR`;
+                    });
+                });
+
+                if (icon) icon.className = 'fas fa-check';
+                if (btn)  btn.disabled = false;
+                setTimeout(() => { if (icon) icon.className = 'fas fa-sync-alt'; }, 3000);
+                if (window.Utils) Utils.toast('✅ Taxas reais do BCB carregadas!', 'success');
+            }
+
+            return { init, switchTab, setDep, nascUpdate, prazoUpdate, entrUpdate, entrPct, entrVal, calcSimular, calcRenda, calcImovel, gerarPDF, prefillFromCliente, atualizarTaxasAPI };
         })();
 
         // ===== AUTH MODULE =====
@@ -29941,9 +30762,17 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             function loadLoginBg() {
                 try {
                     const s = UI.data && UI.data.settings;
-                    if (s && s.loginBgImage) {
+                    if (!s) return;
+                    if (s.loginVideo) {
+                        const vid = document.getElementById('login-bg-video');
+                        if (vid) { vid.src = s.loginVideo; vid.style.display = 'block'; vid.style.opacity = (s.loginBgOpacity || 40) / 100; vid.play().catch(()=>{}); }
+                    } else if (s.loginBgImage) {
                         const layer = document.getElementById('login-bg-layer');
                         if (layer) { layer.style.backgroundImage = `url('${s.loginBgImage}')`; layer.style.opacity = (s.loginBgOpacity || 40) / 100; }
+                    }
+                    if (s.backgroundVideo) {
+                        const vid2 = document.getElementById('sys-bg-video');
+                        if (vid2) { vid2.src = s.backgroundVideo; vid2.style.display = 'block'; vid2.style.opacity = (s.bgOpacity || 45) / 100; vid2.play().catch(()=>{}); }
                     }
                 } catch(e) {}
             }
