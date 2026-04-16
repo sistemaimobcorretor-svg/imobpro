@@ -9879,7 +9879,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <div class="sheet-handle"></div>
             <h3 class="section-title">Envio em Massa - WhatsApp</h3>
             <div class="form-group">
-                <label class="form-label">Selecionar Clientes</label>
+                <label class="form-label" style="display:flex;align-items:center;justify-content:space-between;">
+                    <span>Selecionar Clientes</span>
+                    <span id="envio-massa-ativos-badge" style="font-size:0.72rem;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--accent-ultra);color:var(--accent-dark);border:1px solid var(--accent);"></span>
+                </label>
+                <div style="font-size:0.74rem;color:var(--text-secondary);margin-bottom:6px;padding:6px 10px;background:var(--primary-ultra);border-radius:8px;border-left:3px solid var(--primary);">
+                    <i class="fas fa-filter" style="margin-right:4px;color:var(--primary);"></i> Exibindo apenas clientes <strong>ativos</strong>. Inativos, compra adiada e compra concluida sao ocultados automaticamente.
+                </div>
                 <input type="text" class="form-control" placeholder="Filtrar clientes..." id="filtro-clientes-envio" oninput="UI.filtrarClientesEnvio()">
                 <div style="max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-top: 8px;" id="lista-clientes-envio">
                 </div>
@@ -9896,15 +9902,17 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </div>
             </div>
             <div class="form-group">
-                <label class="form-label">Mensagem (use {nome} para o nome do cliente)</label>
+                <label class="form-label">Mensagem (use {nome} para o primeiro nome do cliente)</label>
+                <div style="font-size:0.74rem;color:var(--text-secondary);margin-bottom:6px;">A saudacao (Bom dia/Boa tarde/Boa noite) e o nome do cliente sao inseridos automaticamente conforme o horario do envio.</div>
                 <textarea id="msg-envio" class="form-control" rows="4"></textarea>
             </div>
             <div class="form-group">
-                <label class="form-label">Delay aleatório entre envios (segundos)</label>
+                <label class="form-label">Delay aleatorio entre envios (segundos)</label>
                 <div class="form-row">
-                    <input type="number" id="delay-min" class="form-control" value="3" min="1" max="30" placeholder="Mín">
-                    <input type="number" id="delay-max" class="form-control" value="8" min="1" max="30" placeholder="Máx">
+                    <input type="number" id="delay-min" class="form-control" value="3" min="1" max="30" placeholder="Min">
+                    <input type="number" id="delay-max" class="form-control" value="8" min="1" max="30" placeholder="Max">
                 </div>
+                <div style="font-size:0.74rem;color:var(--text-secondary);margin-top:4px;">Intervalo aleatorio entre cada envio para evitar bloqueio por spam.</div>
             </div>
             <div id="progresso-envio" style="display: none;">
                 <div class="progress-envio">
@@ -17659,8 +17667,14 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     score += (ordemEtapa[c.etapaFunil] || 2) * 3;
                     // 3. Sem telefone = remove
                     if (!c.telefone) return -1;
-                    // 4. Venda concluída = remove
-                    if (c.etapaFunil === 'venda') return -1;
+                    // 4. Etapas inativas = remove (detecta por ID e nome da etapa)
+                    {
+                        const etapaId = (c.etapaFunil || '').toLowerCase();
+                        const etapaObj = (UI.data.funilEtapas || []).find(e => e.id === c.etapaFunil);
+                        const etapaNome = (etapaObj ? etapaObj.nome : etapaId).toLowerCase();
+                        const palavrasInativas = ['venda', 'inativ', 'adiado', 'adiada', 'cancelado', 'cancelada', 'desistiu', 'perdido', 'perdida', 'concluido', 'concluida', 'concluída', 'concluído', 'encerrado', 'encerrada'];
+                        if (palavrasInativas.some(p => etapaId.includes(p) || etapaNome.includes(p))) return -1;
+                    }
                     return { score, diasSemContato, ultimoContato: ultimosContatos[0] };
                 };
 
@@ -17750,17 +17764,38 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 const metaMensagens = metas.mensagens || metas.leads || 15;
 
                 const SCRIPTS = {
-                    lead: 'Olá {nome}! Vi que você tem interesse em imóveis. Posso te ajudar a encontrar a opção ideal? \u{1F3E1}',
-                    contato: 'Olá {nome}, dando continuidade ao nosso contato anterior — já encontrei algumas opções que combinam com seu perfil! Quer ver? \u{1F60A}',
-                    cpf: 'Oi {nome}! A análise de crédito está em andamento. Qualquer novidade te aviso de imediato. \u{1F44D}',
-                    'sem-restricao': 'Oi {nome}! Ótima notícia — seu CPF está sem restrições. Podemos avançar com os documentos? \u{1F389}',
-                    documentacao: 'Olá {nome}, preciso de alguns documentos para finalizarmos seu processo. Consigo te listar tudo agora! \u{1F4CB}',
-                    aprovado: '{nome}, seu financiamento foi aprovado! Vamos marcar a assinatura do contrato? \u{1F3C6}',
-                    contrato: 'Olá {nome}! Tudo pronto para a assinatura. Quando você pode? \u{1F4DD}',
+                    lead: 'Vi que voce tem interesse em imoveis. Posso te ajudar a encontrar a opcao ideal?',
+                    contato: 'dando continuidade ao nosso contato anterior — ja encontrei algumas opcoes que combinam com seu perfil! Quer ver?',
+                    cpf: 'a analise de credito esta em andamento. Qualquer novidade te aviso de imediato.',
+                    'sem-restricao': 'otima noticia — seu CPF esta sem restricoes. Podemos avancar com os documentos?',
+                    documentacao: 'preciso de alguns documentos para finalizarmos seu processo. Consigo te listar tudo agora!',
+                    aprovado: 'seu financiamento foi aprovado! Vamos marcar a assinatura do contrato?',
+                    contrato: 'tudo pronto para a assinatura. Quando voce pode?',
+                };
+
+                // Saudação baseada no horário atual
+                const getSaudacao = () => {
+                    const hora = agora.getHours();
+                    if (hora >= 5 && hora < 12) return 'Bom dia';
+                    if (hora >= 12 && hora < 18) return 'Boa tarde';
+                    return 'Boa noite';
+                };
+                const saudacao = getSaudacao();
+
+                // Verifica se o cliente está inativo (não deve aparecer na lista)
+                const clienteInativo = (c) => {
+                    // Detecta etapas inativas pelo ID ou pelo nome da etapa personalizada
+                    const etapaId = (c.etapaFunil || '').toLowerCase();
+                    const etapaObj = (UI.data.funilEtapas || []).find(e => e.id === c.etapaFunil);
+                    const etapaNome = (etapaObj ? etapaObj.nome : etapaId).toLowerCase();
+                    // Palavras-chave que indicam cliente não ativo
+                    const palavrasInativas = ['venda', 'inativ', 'adiado', 'adiada', 'cancelado', 'cancelada', 'desistiu', 'desistencia', 'perdido', 'perdida', 'concluido', 'concluida', 'concluída', 'concluído', 'encerrado', 'encerrada'];
+                    if (palavrasInativas.some(p => etapaId.includes(p) || etapaNome.includes(p))) return true;
+                    return false;
                 };
 
                 const scoreMensagem = (c) => {
-                    if (!c.telefone || c.etapaFunil === 'venda') return null;
+                    if (!c.telefone || clienteInativo(c)) return null;
                     const ultimosWpp = visitas
                         .filter(v => v.clienteId === c.id && v.tipo === 'whatsapp')
                         .sort((a, b) => new Date(b.data) - new Date(a.data));
@@ -17770,8 +17805,15 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     let score = Math.min(diasSemWpp * 1.5, 50);
                     const ordemEtapa = { lead:2, contato:4, cpf:6, 'sem-restricao':8, documentacao:9, aprovado:10, contrato:9 };
                     score += (ordemEtapa[c.etapaFunil] || 2) * 2;
-                    const script = SCRIPTS[c.etapaFunil] || SCRIPTS.lead;
-                    return { score, diasSemWpp, ultimoWpp: ultimosWpp[0], script: script.replace(/{nome}/g, c.nome.split(' ')[0]) };
+                    const primeiroNome = c.nome.split(' ')[0];
+                    const scriptBase = SCRIPTS[c.etapaFunil] || SCRIPTS.lead;
+                    // Substitui {nome} pelo saudação + nome personalizado e remove emojis
+                    const scriptPersonalizado = scriptBase
+                        .replace(/{nome}/g, primeiroNome)
+                        .replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[\uD800-\uDBFF][\uDC00-\uDFFF]/gu, '')
+                        .trim();
+                    const script = `${saudacao}, ${primeiroNome}! ${scriptPersonalizado}`;
+                    return { score, diasSemWpp, ultimoWpp: ultimosWpp[0], script };
                 };
 
                 const lista = clientes
@@ -17788,11 +17830,14 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <div class="lista-diaria-header" style="background:linear-gradient(135deg,#128C7E,#25D366);">
                         <div>
                             <h3><i class="fab fa-whatsapp"></i> Lista de Mensagens — ${hoje}</h3>
-                            <p>Meta: ${metaMensagens} mensagens · ${lista.length} clientes priorizados por IA</p>
+                            <p>Meta: ${metaMensagens} mensagens · ${lista.length} clientes ativos priorizados por IA</p>
                         </div>
                         <div class="lista-diaria-actions">
                             <button class="btn-lista-pdf" onclick="UI.exportListaPDF('mensagens', UI.currentReport.data)">
                                 <i class="fas fa-file-pdf"></i> Baixar PDF
+                            </button>
+                            <button class="btn-lista-pdf" style="background:rgba(37,211,102,0.25);color:#fff;border-color:rgba(255,255,255,0.3);" onclick="UI.openEnvioMassaFromLista()">
+                                <i class="fab fa-whatsapp"></i> Envio em Massa
                             </button>
                         </div>
                     </div>
@@ -18396,7 +18441,15 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
             openEnvioMassa: async () => {
                 const settings = await Storage.getSettings();
-                document.getElementById('msg-envio').value = settings.msgPadrao || '{nome}, tudo bem? Me chamo [Seu Nome] e sou corretor da [Imobiliária]. Gostaria de saber se ainda tem interesse em adquirir um imóvel. Fico à disposição! \u{1F3E1}';
+                // Saudação baseada no horário
+                const hora = new Date().getHours();
+                const saudacao = hora >= 5 && hora < 12 ? 'Bom dia' : hora >= 12 && hora < 18 ? 'Boa tarde' : 'Boa noite';
+                const msgPadrao = settings.msgPadrao
+                    ? settings.msgPadrao.replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[\uD800-\uDBFF][\uDC00-\uDFFF]/gu, '').trim()
+                    : `${saudacao}, {nome}! Tudo bem? Meu nome e [Seu Nome] e sou corretor da [Imobiliaria]. Gostaria de saber se ainda tem interesse em adquirir um imovel. Fico a disposicao!`;
+                // Garante a saudação no início se usar {nome}
+                const msgFinal = msgPadrao.includes('{nome}') ? msgPadrao : `${saudacao}, {nome}! ${msgPadrao}`;
+                document.getElementById('msg-envio').value = msgFinal;
                 document.getElementById('delay-min').value = 3;
                 document.getElementById('delay-max').value = 8;
                 document.getElementById('progresso-envio').style.display = 'none';
@@ -18405,22 +18458,101 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 UI.openModal('envio-massa');
             },
 
+            // Abre envio em massa ja com os clientes da lista diaria pre-carregados e selecionados
+            openEnvioMassaFromLista: async () => {
+                const report = UI.currentReport;
+                if (!report || !report.data || report.data.length === 0) {
+                    Utils.toast('Nenhum cliente na lista para enviar.', 'error');
+                    return;
+                }
+                const lista = report.data;
+
+                document.getElementById('delay-min').value = 3;
+                document.getElementById('delay-max').value = 8;
+                document.getElementById('progresso-envio').style.display = 'none';
+                document.getElementById('whatsapp-links').style.display = 'none';
+
+                const hora = new Date().getHours();
+                const saudacao = hora >= 5 && hora < 12 ? 'Bom dia' : hora >= 12 && hora < 18 ? 'Boa tarde' : 'Boa noite';
+                document.getElementById('msg-envio').value = `${saudacao}, {nome}! [Mensagem personalizada por etapa — exibida abaixo de cada cliente]`;
+
+                const container = document.getElementById('lista-clientes-envio');
+                const etapas = UI.data.funilEtapas || [];
+                const getEtapaNome = (id) => (etapas.find(e => e.id === id) || { nome: id }).nome;
+
+                container.innerHTML = lista.map(c => `
+                    <div class="client-select-item" style="align-items:flex-start;">
+                        <input type="checkbox" class="cliente-checkbox"
+                            data-id="${c.id}"
+                            data-nome="${c.nome}"
+                            data-telefone="${c.telefone}"
+                            data-script="${encodeURIComponent(c._script || '')}"
+                            checked>
+                        <div class="client-select-info" style="flex:1;min-width:0;">
+                            <div class="client-select-name">${c.nome}</div>
+                            <div class="client-select-phone">${c.telefone}&nbsp;&middot;&nbsp;<span style="font-size:0.72rem;color:var(--text-secondary);">${getEtapaNome(c.etapaFunil)}</span></div>
+                            <div style="font-size:0.72rem;color:#128C7E;margin-top:3px;line-height:1.4;word-break:break-word;background:rgba(37,211,102,0.07);border-radius:6px;padding:4px 6px;">${c._script || ''}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                const badge = document.getElementById('envio-massa-ativos-badge');
+                if (badge) badge.textContent = `${lista.length} clientes da lista`;
+
+                // Aviso sobre modo lista diaria
+                const msgArea = document.getElementById('msg-envio');
+                let avisoEl = document.getElementById('aviso-script-individual');
+                if (!avisoEl) {
+                    avisoEl = document.createElement('div');
+                    avisoEl.id = 'aviso-script-individual';
+                    avisoEl.style.cssText = 'font-size:0.74rem;margin-top:6px;padding:8px 12px;border-radius:8px;background:rgba(37,211,102,0.10);border-left:3px solid #25D366;color:#065f46;line-height:1.5;';
+                    msgArea.parentNode.appendChild(avisoEl);
+                }
+                avisoEl.innerHTML = '<i class="fas fa-magic" style="margin-right:4px;"></i><strong>Modo lista diaria:</strong> cada cliente recebera a mensagem personalizada da sua etapa (em verde acima). O campo de texto sera ignorado neste modo.';
+                avisoEl.style.display = 'block';
+
+                UI.openModal('envio-massa');
+            },
+
             filtrarClientesEnvio: (filtro = '') => {
                 const termo = document.getElementById('filtro-clientes-envio').value.toLowerCase();
                 const container = document.getElementById('lista-clientes-envio');
-                const clientesFiltrados = UI.data.clientes.filter(c => 
-                    c.nome.toLowerCase().includes(termo) || 
-                    (c.telefone && c.telefone.includes(termo))
+
+                // Função para checar se cliente está ativo (detecta etapas inativas pelo ID ou nome)
+                const clienteAtivo = (c) => {
+                    const etapaId = (c.etapaFunil || '').toLowerCase();
+                    const etapaObj = (UI.data.funilEtapas || []).find(e => e.id === c.etapaFunil);
+                    const etapaNome = (etapaObj ? etapaObj.nome : etapaId).toLowerCase();
+                    const palavrasInativas = ['venda', 'inativ', 'adiado', 'adiada', 'cancelado', 'cancelada', 'desistiu', 'desistencia', 'perdido', 'perdida', 'concluido', 'concluida', 'concluída', 'concluído', 'encerrado', 'encerrada'];
+                    if (palavrasInativas.some(p => etapaId.includes(p) || etapaNome.includes(p))) return false;
+                    return true;
+                };
+
+                const clientesFiltrados = UI.data.clientes.filter(c =>
+                    clienteAtivo(c) &&
+                    c.telefone &&
+                    (c.nome.toLowerCase().includes(termo) ||
+                    (c.telefone && c.telefone.includes(termo)))
                 );
-                container.innerHTML = clientesFiltrados.map(c => `
+
+                const etapas = UI.data.funilEtapas || [];
+                const getEtapaNome = (id) => (etapas.find(e => e.id === id) || { nome: id }).nome;
+
+                container.innerHTML = clientesFiltrados.length === 0
+                    ? `<div style="padding:16px;text-align:center;font-size:0.82rem;color:var(--text-muted);">Nenhum cliente ativo encontrado.</div>`
+                    : clientesFiltrados.map(c => `
                     <div class="client-select-item">
                         <input type="checkbox" class="cliente-checkbox" data-id="${c.id}" data-nome="${c.nome}" data-telefone="${c.telefone}">
                         <div class="client-select-info">
                             <div class="client-select-name">${c.nome}</div>
-                            <div class="client-select-phone">${c.telefone}</div>
+                            <div class="client-select-phone">${c.telefone} &nbsp;·&nbsp; <span style="font-size:0.72rem;color:var(--text-secondary);">${getEtapaNome(c.etapaFunil)}</span></div>
                         </div>
                     </div>
                 `).join('');
+
+                // Atualiza badge de contagem
+                const badge = document.getElementById('envio-massa-ativos-badge');
+                if (badge) badge.textContent = `${clientesFiltrados.length} clientes ativos`;
             },
 
             selecionarTodosClientesEnvio: (selecionar) => {
@@ -18439,7 +18571,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 UI.envioMassaList = Array.from(checkboxes).map(cb => ({
                     id: cb.dataset.id,
                     nome: cb.dataset.nome,
-                    telefone: cb.dataset.telefone
+                    telefone: cb.dataset.telefone,
+                    scriptIndividual: cb.dataset.script ? decodeURIComponent(cb.dataset.script) : ""
                 }));
                 UI.envioMassaMsg = document.getElementById('msg-envio').value;
                 UI.envioMassaDelayMin = parseInt(document.getElementById('delay-min').value) || 3;
@@ -18455,7 +18588,16 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     
                     for (const cliente of UI.envioMassaList) {
                         const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
-                        const mensagem = UI.envioMassaMsg.replace(/{nome}/g, cliente.nome.split(' ')[0]);
+                        const primeiroNome = cliente.nome.split(' ')[0];
+                        const hora = new Date().getHours();
+                        const saudacao = hora >= 5 && hora < 12 ? 'Bom dia' : hora >= 12 && hora < 18 ? 'Boa tarde' : 'Boa noite';
+                        // Usa script individual da lista diaria se disponivel, senao usa a mensagem do campo
+                        let mensagem = cliente.scriptIndividual
+                            ? cliente.scriptIndividual
+                            : UI.envioMassaMsg.replace(/{nome}/g, primeiroNome).replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[\uD800-\uDBFF][\uDC00-\uDFFF]/gu, '').trim();
+                        if (!/^(bom dia|boa tarde|boa noite|ola|oi\b)/i.test(mensagem)) {
+                            mensagem = saudacao + ', ' + primeiroNome + '! ' + mensagem;
+                        }
                         const encodedMsg = encodeURIComponent(mensagem);
                         const url = `https://wa.me/${phoneNumber}?text=${encodedMsg}`;
                         linksList.innerHTML += `<div class="whatsapp-link-item"><a href="${url}" target="_blank">${cliente.nome}</a></div>`;
@@ -18485,10 +18627,22 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 }
 
                 const cliente = UI.envioMassaList[UI.envioMassaIndex];
-                const settings = await Storage.getSettings();
-                let mensagem = UI.envioMassaMsg.replace(/{nome}/g, cliente.nome.split(' ')[0]);
-                if (!mensagem.includes('\u{1F3E1}') && !mensagem.includes('\u{1F3E0}') && !mensagem.includes('\u{1F511}')) {
-                    mensagem += ' \u{1F3E1}';
+                const hora = new Date().getHours();
+                const saudacao = hora >= 5 && hora < 12 ? 'Bom dia' : hora >= 12 && hora < 18 ? 'Boa tarde' : 'Boa noite';
+                const primeiroNome = cliente.nome.split(' ')[0];
+                let mensagem;
+                if (cliente.scriptIndividual) {
+                    // Modo lista diaria: usa o script personalizado da etapa do cliente
+                    mensagem = cliente.scriptIndividual;
+                } else {
+                    // Modo normal: usa o campo de mensagem, remove emojis
+                    mensagem = UI.envioMassaMsg
+                        .replace(/{nome}/g, primeiroNome)
+                        .replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[\uD800-\uDBFF][\uDC00-\uDFFF]/gu, '')
+                        .trim();
+                    if (!/^(bom dia|boa tarde|boa noite|ola|oi\b)/i.test(mensagem)) {
+                        mensagem = saudacao + ', ' + primeiroNome + '! ' + mensagem;
+                    }
                 }
 
                 const phoneNumber = Utils.formatPhoneForWhatsApp(cliente.telefone);
