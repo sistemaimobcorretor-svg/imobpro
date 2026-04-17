@@ -313,6 +313,172 @@
             pointer-events: none;
         }
         .stat-card-coach-hero:active { transform: scale(0.975); box-shadow: 0 12px 36px rgba(29,111,164,0.35); }
+
+        /* ── Coach card — estado piscante com eventos do dia ─── */
+        @keyframes coachPulse {
+            0%   { box-shadow: 0 6px 24px rgba(29,111,164,0.30), 0 2px 8px rgba(0,0,0,0.10), 0 0 0 0 rgba(255,180,0,0.55); }
+            50%  { box-shadow: 0 6px 24px rgba(29,111,164,0.30), 0 2px 8px rgba(0,0,0,0.10), 0 0 0 10px rgba(255,180,0,0); }
+            100% { box-shadow: 0 6px 24px rgba(29,111,164,0.30), 0 2px 8px rgba(0,0,0,0.10), 0 0 0 0 rgba(255,180,0,0); }
+        }
+        @keyframes coachBorderPulse {
+            0%, 100% { border-color: rgba(255,180,0,0.8); }
+            50%       { border-color: rgba(255,220,80,0.3); }
+        }
+        .stat-card-coach-hero.has-events-today {
+            animation: coachPulse 2s ease-in-out infinite;
+            border: 2px solid rgba(255,180,0,0.8) !important;
+            animation: coachPulse 2s ease-in-out infinite, coachBorderPulse 2s ease-in-out infinite;
+        }
+        .coach-hero-events-today {
+            display: none;
+            flex-direction: column;
+            gap: 2px;
+            margin-top: 5px;
+        }
+        .coach-hero-events-today.visible { display: flex; }
+        .coach-hero-event-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255,220,50,0.18);
+            border: 1px solid rgba(255,220,50,0.35);
+            border-radius: 20px;
+            padding: 2px 8px 2px 6px;
+            font-size: 0.62rem;
+            font-weight: 600;
+            color: #FFE082;
+            width: fit-content;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .coach-hero-event-chip i { font-size: 0.6rem; flex-shrink: 0; }
+        .coach-hero-events-count {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #FFD54F;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Sininho de notificações no header ──────────────── */
+        .header-bell-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .header-bell-wrap .icon-btn {
+            position: relative;
+        }
+        @keyframes bellShake {
+            0%,100% { transform: rotate(0deg); }
+            15%      { transform: rotate(14deg); }
+            30%      { transform: rotate(-10deg); }
+            45%      { transform: rotate(8deg); }
+            60%      { transform: rotate(-5deg); }
+            75%      { transform: rotate(3deg); }
+        }
+        .bell-has-events { animation: bellShake 3s ease-in-out infinite; color: #FFD54F !important; }
+        .bell-badge {
+            position: absolute;
+            top: 2px; right: 2px;
+            min-width: 16px; height: 16px;
+            background: #E74C3C;
+            border-radius: 8px;
+            font-size: 0.6rem;
+            font-weight: 800;
+            color: #fff;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            padding: 0 3px;
+            pointer-events: none;
+            border: 1.5px solid #fff;
+        }
+        .bell-badge.visible { display: flex; }
+
+        /* ── Dropdown de eventos do sininho ─────────────────── */
+        .bell-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 290px;
+            background: var(--bg-float);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--shadow-float);
+            z-index: 9999;
+            overflow: hidden;
+        }
+        .bell-dropdown.open { display: block; }
+        .bell-dropdown-header {
+            padding: 12px 14px 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .bell-dropdown-header i { color: var(--primary); }
+        .bell-dropdown-list { max-height: 240px; overflow-y: auto; padding: 6px 0; }
+        .bell-dropdown-list::-webkit-scrollbar { width: 4px; }
+        .bell-dropdown-list::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+        .bell-event-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 9px 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid var(--border);
+        }
+        .bell-event-item:last-child { border-bottom: none; }
+        .bell-event-item:hover { background: var(--primary-ultra); }
+        .bell-event-dot {
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+        .bell-event-info { flex: 1; min-width: 0; }
+        .bell-event-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .bell-event-meta {
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+        .bell-dropdown-empty {
+            padding: 20px 14px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+        }
+        .bell-dropdown-footer {
+            padding: 8px 14px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        .bell-dropdown-footer a {
+            font-size: 0.72rem;
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
         .coach-hero-left { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
         .coach-hero-eyebrow { font-size: 0.63rem; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.58); }
         .coach-hero-title-text { font-size: 1.1rem; font-weight: 900; color: #FFFFFF; letter-spacing: -0.3px; line-height: 1.2; }
@@ -6690,6 +6856,25 @@
                     <div class="user-avatar" id="user-badge-avatar">?</div>
                     <span class="user-name" id="user-badge-name">Usuário</span>
                 </div>
+                <!-- Sininho de compromissos do dia -->
+                <div class="header-bell-wrap" id="header-bell-wrap">
+                    <button class="icon-btn" id="header-bell-btn" onclick="UI.toggleBellDropdown(event)" title="Compromissos do dia">
+                        <i class="fas fa-bell" id="header-bell-icon"></i>
+                        <span class="bell-badge" id="bell-badge"></span>
+                    </button>
+                    <div class="bell-dropdown" id="bell-dropdown">
+                        <div class="bell-dropdown-header">
+                            <i class="fas fa-calendar-day"></i>
+                            Compromissos de Hoje
+                        </div>
+                        <div class="bell-dropdown-list" id="bell-dropdown-list">
+                            <div class="bell-dropdown-empty">Sem compromissos hoje 🎉</div>
+                        </div>
+                        <div class="bell-dropdown-footer">
+                            <a onclick="UI.navigate('agenda'); UI.closeBellDropdown()">Ver agenda completa →</a>
+                        </div>
+                    </div>
+                </div>
                 <button class="icon-btn" id="dark-mode-btn" onclick="UI.toggleDarkMode()" title="Alternar tema"><i class="fas fa-moon"></i></button>
                 <button class="icon-btn" onclick="UI.openSettings()"><i class="fas fa-cog"></i></button>
             </div>
@@ -6741,13 +6926,16 @@
                 <div class="section-title">Visão Geral</div>
                 <div class="stats-grid">
                     <!-- Card Coach destaque — ocupa linha inteira -->
-                    <div class="stat-card-coach-hero" onclick="UI.navigateCoach()">
+                    <div class="stat-card-coach-hero" id="coach-hero-card" onclick="UI.navigateCoach()">
                         <div class="coach-hero-left">
                             <span class="coach-hero-eyebrow">Painel</span>
                             <span class="coach-hero-title-text">🏆 Coach ImobiPro</span>
-                            <span class="coach-hero-sub-text">Rotina, metas e performance do corretor</span>
+                            <span class="coach-hero-sub-text" id="coach-hero-sub">Rotina, metas e performance do corretor</span>
+                            <div class="coach-hero-events-today" id="coach-hero-events-today">
+                                <!-- preenchido dinamicamente -->
+                            </div>
                         </div>
-                        <div class="coach-hero-right">🎯</div>
+                        <div class="coach-hero-right" id="coach-hero-right">🎯</div>
                     </div>
 
                     <div class="stat-card" onclick="UI.navigate('imoveis')">
@@ -14037,6 +14225,113 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 if(el) { UI.switchTab(el); Coach.init(); }
             },
 
+            /* ── Eventos do dia: atualiza card coach + sininho ── */
+            updateTodayEvents: () => {
+                const hoje = Utils.getToday();
+                const visitas = (UI.data && UI.data.visitas) ? UI.data.visitas : [];
+                const eventosHoje = visitas.filter(v =>
+                    v.data === hoje && v.status !== 'cancelado'
+                ).sort((a, b) => (a.hora || '').localeCompare(b.hora || ''));
+
+                const typeColors = {
+                    visita: '#1D6FA4', reuniao: '#1D6FA4',
+                    'reuniao-construtor': '#7C3AED', 'reuniao-equipe': '#0891B2',
+                    documentacao: '#27AE60', plantao: '#E67E22',
+                    ligacao: '#2980B9', whatsapp: '#25D366', outro: '#64748B'
+                };
+                const typeIcons = {
+                    visita: 'fa-house', reuniao: 'fa-handshake',
+                    'reuniao-construtor': 'fa-hard-hat', 'reuniao-equipe': 'fa-users',
+                    documentacao: 'fa-file-alt', plantao: 'fa-clock',
+                    ligacao: 'fa-phone', whatsapp: 'fa-whatsapp', outro: 'fa-calendar'
+                };
+
+                // ── Card coach hero ──────────────────────────────────────
+                const card = document.getElementById('coach-hero-card');
+                const eventsDiv = document.getElementById('coach-hero-events-today');
+                const subText = document.getElementById('coach-hero-sub');
+                const heroRight = document.getElementById('coach-hero-right');
+
+                if (card && eventsDiv) {
+                    if (eventosHoje.length > 0) {
+                        card.classList.add('has-events-today');
+                        eventsDiv.classList.add('visible');
+                        if (subText) subText.style.display = 'none';
+                        if (heroRight) heroRight.innerHTML = '<i class="fas fa-bell" style="color:#FFD54F"></i>';
+
+                        const MAX = 2;
+                        const chips = eventosHoje.slice(0, MAX).map(v => {
+                            const tipo = v.tipo || 'outro';
+                            const icon = typeIcons[tipo] || 'fa-calendar';
+                            const hora = v.hora ? v.hora + ' · ' : '';
+                            const titulo = v.titulo || v.tipo || 'Compromisso';
+                            return '<span class="coach-hero-event-chip"><i class="fas ' + icon + '"></i>' + hora + titulo + '</span>';
+                        }).join('');
+                        const extra = eventosHoje.length > MAX
+                            ? '<span class="coach-hero-events-count">+' + (eventosHoje.length - MAX) + ' mais hoje</span>' : '';
+                        eventsDiv.innerHTML = chips + extra;
+                    } else {
+                        card.classList.remove('has-events-today');
+                        eventsDiv.classList.remove('visible');
+                        eventsDiv.innerHTML = '';
+                        if (subText) subText.style.display = '';
+                        if (heroRight) heroRight.textContent = '🎯';
+                    }
+                }
+
+                // ── Sininho header ────────────────────────────────────────
+                const bellIcon = document.getElementById('header-bell-icon');
+                const bellBadge = document.getElementById('bell-badge');
+                const bellList = document.getElementById('bell-dropdown-list');
+
+                if (bellIcon) {
+                    if (eventosHoje.length > 0) bellIcon.classList.add('bell-has-events');
+                    else bellIcon.classList.remove('bell-has-events');
+                }
+                if (bellBadge) {
+                    if (eventosHoje.length > 0) {
+                        bellBadge.textContent = eventosHoje.length > 9 ? '9+' : String(eventosHoje.length);
+                        bellBadge.classList.add('visible');
+                    } else {
+                        bellBadge.classList.remove('visible');
+                    }
+                }
+                if (bellList) {
+                    if (eventosHoje.length === 0) {
+                        bellList.innerHTML = '<div class="bell-dropdown-empty">Nenhum compromisso hoje 🎉</div>';
+                    } else {
+                        bellList.innerHTML = eventosHoje.map(v => {
+                            const tipo = v.tipo || 'outro';
+                            const cor = typeColors[tipo] || '#64748B';
+                            const hora = v.hora || '--:--';
+                            const titulo = v.titulo || v.tipo || 'Compromisso';
+                            const tipoLabel = tipo.charAt(0).toUpperCase() + tipo.slice(1).replace('-', ' ');
+                            const nomeCliente = v.clienteNome ? ' · ' + v.clienteNome : '';
+                            return '<div class="bell-event-item" onclick="UI.closeBellDropdown();UI.navigate(&apos;agenda&apos;)">'
+                                + '<div class="bell-event-dot" style="background:' + cor + '"></div>'
+                                + '<div class="bell-event-info">'
+                                + '<div class="bell-event-title">' + titulo + '</div>'
+                                + '<div class="bell-event-meta">' + hora + ' · ' + tipoLabel + nomeCliente + '</div>'
+                                + '</div></div>';
+                        }).join('');
+                    }
+                }
+            },
+
+            toggleBellDropdown: (e) => {
+                if (e) e.stopPropagation();
+                const dd = document.getElementById('bell-dropdown');
+                if (!dd) return;
+                const isOpen = dd.classList.contains('open');
+                UI.closeBellDropdown();
+                if (!isOpen) dd.classList.add('open');
+            },
+
+            closeBellDropdown: () => {
+                const dd = document.getElementById('bell-dropdown');
+                if (dd) dd.classList.remove('open');
+            },
+
             navigateLeitura: () => {
                 const el = document.querySelector('.nav-panel-item[data-target="leitura-view"]');
                 if(el) { UI.switchTab(el); Leitura.init(); }
@@ -14055,6 +14350,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
             renderDashboard: () => {
                 const { clientes, imoveis, visitas } = UI.data;
+                // Atualiza card coach e sininho com eventos do dia
+                try { UI.updateTodayEvents(); } catch(e) {}
                 
                 // Limpa skeleton e insere valores reais
                 const setVal = (id, val) => {
@@ -30024,6 +30321,11 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
                 UI.closeModals();
+            }
+            // Fecha dropdown do sininho ao clicar fora
+            const bellWrap = document.getElementById('header-bell-wrap');
+            if (bellWrap && !bellWrap.contains(e.target)) {
+                UI.closeBellDropdown && UI.closeBellDropdown();
             }
         });
 
