@@ -7174,7 +7174,7 @@
             <div id="clientes-view" class="view">
                 <div class="section-title">
                     Clientes
-                    <div style="display:flex;gap:8px;align-items:center;">
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                         <button class="icon-btn" style="background: #25D366; color: white; border-radius: 8px; padding: 8px;" onclick="UI.openEnvioMassa()">
                             <i class="fab fa-whatsapp"></i> Envio em Massa
                         </button>
@@ -7183,6 +7183,9 @@
                         </button>
                         <button class="icon-btn" style="background: linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%); color: white; border-radius: 8px; padding: 8px;" onclick="UI.openInformativoMassa()">
                             <i class="fas fa-newspaper"></i> Informativo
+                        </button>
+                        <button class="icon-btn" style="background: linear-gradient(135deg,#7C3AED,#EC4899); color: white; border-radius: 8px; padding: 8px;" onclick="Novidades.openPanel()">
+                            <i class="fas fa-bell"></i> Novidades
                         </button>
                     </div>
                 </div>
@@ -7199,6 +7202,7 @@
                     <button class="quick-chip" data-origem="plantao" onclick="UI.setClienteOrigemFilter(this, 'plantao')">Plantão</button>
                     <button class="quick-chip" data-origem="zapimoveis" onclick="UI.setClienteOrigemFilter(this, 'zapimoveis')">Zap</button>
                     <button class="quick-chip" data-origem="olx" onclick="UI.setClienteOrigemFilter(this, 'olx')">OLX</button>
+                    <button class="quick-chip" data-origem="__novidades__" onclick="UI.setClienteOrigemFilter(this, '__novidades__')" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:white;border-color:transparent;">📬 Novidades</button>
                 </div>
                 <div id="clientes-list"></div>
             </div>
@@ -9050,6 +9054,21 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <div class="form-group">
                     <label class="form-label">Observações</label>
                     <textarea id="c-observacoes" class="form-control" placeholder="Anotações sobre o cliente..."></textarea>
+                </div>
+
+                <!-- NOVIDADES DO MERCADO IMOBILIÁRIO -->
+                <div class="form-group" style="background:linear-gradient(135deg,#EBF4FB,#E9F7EF);border:1.5px solid #27AE60;border-radius:12px;padding:14px 16px;margin-top:4px;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;flex:1;">
+                            <div style="position:relative;flex-shrink:0;">
+                                <input type="checkbox" id="c-receber-novidades" style="width:22px;height:22px;cursor:pointer;accent-color:#27AE60;">
+                            </div>
+                            <div>
+                                <div style="font-size:0.88rem;font-weight:700;color:#1A2332;">📬 Receber Novidades do Mercado</div>
+                                <div style="font-size:0.75rem;color:#64748B;margin-top:2px;">Cliente deseja receber novidades, lançamentos e oportunidades imobiliárias</div>
+                            </div>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Seção de Documentos do Cliente -->
@@ -15174,7 +15193,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 }
                 
                 // Apply origem filter
-                if (UI._clienteOrigemFilter) {
+                if (UI._clienteOrigemFilter === '__novidades__') {
+                    filtered = filtered.filter(c => !!c.receberNovidades);
+                } else if (UI._clienteOrigemFilter) {
                     filtered = filtered.filter(c => c.origemLead === UI._clienteOrigemFilter);
                 }
                 
@@ -15250,7 +15271,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             ${isAniversario ? `<div class="property-badge badge-pink" style="top: 12px; right: 12px; left: auto;">\u{1F382}</div>` : ''}
                             ${rank !== null ? `<div style="position:absolute;top:10px;left:12px;font-size:0.7rem;font-weight:800;color:var(--text-secondary);opacity:0.6;">#${rank+1}</div>` : ''}
                             <div class="client-header" style="${rank !== null ? 'padding-left:28px;' : ''}">
-                                <div class="client-name">${c.nome} ${idade ? `(${idade} anos)` : ''} <span class="badge badge-primary contact-count">${c.contatos || 0}</span>${prioIcon}</div>
+                                <div class="client-name">${c.nome} ${idade ? `(${idade} anos)` : ''} <span class="badge badge-primary contact-count">${c.contatos || 0}</span>${prioIcon}${c.receberNovidades ? `<span title="Recebe novidades" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:white;font-size:0.6rem;padding:2px 6px;border-radius:10px;margin-left:4px;font-weight:700;">📬</span>` : ''}</div>
                                 <span style="display:inline-flex;align-items:center;gap:5px;background:${etapa.cor};color:white;padding:3px 9px;border-radius:20px;font-size:0.7rem;font-weight:700;white-space:nowrap;letter-spacing:0.02em;">
                                     <i class="fas ${etapaInfo.icon}" style="font-size:0.65rem;"></i>${etapaInfo.abrev}${diasNaEtapa > 0 ? `<span style="opacity:0.8;font-weight:500;">· ${diasNaEtapa}d</span>` : ''}${isParado ? `<span style="background:rgba(255,255,255,0.25);border-radius:10px;padding:1px 5px;font-size:0.62rem;">⚠️</span>` : ''}
                                 </span>
@@ -20581,6 +20602,7 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                     const taxaJuros = parseFloat(document.getElementById('c-taxa-juros').value) || 8.5;
                     const faixaPreco = document.getElementById('c-faixa-preco').value;
                     const observacoes = document.getElementById('c-observacoes').value;
+                    const receberNovidades = document.getElementById('c-receber-novidades')?.checked || false;
                     const origemLead = document.getElementById('c-origem-lead').value || '';
                     const documentos = JSON.parse(document.getElementById('c-documentos-data').value || '[]');
                     const tipoInteresse = document.getElementById('c-tipo-interesse')?.value || '';
@@ -20603,7 +20625,7 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                         tipoInteresse, loteDocsChecked,
                         profissao, estadoCivil, profissaoDocsChecked,
                         conjugeNome, conjugeCpf, conjugeRendaFormal,
-                        dependentes,
+                        dependentes, receberNovidades,
                         dataCriacao: clienteExistente ? clienteExistente.dataCriacao : new Date().toISOString(),
                         dataEntradaFunil: new Date().toISOString().split('T')[0],
                         dataAtualizacao: new Date().toISOString(),
@@ -20659,6 +20681,8 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                     document.getElementById('c-taxa-juros').value = cliente.taxaJuros || '';
                     document.getElementById('c-faixa-preco').value = cliente.faixaPreco || '';
                     document.getElementById('c-observacoes').value = cliente.observacoes || '';
+                    const receberNovidadesEl = document.getElementById('c-receber-novidades');
+                    if(receberNovidadesEl) receberNovidadesEl.checked = !!cliente.receberNovidades;
                     const origemEl = document.getElementById('c-origem-lead'); if(origemEl) origemEl.value = cliente.origemLead || '';
                     const tipoInteresseEl = document.getElementById('c-tipo-interesse'); 
                     if(tipoInteresseEl) { tipoInteresseEl.value = cliente.tipoInteresse || ''; App.cliente.toggleLoteDocumentacao(cliente.loteDocsChecked); }
@@ -33926,6 +33950,431 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
         }
 
         return { open, close, generate };
+    })();
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         MODAL: VER TAREFA AGENDADA (read-only view)
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="overlay-ver-tarefa" onclick="VerTarefa.close()"></div>
+    <div class="modal-sheet" id="sheet-ver-tarefa" style="max-width:520px;margin:auto;">
+        <div class="sheet-handle"></div>
+        <div id="ver-tarefa-content"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         MODAL: PAINEL DE NOVIDADES
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="overlay-novidades" onclick="Novidades.closePanel()"></div>
+    <div class="modal-sheet" id="sheet-novidades" style="max-width:600px;margin:auto;max-height:94vh;overflow-y:auto;">
+        <div class="sheet-handle"></div>
+        <div id="novidades-panel-content"></div>
+    </div>
+
+    <style>
+        /* ── Ver Tarefa Modal ── */
+        .vt-header {
+            background: linear-gradient(135deg, #0C4A6E 0%, #1D6FA4 100%);
+            margin: -1px -1px 0; padding: 18px 20px 16px;
+            border-radius: 16px 16px 0 0;
+        }
+        .vt-header-title { font-size:0.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px; }
+        .vt-atrasada-banner {
+            background: rgba(231,76,60,0.15); border: 1.5px solid #E74C3C;
+            border-radius: 10px; padding: 10px 14px; margin: 14px 0 0;
+            display: flex; align-items: center; gap: 10px; font-size: 0.85rem;
+            font-weight: 700; color: #E74C3C;
+        }
+        .vt-cliente-strip {
+            background: #0E7BAA; padding: 14px 20px;
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        }
+        .vt-cliente-nome { font-size: 1.15rem; font-weight: 900; color: #fff; }
+        .vt-tel-badge {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.12); border-radius: 8px;
+            padding: 6px 10px; font-size: 0.8rem; color: rgba(255,255,255,0.9); font-weight: 600;
+        }
+        .vt-body { padding: 18px 20px; }
+        .vt-row { display: flex; gap: 16px; margin-bottom: 12px; }
+        .vt-field { flex: 1; }
+        .vt-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 3px; }
+        .vt-value { font-size: 0.9rem; font-weight: 600; color: var(--dark); }
+        .vt-badge-atrasada { background: #FDECEA; color: #C0392B; border: 1.5px solid #E74C3C; border-radius: 6px; padding: 3px 10px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; }
+        .vt-msg-box { background: var(--bg-overlay); border-radius: 10px; padding: 12px 14px; margin-top: 4px; font-size: 0.88rem; color: var(--dark); line-height: 1.5; font-style: italic; border-left: 3px solid var(--primary); }
+        .vt-actions { display: flex; gap: 10px; padding: 0 20px 20px; }
+        .vt-btn-concluir { flex: 1; background: linear-gradient(135deg,#27AE60,#1E8449); color: #fff; border: none; border-radius: 10px; padding: 13px; font-size: 0.9rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; }
+        .vt-btn-excluir { flex: 1; background: linear-gradient(135deg,#E74C3C,#C0392B); color: #fff; border: none; border-radius: 10px; padding: 13px; font-size: 0.9rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; }
+        .vt-btn-editar { background: var(--primary); color: #fff; border: none; border-radius: 10px; padding: 13px 18px; font-size: 0.9rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; }
+        .vt-btn-cancelar { background: var(--bg-overlay); color: var(--text-secondary); border: none; border-radius: 10px; padding: 13px; font-size: 0.9rem; font-weight: 600; cursor: pointer; flex: 1; }
+        /* Novidades Panel */
+        .nov-header { background: linear-gradient(135deg,#7C3AED,#EC4899); padding: 20px; border-radius: 16px 16px 0 0; margin: -1px -1px 0; }
+        .nov-header h2 { color: #fff; font-size: 1.1rem; font-weight: 900; margin: 0; }
+        .nov-header p { color: rgba(255,255,255,0.75); font-size: 0.78rem; margin: 4px 0 0; }
+        .nov-stats { display: flex; gap: 10px; padding: 14px 20px 0; }
+        .nov-stat { flex: 1; background: var(--bg-base); border-radius: 10px; padding: 10px 12px; text-align: center; }
+        .nov-stat-val { font-size: 1.4rem; font-weight: 900; color: var(--primary); }
+        .nov-stat-lbl { font-size: 0.7rem; color: var(--text-secondary); font-weight: 600; margin-top: 2px; }
+        .nov-search { padding: 12px 20px 0; }
+        .nov-list { padding: 10px 20px; max-height: 50vh; overflow-y: auto; }
+        .nov-list::-webkit-scrollbar { width: 4px; }
+        .nov-list::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+        .nov-client-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: var(--bg-raised); margin-bottom: 7px; border: 1px solid var(--border); transition: 0.15s; }
+        .nov-client-row:hover { border-color: var(--primary); background: var(--primary-ultra); }
+        .nov-client-check { width: 20px; height: 20px; cursor: pointer; accent-color: #7C3AED; flex-shrink: 0; }
+        .nov-client-info { flex: 1; min-width: 0; }
+        .nov-client-nome { font-size: 0.88rem; font-weight: 700; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .nov-client-tel { font-size: 0.75rem; color: var(--text-secondary); margin-top: 1px; }
+        .nov-client-btn-wpp { background: #25D366; color: #fff; border: none; border-radius: 8px; padding: 7px 10px; font-size: 0.78rem; font-weight: 700; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; gap: 5px; }
+        .nov-actions { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; flex-wrap: wrap; }
+        .nov-btn { flex: 1; min-width: 120px; border: none; border-radius: 10px; padding: 12px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; }
+        .nov-btn-massa { background: #25D366; color: #fff; }
+        .nov-btn-pdf { background: linear-gradient(135deg,#E74C3C,#C0392B); color: #fff; }
+        .nov-btn-select-all { background: var(--primary-ultra); color: var(--primary); border: 1.5px solid var(--primary); }
+        .nov-msg-area { padding: 0 20px 14px; }
+        .nov-msg-area textarea { width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Inter',sans-serif;resize:vertical;color:var(--dark);background:var(--bg-raised);outline:none;transition:0.2s; }
+        .nov-msg-area textarea:focus { border-color: #7C3AED; }
+    </style>
+
+    <script>
+    // ════════════════════════════════════════════════════════════
+    //  VER TAREFA — Modal de leitura de agendamento
+    // ════════════════════════════════════════════════════════════
+    const VerTarefa = (() => {
+        const TIPO_LABELS = {
+            visita: '🏠 Visita ao Imóvel', ligacao: '📞 Ligação', whatsapp: '💬 WhatsApp',
+            reuniao: '👥 Reunião', 'reuniao-construtor': '🏗️ Reunião Construtor',
+            'reuniao-equipe': '👨‍💼 Reunião de Equipe', documentacao: '📄 Documentação',
+            plantao: '📋 Plantão', outro: '🔧 Outro'
+        };
+        const RESP_DEFAULT = 'José Alex Peixoto de Assis';
+
+        function open(visitaId) {
+            const v = (UI.data.visitas || []).find(x => x.id === visitaId);
+            if (!v) return;
+            const cliente = (UI.data.clientes || []).find(c => c.id === v.clienteId);
+            const imovel = (UI.data.imoveis || []).find(i => i.id === v.imovelId);
+            const today = Utils.getToday();
+            const nowStr = new Date().toTimeString().slice(0,5);
+            const isOverdue = v.status === 'agendado' && (v.data < today || (v.data === today && v.horario && v.horario < nowStr));
+            const tipoLabel = TIPO_LABELS[v.tipo] || v.tipo;
+            const settings = UI.data.settings || {};
+            const responsavel = settings.nomeCorretor || RESP_DEFAULT;
+
+            // Phone display
+            const tel = cliente?.telefone || '';
+            const telLimpo = tel.replace(/\D/g,'');
+            const telMask = tel ? tel.replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) *****-$3') : '—';
+
+            // Mensagem/observação principal
+            let mensagem = v.observacoes || '';
+            if (v.tipo === 'whatsapp' && v.whatsappMensagem) mensagem = v.whatsappMensagem;
+            if (v.tipo === 'ligacao' && v.ligacaoAssunto) mensagem = v.ligacaoAssunto;
+            if (v.tipo === 'visita' && v.localVisita) mensagem = v.localVisita;
+
+            const html = `
+                <div class="vt-header">
+                    <div class="vt-header-title">VER TAREFA AGENDADA</div>
+                    <div style="font-size:1rem;font-weight:800;color:#fff;">${tipoLabel}</div>
+                    ${isOverdue ? `<div class="vt-atrasada-banner"><i class="fas fa-bell" style="font-size:1.1rem;"></i> <span>🗓️ <strong>ATRASADA!</strong> Esta tarefa está vencida.</span></div>` : ''}
+                </div>
+                <div class="vt-cliente-strip">
+                    <div>
+                        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:3px;">CLIENTE</div>
+                        <div class="vt-cliente-nome">${cliente?.nome || 'Cliente não especificado'}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:3px;">TELEFONE</div>
+                        <div class="vt-tel-badge"><i class="fas fa-lock" style="font-size:0.7rem;opacity:0.7;"></i> ${telMask || '—'}</div>
+                    </div>
+                </div>
+                <div class="vt-body">
+                    <div class="vt-row">
+                        <div class="vt-field">
+                            <div class="vt-label">DATA AGENDADO</div>
+                            <div class="vt-value">${Utils.formatDate(v.data)} ${v.horario}</div>
+                            ${isOverdue ? `<div style="margin-top:4px;"><span class="vt-badge-atrasada"><i class="fas fa-exclamation-circle"></i> ATRASADA</span></div>` : ''}
+                        </div>
+                        <div class="vt-field">
+                            <div class="vt-label">RESPONSÁVEL</div>
+                            <div class="vt-value">${responsavel}</div>
+                            <div style="margin-top:4px;"><span class="badge badge-primary" style="font-size:0.7rem;">CORRETOR</span></div>
+                        </div>
+                    </div>
+                    <div class="vt-row" style="margin-top:4px;">
+                        <div class="vt-field">
+                            <div class="vt-label">TAREFA</div>
+                            <div class="vt-value">${tipoLabel}</div>
+                        </div>
+                        ${imovel ? `<div class="vt-field"><div class="vt-label">IMÓVEL</div><div class="vt-value" style="font-size:0.82rem;">${imovel.titulo.substring(0,35)}${imovel.titulo.length > 35 ? '...' : ''}</div></div>` : ''}
+                    </div>
+                    ${mensagem ? `<div style="margin-top:4px;"><div class="vt-label">MENSAGEM</div><div class="vt-msg-box">${mensagem}</div></div>` : ''}
+                    ${tel ? `<div style="margin-top:12px;display:flex;gap:8px;">
+                        <button onclick="App.whatsapp?.confirmOpenCliente?.('${cliente?.id}') || (tel && window.open('https://wa.me/55${telLimpo}','_blank'))" style="flex:1;background:#25D366;color:#fff;border:none;border-radius:10px;padding:11px;font-size:0.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                        <button onclick="window.open('tel:+55${telLimpo}')" style="flex:1;background:var(--primary);color:#fff;border:none;border-radius:10px;padding:11px;font-size:0.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;"><i class="fas fa-phone"></i> Ligar</button>
+                    </div>` : ''}
+                </div>
+                <div class="vt-actions">
+                    <button class="vt-btn-concluir" onclick="VerTarefa.concluir('${v.id}')"><i class="fas fa-check"></i> Tarefa Concluída</button>
+                    <button class="vt-btn-excluir" onclick="VerTarefa.excluir('${v.id}')"><i class="fas fa-trash"></i> Excluir Tarefa</button>
+                </div>
+                <div style="padding: 0 20px 16px;display:flex;gap:10px;">
+                    <button class="vt-btn-editar" onclick="VerTarefa.editar('${v.id}')"><i class="fas fa-edit"></i> Editar</button>
+                    <button class="vt-btn-cancelar" onclick="VerTarefa.close()">Cancelar</button>
+                </div>
+            `;
+            document.getElementById('ver-tarefa-content').innerHTML = html;
+            UI.openModal('ver-tarefa');
+        }
+
+        async function concluir(id) {
+            const idx = UI.data.visitas.findIndex(x => x.id === id);
+            if (idx < 0) return;
+            UI.data.visitas[idx].status = 'realizado';
+            await DB.put('visitas', UI.data.visitas[idx]);
+            UI.data.visitas = await Storage.getVisitas();
+            Utils.toast('✅ Tarefa concluída!', 'success');
+            close();
+            UI.renderAgenda();
+            UI.renderDashboard();
+        }
+
+        async function excluir(id) {
+            if (!confirm('Excluir esta tarefa? Esta ação não pode ser desfeita.')) return;
+            UI.data.visitas = UI.data.visitas.filter(x => x.id !== id);
+            await DB.delete('visitas', id);
+            Utils.toast('Tarefa excluída', 'info');
+            close();
+            UI.renderAgenda();
+            UI.renderDashboard();
+        }
+
+        function editar(id) {
+            close();
+            setTimeout(() => App.agenda.edit(id), 200);
+        }
+
+        function close() {
+            UI.closeModal('ver-tarefa');
+        }
+
+        return { open, concluir, excluir, editar, close };
+    })();
+
+    // ════════════════════════════════════════════════════════════
+    //  NOVIDADES — Painel de gestão de clientes que recebem novidades
+    // ════════════════════════════════════════════════════════════
+    const Novidades = (() => {
+        let _searchTerm = '';
+        let _selected = new Set();
+
+        function getClientes() {
+            return (UI.data.clientes || []).filter(c => !!c.receberNovidades);
+        }
+
+        function openPanel() {
+            _selected = new Set();
+            _searchTerm = '';
+            render();
+            UI.openModal('novidades');
+        }
+
+        function render() {
+            const clientes = getClientes();
+            const filtered = clientes.filter(c =>
+                !_searchTerm || c.nome.toLowerCase().includes(_searchTerm) || (c.telefone || '').includes(_searchTerm)
+            );
+            const total = clientes.length;
+            const comTel = clientes.filter(c => c.telefone).length;
+            const selCount = _selected.size;
+
+            const rows = filtered.map(c => `
+                <div class="nov-client-row">
+                    <input type="checkbox" class="nov-client-check" id="nov-chk-${c.id}" ${_selected.has(c.id) ? 'checked' : ''} onchange="Novidades.toggleSelect('${c.id}', this.checked)">
+                    <div class="nov-client-info">
+                        <div class="nov-client-nome">${c.nome}</div>
+                        <div class="nov-client-tel"><i class="fas fa-phone" style="font-size:0.65rem;color:var(--primary);margin-right:3px;"></i>${c.telefone || 'Sem telefone'} ${c.email ? `· ${c.email}` : ''}</div>
+                    </div>
+                    ${c.telefone ? `<button class="nov-client-btn-wpp" onclick="Novidades.enviarIndividual('${c.id}')"><i class="fab fa-whatsapp"></i> Enviar</button>` : ''}
+                </div>
+            `).join('');
+
+            const html = `
+                <div class="nov-header">
+                    <h2>📬 Clientes que recebem Novidades</h2>
+                    <p>Gerencie e envie mensagens para clientes interessados em novidades do mercado</p>
+                </div>
+                <div class="nov-stats">
+                    <div class="nov-stat"><div class="nov-stat-val">${total}</div><div class="nov-stat-lbl">Cadastrados</div></div>
+                    <div class="nov-stat"><div class="nov-stat-val">${comTel}</div><div class="nov-stat-lbl">Com WhatsApp</div></div>
+                    <div class="nov-stat"><div class="nov-stat-val" style="color:#7C3AED;">${selCount}</div><div class="nov-stat-lbl">Selecionados</div></div>
+                </div>
+                <div class="nov-search">
+                    <div class="search-container" style="margin:0;">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Filtrar clientes..." value="${_searchTerm}" oninput="Novidades.search(this.value)">
+                    </div>
+                </div>
+                <div class="nov-msg-area" style="padding-top:12px;">
+                    <label style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">Mensagem</label>
+                    <textarea id="nov-mensagem" rows="3" placeholder="🏡 Olá {nome}! Tenho novidades incríveis do mercado imobiliário para você! Surgiu uma oportunidade especial que pode ser exatamente o que você procura. Posso te contar mais detalhes?">${_getMsgDefault()}</textarea>
+                </div>
+                <div class="nov-actions">
+                    <button class="nov-btn nov-btn-select-all" onclick="Novidades.selectAll()"><i class="fas fa-check-double"></i> ${selCount === filtered.length && filtered.length > 0 ? 'Desmarcar Todos' : 'Selecionar Todos'}</button>
+                    <button class="nov-btn nov-btn-massa" onclick="Novidades.enviarMassa()"><i class="fab fa-whatsapp"></i> Enviar em Massa (${selCount})</button>
+                    <button class="nov-btn nov-btn-pdf" onclick="Novidades.gerarPDF()"><i class="fas fa-file-pdf"></i> Baixar PDF</button>
+                </div>
+                <div class="nov-list" id="nov-list">${filtered.length > 0 ? rows : '<div class="empty-state" style="padding:30px 0;"><i class="fas fa-bell-slash" style="font-size:2rem;color:var(--text-muted);"></i><p style="margin-top:10px;color:var(--text-muted);">Nenhum cliente encontrado.<br><small>Ative "Receber Novidades" no cadastro do cliente.</small></p></div>'}</div>
+                <div style="padding:0 20px 20px;">
+                    <button onclick="Novidades.closePanel()" style="width:100%;background:var(--bg-overlay);color:var(--text-secondary);border:none;border-radius:10px;padding:12px;font-size:0.9rem;font-weight:600;cursor:pointer;">Fechar</button>
+                </div>
+            `;
+            document.getElementById('novidades-panel-content').innerHTML = html;
+        }
+
+        function _getMsgDefault() {
+            const settings = UI.data?.settings || {};
+            const nome = settings.nomeCorretor || 'seu corretor(a)';
+            return `🏡 Olá {nome}! Sou ${nome} e tenho novidades incríveis do mercado imobiliário para você! Surgiu uma oportunidade especial que pode ser exatamente o que você procura. Posso te contar mais? 😊`;
+        }
+
+        function search(term) {
+            _searchTerm = term.toLowerCase();
+            render();
+        }
+
+        function toggleSelect(id, checked) {
+            if (checked) _selected.add(id);
+            else _selected.delete(id);
+            // update counter only
+            const el = document.querySelector('.nov-stat-val:nth-of-type(3)');
+            const countEl = document.querySelectorAll('.nov-stat-val');
+            if (countEl[2]) countEl[2].textContent = _selected.size;
+            const massaBtn = document.querySelector('.nov-btn-massa');
+            if (massaBtn) massaBtn.innerHTML = `<i class="fab fa-whatsapp"></i> Enviar em Massa (${_selected.size})`;
+        }
+
+        function selectAll() {
+            const clientes = getClientes().filter(c =>
+                !_searchTerm || c.nome.toLowerCase().includes(_searchTerm) || (c.telefone || '').includes(_searchTerm)
+            );
+            if (_selected.size === clientes.length) {
+                _selected.clear();
+            } else {
+                clientes.forEach(c => _selected.add(c.id));
+            }
+            render();
+        }
+
+        function _getMsg(nomeCliente) {
+            const textarea = document.getElementById('nov-mensagem');
+            const msg = textarea ? textarea.value : _getMsgDefault();
+            return msg.replace(/\{nome\}/gi, nomeCliente.split(' ')[0]);
+        }
+
+        function enviarIndividual(id) {
+            const c = (UI.data.clientes || []).find(x => x.id === id);
+            if (!c || !c.telefone) { Utils.toast('Cliente sem telefone', 'error'); return; }
+            const tel = c.telefone.replace(/\D/g, '');
+            const msg = encodeURIComponent(_getMsg(c.nome));
+            window.open(`https://wa.me/55${tel}?text=${msg}`, '_blank');
+        }
+
+        function enviarMassa() {
+            if (_selected.size === 0) { Utils.toast('Selecione ao menos um cliente', 'error'); return; }
+            const clientes = (UI.data.clientes || []).filter(c => _selected.has(c.id) && c.telefone);
+            if (clientes.length === 0) { Utils.toast('Nenhum cliente selecionado com telefone', 'error'); return; }
+
+            let delay = 0;
+            clientes.forEach((c, i) => {
+                setTimeout(() => {
+                    const tel = c.telefone.replace(/\D/g, '');
+                    const msg = encodeURIComponent(_getMsg(c.nome));
+                    window.open(`https://wa.me/55${tel}?text=${msg}`, '_blank');
+                }, delay);
+                delay += 1200;
+            });
+            Utils.toast(`📤 Abrindo WhatsApp para ${clientes.length} cliente(s)...`, 'success');
+        }
+
+        function gerarPDF() {
+            if (typeof jspdf === 'undefined' && typeof window.jspdf === 'undefined' && typeof jsPDF === 'undefined') {
+                Utils.toast('Biblioteca PDF não disponível', 'error'); return;
+            }
+            const { jsPDF } = window.jspdf || window;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const clientes = getClientes();
+            const W = 210, M = 14, fw = W - M * 2;
+            let y = M;
+
+            // Header
+            doc.setFillColor(124, 58, 237);
+            doc.rect(0, 0, W, 28, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('ImobiPro — Clientes para Novidades', M, 12);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.text(`Gerado em ${new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' })}  ·  Total: ${clientes.length} cliente(s)`, M, 20);
+            y = 36;
+
+            // Table header
+            doc.setFillColor(240, 233, 253);
+            doc.rect(M, y, fw, 8, 'F');
+            doc.setTextColor(80, 40, 160);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8);
+            doc.text('Nome', M + 3, y + 5.5);
+            doc.text('Telefone', M + 80, y + 5.5);
+            doc.text('E-mail', M + 120, y + 5.5);
+            doc.text('Etapa', M + fw - 25, y + 5.5);
+            y += 10;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            clientes.forEach((c, i) => {
+                if (y > 270) { doc.addPage(); y = 14; }
+                if (i % 2 === 0) { doc.setFillColor(250, 248, 255); doc.rect(M, y - 1, fw, 8, 'F'); }
+                doc.setTextColor(30, 30, 30);
+                doc.text((c.nome || '').substring(0, 35), M + 3, y + 4.5);
+                doc.text(c.telefone || '—', M + 80, y + 4.5);
+                doc.text((c.email || '—').substring(0, 24), M + 120, y + 4.5);
+                const etapa = (UI.data.funilEtapas || []).find(e => e.id === c.etapaFunil);
+                doc.text(etapa?.nome || c.etapaFunil || '—', M + fw - 25, y + 4.5);
+                y += 8;
+            });
+
+            // Footer
+            doc.setFillColor(124, 58, 237);
+            doc.rect(0, 287, W, 10, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(6.5);
+            doc.text('ImobiPro — Relatório de Clientes Interessados em Novidades · Para uso interno', W / 2, 293, { align: 'center' });
+
+            doc.save('clientes_novidades_imobipro.pdf');
+            Utils.toast('📄 PDF gerado com sucesso!', 'success');
+        }
+
+        function closePanel() {
+            UI.closeModal('novidades');
+        }
+
+        return { openPanel, closePanel, search, toggleSelect, selectAll, enviarIndividual, enviarMassa, gerarPDF };
+    })();
+
+    // Patch: clicking agenda cards opens VerTarefa instead of edit form directly
+    // Override createVisitaCard onclick to use VerTarefa
+    (function patchAgendaCards() {
+        const origCreate = UI.createVisitaCard;
+        if (!origCreate) return;
+        UI.createVisitaCard = function(v) {
+            let html = origCreate.call(UI, v);
+            // Replace App.agenda.edit with VerTarefa.open
+            html = html.replace(/onclick="App\.agenda\.edit\('([^']+)'\)"/g, (m, id) => `onclick="VerTarefa.open('${id}')"`);
+            return html;
+        };
     })();
     </script>
 
