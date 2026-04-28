@@ -37433,6 +37433,8 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             .lv-add-comodo-btn { display:flex;align-items:center;gap:8px;width:100%;background:rgba(20,184,166,0.07);border:1.5px dashed rgba(20,184,166,0.4);border-radius:10px;padding:10px 14px;font-size:0.84rem;font-weight:600;color:#0f766e;cursor:pointer;margin-bottom:12px; }
             .lv-btn-gerar  { width:100%;background:linear-gradient(135deg,#0f766e,#14b8a6);color:white;border:none;border-radius:12px;padding:14px;font-size:0.95rem;font-weight:700;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px; }
             .lv-btn-gerar:hover { background:linear-gradient(135deg,#134e4a,#0f766e); }
+            .lv-btn-branco { width:100%;background:linear-gradient(135deg,#1D6FA4,#2E8BC0);color:white;border:none;border-radius:12px;padding:13px;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px; }
+            .lv-btn-branco:hover { background:linear-gradient(135deg,#155A8A,#1D6FA4); }
             .lv-btn-cancel { width:100%;background:var(--bg-overlay);color:var(--text-secondary);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:0.88rem;font-weight:600;cursor:pointer;margin-top:8px; }
             .lv-imovel-tag { display:flex;align-items:center;gap:8px;background:rgba(20,184,166,0.07);border:1.5px solid rgba(20,184,166,0.2);border-radius:10px;padding:10px 14px;margin-bottom:14px; }
             .lv-comodo-remove { background:none;border:none;color:var(--danger);cursor:pointer;font-size:0.8rem;padding:2px 6px;border-radius:6px; }
@@ -37600,6 +37602,9 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
 
                     <button class="lv-btn-gerar" onclick="LaudoVistoria.gerar()">
                         <i class="fas fa-file-pdf"></i> Gerar Laudo PDF
+                    </button>
+                    <button class="lv-btn-branco" onclick="LaudoVistoria.gerarEmBranco()">
+                        <i class="fas fa-file-alt"></i> Baixar Laudo em Branco
                     </button>
                     <button class="lv-btn-cancel" onclick="LaudoVistoria.close()">Cancelar</button>
                 </div>
@@ -38155,7 +38160,283 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             }
         }
 
-        return { open, close, gerar, toggleComodo, adicionarComodo, removerComodo, onEstadoChange };
+        async function gerarEmBranco() {
+            close();
+            await new Promise(r => setTimeout(r, 350));
+            try {
+                const settings = await DB.get('settings','main') || {};
+                const imobNome = (settings.imobiliaria || 'ImobiPro').toUpperCase();
+                const dataHoje = new Date().toLocaleDateString('pt-BR');
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+                const PW = doc.internal.pageSize.getWidth();
+                const PH = doc.internal.pageSize.getHeight();
+                const M = 18, CW = PW - M*2;
+                const SAFE_BOT = PH - 14;
+                const C = {
+                    primary:[15,118,110], primaryDark:[19,78,74],
+                    accent:[20,184,166],
+                    cinza:[100,116,139], cinzaClr:[226,232,240],
+                    cinzaFundo:[245,250,249], branco:[255,255,255], dark:[26,35,50],
+                    vermelho:[220,38,38], amarelo:[217,119,6], verde:[22,163,74], azul:[37,99,235]
+                };
+
+                let pageNum = 1;
+                const drawHeader = (pg1) => {
+                    doc.setFillColor(...C.primaryDark);
+                    doc.rect(0,0,PW,pg1?44:12,'F');
+                    doc.setFillColor(...C.accent);
+                    doc.rect(0,0,5,pg1?44:12,'F');
+                    if (pg1) {
+                        doc.setFillColor(...C.primary);
+                        doc.rect(PW*0.55,0,PW*0.45,44,'F');
+                        doc.setFillColor(...C.accent);
+                        doc.rect(PW*0.55,0,1.5,44,'F');
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica','bold'); doc.setFontSize(13);
+                        doc.text(imobNome, M, 14);
+                        doc.setFont('helvetica','normal'); doc.setFontSize(8);
+                        doc.text('GESTAO IMOBILIARIA PROFISSIONAL', M, 20);
+                        doc.setFont('helvetica','bold'); doc.setFontSize(17);
+                        doc.text('LAUDO DE VISTORIA', M, 34);
+                        doc.setFont('helvetica','normal'); doc.setFontSize(8);
+                        doc.text('FORMULARIO PARA PREENCHIMENTO MANUAL', PW*0.57, 14);
+                        doc.setFontSize(7);
+                        doc.text('Data: ___/___/______', PW*0.57, 22);
+                        doc.text('N\u00BA Laudo: __________________', PW*0.57, 28);
+                        doc.text('Tipo de Vistoria: _______________', PW*0.57, 34);
+                        doc.text('[ ] Entrada  [ ] Sa\u00EDda  [ ] Peri\u00F3dica  [ ] Outro', PW*0.57, 40);
+                    } else {
+                        doc.setTextColor(...C.branco);
+                        doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+                        doc.text(imobNome+' — LAUDO DE VISTORIA EM BRANCO', M, 8.5);
+                        doc.setFont('helvetica','normal'); doc.setFontSize(7);
+                        doc.text('Pg. '+pageNum, PW-M, 8.5, {align:'right'});
+                    }
+                };
+                const drawFooter = () => {
+                    doc.setFillColor(...C.primaryDark);
+                    doc.rect(0, PH-10, PW, 10, 'F');
+                    doc.setFont('helvetica','italic'); doc.setFontSize(6);
+                    doc.setTextColor(...C.branco);
+                    doc.text('ImobiPro — Laudo de Vistoria em Branco para Preenchimento Manual  |  Imprimir em 2 vias', M, PH-4.5);
+                    doc.text('Pg. '+pageNum, PW-M, PH-4.5, {align:'right'});
+                };
+
+                let y = 0;
+                const pgChk = (cy, need) => {
+                    if (cy + need > SAFE_BOT) {
+                        drawFooter(); doc.addPage(); pageNum++;
+                        drawHeader(false); return 20;
+                    }
+                    return cy;
+                };
+
+                // Linha tracejada helper
+                const dashLine = (x1, y1, x2, y2) => {
+                    doc.setDrawColor(...C.cinzaClr); doc.setLineWidth(0.3);
+                    doc.setLineDash([1.5,1.5],0);
+                    doc.line(x1,y1,x2,y2);
+                    doc.setLineDash([],0);
+                };
+
+                // Campo em branco
+                const fieldBlank = (label, x, fy, w, h) => {
+                    h = h || 8;
+                    doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.setTextColor(...C.primary);
+                    doc.text(label.toUpperCase(), x, fy);
+                    doc.setFillColor(252,252,252);
+                    doc.setDrawColor(...C.cinzaClr); doc.setLineWidth(0.4);
+                    doc.roundedRect(x, fy+1.5, w, h, 1,1,'FD');
+                    return fy + h + 4;
+                };
+
+                const secTitle = (txt, sy) => {
+                    doc.setFillColor(...C.primaryDark);
+                    doc.roundedRect(M, sy, CW, 8, 1,1,'F');
+                    doc.setFillColor(...C.accent);
+                    doc.roundedRect(M, sy, 3, 8, 1,1,'F');
+                    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...C.branco);
+                    doc.text(txt.toUpperCase(), M+7, sy+5.5);
+                    return sy+11;
+                };
+
+                // ── Página 1 ──
+                drawHeader(true);
+                y = 52;
+
+                // DADOS DO IMÓVEL
+                y = secTitle('1. Dados do Imóvel', y);
+                const half = (CW-4)/2;
+                const third = (CW-8)/3;
+
+                fieldBlank('Endereço Completo', M, y, CW, 8); y += 14;
+                fieldBlank('Tipo do Imóvel', M, y, third, 8);
+                fieldBlank('Área (m²)', M+third+4, y, third, 8);
+                fieldBlank('Andar / Unidade', M+2*(third+4), y, third, 8);
+                y += 14;
+
+                // DADOS DAS PARTES
+                y = pgChk(y+2, 50);
+                y = secTitle('2. Dados das Partes', y);
+                fieldBlank('Nome do Proprietário / Locador', M, y, half, 8);
+                fieldBlank('CPF / CNPJ', M+half+4, y, half, 8); y += 14;
+                fieldBlank('Nome do Locatário / Ocupante', M, y, half, 8);
+                fieldBlank('CPF', M+half+4, y, half, 8); y += 14;
+                fieldBlank('Vistoriador Responsável', M, y, half, 8);
+                fieldBlank('CRECI', M+half+4, y, half, 8); y += 14;
+
+                // MEDIDORES
+                y = pgChk(y+2, 40);
+                y = secTitle('3. Medidores e Acessórios', y);
+                fieldBlank('Leitura Medidor de Água', M, y, third, 8);
+                fieldBlank('Leitura Medidor de Luz', M+third+4, y, third, 8);
+                fieldBlank('Leitura Medidor de Gás', M+2*(third+4), y, third, 8); y += 14;
+                fieldBlank('Quantidade de Chaves Entregues', M, y, half, 8);
+                fieldBlank('Controles / Cartões de Acesso', M+half+4, y, half, 8); y += 14;
+
+                // CÔMODOS — tabela em branco
+                const comodos = ['Sala de Estar / Jantar','Cozinha','Área de Serviço','Quarto 1','Quarto 2','Quarto 3','Suíte','Banheiro Social','Banheiro de Serviço','Varanda / Sacada','Garagem / Vaga','Hall / Corredor'];
+                const itensBase = ['Paredes e Teto','Piso','Portas e Maçanetas','Janelas / Vidros','Iluminação / Tomadas','Hidráulica / Torneiras','Móveis / Armários','Outros'];
+                const estados = ['Ótimo','Bom','Regular','Ruim','N/A'];
+                const estadoW = 11;
+                const colLabel = CW * 0.32;
+                const colEstado = estados.length * (estadoW+1);
+                const colObs = CW - colLabel - colEstado - 6;
+
+                comodos.forEach((nomeCom, ci) => {
+                    const rowH = 7;
+                    const needH = 14 + itensBase.length * rowH + 20;
+                    y = pgChk(y+4, needH);
+
+                    // Cabeçalho do cômodo
+                    doc.setFillColor(...C.primary);
+                    doc.roundedRect(M, y, CW, 9, 1,1,'F');
+                    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...C.branco);
+                    doc.text((ci+4)+'. '+(nomeCom).toUpperCase(), M+4, y+6);
+                    y += 11;
+
+                    // Cabeçalho colunas
+                    doc.setFillColor(230,244,242);
+                    doc.rect(M, y, CW, 6,'F');
+                    doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...C.primaryDark);
+                    doc.text('ITEM / ELEMENTO', M+2, y+4.3);
+                    estados.forEach((e,ei) => {
+                        const ex = M+colLabel + ei*(estadoW+1);
+                        doc.text(e, ex + estadoW/2, y+4.3, {align:'center'});
+                    });
+                    doc.text('OBSERVAÇÕES', M+colLabel+colEstado+3, y+4.3);
+                    y += 7;
+
+                    itensBase.forEach((item, ii) => {
+                        if (ii % 2 === 0) { doc.setFillColor(250,252,251); doc.rect(M,y,CW,rowH,'F'); }
+                        else { doc.setFillColor(255,255,255); doc.rect(M,y,CW,rowH,'F'); }
+
+                        // Linha separadora
+                        doc.setDrawColor(...C.cinzaClr); doc.setLineWidth(0.2);
+                        doc.line(M,y,M+CW,y);
+
+                        doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor(...C.dark);
+                        doc.text(item, M+2, y+4.5);
+
+                        // Checkboxes para cada estado
+                        estados.forEach((e,ei) => {
+                            const ex = M+colLabel + ei*(estadoW+1) + estadoW/2 - 2;
+                            doc.setDrawColor(...C.cinzaClr); doc.setLineWidth(0.35);
+                            doc.roundedRect(ex, y+1.5, 4, 4, 0.5,0.5,'D');
+                        });
+
+                        // Linha para obs
+                        dashLine(M+colLabel+colEstado+2, y+5.5, M+CW-2, y+5.5);
+                        y += rowH;
+                    });
+
+                    // Linha de obs geral do cômodo
+                    doc.setFillColor(248,250,249);
+                    doc.roundedRect(M,y,CW,12,1,1,'F');
+                    doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...C.primary);
+                    doc.text('OBS. DO CÔMODO:', M+3, y+4.5);
+                    dashLine(M+35, y+4.5, M+CW-3, y+4.5);
+                    dashLine(M+3, y+9.5, M+CW-3, y+9.5);
+                    y += 14;
+                });
+
+                // CONDIÇÃO GERAL
+                y = pgChk(y+4, 40);
+                y = secTitle((comodos.length+4)+'. Condição Geral e Resumo', y);
+
+                doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...C.primaryDark);
+                doc.text('Condição Geral do Imóvel:', M, y+5);
+                const conds = ['Ótimo','Bom','Regular','Ruim','Péssimo'];
+                conds.forEach((c,ci) => {
+                    const cx = M+46 + ci*28;
+                    doc.setDrawColor(...C.cinzaClr); doc.setLineWidth(0.4);
+                    doc.roundedRect(cx, y+1, 4, 4, 0.5,0.5,'D');
+                    doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor(...C.dark);
+                    doc.text(c, cx+6, y+4.5);
+                });
+                y += 12;
+
+                // Total de itens
+                fieldBlank('Total de Itens Vistoriados', M, y, half, 8);
+                fieldBlank('Total de Itens com Ressalvas', M+half+4, y, half, 8); y += 16;
+
+                // Obs gerais
+                y = pgChk(y, 35);
+                doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...C.primary);
+                doc.text('OBSERVAÇÕES / PENDÊNCIAS / RESSALVAS GERAIS:', M, y);
+                doc.setFillColor(252,252,252);
+                doc.setDrawColor(...C.cinzaClr); doc.setLineWidth(0.4);
+                doc.roundedRect(M, y+2, CW, 28, 1,1,'FD');
+                for (let li = 0; li < 4; li++) dashLine(M+3, y+9+li*6, M+CW-3, y+9+li*6);
+                y += 34;
+
+                // ASSINATURAS
+                y = pgChk(y+4, 55);
+                y = secTitle('Declaração e Assinaturas', y);
+                doc.setFillColor(...C.cinzaFundo);
+                doc.roundedRect(M,y,CW,16,1.5,1.5,'F');
+                doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(...C.cinza);
+                const decl = 'Os abaixo assinados declaram que o presente Laudo de Vistoria reflete fielmente o estado do imóvel na data indicada, tendo sido elaborado após inspeção visual detalhada dos ambientes.';
+                const declL = doc.splitTextToSize(decl, CW-8);
+                doc.text(declL, M+4, y+7);
+                y += 20;
+
+                const sigW = (CW-8)/3;
+                const drawSig = (cargo, x, sy) => {
+                    doc.setFillColor(...C.cinzaFundo);
+                    doc.roundedRect(x,sy,sigW,32,2,2,'F');
+                    doc.setDrawColor(...C.cinzaClr); doc.setLineWidth(0.3);
+                    doc.line(x+5,sy+19,x+sigW-5,sy+19);
+                    doc.setFont('helvetica','bold'); doc.setFontSize(7);
+                    doc.setTextColor(...C.primary);
+                    doc.text(cargo, x+sigW/2, sy+24, {align:'center'});
+                    doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor(...C.cinza);
+                    doc.text('Nome: _____________________', x+sigW/2, sy+28, {align:'center'});
+                    doc.setFontSize(5.5);
+                    doc.text('Assinatura', x+sigW/2, sy+31, {align:'center'});
+                };
+                drawSig('PROPRIETÁRIO / LOCADOR', M, y);
+                drawSig('LOCATÁRIO / OCUPANTE', M+sigW+4, y);
+                drawSig('VISTORIADOR / RESPONSÁVEL', M+(sigW+4)*2, y);
+                y += 38;
+
+                doc.setFillColor(...C.cinzaFundo);
+                doc.roundedRect(M,y,CW,9,1.5,1.5,'F');
+                doc.setFont('helvetica','italic'); doc.setFontSize(6); doc.setTextColor(...C.cinza);
+                doc.text('Laudo em branco gerado pelo ImobiPro. Imprimir em 2 vias: uma para o proprietario e outra para o locatario/ocupante. Emitido em: '+dataHoje, M+4, y+5.5, {maxWidth:CW-8});
+
+                drawFooter();
+                doc.save('Laudo_Vistoria_EM_BRANCO_'+new Date().toISOString().split('T')[0]+'.pdf');
+                Utils.toast('Laudo em branco gerado!', 'success');
+            } catch(err) {
+                console.error(err);
+                Utils.toast('Erro ao gerar laudo em branco','error');
+            }
+        }
+
+        return { open, close, gerar, gerarEmBranco, toggleComodo, adicionarComodo, removerComodo, onEstadoChange };
     })();
 
     // Patch: clicking agenda cards opens VerTarefa instead of edit form directly
