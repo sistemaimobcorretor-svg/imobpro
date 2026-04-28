@@ -6437,22 +6437,221 @@
         .fin-tipo-btn.active { border-color: var(--primary); background: var(--primary-ultra); color: var(--primary); }
         .fin-tipo-btn:active { transform: scale(0.95); }
 
+        /* ═══════════════ FINANCEIRO CSS v2 — REDESIGN PROFISSIONAL ═══════════════ */
+
+        /* ── Hero ── */
+        .fin-hero {
+            border-radius: 20px; margin-bottom: 16px;
+            overflow: hidden; position: relative;
+            background: linear-gradient(135deg, #0C3D60 0%, #1D6FA4 48%, #1A9850 100%);
+            box-shadow: 0 8px 32px rgba(29,111,164,0.28), 0 2px 8px rgba(0,0,0,0.10);
+        }
+        .fin-hero::before {
+            content: ''; position: absolute; top: -40px; right: -40px;
+            width: 180px; height: 180px; border-radius: 50%;
+            background: rgba(255,255,255,0.06); pointer-events: none;
+        }
+        .fin-hero::after {
+            content: ''; position: absolute; bottom: -30px; left: 30%;
+            width: 110px; height: 110px; border-radius: 50%;
+            background: rgba(255,255,255,0.04); pointer-events: none;
+        }
+        .fin-hero-top {
+            padding: 20px 18px 16px;
+            display: flex; align-items: center; gap: 14px;
+            position: relative; z-index: 1;
+        }
+        .fin-hero-icon {
+            width: 52px; height: 52px; flex-shrink: 0;
+            background: rgba(255,255,255,0.15);
+            border: 1.5px solid rgba(255,255,255,0.25);
+            border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.20);
+            backdrop-filter: blur(4px);
+        }
+        .fin-hero-info { flex: 1; min-width: 0; }
+        .fin-hero-title { font-size: 1.08rem; font-weight: 900; color: #fff; letter-spacing: -0.3px; }
+        .fin-hero-sub   { font-size: 0.70rem; color: rgba(255,255,255,0.58); margin-top: 2px; font-weight: 500; }
+        .fin-hero-mes-btn {
+            background: rgba(255,255,255,0.13); border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 10px; padding: 6px 11px;
+            color: rgba(255,255,255,0.88); font-size: 0.73rem; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; gap: 6px;
+            transition: background 0.18s; white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+        }
+        .fin-hero-mes-btn:active { background: rgba(255,255,255,0.22); }
+
+        /* KPI Grid (4 colunas fixas) */
+        .fin-kpi-grid {
+            display: grid; grid-template-columns: repeat(4,1fr);
+            gap: 1px; background: rgba(255,255,255,0.12);
+            border-top: 1px solid rgba(255,255,255,0.12);
+            position: relative; z-index: 1;
+        }
+        .fin-kpi-cell {
+            padding: 13px 8px; background: rgba(0,0,0,0.08);
+            text-align: center; transition: background 0.18s;
+        }
+        .fin-kpi-cell:hover { background: rgba(255,255,255,0.07); }
+        .fin-kpi-cell:first-child { border-radius: 0 0 0 20px; }
+        .fin-kpi-cell:last-child  { border-radius: 0 0 20px 0; }
+        .fin-kpi-ico { font-size: 0.68rem; color: rgba(255,255,255,0.55); margin-bottom: 3px; }
+        .fin-kpi-val {
+            font-size: 0.88rem; font-weight: 900; color: #fff;
+            letter-spacing: -0.3px; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis; line-height: 1.1;
+        }
+        .fin-kpi-val.pos  { color: #6EE7B7; }
+        .fin-kpi-val.neg  { color: #FCA5A5; }
+        .fin-kpi-lbl {
+            font-size: 0.57rem; font-weight: 600;
+            color: rgba(255,255,255,0.50); margin-top: 3px;
+            text-transform: uppercase; letter-spacing: .05em;
+        }
+
+        /* ── Tabs redesenhadas ── */
+        .fin-tabs-pro {
+            display: flex; gap: 0;
+            background: var(--bg-raised);
+            border: 1px solid var(--border);
+            border-radius: 14px; padding: 4px;
+            margin-bottom: 16px; box-shadow: var(--shadow-sm);
+            overflow-x: auto; scrollbar-width: none;
+        }
+        .fin-tabs-pro::-webkit-scrollbar { display: none; }
+        .fin-tab-pro {
+            flex: 1; min-width: 76px; padding: 9px 8px;
+            border: none; border-radius: 10px;
+            background: transparent; color: var(--text-secondary);
+            font-size: 0.76rem; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+            transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+            white-space: nowrap; font-family: 'Inter', sans-serif;
+        }
+        .fin-tab-pro i { font-size: 0.76rem; }
+        .fin-tab-pro.active {
+            background: var(--primary); color: #fff;
+            box-shadow: 0 4px 12px rgba(29,111,164,0.28);
+            transform: scale(1.02);
+        }
+        .fin-tab-pro:not(.active):hover { background: var(--primary-ultra); color: var(--primary); }
+        .fin-tab-pro:not(.active):active { transform: scale(0.96); }
+
+        /* ── Barra de seção ── */
+        .fin-secao-bar {
+            display: flex; align-items: center;
+            justify-content: space-between; margin-bottom: 14px;
+        }
+        .fin-secao-titulo {
+            font-size: 0.73rem; font-weight: 800;
+            color: var(--text-secondary); text-transform: uppercase; letter-spacing: .07em;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .fin-secao-titulo::before {
+            content: ''; width: 3px; height: 13px;
+            background: var(--primary); border-radius: 2px;
+        }
+
+        /* ── Botões de ação ── */
+        .fin-btn-add {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 15px; border: none; border-radius: 10px;
+            font-size: 0.78rem; font-weight: 800; cursor: pointer;
+            transition: all 0.18s; font-family: 'Inter', sans-serif;
+            box-shadow: var(--shadow-sm);
+        }
+        .fin-btn-add.primary { background: var(--primary); color: #fff; }
+        .fin-btn-add.primary:hover { background: var(--primary-dark); box-shadow: 0 4px 14px rgba(29,111,164,0.28); transform: translateY(-1px); }
+        .fin-btn-add.primary:active { transform: scale(0.96); }
+        .fin-btn-add.green { background: linear-gradient(135deg,#27AE60,#1E8449); color: #fff; }
+        .fin-btn-add.green:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(39,174,96,0.28); }
+        .fin-btn-add.green:active { transform: scale(0.96); }
+        .fin-btn-add.violet { background: linear-gradient(135deg,#7C3AED,#6D28D9); color: #fff; }
+        .fin-btn-add.violet:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(124,58,237,0.26); }
+        .fin-btn-add.violet:active { transform: scale(0.96); }
+
+        /* ── Cards base ── */
         .fin-card {
             background: var(--bg-raised); border-radius: 16px;
-            border: 1px solid var(--border); padding: 14px 16px;
+            border: 1px solid var(--border); padding: 15px 16px;
             margin-bottom: 10px; box-shadow: var(--shadow-sm);
-            transition: transform 0.18s, box-shadow 0.18s;
+            transition: all 0.2s;
         }
-        .fin-card:active { transform: scale(0.98); box-shadow: none; }
+        .fin-card:hover  { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+        .fin-card:active { transform: scale(0.985); box-shadow: none; }
+
+        .fin-card-row { display: flex; align-items: center; gap: 14px; }
 
         .fin-conta-accent {
-            width: 44px; height: 44px; border-radius: 12px;
+            width: 46px; height: 46px; border-radius: 13px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; flex-shrink: 0;
+            font-size: 1.45rem; flex-shrink: 0;
+        }
+        .fin-card-nome { font-weight: 800; font-size: 0.95rem; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .fin-card-sub  { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; font-weight: 500; }
+        .fin-card-saldo { font-size: 1.08rem; font-weight: 900; letter-spacing: -0.4px; }
+
+        .fin-card-acoes {
+            display: flex; gap: 6px;
+            margin-top: 12px; padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        .fin-acao-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 11px; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 700; cursor: pointer;
+            transition: all 0.15s; border: 1px solid transparent;
+            font-family: 'Inter', sans-serif;
+        }
+        .fin-acao-btn.transf { background: var(--primary-ultra); border-color: var(--border-accent); color: var(--primary); flex: 1; justify-content: center; }
+        .fin-acao-btn.transf:hover { background: rgba(29,111,164,0.13); }
+        .fin-acao-btn.edit { background: rgba(29,111,164,0.07); border-color: var(--border-accent); color: var(--primary); }
+        .fin-acao-btn.edit:hover { background: var(--primary-ultra); }
+        .fin-acao-btn.del { background: rgba(231,76,60,0.07); border-color: rgba(231,76,60,0.20); color: var(--danger); }
+        .fin-acao-btn.del:hover { background: rgba(231,76,60,0.13); }
+        .fin-acao-btn:active { transform: scale(0.93); }
+
+        /* ── Rendimento badge ── */
+        .fin-rend-badge {
+            font-size: 0.68rem; font-weight: 700;
+            background: var(--accent-ultra); color: var(--accent-dark);
+            padding: 2px 7px; border-radius: 20px; display: inline-block;
         }
 
-        .fin-saldo-pos { color: var(--accent); }
-        .fin-saldo-neg { color: var(--danger); }
+        /* ── Meta progress ── */
+        .fin-meta-progress-track {
+            height: 8px; background: var(--border);
+            border-radius: 4px; overflow: hidden; margin-top: 10px;
+        }
+        .fin-meta-progress-fill {
+            height: 100%; border-radius: 4px;
+            transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .fin-meta-pct-row {
+            display: flex; justify-content: space-between; align-items: center; margin-top: 5px;
+        }
+        .fin-meta-pct-val  { font-size: 0.70rem; font-weight: 800; color: #7C3AED; }
+        .fin-meta-pct-rest { font-size: 0.67rem; color: var(--text-muted); font-weight: 600; }
+
+        /* ── Lançamentos ── */
+        .fin-filtros-row {
+            display: flex; gap: 8px; margin-bottom: 14px;
+            overflow-x: auto; scrollbar-width: none; padding-bottom: 2px;
+        }
+        .fin-filtros-row::-webkit-scrollbar { display: none; }
+        .fin-sel {
+            flex-shrink: 0;
+            background: var(--bg-raised); border: 1.5px solid var(--border);
+            border-radius: 10px; padding: 0 12px; height: 38px;
+            font-size: 0.78rem; font-weight: 600; color: var(--dark);
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            transition: border-color 0.18s; outline: none;
+            box-shadow: var(--shadow-sm);
+        }
+        .fin-sel:focus { border-color: var(--primary); }
 
         .fin-lanc-item {
             background: var(--bg-raised); border-radius: 13px;
@@ -6460,54 +6659,274 @@
             margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
             box-shadow: var(--shadow-sm); transition: all 0.18s;
         }
+        .fin-lanc-item:hover  { box-shadow: var(--shadow-md); transform: translateY(-1px); }
         .fin-lanc-item:active { transform: scale(0.98); }
 
         .fin-lanc-icon {
             width: 40px; height: 40px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; flex-shrink: 0;
+            font-size: 1.08rem; flex-shrink: 0;
         }
+
+        .fin-saldo-pos { color: var(--accent); }
+        .fin-saldo-neg { color: var(--danger); }
 
         .fin-badge-parcela {
             display: inline-flex; align-items: center; gap: 4px;
-            background: rgba(29,111,164,0.1); color: var(--primary);
-            font-size: 0.68rem; font-weight: 700; padding: 2px 7px;
+            background: rgba(29,111,164,0.10); color: var(--primary);
+            font-size: 0.66rem; font-weight: 700; padding: 2px 7px;
             border-radius: 20px; margin-left: 4px;
         }
 
-        .fin-meta-progress-track {
-            height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 8px;
+        /* ── Estado vazio ── */
+        .fin-empty {
+            text-align: center; padding: 50px 20px; color: var(--text-muted);
         }
-        .fin-meta-progress-fill {
-            height: 100%; border-radius: 4px;
-            transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+        .fin-empty-icon {
+            width: 68px; height: 68px; border-radius: 20px;
+            background: var(--primary-ultra);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.9rem; margin: 0 auto 14px;
+            box-shadow: 0 4px 14px rgba(29,111,164,0.12);
         }
+        .fin-empty-titulo { font-size: 0.92rem; font-weight: 800; color: var(--dark); margin-bottom: 5px; }
+        .fin-empty-sub { font-size: 0.75rem; color: var(--text-muted); max-width: 210px; margin: 0 auto 18px; line-height: 1.5; }
+        .fin-empty-cta {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 9px 18px; background: var(--primary); color: #fff;
+            border: none; border-radius: 11px; font-size: 0.80rem; font-weight: 800;
+            cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.18s;
+            box-shadow: 0 4px 12px rgba(29,111,164,0.24);
+        }
+        .fin-empty-cta:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .fin-empty-cta:active { transform: scale(0.96); }
 
-        .fin-kpi-chip {
-            background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25);
-            border-radius: 10px; padding: 7px 12px; flex-shrink: 0; white-space: nowrap;
-        }
-        .fin-kpi-chip .val { font-size: 0.92rem; font-weight: 800; color: #fff; }
-        .fin-kpi-chip .lbl { font-size: 0.62rem; color: rgba(255,255,255,0.65); font-weight: 600; margin-top: 1px; }
-
+        /* ── Transf btn (legado) ── */
         .fin-transf-btn {
-            background: rgba(29,111,164,0.08); border: 1px solid var(--border-accent);
+            background: var(--primary-ultra); border: 1px solid var(--border-accent);
             color: var(--primary); border-radius: 8px; padding: 5px 10px;
             font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.15s;
             display: inline-flex; align-items: center; gap: 5px;
+            font-family: 'Inter', sans-serif;
         }
-        .fin-transf-btn:active { transform: scale(0.94); background: var(--primary-ultra); }
+        .fin-transf-btn:active { transform: scale(0.94); }
 
-        #sheet-fin-del-parcela .del-btn:hover { filter: brightness(1.08); }
-
+        /* ── Seção data lançamentos ── */
         .fin-secao-data {
-            font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
-            letter-spacing: .08em; color: var(--text-muted); margin: 14px 0 6px;
+            font-size: 0.68rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: .08em; color: var(--text-muted); margin: 16px 0 8px;
             display: flex; align-items: center; gap: 8px;
         }
-        .fin-secao-data::after {
-            content: ''; flex: 1; height: 1px; background: var(--border);
+        .fin-secao-data::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+        /* ── Panels ── */
+        .fin-panel { display: none; }
+        .fin-panel.active { display: block; animation: finPanelIn 0.20s ease-out; }
+        @keyframes finPanelIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
+
+        #sheet-fin-del-parcela .del-btn:hover { filter: brightness(1.08); }
+        /* ── Gráficos financeiros ── */
+        .fin-chart-card {
+            background: var(--bg-raised); border-radius: 16px;
+            border: 1px solid var(--border); padding: 16px;
+            margin-bottom: 14px; box-shadow: var(--shadow-sm);
+        }
+        .fin-chart-titulo {
+            font-size: 0.73rem; font-weight: 800; color: var(--dark);
+            letter-spacing: -.1px; margin-bottom: 4px;
+            display: flex; align-items: center; gap: 7px;
+        }
+        .fin-chart-sub {
+            font-size: 0.65rem; color: var(--text-muted); font-weight: 500; margin-bottom: 14px;
+        }
+        .fin-chart-legenda {
+            display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px;
+        }
+        .fin-chart-leg-item {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 0.67rem; color: var(--text-secondary); font-weight: 600;
+        }
+        .fin-chart-leg-dot {
+            width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0;
+        }
+
+        /* Barras verticais duplas */
+        .fin-bars-wrap {
+            display: flex; align-items: flex-end; gap: 4px;
+            height: 100px; width: 100%; overflow: hidden;
+        }
+        .fin-bar-group {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; gap: 0; min-width: 0;
+        }
+        .fin-bar-vals {
+            display: flex; align-items: flex-end; gap: 2px; height: 80px;
+        }
+        .fin-bar-col {
+            border-radius: 3px 3px 0 0; min-height: 3px;
+            transition: height 0.5s cubic-bezier(0.34,1.2,0.64,1);
+            cursor: default; position: relative;
+        }
+        .fin-bar-col:hover::after {
+            content: attr(data-tip);
+            position: absolute; bottom: calc(100% + 4px); left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark); color: #fff;
+            font-size: 0.60rem; font-weight: 700;
+            padding: 3px 7px; border-radius: 6px;
+            white-space: nowrap; pointer-events: none; z-index: 10;
+        }
+        .fin-bar-lbl {
+            font-size: 0.58rem; color: var(--text-muted); font-weight: 600;
+            margin-top: 4px; text-align: center; white-space: nowrap;
+        }
+
+        /* Funil / barras horizontais */
+        .fin-funnel-row {
+            margin-bottom: 8px;
+        }
+        .fin-funnel-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 3px;
+        }
+        .fin-funnel-label {
+            font-size: 0.73rem; font-weight: 700; color: var(--dark);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .fin-funnel-vals {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .fin-funnel-count {
+            font-size: 0.72rem; font-weight: 800; color: var(--dark);
+        }
+        .fin-funnel-conv {
+            font-size: 0.65rem; font-weight: 700; padding: 1px 6px;
+            border-radius: 20px;
+        }
+        .fin-funnel-track {
+            height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;
+        }
+        .fin-funnel-fill {
+            height: 100%; border-radius: 4px;
+            transition: width 0.7s cubic-bezier(0.34,1.2,0.64,1);
+        }
+
+        /* KPI cards de conversão */
+        .fin-conv-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;
+        }
+        .fin-conv-cell {
+            background: var(--bg-raised); border-radius: 13px;
+            border: 1px solid var(--border); padding: 13px 14px;
+            box-shadow: var(--shadow-sm);
+        }
+        .fin-conv-val {
+            font-size: 1.3rem; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1;
+        }
+        .fin-conv-lbl {
+            font-size: 0.65rem; color: var(--text-secondary); font-weight: 600; margin-top: 3px;
+        }
+        .fin-conv-trend {
+            font-size: 0.65rem; font-weight: 800; margin-top: 4px;
+            display: flex; align-items: center; gap: 3px;
+        }
+
+        /* Donut SVG */
+        .fin-donut-wrap {
+            display: flex; align-items: center; gap: 18px;
+        }
+        .fin-donut-svg { flex-shrink: 0; }
+        .fin-donut-legend { flex: 1; min-width: 0; }
+        .fin-donut-leg-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 4px 0; border-bottom: 1px solid var(--border);
+        }
+        .fin-donut-leg-row:last-child { border-bottom: none; }
+        .fin-donut-leg-label {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.72rem; font-weight: 600; color: var(--dark);
+        }
+        .fin-donut-leg-val {
+            font-size: 0.72rem; font-weight: 800; color: var(--dark);
+        }
+
+        /* Chips de período ── */
+        .fin-periodo-chip {
+            padding: 5px 12px; border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.22);
+            background: rgba(255,255,255,0.10);
+            color: rgba(255,255,255,0.78); font-size: 0.72rem; font-weight: 700;
+            cursor: pointer; transition: all 0.18s;
+            font-family: 'Inter', sans-serif; white-space: nowrap;
+        }
+        .fin-periodo-chip.active {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.55); color: #fff;
+        }
+        .fin-periodo-chip:active { transform: scale(0.94); }
+
+        /* ── Card comissão realizada ── */
+        .fin-comissao-card {
+            background: var(--bg-raised); border-radius: 14px;
+            border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            padding: 13px 15px; margin-bottom: 9px;
+            display: flex; align-items: center; gap: 13px;
+            box-shadow: var(--shadow-sm); transition: all 0.2s;
+        }
+        .fin-comissao-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+        .fin-comissao-icon {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: var(--accent-ultra);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .fin-comissao-body { flex: 1; min-width: 0; }
+        .fin-comissao-cliente { font-weight: 800; font-size: 0.90rem; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .fin-comissao-imovel  { font-size: 0.70rem; color: var(--text-secondary); margin-top: 2px; }
+        .fin-comissao-right   { text-align: right; flex-shrink: 0; }
+        .fin-comissao-val     { font-size: 1.0rem; font-weight: 900; color: var(--accent); letter-spacing: -0.3px; }
+        .fin-comissao-data    { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+        /* ── Card projeção ── */
+        .fin-proj-card {
+            background: var(--bg-raised); border-radius: 14px;
+            border: 1px solid var(--border); border-left: 4px solid var(--amber);
+            padding: 13px 15px; margin-bottom: 9px;
+            display: flex; align-items: center; gap: 13px;
+            box-shadow: var(--shadow-sm); transition: all 0.2s;
+        }
+        .fin-proj-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+        .fin-proj-icon {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: rgba(245,158,11,0.10);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .fin-proj-body { flex: 1; min-width: 0; }
+        .fin-proj-cliente { font-weight: 800; font-size: 0.90rem; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .fin-proj-info { font-size: 0.70rem; color: var(--text-secondary); margin-top: 2px; }
+        .fin-proj-right { text-align: right; flex-shrink: 0; }
+        .fin-proj-val  { font-size: 1.0rem; font-weight: 900; color: var(--amber); letter-spacing: -0.3px; }
+        .fin-proj-prob { font-size: 0.65rem; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
+        .fin-proj-etapa-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.64rem; font-weight: 800; padding: 2px 7px; border-radius: 20px; }
+
+        /* ── Resumo período ── */
+        .fin-resumo-card {
+            background: var(--bg-raised); border-radius: 14px;
+            border: 1px solid var(--border); padding: 15px 16px; box-shadow: var(--shadow-sm);
+        }
+        .fin-resumo-titulo { font-size: 0.73rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
+        .fin-resumo-titulo::before { content: ''; width: 3px; height: 13px; background: var(--primary); border-radius: 2px; }
+        .fin-resumo-linha { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .fin-resumo-linha:last-child { border-bottom: none; }
+        .fin-resumo-label { font-size: 0.82rem; color: var(--text-secondary); font-weight: 600; display: flex; align-items: center; gap: 7px; }
+        .fin-resumo-val { font-size: 0.88rem; font-weight: 800; }
+        .fin-kpi-val.warn { color: #FDE68A; }
+
+        /* ═══════════════ FIM FINANCEIRO CSS v2 ═══════════════ */
 
     </style>
 
@@ -8507,96 +8926,211 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <!-- ===== FINANCEIRO VIEW ===== -->
             <div id="financeiro-view" class="view">
 
-                <!-- Hero -->
-                <div style="background:linear-gradient(135deg,#0F4C75,#1D6FA4,#27AE60);border-radius:18px;padding:18px 16px;margin-bottom:14px;color:white;position:relative;overflow:hidden;">
-                    <div style="position:absolute;top:-30px;right:-24px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.07);pointer-events:none;"></div>
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-                        <div style="width:48px;height:48px;background:rgba(255,255,255,0.18);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 4px 14px rgba(0,0,0,0.18);flex-shrink:0;">💰</div>
-                        <div>
-                            <div style="font-size:1.05rem;font-weight:900;letter-spacing:-0.3px;">Financeiro Pessoal</div>
-                            <div style="font-size:0.72rem;opacity:0.7;margin-top:1px;">Contas · Investimentos · Metas · Parcelas</div>
+                <!-- ── HERO + FILTRO DE PERÍODO ── -->
+                <div class="fin-hero">
+                    <div class="fin-hero-top">
+                        <div class="fin-hero-icon">💰</div>
+                        <div class="fin-hero-info">
+                            <div class="fin-hero-title">Financeiro Integrado</div>
+                            <div class="fin-hero-sub">Contas · Comissões · Projeções · Pipeline</div>
+                        </div>
+                        <!-- Filtro de período no hero -->
+                        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                            <button class="fin-hero-mes-btn" id="fin-periodo-btn" onclick="Financeiro.togglePeriodoMenu()" style="position:relative;">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span id="fin-hero-mes-label">Este ano</span>
+                                <i class="fas fa-chevron-down" style="font-size:0.6rem;opacity:0.7;"></i>
+                            </button>
                         </div>
                     </div>
-                    <!-- KPI Strip -->
-                    <div id="fin-kpi-strip" style="display:flex;gap:8px;margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;"></div>
+                    <!-- Menu período customizável (oculto por padrão) -->
+                    <div id="fin-periodo-menu" style="display:none;padding:0 18px 14px;position:relative;z-index:2;">
+                        <div style="background:rgba(255,255,255,0.12);border-radius:12px;padding:10px 12px;border:1px solid rgba(255,255,255,0.18);">
+                            <div style="font-size:0.65rem;font-weight:800;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Filtrar período</div>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+                                <button class="fin-periodo-chip" data-periodo="mes" onclick="Financeiro.setPeriodo('mes',this)">Este mês</button>
+                                <button class="fin-periodo-chip" data-periodo="trimestre" onclick="Financeiro.setPeriodo('trimestre',this)">Trimestre</button>
+                                <button class="fin-periodo-chip" data-periodo="semestre" onclick="Financeiro.setPeriodo('semestre',this)">Semestre</button>
+                                <button class="fin-periodo-chip active" data-periodo="ano" onclick="Financeiro.setPeriodo('ano',this)">Este ano</button>
+                                <button class="fin-periodo-chip" data-periodo="custom" onclick="Financeiro.setPeriodo('custom',this)">Personalizado</button>
+                            </div>
+                            <div id="fin-custom-range" style="display:none;display:flex;gap:8px;align-items:center;">
+                                <input type="date" id="fin-periodo-de" class="fin-sel" style="flex:1;height:32px;font-size:0.74rem;" onchange="Financeiro.aplicarPeriodoCustom()">
+                                <span style="color:rgba(255,255,255,0.6);font-size:0.75rem;">até</span>
+                                <input type="date" id="fin-periodo-ate" class="fin-sel" style="flex:1;height:32px;font-size:0.74rem;" onchange="Financeiro.aplicarPeriodoCustom()">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- KPI Grid (4 colunas) — populado via renderKPI() -->
+                    <div class="fin-kpi-grid" id="fin-kpi-strip">
+                        <div class="fin-kpi-cell">
+                            <div class="fin-kpi-ico"><i class="fas fa-wallet"></i></div>
+                            <div class="fin-kpi-val" id="kpi-saldo-total">R$ 0,00</div>
+                            <div class="fin-kpi-lbl">Saldo Total</div>
+                        </div>
+                        <div class="fin-kpi-cell">
+                            <div class="fin-kpi-ico"><i class="fas fa-handshake"></i></div>
+                            <div class="fin-kpi-val pos" id="kpi-comissoes">R$ 0,00</div>
+                            <div class="fin-kpi-lbl">Comissões</div>
+                        </div>
+                        <div class="fin-kpi-cell">
+                            <div class="fin-kpi-ico"><i class="fas fa-arrow-down"></i></div>
+                            <div class="fin-kpi-val neg" id="kpi-despesas-periodo">R$ 0,00</div>
+                            <div class="fin-kpi-lbl">Despesas</div>
+                        </div>
+                        <div class="fin-kpi-cell">
+                            <div class="fin-kpi-ico"><i class="fas fa-binoculars"></i></div>
+                            <div class="fin-kpi-val warn" id="kpi-projecao">R$ 0,00</div>
+                            <div class="fin-kpi-lbl">Projeção</div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Tabs -->
-                <div class="coach-tabs" id="fin-tabs" style="margin-bottom:14px;">
-                    <button class="coach-tab-btn active" onclick="Financeiro.switchTab('contas',this)">🏦 Contas</button>
-                    <button class="coach-tab-btn" onclick="Financeiro.switchTab('investimentos',this)">📈 Investimentos</button>
-                    <button class="coach-tab-btn" onclick="Financeiro.switchTab('metas',this)">🎯 Metas</button>
-                    <button class="coach-tab-btn" onclick="Financeiro.switchTab('lancamentos',this)">📋 Lançamentos</button>
+                <!-- ── TABS ── -->
+                <div class="fin-tabs-pro" id="fin-tabs">
+                    <button class="fin-tab-pro active" onclick="Financeiro.switchTab('visao',this)">
+                        <i class="fas fa-chart-pie"></i> Visão Geral
+                    </button>
+                    <button class="fin-tab-pro" onclick="Financeiro.switchTab('contas',this)">
+                        <i class="fas fa-university"></i> Contas
+                    </button>
+                    <button class="fin-tab-pro" onclick="Financeiro.switchTab('investimentos',this)">
+                        <i class="fas fa-chart-line"></i> Invest.
+                    </button>
+                    <button class="fin-tab-pro" onclick="Financeiro.switchTab('metas',this)">
+                        <i class="fas fa-bullseye"></i> Metas
+                    </button>
+                    <button class="fin-tab-pro" onclick="Financeiro.switchTab('lancamentos',this)">
+                        <i class="fas fa-receipt"></i> Lançamentos
+                    </button>
+                </div>
+
+                <!-- TAB VISÃO GERAL (nova) -->
+                <div id="fin-tab-visao" class="fin-panel active">
+
+                    <!-- ── GRÁFICOS ── -->
+                    <div id="fin-charts-section">
+                        <!-- KPIs de conversão -->
+                        <div class="fin-conv-grid" id="fin-conv-kpis"></div>
+                        <!-- Gráfico: Receitas vs Despesas (12 meses) -->
+                        <div class="fin-chart-card" id="fin-chart-receitas"></div>
+                        <!-- Gráfico: Funil de conversão por etapa -->
+                        <div class="fin-chart-card" id="fin-chart-funil"></div>
+                        <!-- Gráfico: Composição de receitas (donut) -->
+                        <div class="fin-chart-card" id="fin-chart-donut"></div>
+                    </div>
+
+                    <!-- Comissões Realizadas -->
+                    <div class="fin-secao-bar" style="margin-top:4px;">
+                        <div class="fin-secao-titulo">Comissões Realizadas</div>
+                        <span id="fin-badge-vendas" style="font-size:0.70rem;font-weight:800;background:var(--accent-ultra);color:var(--accent-dark);padding:3px 10px;border-radius:20px;">0 vendas</span>
+                    </div>
+                    <div id="fin-lista-comissoes">
+                        <div class="fin-empty" style="padding:30px 20px;">
+                            <div class="fin-empty-icon" style="background:var(--accent-ultra);">🤝</div>
+                            <div class="fin-empty-titulo">Sem comissões no período</div>
+                            <div class="fin-empty-sub">As comissões aparecem automaticamente quando um cliente chega à etapa <strong>Venda</strong> no funil.</div>
+                        </div>
+                    </div>
+
+                    <!-- Projeções do Pipeline -->
+                    <div class="fin-secao-bar" style="margin-top:20px;">
+                        <div class="fin-secao-titulo">Projeção do Pipeline</div>
+                        <span id="fin-badge-pipeline" style="font-size:0.70rem;font-weight:800;background:rgba(245,158,11,0.12);color:var(--amber);padding:3px 10px;border-radius:20px;border:1px solid rgba(245,158,11,0.25);">0 negócios</span>
+                    </div>
+                    <div id="fin-lista-projecoes">
+                        <div class="fin-empty" style="padding:30px 20px;">
+                            <div class="fin-empty-icon" style="background:rgba(245,158,11,0.10);">🔭</div>
+                            <div class="fin-empty-titulo">Nenhuma projeção disponível</div>
+                            <div class="fin-empty-sub">Clientes nas etapas <strong>Aprovado</strong> e <strong>Contrato</strong> geram projeções automáticas de comissão.</div>
+                        </div>
+                    </div>
+
+                    <!-- Resumo do período -->
+                    <div id="fin-resumo-periodo" style="margin-top:20px;"></div>
                 </div>
 
                 <!-- TAB CONTAS -->
-                <div id="fin-tab-contas" class="coach-tab-panel active">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                        <div style="font-size:0.82rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;">Suas Contas</div>
-                        <button onclick="Financeiro.abrirModalConta()" style="background:var(--primary);color:white;border:none;border-radius:10px;padding:7px 14px;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;"><i class="fas fa-plus"></i> Nova Conta</button>
+                <div id="fin-tab-contas" class="fin-panel">
+                    <div class="fin-secao-bar">
+                        <div class="fin-secao-titulo">Suas Contas</div>
+                        <button class="fin-btn-add primary" onclick="Financeiro.abrirModalConta()">
+                            <i class="fas fa-plus"></i> Nova Conta
+                        </button>
                     </div>
                     <div id="fin-lista-contas">
-                        <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
-                            <div style="font-size:2rem;margin-bottom:10px;">🏦</div>
-                            <div style="font-size:0.9rem;font-weight:600;">Nenhuma conta cadastrada</div>
-                            <div style="font-size:0.78rem;margin-top:4px;">Clique em "Nova Conta" para começar</div>
+                        <div class="fin-empty">
+                            <div class="fin-empty-icon">🏦</div>
+                            <div class="fin-empty-titulo">Nenhuma conta cadastrada</div>
+                            <div class="fin-empty-sub">Adicione suas contas bancárias, carteiras e cartões para controlar seu saldo.</div>
+                            <button class="fin-empty-cta" onclick="Financeiro.abrirModalConta()"><i class="fas fa-plus"></i> Adicionar Conta</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- TAB INVESTIMENTOS -->
-                <div id="fin-tab-investimentos" class="coach-tab-panel">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                        <div style="font-size:0.82rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;">Investimentos</div>
-                        <button onclick="Financeiro.abrirModalInvestimento()" style="background:linear-gradient(135deg,#27AE60,#1E8449);color:white;border:none;border-radius:10px;padding:7px 14px;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;"><i class="fas fa-plus"></i> Novo</button>
+                <div id="fin-tab-investimentos" class="fin-panel">
+                    <div class="fin-secao-bar">
+                        <div class="fin-secao-titulo">Investimentos</div>
+                        <button class="fin-btn-add green" onclick="Financeiro.abrirModalInvestimento()">
+                            <i class="fas fa-plus"></i> Novo
+                        </button>
                     </div>
                     <div id="fin-lista-investimentos">
-                        <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
-                            <div style="font-size:2rem;margin-bottom:10px;">📈</div>
-                            <div style="font-size:0.9rem;font-weight:600;">Nenhum investimento cadastrado</div>
-                            <div style="font-size:0.78rem;margin-top:4px;">Clique em "Novo" para adicionar</div>
+                        <div class="fin-empty">
+                            <div class="fin-empty-icon" style="background:var(--accent-ultra);">📈</div>
+                            <div class="fin-empty-titulo">Nenhum investimento cadastrado</div>
+                            <div class="fin-empty-sub">Registre suas aplicações em renda fixa, ações, fundos e outros ativos.</div>
+                            <button class="fin-empty-cta" style="background:var(--accent);" onclick="Financeiro.abrirModalInvestimento()"><i class="fas fa-plus"></i> Adicionar Investimento</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- TAB METAS -->
-                <div id="fin-tab-metas" class="coach-tab-panel">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                        <div style="font-size:0.82rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;">Metas Financeiras</div>
-                        <button onclick="Financeiro.abrirModalMeta()" style="background:linear-gradient(135deg,#7C3AED,#6D28D9);color:white;border:none;border-radius:10px;padding:7px 14px;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;"><i class="fas fa-plus"></i> Nova Meta</button>
+                <div id="fin-tab-metas" class="fin-panel">
+                    <div class="fin-secao-bar">
+                        <div class="fin-secao-titulo">Metas Financeiras</div>
+                        <button class="fin-btn-add violet" onclick="Financeiro.abrirModalMeta()">
+                            <i class="fas fa-plus"></i> Nova Meta
+                        </button>
                     </div>
                     <div id="fin-lista-metas">
-                        <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
-                            <div style="font-size:2rem;margin-bottom:10px;">🎯</div>
-                            <div style="font-size:0.9rem;font-weight:600;">Nenhuma meta definida</div>
-                            <div style="font-size:0.78rem;margin-top:4px;">Clique em "Nova Meta" para começar</div>
+                        <div class="fin-empty">
+                            <div class="fin-empty-icon" style="background:rgba(124,58,237,0.10);">🎯</div>
+                            <div class="fin-empty-titulo">Nenhuma meta definida</div>
+                            <div class="fin-empty-sub">Defina metas de poupança para viagens, emergências, imóveis ou qualquer objetivo.</div>
+                            <button class="fin-empty-cta" style="background:#7C3AED;" onclick="Financeiro.abrirModalMeta()"><i class="fas fa-plus"></i> Criar Meta</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- TAB LANÇAMENTOS -->
-                <div id="fin-tab-lancamentos" class="coach-tab-panel">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-                        <div style="font-size:0.82rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;">Lançamentos</div>
-                        <button onclick="Financeiro.abrirModalLancamento()" style="background:var(--primary);color:white;border:none;border-radius:10px;padding:7px 14px;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;"><i class="fas fa-plus"></i> Novo Lançamento</button>
+                <div id="fin-tab-lancamentos" class="fin-panel">
+                    <div class="fin-secao-bar">
+                        <div class="fin-secao-titulo">Lançamentos</div>
+                        <button class="fin-btn-add primary" onclick="Financeiro.abrirModalLancamento()">
+                            <i class="fas fa-plus"></i> Novo
+                        </button>
                     </div>
                     <!-- Filtros -->
-                    <div style="display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;">
-                        <select id="fin-filtro-tipo" class="form-control" style="min-width:130px;font-size:0.82rem;height:36px;" onchange="Financeiro.renderLancamentos()">
+                    <div class="fin-filtros-row">
+                        <select id="fin-filtro-tipo" class="fin-sel" onchange="Financeiro.renderLancamentos()">
                             <option value="">Todos os tipos</option>
                             <option value="receita">Receitas</option>
                             <option value="despesa">Despesas</option>
                             <option value="transferencia">Transferências</option>
                         </select>
-                        <select id="fin-filtro-conta" class="form-control" style="min-width:130px;font-size:0.82rem;height:36px;" onchange="Financeiro.renderLancamentos()">
+                        <select id="fin-filtro-conta" class="fin-sel" onchange="Financeiro.renderLancamentos()">
                             <option value="">Todas as contas</option>
                         </select>
-                        <input type="month" id="fin-filtro-mes" class="form-control" style="min-width:140px;font-size:0.82rem;height:36px;" onchange="Financeiro.renderLancamentos()">
+                        <input type="month" id="fin-filtro-mes" class="fin-sel" style="min-width:138px;" onchange="Financeiro.renderLancamentos()">
                     </div>
                     <div id="fin-lista-lancamentos">
-                        <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
-                            <div style="font-size:2rem;margin-bottom:10px;">📋</div>
-                            <div style="font-size:0.9rem;font-weight:600;">Nenhum lançamento encontrado</div>
+                        <div class="fin-empty">
+                            <div class="fin-empty-icon">📋</div>
+                            <div class="fin-empty-titulo">Nenhum lançamento encontrado</div>
+                            <div class="fin-empty-sub">Registre suas receitas, despesas e transferências.</div>
+                            <button class="fin-empty-cta" onclick="Financeiro.abrirModalLancamento()"><i class="fas fa-plus"></i> Novo Lançamento</button>
                         </div>
                     </div>
                 </div>
@@ -14179,7 +14713,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 // Ativa todos os itens (drawer + sidebar) com o mesmo data-target
                 const target = el.getAttribute('data-target');
                 document.querySelectorAll(`.nav-panel-item[data-target="${target}"]`).forEach(n => n.classList.add('active'));
-                document.getElementById(target).classList.add('active');
+                const viewEl = target ? document.getElementById(target) : null;
+                if (viewEl) viewEl.classList.add('active');
 
                 UI.closeFabMenu();
                 const fab = document.getElementById('main-fab');
@@ -20853,8 +21388,13 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                     if (!imovel) return;
                     
                     console.log(`Cliente ${cliente.nome} atingiu Venda Concluída para o imóvel ${imovel.titulo}`);
+
+                    // ── Integração Financeiro: registra comissão automaticamente ──
+                    if (window.Financeiro) {
+                        await Financeiro.registrarComissaoVenda(clienteId);
+                    }
                     
-                    Utils.toast(`Cliente marcado como venda concluída para "${imovel.titulo}".`);
+                    Utils.toast(`✅ Venda concluída: "${imovel.titulo}" — comissão registrada no Financeiro.`);
                 },
 
                 addToWaitingList: async function() {
@@ -30979,8 +31519,9 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             function switchTab(id,btn){
                 document.querySelectorAll('#sim-tabs .coach-tab-btn').forEach(b=>b.classList.remove('active'));
                 document.querySelectorAll('#simulador-view .coach-tab-panel').forEach(p=>p.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById('sim-tab-'+id).classList.add('active');
+                if (btn) btn.classList.add('active');
+                const simPanel = document.getElementById('sim-tab-'+id);
+                if (simPanel) simPanel.classList.add('active');
             }
 
             function buildAgeTable(){
@@ -32123,9 +32664,1491 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
         window.Auth = Auth;
 
         // ════════════════════════════════════════════════════════════════
-        //  MÓDULO FINANCEIRO — Contas · Investimentos · Metas · Parcelas
+        //  MÓDULO FINANCEIRO — Integrado com pipeline de vendas
+        //  v3: comissões automáticas, projeções, filtro por período
         // ════════════════════════════════════════════════════════════════
         const Financeiro = (() => {
+
+            // ── Estado interno ────────────────────────────────────────────
+            let _tabAtual = 'visao';
+            let _delParcelaId = null;
+            let _delParcelaGroupId = null;
+            let _delParcelaData = null;
+
+            // ── Estado do período ─────────────────────────────────────────
+            let _periodo = 'ano'; // padrão: ano inteiro para não esconder vendas antigas
+            let _periodoCustomDe  = null;
+            let _periodoCustomAte = null;
+
+            // ── Helpers ───────────────────────────────────────────────────
+            const br = v => Utils.formatCurrency(v || 0);
+            const parseV = s => Utils.parseCurrency(s || '0');
+            const today = () => new Date().toISOString().split('T')[0];
+            const mesAtual = () => new Date().toISOString().slice(0,7);
+
+            // ── CRUD base ─────────────────────────────────────────────────
+            const getContas = () => DB.getAll('fin_contas');
+            const getInvs   = () => DB.getAll('fin_investimentos');
+            const getMetas  = () => DB.getAll('fin_metas');
+            const getLancs  = () => DB.getAll('fin_lancamentos');
+
+            // ── Retorna {de, ate} do período selecionado ──────────────────
+            function getPeriodoDates() {
+                const now = new Date();
+                if (_periodo === 'custom' && _periodoCustomDe && _periodoCustomAte) {
+                    return { de: _periodoCustomDe, ate: _periodoCustomAte };
+                }
+                const y = now.getFullYear(), m = now.getMonth();
+                if (_periodo === 'mes') {
+                    return {
+                        de:  `${y}-${String(m+1).padStart(2,'0')}-01`,
+                        ate: `${y}-${String(m+1).padStart(2,'0')}-${String(new Date(y,m+1,0).getDate()).padStart(2,'0')}`
+                    };
+                }
+                if (_periodo === 'trimestre') {
+                    const mIni = m - (m % 3);
+                    return {
+                        de:  `${y}-${String(mIni+1).padStart(2,'0')}-01`,
+                        ate: `${y}-${String(mIni+3).padStart(2,'0')}-${String(new Date(y,mIni+3,0).getDate()).padStart(2,'0')}`
+                    };
+                }
+                if (_periodo === 'semestre') {
+                    const mIni = m < 6 ? 0 : 6;
+                    return {
+                        de:  `${y}-${String(mIni+1).padStart(2,'0')}-01`,
+                        ate: `${y}-${String(mIni+6).padStart(2,'0')}-${String(new Date(y,mIni+6,0).getDate()).padStart(2,'0')}`
+                    };
+                }
+                if (_periodo === 'ano') {
+                    return { de: `${y}-01-01`, ate: `${y}-12-31` };
+                }
+                // fallback: mês atual
+                return {
+                    de:  `${y}-${String(m+1).padStart(2,'0')}-01`,
+                    ate: `${y}-${String(m+1).padStart(2,'0')}-${String(new Date(y,m+1,0).getDate()).padStart(2,'0')}`
+                };
+            }
+
+            function labelPeriodo() {
+                const labels = { mes:'Este mês', trimestre:'Trimestre', semestre:'Semestre', ano:'Este ano' };
+                if (_periodo === 'custom' && _periodoCustomDe && _periodoCustomAte) {
+                    return _periodoCustomDe.slice(5).split('-').reverse().join('/') + ' – ' + _periodoCustomAte.slice(5).split('-').reverse().join('/');
+                }
+                return labels[_periodo] || 'Este mês';
+            }
+
+            // ── Toggle menu de período ────────────────────────────────────
+            function togglePeriodoMenu() {
+                const menu = document.getElementById('fin-periodo-menu');
+                if (!menu) return;
+                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            }
+
+            // ── Setar período ─────────────────────────────────────────────
+            async function setPeriodo(p, btn) {
+                _periodo = p;
+                document.querySelectorAll('.fin-periodo-chip').forEach(b => b.classList.remove('active'));
+                if (btn) btn.classList.add('active');
+                const cr = document.getElementById('fin-custom-range');
+                if (cr) cr.style.display = p === 'custom' ? 'flex' : 'none';
+                if (p !== 'custom') {
+                    // Limpa o filtro manual de mês para não conflitar com o período global
+                    const mf = document.getElementById('fin-filtro-mes');
+                    if (mf) mf.value = '';
+                    const lbl = document.getElementById('fin-hero-mes-label');
+                    if (lbl) lbl.textContent = labelPeriodo();
+                    document.getElementById('fin-periodo-menu').style.display = 'none';
+                    await init();
+                }
+            }
+
+            async function aplicarPeriodoCustom() {
+                _periodoCustomDe  = document.getElementById('fin-periodo-de')?.value || null;
+                _periodoCustomAte = document.getElementById('fin-periodo-ate')?.value || null;
+                if (_periodoCustomDe && _periodoCustomAte) {
+                    const lbl = document.getElementById('fin-hero-mes-label');
+                    if (lbl) lbl.textContent = labelPeriodo();
+                    document.getElementById('fin-periodo-menu').style.display = 'none';
+                    await init();
+                }
+            }
+
+            // ── Saldo real de uma conta ───────────────────────────────────
+            async function saldoConta(contaId) {
+                const conta = await DB.get('fin_contas', contaId);
+                const all   = await getLancs();
+                let saldo = conta ? (conta.saldoInicial || 0) : 0;
+                all.forEach(l => {
+                    if (l.tipo === 'receita'  && l.contaId === contaId) saldo += l.valor;
+                    if (l.tipo === 'despesa'  && l.contaId === contaId) saldo -= l.valor;
+                    if (l.tipo === 'transferencia') {
+                        if (l.destino === contaId) saldo += l.valor;
+                        if (l.origem  === contaId) saldo -= l.valor;
+                    }
+                });
+                return saldo;
+            }
+
+            async function saldoInvestimento(invId) {
+                const inv  = await DB.get('fin_investimentos', invId);
+                const all  = await getLancs();
+                let s = inv ? (inv.valorInvestido || 0) : 0;
+                all.forEach(l => {
+                    if (l.tipo === 'transferencia') {
+                        if (l.destino === invId) s += l.valor;
+                        if (l.origem  === invId) s -= l.valor;
+                    }
+                });
+                return s;
+            }
+
+            async function saldoMeta(metaId) {
+                const meta = await DB.get('fin_metas', metaId);
+                const all  = await getLancs();
+                let s = meta ? (meta.guardado || 0) : 0;
+                all.forEach(l => {
+                    if (l.tipo === 'transferencia') {
+                        if (l.destino === metaId) s += l.valor;
+                        if (l.origem  === metaId) s -= l.valor;
+                    }
+                });
+                return s;
+            }
+
+            // ═══════════════════════════════════════════════════
+            //  INTEGRAÇÃO COM FUNIL — Registrar comissão de venda
+            // ═══════════════════════════════════════════════════
+
+            /**
+             * Chamado quando cliente entra na etapa 'venda'.
+             * Verifica se já existe lançamento para evitar duplicatas,
+             * cria receita de comissão automaticamente.
+             */
+            async function registrarComissaoVenda(clienteId) {
+                try {
+                    const cliente = (UI.data.clientes || []).find(c => c.id === clienteId)
+                                 || await DB.get('clientes', clienteId);
+                    if (!cliente) return;
+
+                    const imovelId = cliente.imovelInteresseId;
+                    if (!imovelId) return;
+
+                    const imovel = (UI.data.imoveis || []).find(i => i.id === imovelId)
+                                || await DB.get('imoveis', imovelId);
+                    if (!imovel) return;
+
+                    // Impede duplicata
+                    const lancamentos = await getLancs();
+                    const jaExiste = lancamentos.some(l =>
+                        l.tipo === 'receita' &&
+                        l.origem_integracao === 'venda' &&
+                        l.clienteId === clienteId
+                    );
+                    if (jaExiste) return;
+
+                    const settings    = UI.data.settings || await DB.get('settings','main') || {};
+                    const taxaGlobal  = parseFloat(settings.comissao) || 5; // fallback 5%
+                    const taxaImovel  = parseFloat(imovel.comissao);
+                    const taxa        = (!isNaN(taxaImovel) && taxaImovel > 0) ? taxaImovel : taxaGlobal;
+                    const valorImovel = parseFloat(imovel.precoVenda) || parseFloat(imovel.precoAluguel) || 0;
+
+                    // Se valor do imóvel não está cadastrado, registra com valor 0 mesmo
+                    // para que a venda apareça no painel (usuário pode editar depois)
+                    const valorComissao = valorImovel > 0 ? valorImovel * (taxa / 100) : 0;
+
+                    const dataVenda = cliente.dataEntradaFunil || today();
+
+                    await DB.put('fin_lancamentos', {
+                        id:                Utils.id(),
+                        tipo:              'receita',
+                        desc:              `Comissão — ${cliente.nome} / ${imovel.titulo}`,
+                        valor:             valorComissao,
+                        data:              dataVenda,
+                        categoria:         'comissao_venda',
+                        contaId:           null,
+                        origem_integracao: 'venda',
+                        clienteId:         clienteId,
+                        imovelId:          imovelId,
+                        taxa:              taxa,
+                        valorImovel:       valorImovel,
+                        dataCriacao:       new Date().toISOString()
+                    });
+
+                    if (valorComissao > 0) {
+                        Utils.toast(`✅ Comissão de ${br(valorComissao)} registrada no Financeiro!`, 'success');
+                    } else {
+                        Utils.toast(`✅ Venda de ${cliente.nome} registrada! Cadastre o valor do imóvel para calcular a comissão.`, 'success');
+                    }
+                } catch (err) {
+                    console.error('[Financeiro] registrarComissaoVenda:', err);
+                }
+            }
+
+            /**
+             * Varre TODOS os clientes em etapa 'venda' e registra comissões
+             * que ainda não existam no fin_lancamentos.
+             * Chamado no init() para garantir que vendas antigas apareçam.
+             */
+            async function sincronizarVendasExistentes() {
+                try {
+                    const clientes = UI.data.clientes || await DB.getAll('clientes');
+                    const vendas   = clientes.filter(c => c.etapaFunil === 'venda');
+                    if (!vendas.length) return;
+
+                    // Busca lançamentos atuais
+                    let lancamentos = await getLancs();
+
+                    // ── Passo 1: remove duplicatas já existentes no banco ──────
+                    // Agrupa por clienteId, mantém só o mais antigo (dataCriacao menor)
+                    const porCliente = {};
+                    for (const l of lancamentos) {
+                        if (l.origem_integracao !== 'venda' || !l.clienteId) continue;
+                        if (!porCliente[l.clienteId]) {
+                            porCliente[l.clienteId] = l;
+                        } else {
+                            // Mantém o mais antigo; apaga o mais recente
+                            const existente = porCliente[l.clienteId];
+                            const maisRecente = (l.dataCriacao || '') > (existente.dataCriacao || '') ? l : existente;
+                            const maisAntigo  = maisRecente === l ? existente : l;
+                            porCliente[l.clienteId] = maisAntigo;
+                            await DB.delete('fin_lancamentos', maisRecente.id);
+                            console.log(`[Financeiro] Duplicata removida: ${maisRecente.id} (cliente ${l.clienteId})`);
+                        }
+                    }
+
+                    // Recarrega após limpeza
+                    lancamentos = await getLancs();
+
+                    // Set dos clienteIds já com lançamento (evita duplicata intra-loop)
+                    const clientesComLanc = new Set(
+                        lancamentos
+                            .filter(l => l.origem_integracao === 'venda' && l.clienteId)
+                            .map(l => l.clienteId)
+                    );
+
+                    // ── Passo 2: cria lançamentos para vendas sem registro ─────
+                    let novos = 0;
+                    for (const c of vendas) {
+                        if (!c.imovelInteresseId) continue;
+                        if (clientesComLanc.has(c.id)) continue; // já existe
+
+                        const imovel = (UI.data.imoveis || []).find(i => i.id === c.imovelInteresseId)
+                                    || await DB.get('imoveis', c.imovelInteresseId);
+                        if (!imovel) continue;
+
+                        const settings   = UI.data.settings || await DB.get('settings','main') || {};
+                        const taxaGlobal = parseFloat(settings.comissao) || 5;
+                        const taxaImovel = parseFloat(imovel.comissao);
+                        const taxa       = (!isNaN(taxaImovel) && taxaImovel > 0) ? taxaImovel : taxaGlobal;
+                        const valorImovel= parseFloat(imovel.precoVenda) || parseFloat(imovel.precoAluguel) || 0;
+                        const valor      = valorImovel > 0 ? valorImovel * (taxa / 100) : 0;
+                        const dataVenda  = c.dataEntradaFunil || c.dataCriacao?.split('T')[0] || today();
+
+                        await DB.put('fin_lancamentos', {
+                            id:                Utils.id(),
+                            tipo:              'receita',
+                            desc:              `Comissão — ${c.nome} / ${imovel.titulo}`,
+                            valor,
+                            data:              dataVenda,
+                            categoria:         'comissao_venda',
+                            contaId:           null,
+                            origem_integracao: 'venda',
+                            clienteId:         c.id,
+                            imovelId:          c.imovelInteresseId,
+                            taxa,
+                            valorImovel,
+                            dataCriacao:       new Date().toISOString()
+                        });
+
+                        // Marca no Set imediatamente para proteger contra loop duplo
+                        clientesComLanc.add(c.id);
+                        novos++;
+                    }
+
+                    if (novos > 0) {
+                        console.log(`[Financeiro] ${novos} comissão(ões) retroativa(s) registrada(s).`);
+                    }
+                } catch (err) {
+                    console.error('[Financeiro] sincronizarVendasExistentes:', err);
+                }
+            }
+
+            async function calcularProjecoes() {
+                const clientes   = UI.data.clientes || await DB.getAll('clientes');
+                const imoveis    = UI.data.imoveis  || await DB.getAll('imoveis');
+                const settings   = UI.data.settings || {};
+                const taxaGlobal = parseFloat(settings.comissao) || 5;
+
+                // Obtém etapas do funil ordenadas
+                const todasEtapas = (UI.data.funilEtapas || [])
+                    .slice()
+                    .sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
+
+                // ── Palavras-chave que indicam cliente inativo/descartado ──
+                const PALAVRAS_INATIVAS = [
+                    'venda', 'inativ', 'adiado', 'adiada', 'cancelado', 'cancelada',
+                    'desistiu', 'desistencia', 'perdido', 'perdida',
+                    'concluido', 'concluida', 'concluída', 'concluído',
+                    'encerrado', 'encerrada'
+                ];
+
+                const clienteEstaInativo = (c) => {
+                    const etapaId   = (c.etapaFunil || '').toLowerCase();
+                    const etapaObj  = todasEtapas.find(e => e.id === c.etapaFunil);
+                    const etapaNome = (etapaObj ? etapaObj.nome : etapaId).toLowerCase();
+                    return PALAVRAS_INATIVAS.some(p => etapaId.includes(p) || etapaNome.includes(p));
+                };
+
+                // IDs de etapas que ficam ANTES de 'venda' e DEPOIS de 'contato'
+                const ETAPAS_EXCLUIDAS = new Set(['lead', 'contato', 'cpf', 'venda']);
+                const etapasProjecao = todasEtapas.filter(e => !ETAPAS_EXCLUIDAS.has(e.id));
+
+                // Probabilidade por posição relativa no funil (40% → 95%)
+                const totalEtapasProj = etapasProjecao.length || 1;
+                const probPorEtapa = {};
+                etapasProjecao.forEach((e, idx) => {
+                    const prob = 0.40 + (0.55 * (idx / (totalEtapasProj - 1 || 1)));
+                    probPorEtapa[e.id] = Math.round(prob * 100) / 100;
+                });
+                // Garante valores fixos para etapas padrão
+                if (probPorEtapa['sem-restricao'] === undefined) probPorEtapa['sem-restricao'] = 0.40;
+                if (probPorEtapa['documentacao']  === undefined) probPorEtapa['documentacao']  = 0.60;
+                if (probPorEtapa['aprovado']       === undefined) probPorEtapa['aprovado']       = 0.85;
+                if (probPorEtapa['contrato']       === undefined) probPorEtapa['contrato']       = 0.95;
+
+                const etapasAlvoIds = new Set(etapasProjecao.map(e => e.id));
+                const projecoes = [];
+
+                for (const c of clientes) {
+                    if (!etapasAlvoIds.has(c.etapaFunil)) continue;
+
+                    // ── Exclui clientes inativos, com venda adiada ou cancelados ──
+                    if (clienteEstaInativo(c)) continue;
+
+                    const imovel = c.imovelInteresseId
+                        ? imoveis.find(i => i.id === c.imovelInteresseId) || await DB.get('imoveis', c.imovelInteresseId)
+                        : null;
+
+                    const taxaImovel  = parseFloat(imovel?.comissao);
+                    const taxa        = (!isNaN(taxaImovel) && taxaImovel > 0) ? taxaImovel : taxaGlobal;
+                    const valorImovel = imovel
+                        ? (parseFloat(imovel.precoVenda) || parseFloat(imovel.precoAluguel) || 0)
+                        : 0;
+                    const comissaoBruta     = valorImovel > 0 ? valorImovel * (taxa / 100) : 0;
+                    const prob              = probPorEtapa[c.etapaFunil] || 0.50;
+                    const comissaoPonderada = comissaoBruta * prob;
+
+                    const etapaObj  = todasEtapas.find(e => e.id === c.etapaFunil);
+                    const etapaNome = etapaObj?.nome || c.etapaFunil;
+                    const etapaCor  = etapaObj?.cor  || '#888';
+
+                    projecoes.push({
+                        clienteId:         c.id,
+                        clienteNome:       c.nome,
+                        imovelTitulo:      imovel?.titulo || '— imóvel não vinculado —',
+                        etapa:             c.etapaFunil,
+                        etapaNome,
+                        etapaCor,
+                        valorImovel,
+                        taxa,
+                        comissaoBruta,
+                        comissaoPonderada,
+                        prob,
+                        semValor:          valorImovel <= 0
+                    });
+                }
+
+                // Clientes com valor primeiro, depois por prob desc
+                projecoes.sort((a, b) => {
+                    if (a.semValor !== b.semValor) return a.semValor ? 1 : -1;
+                    return b.comissaoPonderada - a.comissaoPonderada;
+                });
+                return projecoes;
+            }
+
+            // ── Init ──────────────────────────────────────────────────────
+            async function init() {
+                const mf = document.getElementById('fin-filtro-mes');
+                if (mf && !mf.value) mf.value = mesAtual();
+
+                const lbl = document.getElementById('fin-hero-mes-label');
+                if (lbl) lbl.textContent = labelPeriodo();
+
+                // Marca o chip correto do período
+                document.querySelectorAll('.fin-periodo-chip').forEach(b => {
+                    b.classList.toggle('active', b.dataset.periodo === _periodo);
+                });
+
+                // Sincroniza vendas existentes que ainda não têm comissão registrada
+                await sincronizarVendasExistentes();
+
+                await renderKPI();
+                await renderVisaoGeral();
+                await renderContas();
+                await renderInvestimentos();
+                await renderMetas();
+                await renderLancamentos();
+                popularSelectsContas();
+            }
+
+            // ── KPI strip ─────────────────────────────────────────────────
+            async function renderKPI() {
+                const { de, ate } = getPeriodoDates();
+                const [contas, lancs] = await Promise.all([getContas(), getLancs()]);
+
+                // Saldo total de todas as contas
+                let totalContas = 0;
+                for (const c of contas) totalContas += await saldoConta(c.id);
+
+                // Lançamentos do período
+                const lancsP  = lancs.filter(l => l.data && l.data >= de && l.data <= ate);
+                const receitas = lancsP.filter(l => l.tipo==='receita').reduce((s,l)=>s+l.valor,0);
+                const despesas = lancsP.filter(l => l.tipo==='despesa').reduce((s,l)=>s+l.valor,0);
+                // Comissões realizadas no período
+                const comissoes = lancsP.filter(l => l.tipo==='receita' && l.origem_integracao==='venda').reduce((s,l)=>s+l.valor,0);
+                // Projeção ponderada do pipeline
+                const projecoes = await calcularProjecoes();
+                const totalProjecao = projecoes.reduce((s,p)=>s+p.comissaoPonderada,0);
+                const resultado = receitas - despesas;
+
+                // Atualizar KPI grid
+                const set = (id, txt, cls) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    el.textContent = txt;
+                    el.className = 'fin-kpi-val' + (cls ? ' '+cls : '');
+                };
+                set('kpi-saldo-total',      br(totalContas),    totalContas < 0 ? 'neg' : '');
+                set('kpi-comissoes',         br(comissoes > 0 ? comissoes : receitas), 'pos');
+                set('kpi-despesas-periodo',  br(despesas),       'neg');
+                set('kpi-projecao',          br(totalProjecao),  'warn');
+
+                // Atualizar o strip fallback se IDs não encontrados (compatibilidade)
+                const strip = document.getElementById('fin-kpi-strip');
+                if (strip && !document.getElementById('kpi-saldo-total')) {
+                    strip.innerHTML = `
+                        <div class="fin-kpi-cell"><div class="fin-kpi-ico"><i class="fas fa-wallet"></i></div><div class="fin-kpi-val${totalContas<0?' neg':''}">${br(totalContas)}</div><div class="fin-kpi-lbl">Saldo Total</div></div>
+                        <div class="fin-kpi-cell"><div class="fin-kpi-ico"><i class="fas fa-handshake"></i></div><div class="fin-kpi-val pos">${br(comissoes||receitas)}</div><div class="fin-kpi-lbl">Comissões</div></div>
+                        <div class="fin-kpi-cell"><div class="fin-kpi-ico"><i class="fas fa-arrow-down"></i></div><div class="fin-kpi-val neg">${br(despesas)}</div><div class="fin-kpi-lbl">Despesas</div></div>
+                        <div class="fin-kpi-cell"><div class="fin-kpi-ico"><i class="fas fa-binoculars"></i></div><div class="fin-kpi-val warn">${br(totalProjecao)}</div><div class="fin-kpi-lbl">Projeção</div></div>`;
+                }
+            }
+
+            // ── Visão Geral: gráficos + comissões + projeções + resumo ───
+            async function renderVisaoGeral() {
+                await renderGraficos();
+                await renderComissoes();
+                await renderProjecoes();
+                await renderResumoPeriodo();
+            }
+
+            async function renderComissoes() {
+                const { de, ate } = getPeriodoDates();
+                const lancs = await getLancs();
+                const clientes = UI.data.clientes || await DB.getAll('clientes');
+                const imoveis  = UI.data.imoveis  || await DB.getAll('imoveis');
+
+                const comissoes = lancs
+                    .filter(l => l.tipo==='receita' && l.origem_integracao==='venda' && l.data >= de && l.data <= ate)
+                    .sort((a,b) => (b.data||'').localeCompare(a.data||''));
+
+                const badge = document.getElementById('fin-badge-vendas');
+                if (badge) badge.textContent = `${comissoes.length} venda${comissoes.length!==1?'s':''}`;
+
+                const el = document.getElementById('fin-lista-comissoes');
+                if (!el) return;
+                if (!comissoes.length) {
+                    el.innerHTML = `<div class="fin-empty" style="padding:28px 20px;"><div class="fin-empty-icon" style="background:var(--accent-ultra);">🤝</div><div class="fin-empty-titulo">Sem comissões no período</div><div class="fin-empty-sub">As comissões são registradas automaticamente quando um cliente chega à etapa <strong>Venda</strong>.</div></div>`;
+                    return;
+                }
+
+                let html = '';
+                for (const l of comissoes) {
+                    const c = clientes.find(x=>x.id===l.clienteId);
+                    const im = imoveis.find(x=>x.id===l.imovelId);
+                    const nomeCliente = c?.nome || l.desc;
+                    const tituloImovel = im?.titulo || '—';
+                    const dataFmt = l.data ? l.data.split('-').reverse().join('/') : '—';
+                    html += `
+                    <div class="fin-comissao-card">
+                        <div class="fin-comissao-icon">🏡</div>
+                        <div class="fin-comissao-body">
+                            <div class="fin-comissao-cliente">${nomeCliente}</div>
+                            <div class="fin-comissao-imovel"><i class="fas fa-home" style="margin-right:3px;color:var(--accent);"></i>${tituloImovel}</div>
+                            <div class="fin-comissao-imovel" style="margin-top:1px;"><i class="fas fa-percent" style="margin-right:3px;"></i>${l.taxa||'?'}% sobre ${br(l.valorImovel||0)}</div>
+                        </div>
+                        <div class="fin-comissao-right">
+                            <div class="fin-comissao-val">+${br(l.valor)}</div>
+                            <div class="fin-comissao-data">${dataFmt}</div>
+                        </div>
+                    </div>`;
+                }
+                el.innerHTML = html;
+            }
+
+            async function renderProjecoes() {
+                const projecoes = await calcularProjecoes();
+
+                const badge = document.getElementById('fin-badge-pipeline');
+                if (badge) badge.textContent = `${projecoes.length} negócio${projecoes.length!==1?'s':''}`;
+
+                const el = document.getElementById('fin-lista-projecoes');
+                if (!el) return;
+                if (!projecoes.length) {
+                    el.innerHTML = `<div class="fin-empty" style="padding:28px 20px;"><div class="fin-empty-icon" style="background:rgba(245,158,11,0.10);">🔭</div><div class="fin-empty-titulo">Nenhuma projeção disponível</div><div class="fin-empty-sub">Clientes nas etapas <strong>Sem Restrição, Documentação, Aprovado, Contrato</strong> e etapas customizadas geram projeções automáticas.</div></div>`;
+                    return;
+                }
+
+                let html = '';
+                for (const p of projecoes) {
+                    // Usa cor da etapa do funil dinamicamente
+                    const cor = p.etapaCor || '#888';
+                    // Converte cor hex para rgba com opacidade para o fundo
+                    const bg  = cor.startsWith('#')
+                        ? cor + '22'
+                        : 'rgba(136,136,136,0.12)';
+
+                    const valorInfo = p.semValor
+                        ? `<span style="font-size:0.65rem;color:var(--warning);font-weight:700;margin-left:5px;"><i class="fas fa-exclamation-triangle"></i> Cadastre o valor do imóvel</span>`
+                        : `<span style="font-size:0.65rem;color:var(--text-muted);font-weight:600;margin-left:5px;">${p.taxa}% s/ ${br(p.valorImovel)}</span>`;
+
+                    const valDisplay = p.semValor
+                        ? `<div class="fin-proj-val" style="color:var(--warning);">—</div>`
+                        : `<div class="fin-proj-val">~${br(p.comissaoBruta)}</div>`;
+
+                    html += `
+                    <div class="fin-proj-card">
+                        <div class="fin-proj-icon">🔭</div>
+                        <div class="fin-proj-body">
+                            <div class="fin-proj-cliente">${p.clienteNome}</div>
+                            <div class="fin-proj-info"><i class="fas fa-home" style="margin-right:3px;"></i>${p.imovelTitulo}</div>
+                            <div style="margin-top:4px;">
+                                <span class="fin-proj-etapa-badge" style="background:${bg};color:${cor};border:1px solid ${cor}55;">${p.etapaNome}</span>
+                                ${valorInfo}
+                            </div>
+                        </div>
+                        <div class="fin-proj-right">
+                            ${valDisplay}
+                            <div class="fin-proj-prob">${Math.round(p.prob*100)}% prob.</div>
+                            ${!p.semValor ? `<div style="font-size:0.60rem;color:var(--text-muted);margin-top:1px;">pond. ${br(p.comissaoPonderada)}</div>` : ''}
+                        </div>
+                    </div>`;
+                }
+                el.innerHTML = html;
+            }
+
+            async function renderResumoPeriodo() {
+                const { de, ate } = getPeriodoDates();
+                const [lancs, projecoes] = await Promise.all([getLancs(), calcularProjecoes()]);
+
+                const lancsP   = lancs.filter(l => l.data && l.data >= de && l.data <= ate);
+                const receitas = lancsP.filter(l=>l.tipo==='receita').reduce((s,l)=>s+l.valor,0);
+                const despesas = lancsP.filter(l=>l.tipo==='despesa').reduce((s,l)=>s+l.valor,0);
+                const comissoes= lancsP.filter(l=>l.tipo==='receita'&&l.origem_integracao==='venda').reduce((s,l)=>s+l.valor,0);
+                const outrasRec= receitas - comissoes;
+                const resultado= receitas - despesas;
+                const totalProj= projecoes.reduce((s,p)=>s+p.comissaoPonderada,0);
+
+                const el = document.getElementById('fin-resumo-periodo');
+                if (!el) return;
+
+                const row = (icon, label, val, cor) =>
+                    `<div class="fin-resumo-linha">
+                        <div class="fin-resumo-label"><i class="fas fa-${icon}" style="color:${cor};width:14px;"></i>${label}</div>
+                        <div class="fin-resumo-val" style="color:${cor};">${val}</div>
+                    </div>`;
+
+                el.innerHTML = `
+                <div class="fin-resumo-card">
+                    <div class="fin-resumo-titulo">Resumo do período (${labelPeriodo()})</div>
+                    ${row('handshake','Comissões realizadas', '+'+br(comissoes), 'var(--accent)')}
+                    ${row('plus-circle','Outras receitas', '+'+br(outrasRec), 'var(--primary)')}
+                    ${row('minus-circle','Despesas', '-'+br(despesas), 'var(--danger)')}
+                    ${row('equals','Resultado líquido', (resultado>=0?'+':'')+br(resultado), resultado>=0?'var(--accent)':'var(--danger)')}
+                    ${row('binoculars','Projeção pipeline (pond.)', '~'+br(totalProj), 'var(--amber)')}
+                </div>`;
+            }
+
+            // ── Renderiza todos os gráficos da aba Visão Geral ───────────
+            async function renderGraficos() {
+                await Promise.all([
+                    renderConvKPIs(),
+                    renderGraficoReceitasDespesas(),
+                    renderGraficoFunil(),
+                    renderGraficoDonut()
+                ]);
+            }
+
+            // ── KPIs de Conversão ─────────────────────────────────────────
+            async function renderConvKPIs() {
+                const el = document.getElementById('fin-conv-kpis');
+                if (!el) return;
+
+                const clientes  = UI.data.clientes || await DB.getAll('clientes');
+                const lancs     = await getLancs();
+
+                // Taxa de conversão Lead → Venda (total histórico)
+                const totalLeads  = clientes.length;
+                const totalVendas = clientes.filter(c => c.etapaFunil === 'venda').length;
+                const taxaConv    = totalLeads > 0 ? (totalVendas / totalLeads * 100) : 0;
+
+                // Ticket médio de comissão (todos os lançamentos reais)
+                const comissoes  = lancs.filter(l => l.origem_integracao === 'venda' && l.valor > 0);
+                const ticketMedio = comissoes.length > 0
+                    ? comissoes.reduce((s,l) => s + l.valor, 0) / comissoes.length : 0;
+
+                // Ciclo médio (dias lead → venda)
+                const clientesVendidos = clientes.filter(c =>
+                    c.etapaFunil === 'venda' && c.dataEntradaFunil && c.dataCriacao
+                );
+                let cicloMedio = 0;
+                if (clientesVendidos.length > 0) {
+                    const totalDias = clientesVendidos.reduce((s, c) => {
+                        const criacao = new Date(c.dataCriacao);
+                        const entrada = new Date(c.dataEntradaFunil + 'T12:00:00');
+                        return s + Math.max(0, Math.round((entrada - criacao) / 86400000));
+                    }, 0);
+                    cicloMedio = Math.round(totalDias / clientesVendidos.length);
+                }
+
+                // Pipeline ativo (em negociação)
+                const EXCLUIDAS  = new Set(['lead', 'contato', 'cpf', 'venda']);
+                const PALAVRAS_I = ['inativ','adiado','adiada','cancelado','cancelada','desistiu','perdido','perdida','encerrado','encerrada'];
+                const etapas     = UI.data.funilEtapas || [];
+                const emNeg = clientes.filter(c => {
+                    if (EXCLUIDAS.has(c.etapaFunil)) return false;
+                    const etObj = etapas.find(e => e.id === c.etapaFunil);
+                    const nome  = (etObj?.nome || c.etapaFunil).toLowerCase();
+                    return !PALAVRAS_I.some(p => nome.includes(p) || c.etapaFunil.includes(p));
+                });
+
+                const cell = (val, lbl, cor, icon, extra='') => `
+                    <div class="fin-conv-cell">
+                        <div class="fin-conv-val" style="color:${cor};">${val}</div>
+                        <div class="fin-conv-lbl"><i class="fas fa-${icon}" style="margin-right:4px;color:${cor};opacity:0.7;"></i>${lbl}</div>
+                        ${extra ? `<div class="fin-conv-trend" style="color:${cor};">${extra}</div>` : ''}
+                    </div>`;
+
+                el.innerHTML =
+                    cell(taxaConv.toFixed(1)+'%', 'Taxa de Conversão', 'var(--primary)', 'percent',
+                         `<i class="fas fa-users"></i> ${totalLeads} leads · ${totalVendas} vendas`) +
+                    cell(br(ticketMedio), 'Ticket Médio', 'var(--accent)', 'hand-holding-usd',
+                         comissoes.length > 0 ? `<i class="fas fa-hashtag"></i> ${comissoes.length} comissões` : 'Sem dados') +
+                    cell(cicloMedio > 0 ? cicloMedio+'d' : '—', 'Ciclo Médio', 'var(--info)', 'clock',
+                         cicloMedio > 0 ? `<i class="fas fa-route"></i> dias lead→venda` : 'Sem dados') +
+                    cell(emNeg.length, 'Em Negociação', 'var(--amber)', 'fire',
+                         `<i class="fas fa-chart-line"></i> pipeline ativo`);
+            }
+
+            // ── Gráfico: Receitas vs Despesas (últimos 12 meses) ──────────
+            async function renderGraficoReceitasDespesas() {
+                const el = document.getElementById('fin-chart-receitas');
+                if (!el) return;
+
+                const lancs = await getLancs();
+                const now   = new Date();
+                const meses = [];
+                for (let i = 11; i >= 0; i--) {
+                    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    meses.push({
+                        key:   `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,
+                        label: d.toLocaleString('pt-BR', { month: 'short' }).replace('.','')
+                    });
+                }
+
+                const dados = meses.map(m => {
+                    const lancsM = lancs.filter(l => l.data && l.data.startsWith(m.key));
+                    const rec  = lancsM.filter(l => l.tipo==='receita').reduce((s,l)=>s+l.valor,0);
+                    const desp = lancsM.filter(l => l.tipo==='despesa').reduce((s,l)=>s+l.valor,0);
+                    const comm = lancsM.filter(l => l.tipo==='receita'&&l.origem_integracao==='venda').reduce((s,l)=>s+l.valor,0);
+                    return { label: m.label, rec, desp, comm };
+                });
+
+                const maxVal = Math.max(...dados.map(d => Math.max(d.rec, d.desp)), 1);
+                const H = 80;
+
+                const barras = dados.map(d => {
+                    const hRec  = Math.max(3, Math.round((d.rec  / maxVal) * H));
+                    const hDesp = Math.max(3, Math.round((d.desp / maxVal) * H));
+                    const hComm = d.comm > 0 ? Math.max(2, Math.round((d.comm / maxVal) * H)) : 0;
+                    return `
+                    <div class="fin-bar-group">
+                        <div class="fin-bar-vals">
+                            <div class="fin-bar-col" style="width:9px;height:${hRec}px;background:var(--primary);opacity:0.85;" data-tip="Rec: ${br(d.rec)}"></div>
+                            ${hComm > 0
+                                ? `<div class="fin-bar-col" style="width:6px;height:${hComm}px;background:var(--accent);" data-tip="Com: ${br(d.comm)}"></div>`
+                                : '<div style="width:6px;"></div>'}
+                            <div class="fin-bar-col" style="width:9px;height:${hDesp}px;background:var(--danger);opacity:0.75;" data-tip="Desp: ${br(d.desp)}"></div>
+                        </div>
+                        <div class="fin-bar-lbl">${d.label}</div>
+                    </div>`;
+                }).join('');
+
+                el.innerHTML = `
+                <div class="fin-chart-titulo"><i class="fas fa-chart-bar" style="color:var(--primary);"></i> Receitas × Despesas — 12 meses</div>
+                <div class="fin-chart-sub">Azul = receitas · Verde = comissões · Vermelho = despesas. Passe o mouse sobre as barras.</div>
+                <div class="fin-chart-legenda">
+                    <div class="fin-chart-leg-item"><div class="fin-chart-leg-dot" style="background:var(--primary);"></div>Receitas</div>
+                    <div class="fin-chart-leg-item"><div class="fin-chart-leg-dot" style="background:var(--accent);"></div>Comissões</div>
+                    <div class="fin-chart-leg-item"><div class="fin-chart-leg-dot" style="background:var(--danger);opacity:0.75;"></div>Despesas</div>
+                </div>
+                <div class="fin-bars-wrap" style="height:${H+24}px;align-items:flex-end;">${barras}</div>`;
+            }
+
+            // ── Gráfico: Funil de conversão por etapa ─────────────────────
+            async function renderGraficoFunil() {
+                const el = document.getElementById('fin-chart-funil');
+                if (!el) return;
+
+                const clientes = UI.data.clientes || await DB.getAll('clientes');
+                const etapas   = (UI.data.funilEtapas || [])
+                    .slice().sort((a,b) => (a.ordem||0)-(b.ordem||0))
+                    .filter(e => e.id !== 'venda');
+
+                if (!etapas.length) { el.innerHTML = ''; return; }
+
+                const totalGeral = clientes.length || 1;
+                const vendas     = clientes.filter(c => c.etapaFunil === 'venda').length;
+
+                const linhas = etapas.map((etapa, idx) => {
+                    const count    = clientes.filter(c => c.etapaFunil === etapa.id).length;
+                    const pctTotal = Math.round(count / totalGeral * 100);
+                    const cor      = etapa.cor || 'var(--primary)';
+                    const prevEtapa= etapas[idx - 1];
+                    const prevCount= prevEtapa
+                        ? clientes.filter(c => c.etapaFunil === prevEtapa.id).length
+                        : totalGeral;
+                    const taxaEtapa= prevCount > 0 ? Math.round(count / prevCount * 100) : 0;
+                    const convCor  = taxaEtapa >= 50 ? '#27AE60' : taxaEtapa >= 20 ? '#E67E22' : '#E74C3C';
+                    return `
+                    <div class="fin-funnel-row">
+                        <div class="fin-funnel-header">
+                            <div class="fin-funnel-label">
+                                <div style="width:8px;height:8px;border-radius:2px;background:${cor};flex-shrink:0;"></div>
+                                ${etapa.nome}
+                            </div>
+                            <div class="fin-funnel-vals">
+                                <span class="fin-funnel-count">${count}</span>
+                                ${idx > 0 ? `<span class="fin-funnel-conv" style="background:${convCor}18;color:${convCor};">${taxaEtapa}%</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="fin-funnel-track">
+                            <div class="fin-funnel-fill" style="width:${Math.max(pctTotal, count>0?2:0)}%;background:${cor};opacity:0.8;"></div>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                const taxaFinal = (vendas / totalGeral * 100).toFixed(1);
+                const vendaLinha = `
+                <div class="fin-funnel-row" style="margin-top:6px;padding-top:8px;border-top:1px dashed var(--border);">
+                    <div class="fin-funnel-header">
+                        <div class="fin-funnel-label">
+                            <div style="width:8px;height:8px;border-radius:2px;background:var(--primary-dark);flex-shrink:0;"></div>
+                            <strong>Venda Concluída</strong>
+                        </div>
+                        <div class="fin-funnel-vals">
+                            <span class="fin-funnel-count">${vendas}</span>
+                            <span class="fin-funnel-conv" style="background:var(--primary-ultra);color:var(--primary);font-weight:900;">${taxaFinal}% total</span>
+                        </div>
+                    </div>
+                    <div class="fin-funnel-track">
+                        <div class="fin-funnel-fill" style="width:${Math.max(parseFloat(taxaFinal),vendas>0?2:0)}%;background:var(--primary-dark);"></div>
+                    </div>
+                </div>`;
+
+                el.innerHTML = `
+                <div class="fin-chart-titulo"><i class="fas fa-filter" style="color:var(--primary);"></i> Taxa de Conversão por Etapa do Funil</div>
+                <div class="fin-chart-sub">Largura da barra = % do total de clientes · Badge % = conversão da etapa anterior</div>
+                ${linhas}${vendaLinha}`;
+            }
+
+            // ── Gráfico: Composição de receitas (donut SVG) ───────────────
+            async function renderGraficoDonut() {
+                const el = document.getElementById('fin-chart-donut');
+                if (!el) return;
+
+                const lancs = await getLancs();
+                const { de, ate } = getPeriodoDates();
+                const lancsP = lancs.filter(l => l.data && l.data >= de && l.data <= ate && l.tipo === 'receita');
+
+                const grupos = {};
+                lancsP.forEach(l => {
+                    const cat   = l.origem_integracao === 'venda' ? 'Comissão de Venda'
+                                : (l.categoria || 'outros');
+                    const label = cat.charAt(0).toUpperCase() + cat.slice(1).replace(/_/g,' ');
+                    grupos[label] = (grupos[label] || 0) + l.valor;
+                });
+
+                const total = Object.values(grupos).reduce((s,v)=>s+v,0);
+                if (total <= 0) { el.innerHTML = ''; return; }
+
+                const CORES = ['#1D6FA4','#27AE60','#E67E22','#7C3AED','#0891B2','#EC4899','#F59E0B'];
+                const items = Object.entries(grupos)
+                    .sort((a,b)=>b[1]-a[1])
+                    .map(([label, val], i) => ({ label, val, pct: val/total, cor: CORES[i%CORES.length] }));
+
+                const R = 36, CX = 42, CY = 42, SW = 12;
+                const circum = 2 * Math.PI * R;
+                let offset = 0;
+                const arcos = items.map(item => {
+                    const dash = item.pct * circum;
+                    const arc  = `<circle cx="${CX}" cy="${CY}" r="${R}" fill="none"
+                        stroke="${item.cor}" stroke-width="${SW}"
+                        stroke-dasharray="${dash.toFixed(2)} ${(circum-dash).toFixed(2)}"
+                        stroke-dashoffset="${(-offset).toFixed(2)}" />`;
+                    offset += dash;
+                    return arc;
+                }).join('');
+
+                const legendRows = items.map(item => `
+                <div class="fin-donut-leg-row">
+                    <div class="fin-donut-leg-label">
+                        <div style="width:9px;height:9px;border-radius:2px;background:${item.cor};flex-shrink:0;"></div>
+                        ${item.label}
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:0.63rem;color:var(--text-muted);font-weight:700;">${Math.round(item.pct*100)}%</span>
+                        <span class="fin-donut-leg-val">${br(item.val)}</span>
+                    </div>
+                </div>`).join('');
+
+                el.innerHTML = `
+                <div class="fin-chart-titulo"><i class="fas fa-chart-pie" style="color:var(--primary);"></i> Composição de Receitas</div>
+                <div class="fin-chart-sub">Distribuição por categoria no período selecionado</div>
+                <div class="fin-donut-wrap">
+                    <div style="position:relative;flex-shrink:0;">
+                        <svg width="84" height="84" viewBox="0 0 84 84" style="transform:rotate(-90deg);display:block;">
+                            <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="var(--border)" stroke-width="${SW}" />
+                            ${arcos}
+                        </svg>
+                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;">
+                            <div style="font-size:0.55rem;color:var(--text-muted);font-weight:700;line-height:1.2;">TOTAL</div>
+                            <div style="font-size:0.68rem;font-weight:900;color:var(--dark);line-height:1.2;">${br(total)}</div>
+                        </div>
+                    </div>
+                    <div class="fin-donut-legend">${legendRows}</div>
+                </div>`;
+            }
+
+            // ── Switch tab ────────────────────────────────────────────────
+            function switchTab(tab, btn) {
+                _tabAtual = tab;
+                document.querySelectorAll('#fin-tabs .fin-tab-pro').forEach(b => b.classList.remove('active'));
+                if (btn) btn.classList.add('active');
+                document.querySelectorAll('#financeiro-view .fin-panel').forEach(p => p.classList.remove('active'));
+                const panel = document.getElementById('fin-tab-' + tab);
+                if (panel) panel.classList.add('active');
+            }
+            const CONTA_ICONES = {
+                corrente:'🏦', poupanca:'🐷', carteira:'👜', digital:'📱', credito:'💳', outro:'📂'
+            };
+
+            function abrirModalConta(id) {
+                document.getElementById('fin-conta-id').value = id || '';
+                document.getElementById('fin-conta-nome').value = '';
+                document.getElementById('fin-conta-saldo').value = '';
+                document.getElementById('fin-conta-tipo').value = 'corrente';
+                document.getElementById('fin-conta-cor').value = '#1D6FA4';
+                document.querySelectorAll('.fin-cor-btn').forEach(b => b.classList.remove('active'));
+                const first = document.querySelector('.fin-cor-btn[data-cor="#1D6FA4"]');
+                if (first) first.classList.add('active');
+
+                if (id) {
+                    DB.get('fin_contas', id).then(c => {
+                        if (!c) return;
+                        document.getElementById('fin-conta-titulo').textContent = 'Editar Conta';
+                        document.getElementById('fin-conta-nome').value = c.nome || '';
+                        document.getElementById('fin-conta-tipo').value = c.tipo || 'corrente';
+                        document.getElementById('fin-conta-saldo').value = c.saldoInicial ? Utils.formatMoneyField(c.saldoInicial) : '';
+                        document.getElementById('fin-conta-cor').value = c.cor || '#1D6FA4';
+                        document.querySelectorAll('.fin-cor-btn').forEach(b => b.classList.remove('active'));
+                        const btn = document.querySelector(`.fin-cor-btn[data-cor="${c.cor}"]`);
+                        if (btn) btn.classList.add('active');
+                    });
+                } else {
+                    document.getElementById('fin-conta-titulo').textContent = 'Nova Conta';
+                }
+                UI.openModal('fin-conta');
+            }
+
+            async function salvarConta(e) {
+                e.preventDefault();
+                const id    = document.getElementById('fin-conta-id').value || Utils.id();
+                const nome  = document.getElementById('fin-conta-nome').value.trim();
+                const tipo  = document.getElementById('fin-conta-tipo').value;
+                const saldo = parseV(document.getElementById('fin-conta-saldo').value);
+                const cor   = document.getElementById('fin-conta-cor').value || '#1D6FA4';
+                await DB.put('fin_contas', { id, nome, tipo, saldoInicial: saldo, cor, dataCriacao: new Date().toISOString() });
+                Utils.toast('Conta salva!');
+                UI.closeModals();
+                await renderContas();
+                await renderKPI();
+                popularSelectsContas();
+            }
+
+            async function renderContas() {
+                const contas = await getContas();
+                const el = document.getElementById('fin-lista-contas');
+                if (!el) return;
+                if (!contas.length) {
+                    el.innerHTML = `<div class="fin-empty"><div class="fin-empty-icon">🏦</div><div class="fin-empty-titulo">Nenhuma conta cadastrada</div><div class="fin-empty-sub">Adicione suas contas bancárias, carteiras e cartões.</div><button class="fin-empty-cta" onclick="Financeiro.abrirModalConta()"><i class="fas fa-plus"></i> Adicionar Conta</button></div>`;
+                    return;
+                }
+                let html = '';
+                for (const c of contas) {
+                    const s = await saldoConta(c.id);
+                    const ic = CONTA_ICONES[c.tipo] || '🏦';
+                    html += `
+                    <div class="fin-card">
+                        <div class="fin-card-row">
+                            <div class="fin-conta-accent" style="background:${c.cor}22;">${ic}</div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="fin-card-nome">${c.nome}</div>
+                                <div class="fin-card-sub">${c.tipo.charAt(0).toUpperCase()+c.tipo.slice(1)}</div>
+                            </div>
+                            <div style="text-align:right;flex-shrink:0;">
+                                <div class="fin-card-saldo ${s<0?'fin-saldo-neg':'fin-saldo-pos'}">${br(s)}</div>
+                            </div>
+                        </div>
+                        <div class="fin-card-acoes">
+                            <button onclick="Financeiro.abrirTransferencia('${c.id}')" class="fin-acao-btn transf"><i class="fas fa-exchange-alt"></i> Transferir</button>
+                            <button onclick="Financeiro.abrirModalConta('${c.id}')" class="fin-acao-btn edit"><i class="fas fa-edit"></i></button>
+                            <button onclick="Financeiro.excluirConta('${c.id}')" class="fin-acao-btn del"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                }
+                el.innerHTML = html;
+            }
+
+            async function excluirConta(id) {
+                if (!confirm('Excluir esta conta? Os lançamentos vinculados permanecerão.')) return;
+                await DB.delete('fin_contas', id);
+                Utils.toast('Conta excluída.');
+                await renderContas();
+                await renderKPI();
+                popularSelectsContas();
+            }
+
+            // ════════════════════════════════════════
+            //  INVESTIMENTOS
+            // ════════════════════════════════════════
+            const INV_ICONES = {
+                renda_fixa:'📄', renda_variavel:'📊', tesouro:'🏛️', cdb:'🏦',
+                acoes:'📈', fundos:'🏢', cripto:'₿', imovel:'🏠', outro:'📂'
+            };
+
+            function abrirModalInvestimento(id) {
+                ['fin-inv-id','fin-inv-nome','fin-inv-valor','fin-inv-rendimento','fin-inv-vencimento','fin-inv-obs'].forEach(i => {
+                    const el = document.getElementById(i); if(el) el.value = '';
+                });
+                document.getElementById('fin-inv-tipo').value = 'renda_fixa';
+                if (id) {
+                    DB.get('fin_investimentos', id).then(inv => {
+                        if (!inv) return;
+                        document.getElementById('fin-inv-titulo').textContent = 'Editar Investimento';
+                        document.getElementById('fin-inv-id').value = inv.id;
+                        document.getElementById('fin-inv-nome').value = inv.nome || '';
+                        document.getElementById('fin-inv-tipo').value = inv.tipo || 'renda_fixa';
+                        document.getElementById('fin-inv-valor').value = inv.valorInvestido ? Utils.formatMoneyField(inv.valorInvestido) : '';
+                        document.getElementById('fin-inv-rendimento').value = inv.rendimento || '';
+                        document.getElementById('fin-inv-vencimento').value = inv.vencimento || '';
+                        document.getElementById('fin-inv-obs').value = inv.obs || '';
+                    });
+                } else {
+                    document.getElementById('fin-inv-titulo').textContent = 'Novo Investimento';
+                }
+                UI.openModal('fin-investimento');
+            }
+
+            async function salvarInvestimento(e) {
+                e.preventDefault();
+                const id   = document.getElementById('fin-inv-id').value || Utils.id();
+                const nome = document.getElementById('fin-inv-nome').value.trim();
+                const tipo = document.getElementById('fin-inv-tipo').value;
+                const val  = parseV(document.getElementById('fin-inv-valor').value);
+                const rend = parseFloat(document.getElementById('fin-inv-rendimento').value) || 0;
+                const venc = document.getElementById('fin-inv-vencimento').value;
+                const obs  = document.getElementById('fin-inv-obs').value;
+                await DB.put('fin_investimentos', { id, nome, tipo, valorInvestido: val, rendimento: rend, vencimento: venc, obs, dataCriacao: new Date().toISOString() });
+                Utils.toast('Investimento salvo!');
+                UI.closeModals();
+                await renderInvestimentos();
+                await popularSelectsContas();
+            }
+
+            async function renderInvestimentos() {
+                const invs = await getInvs();
+                const el = document.getElementById('fin-lista-investimentos');
+                if (!el) return;
+                if (!invs.length) {
+                    el.innerHTML = `<div class="fin-empty"><div class="fin-empty-icon" style="background:var(--accent-ultra);">📈</div><div class="fin-empty-titulo">Nenhum investimento cadastrado</div><div class="fin-empty-sub">Registre suas aplicações em renda fixa, ações, fundos e outros ativos.</div><button class="fin-empty-cta" style="background:var(--accent);" onclick="Financeiro.abrirModalInvestimento()"><i class="fas fa-plus"></i> Adicionar Investimento</button></div>`;
+                    return;
+                }
+                let html = '';
+                for (const inv of invs) {
+                    const s = await saldoInvestimento(inv.id);
+                    const ic = INV_ICONES[inv.tipo] || '📂';
+                    const rendTxt = inv.rendimento ? `<span class="fin-rend-badge">${inv.rendimento}% a.a.</span>` : '';
+                    const vencTxt = inv.vencimento ? `<div style="font-size:0.70rem;color:var(--text-muted);margin-top:2px;"><i class="fas fa-calendar-alt" style="margin-right:3px;"></i>Vence: ${Utils.formatDate(inv.vencimento)}</div>` : '';
+                    html += `
+                    <div class="fin-card">
+                        <div class="fin-card-row">
+                            <div class="fin-conta-accent" style="background:var(--accent-ultra);">${ic}</div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="fin-card-nome">${inv.nome}</div>
+                                <div style="margin-top:3px;">${rendTxt}</div>
+                                ${vencTxt}
+                                ${inv.obs ? `<div class="fin-card-sub" style="margin-top:2px;">${inv.obs}</div>` : ''}
+                            </div>
+                            <div style="text-align:right;flex-shrink:0;">
+                                <div class="fin-card-saldo fin-saldo-pos">${br(s)}</div>
+                            </div>
+                        </div>
+                        <div class="fin-card-acoes">
+                            <button onclick="Financeiro.abrirTransferencia('${inv.id}')" class="fin-acao-btn transf"><i class="fas fa-exchange-alt"></i> Aportar</button>
+                            <button onclick="Financeiro.abrirModalInvestimento('${inv.id}')" class="fin-acao-btn edit"><i class="fas fa-edit"></i></button>
+                            <button onclick="Financeiro.excluirInvestimento('${inv.id}')" class="fin-acao-btn del"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                }
+                el.innerHTML = html;
+            }
+
+            async function excluirInvestimento(id) {
+                if (!confirm('Excluir este investimento?')) return;
+                await DB.delete('fin_investimentos', id);
+                Utils.toast('Investimento excluído.');
+                await renderInvestimentos();
+                popularSelectsContas();
+            }
+
+            // ════════════════════════════════════════
+            //  METAS
+            // ════════════════════════════════════════
+            function abrirModalMeta(id) {
+                ['fin-meta-id','fin-meta-nome','fin-meta-valor','fin-meta-guardado','fin-meta-prazo'].forEach(i => {
+                    const el = document.getElementById(i); if(el) el.value = '';
+                });
+                document.getElementById('fin-meta-emoji').value = '🎯';
+                document.querySelectorAll('.fin-emoji-btn').forEach(b => b.classList.remove('active'));
+                const first = document.querySelector('.fin-emoji-btn[data-emoji="🎯"]');
+                if (first) first.classList.add('active');
+
+                if (id) {
+                    DB.get('fin_metas', id).then(m => {
+                        if (!m) return;
+                        document.getElementById('fin-meta-titulo').textContent = 'Editar Meta';
+                        document.getElementById('fin-meta-id').value = m.id;
+                        document.getElementById('fin-meta-nome').value = m.nome || '';
+                        document.getElementById('fin-meta-valor').value = m.valorTotal ? Utils.formatMoneyField(m.valorTotal) : '';
+                        document.getElementById('fin-meta-guardado').value = m.guardado ? Utils.formatMoneyField(m.guardado) : '';
+                        document.getElementById('fin-meta-prazo').value = m.prazo || '';
+                        document.getElementById('fin-meta-emoji').value = m.emoji || '🎯';
+                        document.querySelectorAll('.fin-emoji-btn').forEach(b => b.classList.remove('active'));
+                        const btn = document.querySelector(`.fin-emoji-btn[data-emoji="${m.emoji}"]`);
+                        if (btn) btn.classList.add('active');
+                    });
+                } else {
+                    document.getElementById('fin-meta-titulo').textContent = 'Nova Meta';
+                }
+                UI.openModal('fin-meta');
+            }
+
+            async function salvarMeta(e) {
+                e.preventDefault();
+                const id     = document.getElementById('fin-meta-id').value || Utils.id();
+                const nome   = document.getElementById('fin-meta-nome').value.trim();
+                const total  = parseV(document.getElementById('fin-meta-valor').value);
+                const guarda = parseV(document.getElementById('fin-meta-guardado').value);
+                const prazo  = document.getElementById('fin-meta-prazo').value;
+                const emoji  = document.getElementById('fin-meta-emoji').value || '🎯';
+                await DB.put('fin_metas', { id, nome, valorTotal: total, guardado: guarda, prazo, emoji, dataCriacao: new Date().toISOString() });
+                Utils.toast('Meta salva!');
+                UI.closeModals();
+                await renderMetas();
+                popularSelectsContas();
+            }
+
+            async function renderMetas() {
+                const metas = await getMetas();
+                const el = document.getElementById('fin-lista-metas');
+                if (!el) return;
+                if (!metas.length) {
+                    el.innerHTML = `<div class="fin-empty"><div class="fin-empty-icon" style="background:rgba(124,58,237,0.10);">🎯</div><div class="fin-empty-titulo">Nenhuma meta definida</div><div class="fin-empty-sub">Defina metas de poupança para viagens, emergências, imóveis ou qualquer objetivo.</div><button class="fin-empty-cta" style="background:#7C3AED;" onclick="Financeiro.abrirModalMeta()"><i class="fas fa-plus"></i> Criar Meta</button></div>`;
+                    return;
+                }
+                let html = '';
+                for (const m of metas) {
+                    const guardado = await saldoMeta(m.id);
+                    const pct = m.valorTotal > 0 ? Math.min(100, (guardado / m.valorTotal) * 100) : 0;
+                    const falta = Math.max(0, m.valorTotal - guardado);
+                    const prazoTxt = m.prazo ? `<div class="fin-card-sub" style="margin-top:2px;"><i class="fas fa-calendar-alt" style="margin-right:3px;"></i>Prazo: ${Utils.formatDate(m.prazo)}</div>` : '';
+                    const gradBar = pct >= 100 ? 'var(--accent)' : 'linear-gradient(90deg,var(--primary),#7C3AED)';
+                    html += `
+                    <div class="fin-card">
+                        <div class="fin-card-row">
+                            <div class="fin-conta-accent" style="background:rgba(124,58,237,0.10);font-size:1.45rem;">${m.emoji||'🎯'}</div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="fin-card-nome">${m.nome}</div>
+                                ${prazoTxt}
+                            </div>
+                            <div style="text-align:right;flex-shrink:0;">
+                                <div class="fin-card-sub">Meta: ${br(m.valorTotal)}</div>
+                                <div style="font-size:1.0rem;font-weight:900;color:#7C3AED;">${br(guardado)}</div>
+                            </div>
+                        </div>
+                        <div class="fin-meta-progress-track">
+                            <div class="fin-meta-progress-fill" style="width:${pct}%;background:${gradBar};"></div>
+                        </div>
+                        <div class="fin-meta-pct-row">
+                            <span class="fin-meta-pct-val">${pct.toFixed(0)}% concluído</span>
+                            <span class="fin-meta-pct-rest">Falta ${br(falta)}</span>
+                        </div>
+                        <div class="fin-card-acoes" style="margin-top:10px;padding-top:10px;">
+                            <button onclick="Financeiro.abrirTransferencia('${m.id}')" class="fin-acao-btn transf" style="background:rgba(124,58,237,0.08);border-color:rgba(124,58,237,0.25);color:#7C3AED;"><i class="fas fa-plus"></i> Aportar</button>
+                            <button onclick="Financeiro.abrirModalMeta('${m.id}')" class="fin-acao-btn edit"><i class="fas fa-edit"></i></button>
+                            <button onclick="Financeiro.excluirMeta('${m.id}')" class="fin-acao-btn del"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                }
+                el.innerHTML = html;
+            }
+
+            async function excluirMeta(id) {
+                if (!confirm('Excluir esta meta?')) return;
+                await DB.delete('fin_metas', id);
+                Utils.toast('Meta excluída.');
+                await renderMetas();
+                popularSelectsContas();
+            }
+
+            // ════════════════════════════════════════
+            //  LANÇAMENTOS
+            // ════════════════════════════════════════
+            const CAT_ICONES = {
+                alimentacao:'🍽️', moradia:'🏠', transporte:'🚗', saude:'🏥', educacao:'🎓',
+                lazer:'🎉', vestuario:'👔', salario:'💰', investimento:'📈',
+                comissao_venda:'🏡', outros:'📂', '':'📋'
+            };
+
+            function abrirModalLancamento(id) {
+                document.getElementById('fin-lanc-id').value = id || '';
+                document.getElementById('fin-lanc-desc').value = '';
+                document.getElementById('fin-lanc-valor').value = '';
+                document.getElementById('fin-lanc-data').value = today();
+                document.getElementById('fin-lanc-obs').value = '';
+                document.getElementById('fin-lanc-categoria').value = '';
+                document.getElementById('fin-lanc-parcelado').checked = false;
+                document.getElementById('fin-lanc-num-parcelas').value = 2;
+                document.getElementById('fin-lanc-parcelas-grupo').style.display = 'none';
+                selecionarTipoLanc('receita');
+
+                if (id) {
+                    DB.get('fin_lancamentos', id).then(l => {
+                        if (!l) return;
+                        document.getElementById('fin-lanc-titulo').textContent = 'Editar Lançamento';
+                        document.getElementById('fin-lanc-id').value = l.id;
+                        document.getElementById('fin-lanc-desc').value = l.desc || '';
+                        document.getElementById('fin-lanc-valor').value = l.valor ? Utils.formatMoneyField(l.valor) : '';
+                        document.getElementById('fin-lanc-data').value = l.data || today();
+                        document.getElementById('fin-lanc-obs').value = l.obs || '';
+                        document.getElementById('fin-lanc-categoria').value = l.categoria || '';
+                        selecionarTipoLanc(l.tipo || 'receita');
+                        if (l.contaId) document.getElementById('fin-lanc-conta').value = l.contaId;
+                    });
+                } else {
+                    document.getElementById('fin-lanc-titulo').textContent = 'Novo Lançamento';
+                }
+                UI.openModal('fin-lancamento');
+            }
+
+            function selecionarTipoLanc(tipo) {
+                ['receita','despesa','transferencia'].forEach(t => {
+                    const btn = document.getElementById('fin-lanc-btn-'+t);
+                    if (btn) btn.classList.toggle('active', t===tipo);
+                });
+                document.getElementById('fin-lanc-tipo').value = tipo;
+                const contaGrp = document.getElementById('fin-lanc-conta-grupo');
+                const transfGrp = document.getElementById('fin-lanc-transf-grupo');
+                if (contaGrp)  contaGrp.style.display  = tipo !== 'transferencia' ? '' : 'none';
+                if (transfGrp) transfGrp.style.display = tipo === 'transferencia' ? '' : 'none';
+            }
+
+            function toggleParcelamento(cb) {
+                const g = document.getElementById('fin-lanc-parcelas-grupo');
+                if (g) g.style.display = cb.checked ? '' : 'none';
+            }
+
+            function atualizarDestinosTransf() {
+                const origem = document.getElementById('fin-lanc-transf-origem')?.value;
+                const dest   = document.getElementById('fin-lanc-transf-destino');
+                if (!dest) return;
+                Array.from(dest.options).forEach(o => {
+                    o.disabled = o.value === origem;
+                });
+            }
+
+            async function salvarLancamento(e) {
+                e.preventDefault();
+                const id    = document.getElementById('fin-lanc-id').value || Utils.id();
+                const tipo  = document.getElementById('fin-lanc-tipo').value;
+                const desc  = document.getElementById('fin-lanc-desc').value.trim();
+                const valor = parseV(document.getElementById('fin-lanc-valor').value);
+                const data  = document.getElementById('fin-lanc-data').value || today();
+                const obs   = document.getElementById('fin-lanc-obs').value;
+                const cat   = document.getElementById('fin-lanc-categoria').value;
+                const base  = { id, tipo, desc, valor, data, obs, categoria: cat, dataCriacao: new Date().toISOString() };
+
+                if (tipo === 'transferencia') {
+                    base.origem  = document.getElementById('fin-lanc-transf-origem')?.value;
+                    base.destino = document.getElementById('fin-lanc-transf-destino')?.value;
+                } else {
+                    base.contaId = document.getElementById('fin-lanc-conta')?.value || null;
+                }
+
+                const parcelado = document.getElementById('fin-lanc-parcelado')?.checked;
+                if (parcelado && tipo !== 'transferencia') {
+                    const numParc = parseInt(document.getElementById('fin-lanc-num-parcelas')?.value) || 2;
+                    const groupId = Utils.id();
+                    for (let i = 0; i < numParc; i++) {
+                        const d = new Date(data + 'T12:00:00');
+                        d.setMonth(d.getMonth() + i);
+                        const parcData = d.toISOString().split('T')[0];
+                        const lanc = { ...base, id: i === 0 ? id : Utils.id(), data: parcData, groupId, parcelaNum: i+1, totalParcelas: numParc,
+                            desc: `${desc} (${i+1}/${numParc})` };
+                        await DB.put('fin_lancamentos', lanc);
+                    }
+                    Utils.toast(`${numParc} parcelas criadas!`);
+                } else {
+                    await DB.put('fin_lancamentos', { ...base, id });
+                    Utils.toast('Lançamento salvo!');
+                }
+                UI.closeModals();
+                await renderLancamentos();
+                await renderContas();
+                await renderKPI();
+                await renderVisaoGeral();
+            }
+
+            async function renderLancamentos() {
+                const { de, ate } = getPeriodoDates();
+                const all    = await getLancs();
+                const tipoF  = document.getElementById('fin-filtro-tipo')?.value || '';
+                const contaF = document.getElementById('fin-filtro-conta')?.value || '';
+                // Se há filtro de mês manual, usa ele; senão usa o período selecionado
+                const mesF   = document.getElementById('fin-filtro-mes')?.value || '';
+
+                let lista = all.slice().sort((a,b) => (b.data||'').localeCompare(a.data||''));
+                if (tipoF)   lista = lista.filter(l => l.tipo === tipoF);
+                if (contaF)  lista = lista.filter(l => l.contaId===contaF || l.origem===contaF || l.destino===contaF);
+                if (mesF) {
+                    lista = lista.filter(l => l.data && l.data.startsWith(mesF));
+                } else {
+                    lista = lista.filter(l => l.data && l.data >= de && l.data <= ate);
+                }
+
+                const el = document.getElementById('fin-lista-lancamentos');
+                if (!el) return;
+                if (!lista.length) {
+                    el.innerHTML = `<div class="fin-empty"><div class="fin-empty-icon">📋</div><div class="fin-empty-titulo">Nenhum lançamento encontrado</div><div class="fin-empty-sub">Registre suas receitas, despesas e transferências.</div><button class="fin-empty-cta" onclick="Financeiro.abrirModalLancamento()"><i class="fas fa-plus"></i> Novo Lançamento</button></div>`;
+                    return;
+                }
+
+                const grupos = {};
+                lista.forEach(l => {
+                    const d = l.data || '0000-00-00';
+                    if (!grupos[d]) grupos[d] = [];
+                    grupos[d].push(l);
+                });
+
+                const [contas, invs, metas] = await Promise.all([getContas(), getInvs(), getMetas()]);
+                const nomeConta = id => {
+                    const c = contas.find(x=>x.id===id);
+                    if(c) return c.nome;
+                    const inv = invs.find(x=>x.id===id);
+                    if(inv) return inv.nome;
+                    const m = metas.find(x=>x.id===id);
+                    if(m) return m.nome;
+                    return id ? '—' : 'Sem conta';
+                };
+
+                let html = '';
+                Object.keys(grupos).sort((a,b)=>b.localeCompare(a)).forEach(data => {
+                    html += `<div class="fin-secao-data">${Utils.formatDate(data)}</div>`;
+                    grupos[data].forEach(l => {
+                        const isRec    = l.tipo==='receita';
+                        const isDes    = l.tipo==='despesa';
+                        const isTransf = l.tipo==='transferencia';
+                        const isComiss = l.origem_integracao === 'venda';
+                        const cor = isRec ? '#27AE60' : isDes ? '#E74C3C' : '#2980B9';
+                        const bg  = isRec ? 'rgba(39,174,96,0.1)' : isDes ? 'rgba(231,76,60,0.1)' : 'rgba(41,128,185,0.1)';
+                        const icone = isComiss ? '🏡' : isTransf ? '🔀' : (CAT_ICONES[l.categoria] || (isRec?'💚':'🔴'));
+                        const parcelaBadge = l.groupId ? `<span class="fin-badge-parcela"><i class="fas fa-layer-group"></i> ${l.parcelaNum||''}/${l.totalParcelas||''}</span>` : '';
+                        const comissBadge  = isComiss ? `<span class="fin-badge-parcela" style="background:var(--accent-ultra);color:var(--accent-dark);margin-left:4px;"><i class="fas fa-handshake"></i> Comissão</span>` : '';
+                        const contaNome = isTransf ? `${nomeConta(l.origem)} → ${nomeConta(l.destino)}` : nomeConta(l.contaId);
+                        html += `
+                        <div class="fin-lanc-item">
+                            <div class="fin-lanc-icon" style="background:${bg};color:${cor};">${icone}</div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-weight:700;font-size:0.88rem;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.desc}${parcelaBadge}${comissBadge}</div>
+                                <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:2px;">${contaNome}</div>
+                            </div>
+                            <div style="text-align:right;flex-shrink:0;margin-left:8px;">
+                                <div style="font-size:0.95rem;font-weight:800;color:${cor};">${isRec?'+':isDes?'-':''}${br(l.valor)}</div>
+                                <div style="display:flex;gap:5px;justify-content:flex-end;margin-top:5px;">
+                                    ${!isTransf && !l.groupId && !isComiss ? `<button onclick="Financeiro.abrirModalLancamento('${l.id}')" class="fin-acao-btn edit" style="padding:4px 8px;font-size:0.70rem;"><i class="fas fa-edit"></i></button>` : ''}
+                                    ${!isComiss ? `<button onclick="Financeiro.pedirExclusao('${l.id}')" class="fin-acao-btn del" style="padding:4px 8px;font-size:0.70rem;"><i class="fas fa-trash"></i></button>` : ''}
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                });
+                el.innerHTML = html;
+            }
+
+            // ── Exclusão inteligente de parcelas ──────────────────────────
+            async function pedirExclusao(id) {
+                const l = await DB.get('fin_lancamentos', id);
+                if (!l) return;
+                _delParcelaId      = id;
+                _delParcelaGroupId = l.groupId || null;
+                _delParcelaData    = l.data || null;
+                const infoEl = document.getElementById('fin-del-parcela-info');
+                const proxEl = document.getElementById('fin-del-proximas-count');
+                if (l.groupId) {
+                    const all = await getLancs();
+                    const proximas = all.filter(x => x.groupId === l.groupId && (x.data||'') >= (l.data||''));
+                    if (infoEl) infoEl.innerHTML = `<strong>${l.desc}</strong><br>Valor: ${br(l.valor)} · Data: ${Utils.formatDate(l.data)}<br>Parcela <strong>${l.parcelaNum||'?'}/${l.totalParcelas||'?'}</strong>`;
+                    if (proxEl) proxEl.textContent = `Remove esta e mais ${proximas.length-1} parcela(s) seguinte(s)`;
+                    const btn2 = document.getElementById('sheet-fin-del-parcela')?.querySelector('[onclick*="proximas"]');
+                    if (btn2) btn2.style.display = '';
+                } else {
+                    if (infoEl) infoEl.innerHTML = `<strong>${l.desc}</strong><br>Valor: ${br(l.valor)} · Data: ${Utils.formatDate(l.data)}`;
+                    const btn2 = document.getElementById('sheet-fin-del-parcela')?.querySelector('[onclick*="proximas"]');
+                    if (btn2) btn2.style.display = 'none';
+                }
+                UI.openModal('fin-del-parcela');
+            }
+
+            async function confirmarExclusaoParcela(modo) {
+                UI.closeModals();
+                const all = await getLancs();
+                if (modo === 'unica') {
+                    await DB.delete('fin_lancamentos', _delParcelaId);
+                } else {
+                    const para_del = all.filter(x =>
+                        x.groupId === _delParcelaGroupId && (x.data||'') >= (_delParcelaData||'')
+                    );
+                    for (const x of para_del) await DB.delete('fin_lancamentos', x.id);
+                }
+                Utils.toast('Lançamento(s) excluído(s).');
+                await renderLancamentos();
+                await renderContas();
+                await renderKPI();
+                await renderVisaoGeral();
+            }
+
+            // ── Transferência ─────────────────────────────────────────────
+            async function abrirTransferencia(contaOrigemId) {
+                document.getElementById('fin-transf-origem').value = contaOrigemId || '';
+                await atualizarDestinoTransfModal();
+                document.getElementById('fin-transf-valor').value = '';
+                document.getElementById('fin-transf-data').value  = today();
+                document.getElementById('fin-transf-desc').value  = '';
+                UI.openModal('fin-transferencia');
+            }
+
+            async function atualizarDestinoTransfModal() {
+                const orig  = document.getElementById('fin-transf-origem')?.value;
+                const dest  = document.getElementById('fin-transf-destino');
+                if (!dest) return;
+                const [contas, invs, metas] = await Promise.all([getContas(), getInvs(), getMetas()]);
+                const todas = [
+                    ...contas.map(c => ({ id:c.id, nome:c.nome, grupo:'Conta' })),
+                    ...invs.map(i   => ({ id:i.id, nome:i.nome, grupo:'Investimento' })),
+                    ...metas.map(m  => ({ id:m.id, nome:m.nome, grupo:'Meta' }))
+                ];
+                dest.innerHTML = todas.map(x =>
+                    `<option value="${x.id}" ${x.id===orig?'disabled':''}>[${x.grupo}] ${x.nome}</option>`
+                ).join('');
+            }
+
+            async function executarTransferencia(e) {
+                e.preventDefault();
+                const origem = document.getElementById('fin-transf-origem').value;
+                const destino = document.getElementById('fin-transf-destino').value;
+                const valor = parseV(document.getElementById('fin-transf-valor').value);
+                const data  = document.getElementById('fin-transf-data').value || today();
+                const desc  = document.getElementById('fin-transf-desc').value || 'Transferência';
+                if (!origem || !destino || valor <= 0) {
+                    Utils.toast('Preencha todos os campos.', 'error'); return;
+                }
+                await DB.put('fin_lancamentos', {
+                    id: Utils.id(), tipo: 'transferencia', desc, valor, data, origem, destino,
+                    dataCriacao: new Date().toISOString()
+                });
+                Utils.toast('Transferência realizada!');
+                UI.closeModals();
+                await renderContas();
+                await renderKPI();
+                await renderLancamentos();
+            }
+
+            // ── Selects de contas para lançamentos ────────────────────────
+            async function popularSelectsContas() {
+                const [contas, invs, metas] = await Promise.all([getContas(), getInvs(), getMetas()]);
+                const todas = [
+                    ...contas.map(c => ({ id:c.id, nome:c.nome })),
+                    ...invs.map(i   => ({ id:i.id, nome:i.nome })),
+                    ...metas.map(m  => ({ id:m.id, nome:m.nome }))
+                ];
+                ['fin-lanc-conta','fin-filtro-conta'].forEach(selId => {
+                    const sel = document.getElementById(selId);
+                    if (!sel) return;
+                    const prev = sel.value;
+                    sel.innerHTML = selId === 'fin-filtro-conta'
+                        ? '<option value="">Todas as contas</option>'
+                        : '<option value="">Sem conta específica</option>';
+                    todas.forEach(c => {
+                        sel.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+                    });
+                    if (prev) sel.value = prev;
+                });
+                ['fin-lanc-transf-origem','fin-transf-origem'].forEach(selId => {
+                    const sel = document.getElementById(selId);
+                    if (!sel) return;
+                    sel.innerHTML = todas.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+                });
+            }
+
+            function selecionarCor(btn) {
+                document.querySelectorAll('.fin-cor-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('fin-conta-cor').value = btn.dataset.cor;
+            }
+
+            function selecionarEmoji(btn) {
+                document.querySelectorAll('.fin-emoji-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('fin-meta-emoji').value = btn.dataset.emoji;
+            }
+
+            return {
+                init, switchTab,
+                togglePeriodoMenu, setPeriodo, aplicarPeriodoCustom,
+                registrarComissaoVenda, sincronizarVendasExistentes,
+                renderKPI, renderLancamentos, renderContas, renderInvestimentos, renderMetas,
+                renderVisaoGeral, renderGraficos,
+                abrirModalConta, salvarConta, excluirConta, selecionarCor,
+                abrirModalInvestimento, salvarInvestimento, excluirInvestimento,
+                abrirModalMeta, salvarMeta, excluirMeta, selecionarEmoji,
+                abrirModalLancamento, salvarLancamento, selecionarTipoLanc, toggleParcelamento,
+                atualizarDestinosTransf, atualizarDestinoTransfModal,
+                abrirTransferencia, executarTransferencia,
+                pedirExclusao, confirmarExclusaoParcela,
+                popularSelectsContas
+            };
+        })();
 
             // ── Estado interno ────────────────────────────────────────────
             let _tabAtual = 'contas';
@@ -32214,34 +34237,47 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 const lancsM = lancs.filter(l => l.data && l.data.startsWith(mes));
                 const receitas = lancsM.filter(l=>l.tipo==='receita').reduce((s,l)=>s+l.valor,0);
                 const despesas = lancsM.filter(l=>l.tipo==='despesa').reduce((s,l)=>s+l.valor,0);
+                const resultado = receitas - despesas;
+
+                // Atualiza label do mês no hero
+                const mesLabel = document.getElementById('fin-hero-mes-label');
+                if (mesLabel && mes) {
+                    const [y,m] = mes.split('-');
+                    const nomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+                    mesLabel.textContent = (nomes[parseInt(m,10)-1] || '') + ' ' + y;
+                }
 
                 const strip = document.getElementById('fin-kpi-strip');
                 if (!strip) return;
                 strip.innerHTML = `
-                    <div class="fin-kpi-chip">
-                        <div class="val">${br(totalContas)}</div>
-                        <div class="lbl">Saldo Total</div>
+                    <div class="fin-kpi-cell">
+                        <div class="fin-kpi-ico"><i class="fas fa-wallet"></i></div>
+                        <div class="fin-kpi-val${totalContas<0?' neg':''}">${br(totalContas)}</div>
+                        <div class="fin-kpi-lbl">Saldo Total</div>
                     </div>
-                    <div class="fin-kpi-chip">
-                        <div class="val" style="color:#6EE7B7;">${br(receitas)}</div>
-                        <div class="lbl">Receitas / mês</div>
+                    <div class="fin-kpi-cell">
+                        <div class="fin-kpi-ico"><i class="fas fa-arrow-up"></i></div>
+                        <div class="fin-kpi-val pos">${br(receitas)}</div>
+                        <div class="fin-kpi-lbl">Receitas / mês</div>
                     </div>
-                    <div class="fin-kpi-chip">
-                        <div class="val" style="color:#FCA5A5;">${br(despesas)}</div>
-                        <div class="lbl">Despesas / mês</div>
+                    <div class="fin-kpi-cell">
+                        <div class="fin-kpi-ico"><i class="fas fa-arrow-down"></i></div>
+                        <div class="fin-kpi-val neg">${br(despesas)}</div>
+                        <div class="fin-kpi-lbl">Despesas / mês</div>
                     </div>
-                    <div class="fin-kpi-chip">
-                        <div class="val" style="color:${receitas-despesas>=0?'#6EE7B7':'#FCA5A5'}">${br(receitas-despesas)}</div>
-                        <div class="lbl">Resultado</div>
+                    <div class="fin-kpi-cell">
+                        <div class="fin-kpi-ico"><i class="fas fa-chart-line"></i></div>
+                        <div class="fin-kpi-val${resultado>=0?' pos':' neg'}">${br(resultado)}</div>
+                        <div class="fin-kpi-lbl">Resultado</div>
                     </div>`;
             }
 
             // ── Switch tab ────────────────────────────────────────────────
             function switchTab(tab, btn) {
                 _tabAtual = tab;
-                document.querySelectorAll('#fin-tabs .coach-tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('#fin-tabs .fin-tab-pro').forEach(b => b.classList.remove('active'));
                 if (btn) btn.classList.add('active');
-                document.querySelectorAll('#financeiro-view .coach-tab-panel').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('#financeiro-view .fin-panel').forEach(p => p.classList.remove('active'));
                 const panel = document.getElementById('fin-tab-' + tab);
                 if (panel) panel.classList.add('active');
             }
@@ -32302,7 +34338,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 const el = document.getElementById('fin-lista-contas');
                 if (!el) return;
                 if (!contas.length) {
-                    el.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);"><div style="font-size:2rem;margin-bottom:10px;">🏦</div><div style="font-size:0.9rem;font-weight:600;">Nenhuma conta cadastrada</div></div>`;
+                    el.innerHTML = `<div class="fin-empty"><div class="fin-empty-icon">🏦</div><div class="fin-empty-titulo">Nenhuma conta cadastrada</div><div class="fin-empty-sub">Adicione suas contas bancárias, carteiras e cartões.</div><button class="fin-empty-cta" onclick="Financeiro.abrirModalConta()"><i class="fas fa-plus"></i> Adicionar Conta</button></div>`;
                     return;
                 }
                 let html = '';
@@ -32310,21 +34346,23 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                     const s = await saldoConta(c.id);
                     const ic = CONTA_ICONES[c.tipo] || '🏦';
                     html += `
-                    <div class="fin-card" style="display:flex;align-items:center;gap:14px;">
-                        <div class="fin-conta-accent" style="background:${c.cor}22;">
-                            <span style="font-size:1.5rem;">${ic}</span>
-                        </div>
-                        <div style="flex:1;min-width:0;">
-                            <div style="font-weight:800;font-size:0.95rem;color:var(--dark);">${c.nome}</div>
-                            <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;">${c.tipo.charAt(0).toUpperCase()+c.tipo.slice(1)}</div>
-                        </div>
-                        <div style="text-align:right;flex-shrink:0;">
-                            <div style="font-size:1.05rem;font-weight:900;${s<0?'color:var(--danger)':'color:var(--accent)'};">${br(s)}</div>
-                            <div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end;">
-                                <button onclick="Financeiro.abrirTransferencia('${c.id}')" class="fin-transf-btn"><i class="fas fa-exchange-alt"></i> Transf.</button>
-                                <button onclick="Financeiro.abrirModalConta('${c.id}')" style="background:rgba(29,111,164,0.08);border:1px solid var(--border-accent);color:var(--primary);border-radius:8px;padding:5px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;"><i class="fas fa-edit"></i></button>
-                                <button onclick="Financeiro.excluirConta('${c.id}')" style="background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);color:var(--danger);border-radius:8px;padding:5px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;"><i class="fas fa-trash"></i></button>
+                    <div class="fin-card">
+                        <div class="fin-card-row">
+                            <div class="fin-conta-accent" style="background:${c.cor}22;">
+                                <span>${ic}</span>
                             </div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="fin-card-nome">${c.nome}</div>
+                                <div class="fin-card-sub">${c.tipo.charAt(0).toUpperCase()+c.tipo.slice(1)}</div>
+                            </div>
+                            <div style="text-align:right;flex-shrink:0;">
+                                <div class="fin-card-saldo ${s<0?'fin-saldo-neg':'fin-saldo-pos'}">${br(s)}</div>
+                            </div>
+                        </div>
+                        <div class="fin-card-acoes">
+                            <button onclick="Financeiro.abrirTransferencia('${c.id}')" class="fin-acao-btn transf"><i class="fas fa-exchange-alt"></i> Transferir</button>
+                            <button onclick="Financeiro.abrirModalConta('${c.id}')" class="fin-acao-btn edit"><i class="fas fa-edit"></i></button>
+                            <button onclick="Financeiro.excluirConta('${c.id}')" class="fin-acao-btn del"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>`;
                 }
@@ -32392,30 +34430,33 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 const el = document.getElementById('fin-lista-investimentos');
                 if (!el) return;
                 if (!invs.length) {
-                    el.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);"><div style="font-size:2rem;margin-bottom:10px;">📈</div><div style="font-size:0.9rem;font-weight:600;">Nenhum investimento cadastrado</div></div>`;
+                    el.innerHTML = `<div class="fin-empty"><div class="fin-empty-icon" style="background:var(--accent-ultra);">📈</div><div class="fin-empty-titulo">Nenhum investimento cadastrado</div><div class="fin-empty-sub">Registre suas aplicações em renda fixa, ações, fundos e outros ativos.</div><button class="fin-empty-cta" style="background:var(--accent);" onclick="Financeiro.abrirModalInvestimento()"><i class="fas fa-plus"></i> Adicionar Investimento</button></div>`;
                     return;
                 }
                 let html = '';
                 for (const inv of invs) {
                     const s = await saldoInvestimento(inv.id);
                     const ic = INV_ICONES[inv.tipo] || '📂';
-                    const rendTxt = inv.rendimento ? `<span style="background:rgba(39,174,96,0.12);color:var(--accent);font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:20px;">${inv.rendimento}% a.a.</span>` : '';
-                    const vencTxt = inv.vencimento ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Vence: ${Utils.formatDate(inv.vencimento)}</div>` : '';
+                    const rendTxt = inv.rendimento ? `<span class="fin-rend-badge">${inv.rendimento}% a.a.</span>` : '';
+                    const vencTxt = inv.vencimento ? `<div style="font-size:0.70rem;color:var(--text-muted);margin-top:2px;"><i class="fas fa-calendar-alt" style="margin-right:3px;"></i>Vence: ${Utils.formatDate(inv.vencimento)}</div>` : '';
                     html += `
-                    <div class="fin-card" style="display:flex;align-items:center;gap:14px;">
-                        <div style="width:44px;height:44px;border-radius:12px;background:rgba(39,174,96,0.1);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;">${ic}</div>
-                        <div style="flex:1;min-width:0;">
-                            <div style="font-weight:800;font-size:0.95rem;color:var(--dark);">${inv.nome} ${rendTxt}</div>
-                            ${vencTxt}
-                            ${inv.obs ? `<div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;">${inv.obs}</div>` : ''}
-                        </div>
-                        <div style="text-align:right;flex-shrink:0;">
-                            <div style="font-size:1.05rem;font-weight:900;color:var(--accent);">${br(s)}</div>
-                            <div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end;">
-                                <button onclick="Financeiro.abrirTransferencia('${inv.id}')" class="fin-transf-btn"><i class="fas fa-exchange-alt"></i> Transf.</button>
-                                <button onclick="Financeiro.abrirModalInvestimento('${inv.id}')" style="background:rgba(29,111,164,0.08);border:1px solid var(--border-accent);color:var(--primary);border-radius:8px;padding:5px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;"><i class="fas fa-edit"></i></button>
-                                <button onclick="Financeiro.excluirInvestimento('${inv.id}')" style="background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);color:var(--danger);border-radius:8px;padding:5px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;"><i class="fas fa-trash"></i></button>
+                    <div class="fin-card">
+                        <div class="fin-card-row">
+                            <div class="fin-conta-accent" style="background:var(--accent-ultra);">${ic}</div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="fin-card-nome">${inv.nome}</div>
+                                <div style="margin-top:3px;">${rendTxt}</div>
+                                ${vencTxt}
+                                ${inv.obs ? `<div class="fin-card-sub" style="margin-top:2px;">${inv.obs}</div>` : ''}
                             </div>
+                            <div style="text-align:right;flex-shrink:0;">
+                                <div class="fin-card-saldo fin-saldo-pos">${br(s)}</div>
+                            </div>
+                        </div>
+                        <div class="fin-card-acoes">
+                            <button onclick="Financeiro.abrirTransferencia('${inv.id}')" class="fin-acao-btn transf"><i class="fas fa-exchange-alt"></i> Aportar</button>
+                            <button onclick="Financeiro.abrirModalInvestimento('${inv.id}')" class="fin-acao-btn edit"><i class="fas fa-edit"></i></button>
+                            <button onclick="Financeiro.excluirInvestimento('${inv.id}')" class="fin-acao-btn del"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>`;
                 }
@@ -32482,7 +34523,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 const el = document.getElementById('fin-lista-metas');
                 if (!el) return;
                 if (!metas.length) {
-                    el.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);"><div style="font-size:2rem;margin-bottom:10px;">🎯</div><div style="font-size:0.9rem;font-weight:600;">Nenhuma meta definida</div></div>`;
+                    el.innerHTML = `<div class="fin-empty"><div class="fin-empty-icon" style="background:rgba(124,58,237,0.10);">🎯</div><div class="fin-empty-titulo">Nenhuma meta definida</div><div class="fin-empty-sub">Defina metas de poupança para viagens, emergências, imóveis ou qualquer objetivo.</div><button class="fin-empty-cta" style="background:#7C3AED;" onclick="Financeiro.abrirModalMeta()"><i class="fas fa-plus"></i> Criar Meta</button></div>`;
                     return;
                 }
                 let html = '';
@@ -32490,30 +34531,32 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                     const guardado = await saldoMeta(m.id);
                     const pct = m.valorTotal > 0 ? Math.min(100, (guardado / m.valorTotal) * 100) : 0;
                     const falta = Math.max(0, m.valorTotal - guardado);
-                    const prazoTxt = m.prazo ? `<div style="font-size:0.72rem;color:var(--text-secondary);">Prazo: ${Utils.formatDate(m.prazo)}</div>` : '';
+                    const prazoTxt = m.prazo ? `<div class="fin-card-sub" style="margin-top:2px;"><i class="fas fa-calendar-alt" style="margin-right:3px;"></i>Prazo: ${Utils.formatDate(m.prazo)}</div>` : '';
+                    const gradBar = pct >= 100 ? 'var(--accent)' : 'linear-gradient(90deg,var(--primary),#7C3AED)';
                     html += `
                     <div class="fin-card">
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div style="font-size:2rem;flex-shrink:0;">${m.emoji||'🎯'}</div>
+                        <div class="fin-card-row">
+                            <div class="fin-conta-accent" style="background:rgba(124,58,237,0.10);font-size:1.45rem;">${m.emoji||'🎯'}</div>
                             <div style="flex:1;min-width:0;">
-                                <div style="font-weight:800;font-size:0.95rem;color:var(--dark);">${m.nome}</div>
+                                <div class="fin-card-nome">${m.nome}</div>
                                 ${prazoTxt}
                             </div>
                             <div style="text-align:right;flex-shrink:0;">
-                                <div style="font-size:0.75rem;color:var(--text-secondary);">Meta: ${br(m.valorTotal)}</div>
-                                <div style="font-size:0.9rem;font-weight:800;color:var(--accent);">${br(guardado)}</div>
+                                <div class="fin-card-sub">Meta: ${br(m.valorTotal)}</div>
+                                <div style="font-size:1.0rem;font-weight:900;color:#7C3AED;">${br(guardado)}</div>
                             </div>
                         </div>
                         <div class="fin-meta-progress-track">
-                            <div class="fin-meta-progress-fill" style="width:${pct}%;background:${pct>=100?'var(--accent)':'linear-gradient(90deg,var(--primary),var(--accent))'}"></div>
+                            <div class="fin-meta-progress-fill" style="width:${pct}%;background:${gradBar};"></div>
                         </div>
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
-                            <span style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);">${pct.toFixed(0)}% concluído · Falta ${br(falta)}</span>
-                            <div style="display:flex;gap:6px;">
-                                <button onclick="Financeiro.abrirTransferencia('${m.id}')" class="fin-transf-btn"><i class="fas fa-plus"></i> Aportar</button>
-                                <button onclick="Financeiro.abrirModalMeta('${m.id}')" style="background:rgba(29,111,164,0.08);border:1px solid var(--border-accent);color:var(--primary);border-radius:8px;padding:5px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;"><i class="fas fa-edit"></i></button>
-                                <button onclick="Financeiro.excluirMeta('${m.id}')" style="background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);color:var(--danger);border-radius:8px;padding:5px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;"><i class="fas fa-trash"></i></button>
-                            </div>
+                        <div class="fin-meta-pct-row">
+                            <span class="fin-meta-pct-val">${pct.toFixed(0)}% concluído</span>
+                            <span class="fin-meta-pct-rest">Falta ${br(falta)}</span>
+                        </div>
+                        <div class="fin-card-acoes" style="margin-top:10px;padding-top:10px;">
+                            <button onclick="Financeiro.abrirTransferencia('${m.id}')" class="fin-acao-btn transf" style="background:rgba(124,58,237,0.08);border-color:rgba(124,58,237,0.25);color:#7C3AED;"><i class="fas fa-plus"></i> Aportar</button>
+                            <button onclick="Financeiro.abrirModalMeta('${m.id}')" class="fin-acao-btn edit"><i class="fas fa-edit"></i></button>
+                            <button onclick="Financeiro.excluirMeta('${m.id}')" class="fin-acao-btn del"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>`;
                 }
@@ -32582,7 +34625,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 if (tipo === 'transferencia') {
                     gConta.style.display = 'none';
                     gTransf.style.display = 'block';
-                    popularSelectsTransfLanc();
+                    popularSelectsContas();
                 } else {
                     gConta.style.display = '';
                     gTransf.style.display = 'none';
@@ -32661,7 +34704,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 if (!el) return;
 
                 if (!lista.length) {
-                    el.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);"><div style="font-size:2rem;margin-bottom:10px;">📋</div><div style="font-size:0.9rem;font-weight:600;">Nenhum lançamento encontrado</div></div>`;
+                    el.innerHTML = `<div class="fin-empty"><div class="fin-empty-icon">📋</div><div class="fin-empty-titulo">Nenhum lançamento encontrado</div><div class="fin-empty-sub">Registre suas receitas, despesas e transferências.</div><button class="fin-empty-cta" onclick="Financeiro.abrirModalLancamento()"><i class="fas fa-plus"></i> Novo Lançamento</button></div>`;
                     return;
                 }
 
@@ -32767,162 +34810,6 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 await renderContas();
                 await renderKPI();
             }
-
-            // ════════════════════════════════════════
-            //  TRANSFERÊNCIA entre Conta/Invest/Meta
-            // ════════════════════════════════════════
-            async function popularSelectsContas() {
-                const [contas, invs, metas] = await Promise.all([getContas(), getInvs(), getMetas()]);
-                const todos = [
-                    ...contas.map(c=>({ id:c.id, label:`🏦 ${c.nome}`, tipo:'conta' })),
-                    ...invs.map(i=>({ id:i.id, label:`📈 ${i.nome}`, tipo:'investimento' })),
-                    ...metas.map(m=>({ id:m.id, label:`🎯 ${m.nome}`, tipo:'meta' }))
-                ];
-
-                // Filtro de conta nos lançamentos
-                const selFiltro = document.getElementById('fin-filtro-conta');
-                if (selFiltro) {
-                    const v = selFiltro.value;
-                    selFiltro.innerHTML = '<option value="">Todas as contas</option>';
-                    contas.forEach(c => selFiltro.innerHTML += `<option value="${c.id}">${c.nome}</option>`);
-                    selFiltro.value = v;
-                }
-
-                // Conta no form de lançamento
-                const selConta = document.getElementById('fin-lanc-conta');
-                if (selConta) {
-                    const v = selConta.value;
-                    selConta.innerHTML = '<option value="">— Selecione —</option>';
-                    contas.forEach(c => selConta.innerHTML += `<option value="${c.id}">${c.nome}</option>`);
-                    selConta.value = v;
-                }
-
-                // Selects do modal de transferência
-                ['fin-transf-origem','fin-transf-destino'].forEach(sid => {
-                    const sel = document.getElementById(sid);
-                    if (!sel) return;
-                    const v = sel.value;
-                    sel.innerHTML = `<option value="">— Selecione —</option>`;
-                    todos.forEach(t => sel.innerHTML += `<option value="${t.id}">${t.label}</option>`);
-                    sel.value = v;
-                });
-            }
-
-            async function popularSelectsTransfLanc() {
-                const [contas, invs, metas] = await Promise.all([getContas(), getInvs(), getMetas()]);
-                const todos = [
-                    ...contas.map(c=>({ id:c.id, label:`🏦 ${c.nome}` })),
-                    ...invs.map(i=>({ id:i.id, label:`📈 ${i.nome}` })),
-                    ...metas.map(m=>({ id:m.id, label:`🎯 ${m.nome}` }))
-                ];
-                ['fin-lanc-transf-origem','fin-lanc-transf-destino'].forEach(sid => {
-                    const sel = document.getElementById(sid);
-                    if (!sel) return;
-                    sel.innerHTML = '<option value="">— Selecione —</option>';
-                    todos.forEach(t => sel.innerHTML += `<option value="${t.id}">${t.label}</option>`);
-                });
-            }
-
-            async function atualizarDestinosTransf(preselect) {
-                const origem = document.getElementById('fin-lanc-transf-origem')?.value;
-                const sel = document.getElementById('fin-lanc-transf-destino');
-                if (!sel) return;
-                const [contas, invs, metas] = await Promise.all([getContas(), getInvs(), getMetas()]);
-                const todos = [
-                    ...contas.map(c=>({ id:c.id, label:`🏦 ${c.nome}` })),
-                    ...invs.map(i=>({ id:i.id, label:`📈 ${i.nome}` })),
-                    ...metas.map(m=>({ id:m.id, label:`🎯 ${m.nome}` }))
-                ];
-                sel.innerHTML = '<option value="">— Selecione —</option>';
-                todos.filter(t=>t.id!==origem).forEach(t => sel.innerHTML += `<option value="${t.id}">${t.label}</option>`);
-                if (preselect) sel.value = preselect;
-            }
-
-            async function abrirTransferencia(idPreOrigem) {
-                await popularSelectsContas();
-                const orSel = document.getElementById('fin-transf-origem');
-                if (orSel && idPreOrigem) {
-                    orSel.value = idPreOrigem;
-                    await atualizarDestinoTransfModal();
-                }
-                document.getElementById('fin-transf-valor').value = '';
-                document.getElementById('fin-transf-data').value = today();
-                document.getElementById('fin-transf-desc').value = '';
-                UI.openModal('fin-transferencia');
-            }
-
-            async function atualizarDestinoTransfModal() {
-                const origem = document.getElementById('fin-transf-origem').value;
-                const sel = document.getElementById('fin-transf-destino');
-                const [contas, invs, metas] = await Promise.all([getContas(), getInvs(), getMetas()]);
-                const todos = [
-                    ...contas.map(c=>({ id:c.id, label:`🏦 ${c.nome}` })),
-                    ...invs.map(i=>({ id:i.id, label:`📈 ${i.nome}` })),
-                    ...metas.map(m=>({ id:m.id, label:`🎯 ${m.nome}` }))
-                ];
-                sel.innerHTML = '<option value="">— Selecione —</option>';
-                todos.filter(t=>t.id!==origem).forEach(t => sel.innerHTML += `<option value="${t.id}">${t.label}</option>`);
-            }
-
-            async function executarTransferencia(e) {
-                e.preventDefault();
-                const origem  = document.getElementById('fin-transf-origem').value;
-                const destino = document.getElementById('fin-transf-destino').value;
-                const valor   = parseV(document.getElementById('fin-transf-valor').value);
-                const data    = document.getElementById('fin-transf-data').value || today();
-                const desc    = document.getElementById('fin-transf-desc').value || 'Transferência';
-
-                if (!origem || !destino) { Utils.toast('Selecione origem e destino.','error'); return; }
-                if (!valor || valor <= 0) { Utils.toast('Informe um valor válido.','error'); return; }
-                if (origem === destino)   { Utils.toast('Origem e destino devem ser diferentes.','error'); return; }
-
-                const [contas, invs, metas] = await Promise.all([getContas(), getInvs(), getMetas()]);
-                const todos = [...contas,...invs,...metas];
-                const nomeOrigem  = todos.find(x=>x.id===origem)?.nome || origem;
-                const nomeDestino = todos.find(x=>x.id===destino)?.nome || destino;
-
-                const lanc = {
-                    id: Utils.id(), tipo: 'transferencia',
-                    desc: desc || `${nomeOrigem} → ${nomeDestino}`,
-                    valor, data, origem, destino, contaId: origem,
-                    categoria: 'investimento', dataCriacao: new Date().toISOString()
-                };
-                await DB.put('fin_lancamentos', lanc);
-                Utils.toast(`Transferência de ${br(valor)} registrada!`);
-                UI.closeModals();
-                await init();
-            }
-
-            // ── Selecionar cor / emoji helpers ────────────────────────────
-            function selecionarCor(btn) {
-                document.querySelectorAll('.fin-cor-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById('fin-conta-cor').value = btn.dataset.cor;
-            }
-
-            function selecionarEmoji(btn) {
-                document.querySelectorAll('.fin-emoji-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById('fin-meta-emoji').value = btn.dataset.emoji;
-            }
-
-            // ── Expor publicamente ────────────────────────────────────────
-            return {
-                init, switchTab,
-                abrirModalConta, salvarConta, excluirConta, renderContas,
-                abrirModalInvestimento, salvarInvestimento, excluirInvestimento, renderInvestimentos,
-                abrirModalMeta, salvarMeta, excluirMeta, renderMetas,
-                abrirModalLancamento, salvarLancamento, renderLancamentos,
-                selecionarTipoLanc, toggleParcelamento,
-                pedirExclusao, confirmarExclusaoParcela,
-                abrirTransferencia, atualizarDestinoTransfModal,
-                atualizarDestinosTransf, executarTransferencia,
-                popularSelectsContas, popularSelectsTransfLanc,
-                selecionarCor, selecionarEmoji
-            };
-        })();
-
-        window.Financeiro = Financeiro;
 
         // ── wppOpen: abre WhatsApp com compatibilidade total mobile/PWA ──
         // Usado nos onclick inline dos templates. Delega para Utils.openWhatsApp
