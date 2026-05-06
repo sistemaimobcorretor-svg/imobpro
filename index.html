@@ -40735,19 +40735,15 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
 
         // ── Ponte com a extensão Chrome ──────────────────────────
         function _sendToExtension(imovel) {
-            // Envia dados para a extensão ImobiPro Publicador via custom event
+            // Salva no localStorage — content script bridge lê e repassa para chrome.storage
             try {
-                const evt = new CustomEvent('imobipro:imovel', {
-                    detail: { imovel },
-                    bubbles: true
-                });
-                document.dispatchEvent(evt);
-            } catch(e) {}
-            // Também salva em localStorage para a extensão ler via content script
-            try {
-                localStorage.setItem('imobipro_ext_imovel', JSON.stringify({
+                localStorage.setItem('imobipro_ext_pending', JSON.stringify({
                     imovel,
                     ts: Date.now()
+                }));
+                // Dispara evento para o bridge script escutar
+                window.dispatchEvent(new CustomEvent('imobipro_send', {
+                    detail: { imovel, ts: Date.now() }
                 }));
             } catch(e) {}
         }
