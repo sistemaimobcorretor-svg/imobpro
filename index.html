@@ -7204,7 +7204,7 @@ var _ActModal = (function(){
 
     function show(){
         document.getElementById('_act_modal').classList.add('_show');
-        setTimeout(function(){ document.getElementById('_act_input').focus(); }, 300);
+        setTimeout(function(){ const _i = document.getElementById('_act_input'); if(_i) _i.focus(); }, 300);
     }
 
     function hide(){
@@ -9427,6 +9427,179 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             </div>
             <!-- END FINANCEIRO VIEW -->
 
+            <!-- ===== MATCH IMÓVEL × CLIENTE VIEW ===== -->
+            <div id="match-view" class="view">
+                <div style="background:linear-gradient(135deg,#1D6FA4 0%,#155A8A 100%);border-radius:18px;padding:20px;margin-bottom:16px;color:white;position:relative;overflow:hidden;">
+                    <div style="position:absolute;top:-30px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.08);pointer-events:none;"></div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+                        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🎯</div>
+                        <div>
+                            <div style="font-size:1.05rem;font-weight:900;letter-spacing:-0.3px;">Match Imóvel × Cliente</div>
+                            <div style="font-size:0.78rem;opacity:0.85;">Selecione um cliente e veja os imóveis compatíveis com seu perfil financeiro</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seleção de cliente -->
+                <div style="background:white;border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+                    <div style="font-size:0.78rem;font-weight:700;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Selecionar Cliente</div>
+                    <div style="position:relative;">
+                        <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.85rem;"></i>
+                        <input type="text" id="match-busca-cliente" placeholder="Buscar cliente por nome..." 
+                            style="width:100%;padding:10px 10px 10px 36px;border:1px solid var(--border);border-radius:10px;font-size:0.9rem;font-family:inherit;color:var(--dark);outline:none;"
+                            oninput="MatchModule.filtrarClientes(this.value)">
+                    </div>
+                    <div id="match-lista-clientes" style="margin-top:8px;max-height:180px;overflow-y:auto;display:none;"></div>
+                    <div id="match-cliente-selecionado" style="display:none;margin-top:10px;"></div>
+                </div>
+
+                <!-- Filtros extras -->
+                <div id="match-filtros" style="display:none;background:white;border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+                    <div style="font-size:0.78rem;font-weight:700;color:var(--text-secondary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;">Filtros Adicionais</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div>
+                            <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">Tipo de Imóvel</label>
+                            <select id="match-filtro-tipo" class="form-control" style="font-size:0.85rem;" onchange="MatchModule.executarMatch()">
+                                <option value="">Todos</option>
+                                <option value="apartamento">Apartamento</option>
+                                <option value="casa">Casa</option>
+                                <option value="terreno">Terreno</option>
+                                <option value="comercial">Comercial</option>
+                                <option value="cobertura">Cobertura</option>
+                                <option value="studio">Studio/Loft</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">Tipo de Transação</label>
+                            <select id="match-filtro-transacao" class="form-control" style="font-size:0.85rem;" onchange="MatchModule.executarMatch()">
+                                <option value="">Todos</option>
+                                <option value="venda">Venda</option>
+                                <option value="aluguel">Aluguel</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-top:10px;">
+                        <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">Tolerância de Preço (além da capacidade máx.)</label>
+                        <select id="match-filtro-tolerancia" class="form-control" style="font-size:0.85rem;" onchange="MatchModule.executarMatch()">
+                            <option value="0">Sem tolerância (rígido)</option>
+                            <option value="0.1" selected>+10%</option>
+                            <option value="0.2">+20%</option>
+                            <option value="0.3">+30%</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Resultados -->
+                <div id="match-resultados" style="display:none;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <div style="font-size:0.85rem;font-weight:700;color:var(--dark);" id="match-contagem-label"></div>
+                        <button onclick="MatchModule.gerarPDFMatch()" style="background:var(--primary);color:white;border:none;border-radius:9px;padding:8px 14px;font-size:0.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">
+                            <i class="fas fa-file-pdf"></i> Baixar Ficha PDF
+                        </button>
+                    </div>
+                    <div id="match-imoveis-lista" style="display:flex;flex-direction:column;gap:10px;"></div>
+                </div>
+
+                <div id="match-empty" style="display:none;text-align:center;padding:40px 20px;color:var(--text-muted);">
+                    <i class="fas fa-home" style="font-size:2.5rem;opacity:0.25;display:block;margin-bottom:12px;"></i>
+                    <div style="font-size:0.9rem;font-weight:600;">Nenhum imóvel encontrado para este perfil</div>
+                    <div style="font-size:0.8rem;margin-top:4px;">Tente ajustar a tolerância de preço ou cadastre novos imóveis</div>
+                </div>
+            </div>
+            <!-- END MATCH VIEW -->
+
+            <!-- ===== ANÁLISE DE PERFIS E CENÁRIOS VIEW ===== -->
+            <div id="perfis-view" class="view">
+                <div style="background:linear-gradient(135deg,#27AE60 0%,#1E8449 100%);border-radius:18px;padding:20px;margin-bottom:16px;color:white;position:relative;overflow:hidden;">
+                    <div style="position:absolute;top:-30px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.08);pointer-events:none;"></div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+                        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">📊</div>
+                        <div>
+                            <div style="font-size:1.05rem;font-weight:900;letter-spacing:-0.3px;">Análise de Perfis & Cenários</div>
+                            <div style="font-size:0.78rem;opacity:0.85;">Simule perfis variados e descubra os melhores imóveis para cada cenário</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Abas -->
+                <div style="display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;">
+                    <button id="pf-tab-exemplos" onclick="PerfisModule.switchTab('exemplos')" style="flex-shrink:0;padding:8px 16px;border-radius:20px;border:none;background:var(--accent);color:white;font-size:0.82rem;font-weight:700;cursor:pointer;">
+                        <i class="fas fa-users"></i> Perfis Exemplo
+                    </button>
+                    <button id="pf-tab-personalizado" onclick="PerfisModule.switchTab('personalizado')" style="flex-shrink:0;padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:white;color:var(--text-secondary);font-size:0.82rem;font-weight:700;cursor:pointer;">
+                        <i class="fas fa-sliders-h"></i> Perfil Personalizado
+                    </button>
+                    <button id="pf-tab-cenarios" onclick="PerfisModule.switchTab('cenarios')" style="flex-shrink:0;padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:white;color:var(--text-secondary);font-size:0.82rem;font-weight:700;cursor:pointer;">
+                        <i class="fas fa-chart-bar"></i> Comparar Cenários
+                    </button>
+                </div>
+
+                <!-- Aba: Perfis Exemplo -->
+                <div id="pf-panel-exemplos">
+                    <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:10px;">Clique em um perfil para ver os melhores imóveis do seu portfólio que se encaixam:</div>
+                    <div id="pf-perfis-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;"></div>
+                    <div id="pf-resultado-exemplos" style="display:none;"></div>
+                </div>
+
+                <!-- Aba: Perfil Personalizado -->
+                <div id="pf-panel-personalizado" style="display:none;">
+                    <div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);box-shadow:var(--shadow-sm);margin-bottom:14px;">
+                        <div style="font-size:0.82rem;font-weight:700;color:var(--dark);margin-bottom:12px;">Configurar Perfil</div>
+                        <div style="display:grid;gap:10px;">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                <div>
+                                    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">Renda Mensal (titular)</label>
+                                    <input type="text" id="pf-renda" class="form-control" placeholder="Ex: 5.000,00" oninput="Utils.maskMoney(this)" style="font-size:0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">Renda Cônjuge</label>
+                                    <input type="text" id="pf-renda-conjuge" class="form-control" placeholder="0,00 (se houver)" oninput="Utils.maskMoney(this)" style="font-size:0.85rem;">
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                <div>
+                                    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">Idade do Proponente</label>
+                                    <input type="number" id="pf-idade" class="form-control" placeholder="Ex: 35" min="18" max="79" style="font-size:0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">Idade Cônjuge (se casado)</label>
+                                    <input type="number" id="pf-idade-conjuge" class="form-control" placeholder="—" min="18" max="79" style="font-size:0.85rem;">
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                <div>
+                                    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">FGTS disponível</label>
+                                    <input type="text" id="pf-fgts" class="form-control" placeholder="0,00" oninput="Utils.maskMoney(this)" style="font-size:0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">Tipo de imóvel preferido</label>
+                                    <select id="pf-tipo-pref" class="form-control" style="font-size:0.85rem;">
+                                        <option value="">Qualquer</option>
+                                        <option value="apartamento">Apartamento</option>
+                                        <option value="casa">Casa</option>
+                                        <option value="terreno">Terreno</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">Nome / Identificação do perfil</label>
+                                <input type="text" id="pf-nome" class="form-control" placeholder="Ex: Casal jovem com renda mista" style="font-size:0.85rem;">
+                            </div>
+                        </div>
+                        <button onclick="PerfisModule.analisarPersonalizado()" style="margin-top:12px;width:100%;background:var(--accent);color:white;border:none;border-radius:10px;padding:12px;font-size:0.9rem;font-weight:700;cursor:pointer;">
+                            <i class="fas fa-search"></i> Analisar Perfil
+                        </button>
+                    </div>
+                    <div id="pf-resultado-personalizado" style="display:none;"></div>
+                </div>
+
+                <!-- Aba: Comparar Cenários -->
+                <div id="pf-panel-cenarios" style="display:none;">
+                    <div id="pf-cenarios-content"></div>
+                </div>
+            </div>
+            <!-- END PERFIS VIEW -->
+
         </main>
 
         <!-- ── FAB Speed Dial ── -->
@@ -9500,6 +9673,14 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <button class="nav-panel-item" data-target="venda-certa-view" onclick="UI.switchTab(this);VendaCerta.init();UI.closeNavDrawer();return false;">
                     <i class="fas fa-bullseye"></i> Venda Certa
                 </button>
+                <button class="nav-panel-item" data-target="match-view" onclick="UI.switchTab(this);MatchModule.init();UI.closeNavDrawer();return false;">
+                    <i class="fas fa-magic"></i> Match Imóvel
+                    <span style="font-size:.6rem;background:rgba(29,111,164,0.12);color:var(--primary);padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
+                </button>
+                <button class="nav-panel-item" data-target="perfis-view" onclick="UI.switchTab(this);PerfisModule.init();UI.closeNavDrawer();return false;">
+                    <i class="fas fa-chart-bar"></i> Perfis & Cenários
+                    <span style="font-size:.6rem;background:rgba(39,174,96,0.12);color:var(--accent);padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
+                </button>
                 <button class="nav-panel-item" data-target="coach-view" onclick="UI.switchTab(this);Coach.init();UI.closeNavDrawer();return false;">
                     <i class="fas fa-trophy"></i> Coach
                 </button>
@@ -9567,6 +9748,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </button>
                 <button class="nav-panel-item" data-target="venda-certa-view" onclick="UI.switchTab(this);VendaCerta.init();return false;">
                     <i class="fas fa-bullseye"></i> Venda Certa
+                </button>
+                <button class="nav-panel-item" data-target="match-view" onclick="UI.switchTab(this);MatchModule.init();return false;">
+                    <i class="fas fa-magic"></i> Match Imóvel
+                </button>
+                <button class="nav-panel-item" data-target="perfis-view" onclick="UI.switchTab(this);PerfisModule.init();return false;">
+                    <i class="fas fa-chart-bar"></i> Perfis & Cenários
                 </button>
                 <button class="nav-panel-item" data-target="coach-view" onclick="UI.switchTab(this);Coach.init();return false;">
                     <i class="fas fa-trophy"></i> Coach
@@ -15043,6 +15230,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 } else if (target === 'mercado-view') {
                     container.style.display = 'none';
                     MarketPanel.load(false);
+                } else if (target === 'match-view') {
+                    container.style.display = 'none';
+                    MatchModule.init();
+                } else if (target === 'perfis-view') {
+                    container.style.display = 'none';
+                    PerfisModule.init();
                 } else {
                     container.style.display = 'none';
                 }
@@ -25054,7 +25247,7 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     document.getElementById('corr-obs').value = '';
                     document.getElementById('corr-form-title').textContent = 'Novo Correspondente';
                     document.getElementById('correspondentes-form-wrap').style.display = 'block';
-                    document.getElementById('corr-nome').focus();
+                    document.getElementById('corr-nome')?.focus();
                 },
 
                 editarFormulario: function(id) {
@@ -25068,7 +25261,7 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     document.getElementById('corr-obs').value = c.obs || '';
                     document.getElementById('corr-form-title').textContent = 'Editar Correspondente';
                     document.getElementById('correspondentes-form-wrap').style.display = 'block';
-                    document.getElementById('corr-nome').focus();
+                    document.getElementById('corr-nome')?.focus();
                 },
 
                 fecharFormulario: function() {
@@ -25163,7 +25356,7 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     document.getElementById('ger-telefone').value = '';
                     document.getElementById('ger-form-title').textContent = 'Novo Gerente';
                     document.getElementById('gerentes-form-wrap').style.display = 'block';
-                    document.getElementById('ger-nome').focus();
+                    document.getElementById('ger-nome')?.focus();
                 },
 
                 editarFormulario: function(id) {
@@ -25176,7 +25369,7 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     document.getElementById('ger-telefone').value = g.telefone || '';
                     document.getElementById('ger-form-title').textContent = 'Editar Gerente';
                     document.getElementById('gerentes-form-wrap').style.display = 'block';
-                    document.getElementById('ger-nome').focus();
+                    document.getElementById('ger-nome')?.focus();
                 },
 
                 fecharFormulario: function() {
@@ -25270,7 +25463,7 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     document.getElementById('imob-endereco').value = '';
                     document.getElementById('imob-form-title').textContent = 'Nova Imobiliária';
                     document.getElementById('imobiliarias-form-wrap').style.display = 'block';
-                    document.getElementById('imob-nome').focus();
+                    document.getElementById('imob-nome')?.focus();
                 },
 
                 editarFormulario: function(id) {
@@ -25284,7 +25477,7 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     document.getElementById('imob-endereco').value = im.endereco || '';
                     document.getElementById('imob-form-title').textContent = 'Editar Imobiliária';
                     document.getElementById('imobiliarias-form-wrap').style.display = 'block';
-                    document.getElementById('imob-nome').focus();
+                    document.getElementById('imob-nome')?.focus();
                 },
 
                 fecharFormulario: function() {
@@ -30834,7 +31027,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 this._corSelecionada = '#F59E0B';
                 document.getElementById('title-nota').textContent = 'Nova Nota';
                 UI.openModal('nota');
-                setTimeout(() => document.getElementById('nota-conteudo').focus(), 350);
+                setTimeout(() => document.getElementById('nota-conteudo')?.focus(), 350);
             },
 
             edit(id) {
@@ -41101,6 +41294,712 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
         }
 
         return { open, marcarPublicado, getBadgesHTML, _toggle, _switchTab, _saveText, _launch };
+    })();
+
+    // ===================================================================
+    // MATCH MODULE — Melhor imóvel para o cliente
+    // ===================================================================
+    const MatchModule = (() => {
+        let _clienteSelecionado = null;
+
+        function init() {
+            _clienteSelecionado = null;
+            const buscaEl = document.getElementById('match-busca-cliente');
+            const listaEl = document.getElementById('match-lista-clientes');
+            const selEl   = document.getElementById('match-cliente-selecionado');
+            const filtEl  = document.getElementById('match-filtros');
+            const resEl   = document.getElementById('match-resultados');
+            const empEl   = document.getElementById('match-empty');
+            if (buscaEl) buscaEl.value = '';
+            if (listaEl) listaEl.style.display = 'none';
+            if (selEl)   selEl.style.display   = 'none';
+            if (filtEl)  filtEl.style.display  = 'none';
+            if (resEl)   resEl.style.display   = 'none';
+            if (empEl)   empEl.style.display   = 'none';
+        }
+
+        function filtrarClientes(termo) {
+            const lista = document.getElementById('match-lista-clientes');
+            if (!lista) return;
+            if (!termo || termo.length < 2) { lista.style.display = 'none'; return; }
+            const clientes = (UI.data && UI.data.clientes) ? UI.data.clientes : [];
+            const filtrados = clientes.filter(c => c.nome && c.nome.toLowerCase().includes(termo.toLowerCase())).slice(0, 8);
+            if (filtrados.length === 0) { lista.style.display = 'none'; return; }
+            lista.style.display = 'block';
+            lista.innerHTML = filtrados.map(c => {
+                const renda = c.rendaMensal ? Utils.formatCurrency(c.rendaMensal) : 'Renda não informada';
+                const idade = c.dataNascimento ? Utils.calculateAge(c.dataNascimento) + ' anos' : 'Idade não informada';
+                return `<div onclick="MatchModule.selecionarCliente('${c.id}')" style="padding:10px 12px;border-radius:8px;cursor:pointer;transition:background 0.15s;border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--primary-ultra)'" onmouseout="this.style.background='transparent'">
+                    <div style="font-weight:700;font-size:0.9rem;color:var(--dark);">${c.nome}</div>
+                    <div style="font-size:0.75rem;color:var(--text-secondary);">${renda} · ${idade}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function selecionarCliente(id) {
+            const cliente = (UI.data && UI.data.clientes) ? UI.data.clientes.find(c => c.id === id) : null;
+            if (!cliente) return;
+            _clienteSelecionado = cliente;
+            const buscaEl = document.getElementById('match-busca-cliente');
+            const listaEl = document.getElementById('match-lista-clientes');
+            if (buscaEl) buscaEl.value = '';
+            if (listaEl) listaEl.style.display = 'none';
+
+            const idade = cliente.dataNascimento ? Utils.calculateAge(cliente.dataNascimento) : null;
+            const renda = cliente.rendaMensal || 0;
+            const conjugeRenda = (cliente.conjugeRendaFormal === 'sim') ? (renda * 0.0) : 0; // será tratado na renda total
+            const rendaTotal = renda;
+            const poder = Utils.calcMaxImovelCliente(cliente);
+            const prazoMax = idade ? Utils.getPrazoMaximoCaixa(idade) : 420;
+            const maxPrestacao = rendaTotal * 0.30;
+            const taxaInfo = Utils.getTaxaCaixa(rendaTotal);
+
+            const selDiv = document.getElementById('match-cliente-selecionado');
+            if (!selDiv) return;
+            selDiv.style.display = 'block';
+            selDiv.innerHTML = `
+                <div style="background:linear-gradient(135deg,var(--primary-ultra),rgba(255,255,255,0.5));border:1.5px solid var(--border-accent);border-radius:12px;padding:12px;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+                        <div>
+                            <div style="font-weight:800;font-size:0.95rem;color:var(--dark);">${cliente.nome}</div>
+                            <div style="font-size:0.75rem;color:var(--text-secondary);">${idade ? idade + ' anos' : '—'} · ${cliente.estadoCivil || '—'} · ${cliente.profissao || '—'}</div>
+                        </div>
+                        <button onclick="MatchModule.init()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.75rem;">✕ Trocar</button>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+                        <div style="background:white;border-radius:9px;padding:9px;border:1px solid var(--border);">
+                            <div style="font-size:0.65rem;color:var(--text-secondary);font-weight:700;margin-bottom:2px;">RENDA MENSAL</div>
+                            <div style="font-size:0.9rem;font-weight:900;color:var(--primary);">${Utils.formatCurrency(rendaTotal)}</div>
+                        </div>
+                        <div style="background:white;border-radius:9px;padding:9px;border:1px solid var(--border);">
+                            <div style="font-size:0.65rem;color:var(--text-secondary);font-weight:700;margin-bottom:2px;">PRESTAÇÃO MÁX.</div>
+                            <div style="font-size:0.9rem;font-weight:900;color:var(--warning);">${Utils.formatCurrency(maxPrestacao)}/mês</div>
+                        </div>
+                        <div style="background:white;border-radius:9px;padding:9px;border:1px solid var(--border);">
+                            <div style="font-size:0.65rem;color:var(--text-secondary);font-weight:700;margin-bottom:2px;">PRAZO MÁX.</div>
+                            <div style="font-size:0.9rem;font-weight:900;color:var(--accent);">${prazoMax} meses</div>
+                        </div>
+                    </div>
+                    ${poder ? `<div style="margin-top:8px;padding:8px 10px;background:rgba(39,174,96,0.08);border-radius:8px;border:1px solid rgba(39,174,96,0.20);">
+                        <span style="font-size:0.75rem;color:var(--accent);font-weight:700;">💰 Capacidade de compra estimada: </span>
+                        <span style="font-size:0.85rem;font-weight:900;color:var(--accent);">${Utils.formatCurrency(poder.maxImovelPelaRenda)}</span>
+                        <span style="font-size:0.7rem;color:var(--text-secondary);"> · Taxa Caixa: ${taxaInfo.taxa}% a.a.</span>
+                    </div>` : '<div style="margin-top:8px;padding:8px 10px;background:rgba(231,76,60,0.06);border-radius:8px;font-size:0.75rem;color:var(--danger);">⚠️ Renda ou data de nascimento não informada — capacidade de compra não calculada</div>'}
+                </div>
+            `;
+            const filtEl = document.getElementById('match-filtros');
+            if (filtEl) filtEl.style.display = 'block';
+            executarMatch();
+        }
+
+        function executarMatch() {
+            if (!_clienteSelecionado) return;
+            const cliente = _clienteSelecionado;
+            const imoveis = (UI.data && UI.data.imoveis) ? UI.data.imoveis : [];
+            const filtroTipoEl = document.getElementById('match-filtro-tipo');
+            const filtroTransEl = document.getElementById('match-filtro-transacao');
+            const toleranciaEl = document.getElementById('match-filtro-tolerancia');
+            const resDiv = document.getElementById('match-resultados');
+            const emptyDiv = document.getElementById('match-empty');
+            const lista = document.getElementById('match-imoveis-lista');
+            const contagemEl = document.getElementById('match-contagem-label');
+            if (!resDiv || !emptyDiv || !lista) return;
+
+            const filtroTipo = filtroTipoEl ? filtroTipoEl.value : '';
+            const filtroTransacao = filtroTransEl ? filtroTransEl.value : '';
+            const tolerancia = toleranciaEl ? (parseFloat(toleranciaEl.value) || 0.1) : 0.1;
+
+            const poder = Utils.calcMaxImovelCliente(cliente);
+            const maxValor = poder ? poder.maxImovelPelaRenda * (1 + tolerancia) : Infinity;
+            const renda = cliente.rendaMensal || 0;
+            const maxPrestacao = renda * 0.30;
+            const idade = cliente.dataNascimento ? Utils.calculateAge(cliente.dataNascimento) : null;
+
+            const compatíveis = imoveis.filter(i => {
+                if (i.status === 'vendido' || i.status === 'alugado') return false;
+                if (filtroTipo && i.tipo !== filtroTipo) return false;
+                if (filtroTransacao && i.transacao !== filtroTransacao) return false;
+
+                const precoVenda = i.precoVenda || 0;
+                if (filtroTransacao === 'aluguel' || (!filtroTransacao && i.transacao === 'aluguel')) {
+                    const aluguel = i.precoAluguel || 0;
+                    if (renda > 0 && aluguel > maxPrestacao * 1.2) return false;
+                    return true;
+                }
+                // Para venda
+                if (!precoVenda) return false;
+                if (poder && precoVenda > maxValor) return false;
+                return true;
+            }).map(i => {
+                let score = 100;
+                let badges = [];
+                const precoVenda = i.precoVenda || 0;
+                const poder = Utils.calcMaxImovelCliente(cliente);
+                if (poder && precoVenda > 0) {
+                    const ratio = precoVenda / poder.maxImovelPelaRenda;
+                    if (ratio <= 0.7) { score += 20; badges.push({ txt: '✅ Excelente capacidade', cor: '#27AE60' }); }
+                    else if (ratio <= 0.9) { score += 10; badges.push({ txt: '👍 Boa capacidade', cor: '#2980B9' }); }
+                    else if (ratio <= 1.0) { badges.push({ txt: '⚠️ Limite da renda', cor: '#E67E22' }); }
+                    else { score -= 10; badges.push({ txt: '📋 Exige entrada maior', cor: '#E74C3C' }); }
+                }
+                if (cliente.tipoInteresse && i.tipo === cliente.tipoInteresse) { score += 15; badges.push({ txt: '⭐ Tipo de interesse', cor: '#7C3AED' }); }
+                if (i.status === 'disponivel') score += 5;
+                const sim = (poder && precoVenda) ? Utils.simulateFinancing(cliente, i, null) : null;
+                return { imovel: i, score, badges, sim };
+            }).sort((a, b) => b.score - a.score);
+
+            if (compatíveis.length === 0) {
+                resDiv.style.display = 'none';
+                emptyDiv.style.display = 'block';
+                return;
+            }
+            emptyDiv.style.display = 'none';
+            resDiv.style.display = 'block';
+            if (contagemEl) contagemEl.textContent = compatíveis.length > 0 ? `${compatíveis.length} imóvel(is) compatível(is) com o perfil` : '';
+
+            lista.innerHTML = compatíveis.map(({ imovel: i, score, badges, sim }) => {
+                const preco = i.precoVenda ? Utils.formatCurrency(i.precoVenda) : i.precoAluguel ? Utils.formatCurrency(i.precoAluguel) + '/mês' : 'Consulte';
+                const img = (i.imagens && i.imagens.length) ? `<img src="${i.imagens[0]}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;flex-shrink:0;border:1px solid var(--border);">` : `<div style="width:80px;height:80px;border-radius:10px;background:var(--primary-ultra);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;border:1px solid var(--border);">🏠</div>`;
+                const scoreColor = score >= 120 ? '#27AE60' : score >= 100 ? '#2980B9' : '#E67E22';
+                const badgesHtml = badges.map(b => `<span style="font-size:0.65rem;background:${b.cor}18;color:${b.cor};padding:2px 7px;border-radius:10px;font-weight:700;">${b.txt}</span>`).join('');
+                const simInfo = sim && !sim.error ? `<div style="font-size:0.72rem;color:var(--text-secondary);margin-top:4px;">Prestação est.: <strong>${Utils.formatCurrency(sim.prestacaoMensal)}/mês</strong> · Entrada mín.: <strong>${Utils.formatCurrency(sim.entradaNecessaria)}</strong></div>` : '';
+                return `<div style="background:white;border-radius:12px;padding:12px;border:1px solid var(--border);box-shadow:var(--shadow-sm);display:flex;gap:12px;align-items:flex-start;">
+                    ${img}
+                    <div style="flex:1;min-width:0;">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:4px;">
+                            <div style="font-weight:800;font-size:0.88rem;color:var(--dark);line-height:1.3;">${i.titulo}</div>
+                            <div style="flex-shrink:0;background:${scoreColor}18;color:${scoreColor};font-size:0.68rem;font-weight:900;padding:3px 8px;border-radius:10px;border:1px solid ${scoreColor}33;">Score ${score}</div>
+                        </div>
+                        <div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><i class="fas fa-map-marker-alt" style="margin-right:3px;"></i>${i.endereco || '—'}</div>
+                        <div style="font-size:1rem;font-weight:900;color:var(--primary);margin-bottom:5px;">${preco}</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;">${badgesHtml}</div>
+                        ${simInfo}
+                        <button onclick="UI.showImovelDetails('${i.id}')" style="margin-top:6px;background:var(--primary-ultra);color:var(--primary);border:1px solid var(--border-accent);border-radius:8px;padding:5px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;">Ver Detalhes</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function gerarPDFMatch() {
+            if (!_clienteSelecionado) { Utils.toast('Selecione um cliente primeiro', 'error'); return; }
+            const { jsPDF } = window.jspdf;
+            if (!jsPDF) { Utils.toast('jsPDF não disponível', 'error'); return; }
+            const cliente = _clienteSelecionado;
+            const imoveis = (UI.data && UI.data.imoveis) ? UI.data.imoveis : [];
+            const filtroTipoEl = document.getElementById('match-filtro-tipo');
+            const filtroTransEl = document.getElementById('match-filtro-transacao');
+            const toleranciaEl = document.getElementById('match-filtro-tolerancia');
+            const filtroTipo = filtroTipoEl ? filtroTipoEl.value : '';
+            const filtroTransacao = filtroTransEl ? filtroTransEl.value : '';
+            const tolerancia = toleranciaEl ? (parseFloat(toleranciaEl.value) || 0.1) : 0.1;
+            const poder = Utils.calcMaxImovelCliente(cliente);
+            const maxValor = poder ? poder.maxImovelPelaRenda * (1 + tolerancia) : Infinity;
+            const renda = cliente.rendaMensal || 0;
+            const maxPrestacao = renda * 0.30;
+
+            const compatíveis = imoveis.filter(i => {
+                if (i.status === 'vendido' || i.status === 'alugado') return false;
+                if (filtroTipo && i.tipo !== filtroTipo) return false;
+                if (filtroTransacao && i.transacao !== filtroTransacao) return false;
+                if (i.transacao === 'aluguel') { return !renda || !i.precoAluguel || i.precoAluguel <= maxPrestacao * 1.2; }
+                if (!i.precoVenda) return false;
+                return !poder || i.precoVenda <= maxValor;
+            }).map(i => {
+                let score = 100;
+                if (poder && i.precoVenda) {
+                    const r = i.precoVenda / poder.maxImovelPelaRenda;
+                    if (r <= 0.7) score += 20; else if (r <= 0.9) score += 10; else if (r > 1) score -= 10;
+                }
+                if (cliente.tipoInteresse && i.tipo === cliente.tipoInteresse) score += 15;
+                const sim = (poder && i.precoVenda) ? Utils.simulateFinancing(cliente, i, null) : null;
+                return { imovel: i, score, sim };
+            }).sort((a, b) => b.score - a.score);
+
+            if (compatíveis.length === 0) { Utils.toast('Nenhum imóvel compatível para gerar PDF', 'error'); return; }
+
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const W = 210, M = 14;
+            let y = 0;
+
+            // Header
+            doc.setFillColor(29, 111, 164);
+            doc.rect(0, 0, W, 42, 'F');
+            doc.setFillColor(39, 174, 96);
+            doc.rect(0, 42, W, 4, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(20);
+            doc.text('ImobiPro', M, 16);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(176, 214, 236);
+            doc.text('Match — Imóveis compatíveis com o perfil do cliente', M, 25);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(255, 255, 255);
+            doc.text(new Date().toLocaleDateString('pt-BR', { day:'numeric', month:'long', year:'numeric' }), W - M, 25, { align: 'right' });
+            y = 54;
+
+            // Dados do cliente
+            doc.setFillColor(235, 244, 251);
+            doc.roundedRect(M, y, W - M * 2, 32, 4, 4, 'F');
+            doc.setDrawColor(29, 111, 164, 80);
+            doc.roundedRect(M, y, W - M * 2, 32, 4, 4, 'S');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(29, 111, 164);
+            doc.text('PERFIL DO CLIENTE', M + 4, y + 8);
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(30, 50, 70);
+            doc.text(cliente.nome, M + 4, y + 16);
+            const idade = cliente.dataNascimento ? Utils.calculateAge(cliente.dataNascimento) : null;
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(80, 100, 120);
+            const infoLinha = [
+                idade ? `Idade: ${idade} anos` : '',
+                renda ? `Renda: ${Utils.formatCurrency(renda)}/mês` : '',
+                maxPrestacao ? `Prestação máx: ${Utils.formatCurrency(maxPrestacao)}/mês` : '',
+                poder ? `Cap. de compra: ${Utils.formatCurrency(poder.maxImovelPelaRenda)}` : '',
+            ].filter(Boolean).join('   ·   ');
+            doc.text(infoLinha, M + 4, y + 24);
+            doc.text(`${compatíveis.length} imóvel(is) compatível(is) encontrado(s)`, M + 4, y + 30);
+            y += 38;
+
+            // Imóveis
+            compatíveis.forEach(({ imovel: i, score, sim }, idx) => {
+                if (y > 240) { doc.addPage(); y = 16; }
+                const bgColor = idx % 2 === 0 ? [248, 250, 252] : [255, 255, 255];
+                doc.setFillColor(...bgColor);
+                doc.roundedRect(M, y, W - M * 2, 36, 4, 4, 'F');
+                doc.setDrawColor(220, 230, 240);
+                doc.roundedRect(M, y, W - M * 2, 36, 4, 4, 'S');
+
+                // Score badge
+                const sColor = score >= 120 ? [39, 174, 96] : score >= 100 ? [41, 128, 185] : [230, 126, 34];
+                doc.setFillColor(...sColor);
+                doc.roundedRect(W - M - 22, y + 4, 22, 10, 3, 3, 'F');
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(255, 255, 255);
+                doc.text(`⭐ ${score}`, W - M - 11, y + 10.5, { align: 'center' });
+
+                // Número
+                doc.setFillColor(29, 111, 164);
+                doc.circle(M + 7, y + 10, 5, 'F');
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(255, 255, 255);
+                doc.text(String(idx + 1), M + 7, y + 12.5, { align: 'center' });
+
+                // Título
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(30, 50, 70);
+                doc.text(i.titulo.substring(0, 52), M + 16, y + 9);
+
+                // Endereço
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(100, 120, 140);
+                doc.text(String(i.endereco || '—').substring(0, 60), M + 16, y + 16);
+
+                // Preço
+                const preco = i.precoVenda ? Utils.formatCurrency(i.precoVenda) : i.precoAluguel ? Utils.formatCurrency(i.precoAluguel) + '/mês' : 'Consulte';
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(29, 111, 164);
+                doc.text(preco, M + 16, y + 24);
+
+                // Prestação / Entrada
+                if (sim && !sim.error) {
+                    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(60, 80, 60);
+                    doc.text(`Prestação est: ${Utils.formatCurrency(sim.prestacaoMensal)}/mês   Entrada mín: ${Utils.formatCurrency(sim.entradaNecessaria)}   Prazo: ${sim.prazoMeses} meses`, M + 16, y + 31);
+                }
+
+                // Características
+                const caract = [];
+                if (i.area) caract.push(`${i.area}m²`);
+                if (i.quartos) caract.push(`${i.quartos}Q`);
+                if (i.banheiros) caract.push(`${i.banheiros}B`);
+                if (i.vagas) caract.push(`${i.vagas}V`);
+                if (caract.length) {
+                    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(100, 120, 140);
+                    doc.text(caract.join('  ·  '), W - M - 4 - 22 - 2, y + 31, { align: 'right' });
+                }
+                y += 40;
+            });
+
+            // Footer
+            const nPgs = doc.internal.getNumberOfPages();
+            for (let p = 1; p <= nPgs; p++) {
+                doc.setPage(p);
+                doc.setFillColor(29, 111, 164);
+                doc.rect(0, 287, W, 10, 'F');
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(255, 255, 255);
+                doc.text(`ImobiPro · Match Imóvel × Cliente · ${cliente.nome}`, M, 293);
+                doc.text(`Pág ${p}/${nPgs}`, W - M, 293, { align: 'right' });
+            }
+
+            const data = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+            doc.save(`Match_${cliente.nome.replace(/\s/g, '_')}_${data}.pdf`);
+            Utils.toast('✅ PDF do Match gerado com sucesso!', 'success');
+        }
+
+        return { init, filtrarClientes, selecionarCliente, executarMatch, gerarPDFMatch };
+    })();
+
+    // ===================================================================
+    // PERFIS MODULE — Análise de perfis e cenários
+    // ===================================================================
+    const PerfisModule = (() => {
+        const PERFIS_EXEMPLO = [
+            {
+                id: 'jovem_solteiro',
+                emoji: '👨‍💼',
+                titulo: 'Jovem Profissional',
+                descricao: 'Solteiro, 28 anos, CLT',
+                renda: 3500,
+                idade: 28,
+                idadeConjuge: null,
+                rendaConjuge: 0,
+                fgts: 8000,
+                cor: '#1D6FA4',
+            },
+            {
+                id: 'casal_jovem',
+                emoji: '💑',
+                titulo: 'Casal Jovem',
+                descricao: 'Casados, 30+30 anos',
+                renda: 4000,
+                idade: 30,
+                idadeConjuge: 30,
+                rendaConjuge: 3000,
+                fgts: 15000,
+                cor: '#27AE60',
+            },
+            {
+                id: 'familia_media',
+                emoji: '👨‍👩‍👧‍👦',
+                titulo: 'Família de Classe Média',
+                descricao: 'Casados, 40+38 anos, 2 filhos',
+                renda: 8000,
+                idade: 40,
+                idadeConjuge: 38,
+                rendaConjuge: 5000,
+                fgts: 40000,
+                cor: '#7C3AED',
+            },
+            {
+                id: 'servidor_publico',
+                emoji: '🏛️',
+                titulo: 'Servidor Público',
+                descricao: 'Servidor, 45 anos, solteiro',
+                renda: 7500,
+                idade: 45,
+                idadeConjuge: null,
+                rendaConjuge: 0,
+                fgts: 50000,
+                cor: '#0891B2',
+            },
+            {
+                id: 'autonomo_mei',
+                emoji: '🔧',
+                titulo: 'Autônomo / MEI',
+                descricao: 'MEI, 35 anos, renda variável',
+                renda: 5000,
+                idade: 35,
+                idadeConjuge: null,
+                rendaConjuge: 0,
+                fgts: 0,
+                cor: '#E67E22',
+            },
+            {
+                id: 'aposentado',
+                emoji: '👴',
+                titulo: 'Aposentado',
+                descricao: 'Aposentado INSS, 62 anos',
+                renda: 3000,
+                idade: 62,
+                idadeConjuge: null,
+                rendaConjuge: 0,
+                fgts: 20000,
+                cor: '#E74C3C',
+            },
+            {
+                id: 'alta_renda',
+                emoji: '💎',
+                titulo: 'Alta Renda',
+                descricao: 'Executivo, 45 anos, casado',
+                renda: 20000,
+                idade: 45,
+                idadeConjuge: 42,
+                rendaConjuge: 12000,
+                fgts: 80000,
+                cor: '#155A8A',
+            },
+            {
+                id: 'casal_maduros',
+                emoji: '🤝',
+                titulo: 'Casal Maduro',
+                descricao: 'Casados, 55+52 anos',
+                renda: 6000,
+                idade: 55,
+                idadeConjuge: 52,
+                rendaConjuge: 4000,
+                fgts: 60000,
+                cor: '#10B981',
+            },
+        ];
+
+        function init() {
+            _renderPerfisGrid();
+            const resEl = document.getElementById('pf-resultado-exemplos');
+            if (resEl) resEl.style.display = 'none';
+            _renderCenarios();
+        }
+
+        function _renderPerfisGrid() {
+            const grid = document.getElementById('pf-perfis-grid');
+            if (!grid) return;
+            grid.innerHTML = PERFIS_EXEMPLO.map(p => `
+                <div onclick="PerfisModule.analisarPerfil('${p.id}')" style="background:white;border-radius:13px;padding:13px;border:1.5px solid ${p.cor}33;cursor:pointer;transition:all 0.2s;box-shadow:var(--shadow-sm);" onmouseover="this.style.background='${p.cor}0d'" onmouseout="this.style.background='white'">
+                    <div style="font-size:1.5rem;margin-bottom:5px;">${p.emoji}</div>
+                    <div style="font-weight:800;font-size:0.85rem;color:var(--dark);">${p.titulo}</div>
+                    <div style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:6px;">${p.descricao}</div>
+                    <div style="font-size:0.78rem;font-weight:700;color:${p.cor};">${Utils.formatCurrency(p.renda + p.rendaConjuge)}/mês</div>
+                </div>
+            `).join('');
+        }
+
+        function _calcPerfil(p) {
+            const rendaTotal = (p.renda || 0) + (p.rendaConjuge || 0);
+            // Para determinar prazo, usa a MAIOR idade (proponente mais velho, regra Caixa)
+            const idadeMaisVelho = p.idadeConjuge ? Math.max(p.idade, p.idadeConjuge) : p.idade;
+            const prazoMax = Utils.getPrazoMaximoCaixa(idadeMaisVelho);
+            const maxPrestacao = rendaTotal * 0.30;
+            const taxaInfo = Utils.getTaxaCaixa(rendaTotal);
+            const i = taxaInfo.taxa / 100 / 12;
+            let maxFinanciado = 0;
+            if (i > 0 && prazoMax > 0) {
+                maxFinanciado = maxPrestacao * (1 - Math.pow(1 + i, -prazoMax)) / i;
+            }
+            const maxImovel = maxFinanciado / 0.8;
+            const entradaMin = maxImovel * 0.2;
+            const fgts = p.fgts || 0;
+            const maxComFgts = maxImovel + fgts;
+            return { rendaTotal, idadeMaisVelho, prazoMax, maxPrestacao, taxaInfo, maxImovel, maxFinanciado, entradaMin, fgts, maxComFgts };
+        }
+
+        function analisarPerfil(id) {
+            const perfil = PERFIS_EXEMPLO.find(p => p.id === id);
+            if (!perfil) return;
+            const calc = _calcPerfil(perfil);
+            const imoveis = (UI.data && UI.data.imoveis) ? UI.data.imoveis : [];
+            const imovelCompativeis = imoveis.filter(i => {
+                if (i.status === 'vendido' || i.status === 'alugado') return false;
+                if (!i.precoVenda) return false;
+                return i.precoVenda <= calc.maxComFgts * 1.1;
+            }).sort((a, b) => {
+                const ra = Math.abs(a.precoVenda / calc.maxImovel - 0.85);
+                const rb = Math.abs(b.precoVenda / calc.maxImovel - 0.85);
+                return ra - rb;
+            }).slice(0, 5);
+
+            const resDiv = document.getElementById('pf-resultado-exemplos');
+            if (!resDiv) return;
+            resDiv.style.display = 'block';
+            resDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            const prazoAnos = Math.floor(calc.prazoMax / 12);
+            resDiv.innerHTML = `
+                <div style="background:white;border-radius:14px;padding:14px;border:1.5px solid ${perfil.cor}40;box-shadow:var(--shadow-sm);margin-bottom:12px;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                        <div style="font-size:2rem;">${perfil.emoji}</div>
+                        <div>
+                            <div style="font-size:1rem;font-weight:900;color:var(--dark);">${perfil.titulo}</div>
+                            <div style="font-size:0.78rem;color:var(--text-secondary);">${perfil.descricao}</div>
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+                        <div style="background:var(--primary-ultra);border-radius:9px;padding:10px;border:1px solid var(--border-accent);">
+                            <div style="font-size:0.65rem;color:var(--text-secondary);font-weight:700;margin-bottom:2px;">RENDA FAMILIAR</div>
+                            <div style="font-size:0.95rem;font-weight:900;color:var(--primary);">${Utils.formatCurrency(calc.rendaTotal)}/mês</div>
+                        </div>
+                        <div style="background:rgba(230,126,34,0.08);border-radius:9px;padding:10px;border:1px solid rgba(230,126,34,0.15);">
+                            <div style="font-size:0.65rem;color:var(--text-secondary);font-weight:700;margin-bottom:2px;">PRESTAÇÃO MÁX. (30%)</div>
+                            <div style="font-size:0.95rem;font-weight:900;color:#E67E22;">${Utils.formatCurrency(calc.maxPrestacao)}/mês</div>
+                        </div>
+                        <div style="background:rgba(39,174,96,0.08);border-radius:9px;padding:10px;border:1px solid rgba(39,174,96,0.15);">
+                            <div style="font-size:0.65rem;color:var(--text-secondary);font-weight:700;margin-bottom:2px;">VALOR MÁX. IMÓVEL</div>
+                            <div style="font-size:0.95rem;font-weight:900;color:var(--accent);">${Utils.formatCurrency(calc.maxImovel)}</div>
+                        </div>
+                        <div style="background:rgba(124,58,237,0.08);border-radius:9px;padding:10px;border:1px solid rgba(124,58,237,0.15);">
+                            <div style="font-size:0.65rem;color:var(--text-secondary);font-weight:700;margin-bottom:2px;">PRAZO MÁX. (CAIXA)</div>
+                            <div style="font-size:0.95rem;font-weight:900;color:#7C3AED;">${calc.prazoMax} meses (${prazoAnos} anos)</div>
+                            <div style="font-size:0.62rem;color:var(--text-secondary);">Proponente mais velho: ${calc.idadeMaisVelho} anos</div>
+                        </div>
+                    </div>
+                    <div style="padding:8px 10px;background:rgba(39,174,96,0.07);border-radius:8px;border:1px solid rgba(39,174,96,0.15);margin-bottom:6px;font-size:0.78rem;">
+                        <span style="font-weight:700;color:var(--accent);">🏦 Taxa Caixa:</span> <span style="color:var(--dark);">${calc.taxaInfo.taxa}% a.a. — ${calc.taxaInfo.faixa}</span>
+                        ${calc.fgts > 0 ? `<span style="margin-left:10px;font-weight:700;color:#7C3AED;">+ FGTS: ${Utils.formatCurrency(calc.fgts)}</span>` : ''}
+                    </div>
+                    <div style="padding:8px 10px;background:var(--primary-ultra);border-radius:8px;border:1px solid var(--border-accent);font-size:0.8rem;font-weight:700;color:var(--primary);">
+                        💰 Com FGTS: capacidade total até ${Utils.formatCurrency(calc.maxComFgts)}
+                    </div>
+                </div>
+
+                <div style="font-weight:700;font-size:0.85rem;color:var(--dark);margin-bottom:8px;">
+                    ${imovelCompativeis.length > 0 ? `🏠 Imóveis do portfólio compatíveis (${imovelCompativeis.length}):` : '⚠️ Nenhum imóvel cadastrado no portfólio se encaixa neste perfil ainda.'}
+                </div>
+                ${imovelCompativeis.map(i => {
+                    const precoStr = Utils.formatCurrency(i.precoVenda);
+                    const pct = calc.maxImovel > 0 ? Math.round((i.precoVenda / calc.maxImovel) * 100) : 0;
+                    const barColor = pct <= 80 ? '#27AE60' : pct <= 100 ? '#E67E22' : '#E74C3C';
+                    const clienteFake = { rendaMensal: calc.rendaTotal, dataNascimento: _ageToDate(calc.idadeMaisVelho) };
+                    const sim = Utils.simulateFinancing(clienteFake, i, null);
+                    return `<div style="background:white;border-radius:11px;padding:12px;border:1px solid var(--border);margin-bottom:8px;box-shadow:var(--shadow-sm);">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+                            <div style="font-weight:800;font-size:0.87rem;color:var(--dark);flex:1;">${i.titulo}</div>
+                            <div style="font-size:0.95rem;font-weight:900;color:var(--primary);margin-left:8px;">${precoStr}</div>
+                        </div>
+                        <div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:8px;">${i.endereco || '—'}</div>
+                        <div style="height:6px;background:var(--border);border-radius:3px;margin-bottom:4px;">
+                            <div style="height:100%;width:${Math.min(pct,100)}%;background:${barColor};border-radius:3px;transition:width 0.5s;"></div>
+                        </div>
+                        <div style="font-size:0.72rem;color:${barColor};font-weight:700;margin-bottom:5px;">${pct}% da capacidade máx. deste perfil</div>
+                        ${sim && !sim.error ? `<div style="font-size:0.72rem;color:var(--text-secondary);">Prestação est.: <strong>${Utils.formatCurrency(sim.prestacaoMensal)}/mês</strong> · Entrada mín.: <strong>${Utils.formatCurrency(sim.entradaNecessaria)}</strong> · ${sim.prazoMeses} meses</div>` : ''}
+                    </div>`;
+                }).join('')}
+            `;
+        }
+
+        function analisarPersonalizado() {
+            const rendaEl = document.getElementById('pf-renda');
+            const rendaConjEl = document.getElementById('pf-renda-conjuge');
+            const idadeEl = document.getElementById('pf-idade');
+            const idadeConjEl = document.getElementById('pf-idade-conjuge');
+            const fgtsEl = document.getElementById('pf-fgts');
+            const tipoPrefEl = document.getElementById('pf-tipo-pref');
+            const nomeEl = document.getElementById('pf-nome');
+            if (!rendaEl || !idadeEl) { Utils.toast('Formulário não carregado', 'error'); return; }
+
+            const rendaStr = rendaEl.value;
+            const rendaConjStr = rendaConjEl ? rendaConjEl.value : '';
+            const idade = parseInt(idadeEl.value) || null;
+            const idadeConj = idadeConjEl ? (parseInt(idadeConjEl.value) || null) : null;
+            const fgtsStr = fgtsEl ? fgtsEl.value : '';
+            const tipoPref = tipoPrefEl ? tipoPrefEl.value : '';
+            const nome = (nomeEl ? nomeEl.value : '') || 'Perfil Personalizado';
+
+            const renda = Utils.parseCurrency(rendaStr) || 0;
+            const rendaConj = Utils.parseCurrency(rendaConjStr) || 0;
+            const fgts = Utils.parseCurrency(fgtsStr) || 0;
+
+            if (!renda && !rendaConj) { Utils.toast('Informe ao menos a renda mensal', 'error'); return; }
+            if (!idade) { Utils.toast('Informe a idade do proponente', 'error'); return; }
+
+            const perfil = { id: 'personalizado', emoji: '📋', titulo: nome, descricao: `Renda ${Utils.formatCurrency(renda + rendaConj)}/mês · ${idade} anos`, renda, rendaConjuge: rendaConj, idade, idadeConjuge: idadeConj, fgts, cor: '#1D6FA4' };
+            const calc = _calcPerfil(perfil);
+            const imoveis = (UI.data && UI.data.imoveis) ? UI.data.imoveis : [];
+            const imovelCompativeis = imoveis.filter(i => {
+                if (i.status === 'vendido' || i.status === 'alugado') return false;
+                if (tipoPref && i.tipo !== tipoPref) return false;
+                if (!i.precoVenda) return false;
+                return i.precoVenda <= calc.maxComFgts * 1.1;
+            }).sort((a, b) => Math.abs(a.precoVenda / calc.maxImovel - 0.85) - Math.abs(b.precoVenda / calc.maxImovel - 0.85)).slice(0, 8);
+
+            const resDiv = document.getElementById('pf-resultado-personalizado');
+            if (!resDiv) return;
+            resDiv.style.display = 'block';
+            const prazoAnos = Math.floor(calc.prazoMax / 12);
+
+            resDiv.innerHTML = `
+                <div style="background:white;border-radius:14px;padding:14px;border:1.5px solid var(--primary)40;box-shadow:var(--shadow-sm);margin-bottom:12px;">
+                    <div style="font-size:0.9rem;font-weight:900;color:var(--dark);margin-bottom:10px;">📋 ${nome}</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+                        <div style="background:var(--primary-ultra);border-radius:9px;padding:9px;"><div style="font-size:0.62rem;color:var(--text-secondary);font-weight:700;">RENDA FAMILIAR</div><div style="font-size:0.9rem;font-weight:900;color:var(--primary);">${Utils.formatCurrency(calc.rendaTotal)}/mês</div></div>
+                        <div style="background:rgba(230,126,34,0.08);border-radius:9px;padding:9px;"><div style="font-size:0.62rem;color:var(--text-secondary);font-weight:700;">PRESTAÇÃO MÁX.</div><div style="font-size:0.9rem;font-weight:900;color:#E67E22;">${Utils.formatCurrency(calc.maxPrestacao)}/mês</div></div>
+                        <div style="background:rgba(39,174,96,0.08);border-radius:9px;padding:9px;"><div style="font-size:0.62rem;color:var(--text-secondary);font-weight:700;">VALOR MÁX. IMÓVEL</div><div style="font-size:0.9rem;font-weight:900;color:var(--accent);">${Utils.formatCurrency(calc.maxImovel)}</div></div>
+                        <div style="background:rgba(124,58,237,0.08);border-radius:9px;padding:9px;"><div style="font-size:0.62rem;color:var(--text-secondary);font-weight:700;">PRAZO MÁX.</div><div style="font-size:0.9rem;font-weight:900;color:#7C3AED;">${calc.prazoMax}m · ${prazoAnos}a</div><div style="font-size:0.6rem;color:var(--text-secondary);">Proponente+velho: ${calc.idadeMaisVelho}a</div></div>
+                    </div>
+                    <div style="padding:7px 10px;background:var(--primary-ultra);border-radius:8px;font-size:0.77rem;font-weight:700;color:var(--primary);">💰 Com FGTS: até ${Utils.formatCurrency(calc.maxComFgts)} · Taxa: ${calc.taxaInfo.taxa}% a.a.</div>
+                </div>
+                <div style="font-weight:700;font-size:0.85rem;color:var(--dark);margin-bottom:8px;">${imovelCompativeis.length > 0 ? `🏠 Melhores imóveis (${imovelCompativeis.length}):` : '⚠️ Nenhum imóvel cadastrado se encaixa neste perfil.'}</div>
+                ${imovelCompativeis.map(i => {
+                    const pct = calc.maxImovel > 0 ? Math.round((i.precoVenda / calc.maxImovel) * 100) : 0;
+                    const barColor = pct <= 80 ? '#27AE60' : pct <= 100 ? '#E67E22' : '#E74C3C';
+                    const clienteFake = { rendaMensal: calc.rendaTotal, dataNascimento: _ageToDate(calc.idadeMaisVelho) };
+                    const sim = Utils.simulateFinancing(clienteFake, i, null);
+                    return `<div style="background:white;border-radius:11px;padding:11px;border:1px solid var(--border);margin-bottom:8px;box-shadow:var(--shadow-sm);">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;">
+                            <div style="font-weight:800;font-size:0.87rem;color:var(--dark);flex:1;">${i.titulo}</div>
+                            <div style="font-size:0.9rem;font-weight:900;color:var(--primary);margin-left:8px;">${Utils.formatCurrency(i.precoVenda)}</div>
+                        </div>
+                        <div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:6px;">${i.endereco || '—'}</div>
+                        <div style="height:5px;background:var(--border);border-radius:3px;margin-bottom:3px;"><div style="height:100%;width:${Math.min(pct,100)}%;background:${barColor};border-radius:3px;"></div></div>
+                        <div style="font-size:0.7rem;color:${barColor};font-weight:700;margin-bottom:4px;">${pct}% da capacidade</div>
+                        ${sim && !sim.error ? `<div style="font-size:0.7rem;color:var(--text-secondary);">Prestação: <strong>${Utils.formatCurrency(sim.prestacaoMensal)}/mês</strong> · Entrada: <strong>${Utils.formatCurrency(sim.entradaNecessaria)}</strong></div>` : ''}
+                    </div>`;
+                }).join('')}
+            `;
+        }
+
+        function _renderCenarios() {
+            const div = document.getElementById('pf-cenarios-content');
+            if (!div) return;
+            // Gera cenários comparativos para todos os perfis-exemplo contra o portfólio atual
+            const imoveis = (UI.data && UI.data.imoveis) ? UI.data.imoveis.filter(i => i.status !== 'vendido' && i.status !== 'alugado' && i.precoVenda) : [];
+            if (imoveis.length === 0) {
+                div.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:0.85rem;"><i class="fas fa-home" style="font-size:2rem;opacity:0.2;display:block;margin-bottom:8px;"></i>Nenhum imóvel disponível no portfólio para comparar cenários.</div>';
+                return;
+            }
+
+            // Top 3 imóveis mais acessíveis e top 3 mais caros
+            const ordPreco = [...imoveis].sort((a, b) => a.precoVenda - b.precoVenda);
+            const imovelAmostra = [ordPreco[0], ordPreco[Math.floor(ordPreco.length / 2)], ordPreco[ordPreco.length - 1]].filter(Boolean);
+
+            let html = `<div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:12px;">Comparação: quais perfis se encaixam em cada imóvel do portfólio</div>`;
+            html += `<div style="display:flex;flex-direction:column;gap:14px;">`;
+            imovelAmostra.forEach(imovel => {
+                const perfisEncaixam = PERFIS_EXEMPLO.map(p => {
+                    const calc = _calcPerfil(p);
+                    const encaixa = imovel.precoVenda <= calc.maxComFgts * 1.1;
+                    return { ...p, calc, encaixa };
+                });
+                const qtdEncaixa = perfisEncaixam.filter(p => p.encaixa).length;
+                html += `<div style="background:white;border-radius:13px;padding:13px;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+                    <div style="font-weight:800;font-size:0.92rem;color:var(--dark);margin-bottom:3px;">${imovel.titulo}</div>
+                    <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:8px;">${imovel.endereco || '—'} · <strong style="color:var(--primary);">${Utils.formatCurrency(imovel.precoVenda)}</strong></div>
+                    <div style="font-size:0.75rem;font-weight:700;color:var(--dark);margin-bottom:6px;">${qtdEncaixa} de ${PERFIS_EXEMPLO.length} perfis se encaixam:</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                    ${perfisEncaixam.map(p => `
+                        <div style="display:flex;align-items:center;gap:5px;padding:5px 9px;border-radius:20px;background:${p.encaixa ? p.cor + '15' : 'rgba(0,0,0,0.04)'};border:1px solid ${p.encaixa ? p.cor + '40' : 'var(--border)'};opacity:${p.encaixa ? '1' : '0.5'};">
+                            <span style="font-size:0.9rem;">${p.emoji}</span>
+                            <span style="font-size:0.72rem;font-weight:700;color:${p.encaixa ? p.cor : 'var(--text-muted)'};">${p.titulo}</span>
+                            ${p.encaixa ? '<i class="fas fa-check-circle" style="color:' + p.cor + ';font-size:0.65rem;"></i>' : '<i class="fas fa-times-circle" style="color:var(--text-muted);font-size:0.65rem;"></i>'}
+                        </div>
+                    `).join('')}
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            div.innerHTML = html;
+        }
+
+        function switchTab(tab) {
+            ['exemplos', 'personalizado', 'cenarios'].forEach(t => {
+                const panel = document.getElementById(`pf-panel-${t}`);
+                const btn = document.getElementById(`pf-tab-${t}`);
+                if (!panel || !btn) return;
+                if (t === tab) {
+                    panel.style.display = 'block';
+                    btn.style.background = t === 'cenarios' ? '#7C3AED' : t === 'personalizado' ? '#1D6FA4' : 'var(--accent)';
+                    btn.style.color = 'white';
+                    btn.style.border = 'none';
+                } else {
+                    panel.style.display = 'none';
+                    btn.style.background = 'white';
+                    btn.style.color = 'var(--text-secondary)';
+                    btn.style.border = '1.5px solid var(--border)';
+                }
+            });
+            if (tab === 'cenarios') _renderCenarios();
+        }
+
+        function _ageToDate(age) {
+            if (!age) return null;
+            const d = new Date();
+            d.setFullYear(d.getFullYear() - age);
+            return d.toISOString().split('T')[0];
+        }
+
+        return { init, analisarPerfil, analisarPersonalizado, switchTab };
     })();
 
     // Patch: clicking agenda cards opens VerTarefa instead of edit form directly
