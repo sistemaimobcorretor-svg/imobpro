@@ -9600,6 +9600,76 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             </div>
             <!-- END PERFIS VIEW -->
 
+            <!-- ===== FLUXO FINANCEIRO — MANUAL DO CORRETOR ===== -->
+            <div id="fluxo-view" class="view">
+
+                <!-- Hero -->
+                <div style="background:linear-gradient(135deg,#0C4A6E 0%,#1D6FA4 60%,#27AE60 100%);border-radius:18px;padding:20px;margin-bottom:16px;color:white;position:relative;overflow:hidden;">
+                    <div style="position:absolute;top:-40px;right:-24px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.07);pointer-events:none;"></div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+                        <div style="width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;">📋</div>
+                        <div>
+                            <div style="font-size:1.05rem;font-weight:900;letter-spacing:-0.3px;">Manual do Fluxo Financeiro</div>
+                            <div style="font-size:0.78rem;opacity:0.85;">Imóvel na planta · Juros de obra · INCC · IGPM · Impacto na renda · Estratégias</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+                        <button onclick="FluxoManual.baixarPDF()" style="background:rgba(255,255,255,0.20);color:white;border:1px solid rgba(255,255,255,0.35);border-radius:20px;padding:7px 16px;font-size:0.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">
+                            <i class="fas fa-file-pdf"></i> Baixar Manual PDF
+                        </button>
+                        <button onclick="FluxoManual.switchTab('simulador')" style="background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.20);border-radius:20px;padding:7px 16px;font-size:0.8rem;font-weight:700;cursor:pointer;">
+                            <i class="fas fa-calculator"></i> Simular Cenário
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Abas -->
+                <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;">
+                    <button id="fl-tab-manual" onclick="FluxoManual.switchTab('manual')" style="flex-shrink:0;padding:8px 14px;border-radius:20px;border:none;background:var(--primary);color:white;font-size:0.8rem;font-weight:700;cursor:pointer;"><i class="fas fa-book-open"></i> Manual</button>
+                    <button id="fl-tab-simulador" onclick="FluxoManual.switchTab('simulador')" style="flex-shrink:0;padding:8px 14px;border-radius:20px;border:1.5px solid var(--border);background:white;color:var(--text-secondary);font-size:0.8rem;font-weight:700;cursor:pointer;"><i class="fas fa-calculator"></i> Simulador</button>
+                    <button id="fl-tab-corretor" onclick="FluxoManual.switchTab('corretor')" style="flex-shrink:0;padding:8px 14px;border-radius:20px;border:1.5px solid var(--border);background:white;color:var(--text-secondary);font-size:0.8rem;font-weight:700;cursor:pointer;"><i class="fas fa-user-tie"></i> Guia Corretor</button>
+                    <button id="fl-tab-cliente" onclick="FluxoManual.switchTab('cliente')" style="flex-shrink:0;padding:8px 14px;border-radius:20px;border:1.5px solid var(--border);background:white;color:var(--text-secondary);font-size:0.8rem;font-weight:700;cursor:pointer;"><i class="fas fa-user"></i> Guia Cliente</button>
+                </div>
+
+                <!-- Painel Manual -->
+                <div id="fl-panel-manual">
+                    <div id="fl-manual-content"></div>
+                </div>
+
+                <!-- Painel Simulador -->
+                <div id="fl-panel-simulador" style="display:none;">
+                    <div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);box-shadow:var(--shadow-sm);margin-bottom:14px;">
+                        <div style="font-size:0.85rem;font-weight:800;color:var(--dark);margin-bottom:12px;">⚙️ Parâmetros do Cenário</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                            <div><label style="font-size:0.72rem;color:var(--text-secondary);font-weight:700;display:block;margin-bottom:3px;">Valor do Imóvel</label><input type="text" id="fl-valor-imovel" class="form-control" placeholder="Ex: 300.000,00" oninput="Utils.maskMoney(this)" style="font-size:0.85rem;"></div>
+                            <div><label style="font-size:0.72rem;color:var(--text-secondary);font-weight:700;display:block;margin-bottom:3px;">Entrada (% do valor)</label><input type="number" id="fl-pct-entrada" class="form-control" placeholder="20" min="10" max="60" value="20" style="font-size:0.85rem;"></div>
+                            <div><label style="font-size:0.72rem;color:var(--text-secondary);font-weight:700;display:block;margin-bottom:3px;">Prazo entrada (meses)</label><input type="number" id="fl-prazo-entrada" class="form-control" placeholder="60" min="12" max="60" value="60" style="font-size:0.85rem;"></div>
+                            <div><label style="font-size:0.72rem;color:var(--text-secondary);font-weight:700;display:block;margin-bottom:3px;">Prazo financiamento (meses)</label><input type="number" id="fl-prazo-fin" class="form-control" placeholder="360" min="60" max="420" value="360" style="font-size:0.85rem;"></div>
+                            <div><label style="font-size:0.72rem;color:var(--text-secondary);font-weight:700;display:block;margin-bottom:3px;">Taxa Caixa (% a.a.)</label><input type="number" id="fl-taxa-caixa" class="form-control" placeholder="8.16" step="0.01" value="8.16" style="font-size:0.85rem;"></div>
+                            <div><label style="font-size:0.72rem;color:var(--text-secondary);font-weight:700;display:block;margin-bottom:3px;">Taxa juros de obra (% a.a.)</label><input type="number" id="fl-taxa-obra" class="form-control" placeholder="12" step="0.01" value="12" style="font-size:0.85rem;"></div>
+                            <div><label style="font-size:0.72rem;color:var(--text-secondary);font-weight:700;display:block;margin-bottom:3px;">INCC mensal estimado (%)</label><input type="number" id="fl-incc" class="form-control" placeholder="0.50" step="0.01" value="0.50" style="font-size:0.85rem;"></div>
+                            <div><label style="font-size:0.72rem;color:var(--text-secondary);font-weight:700;display:block;margin-bottom:3px;">Entrega da obra (meses)</label><input type="number" id="fl-entrega" class="form-control" placeholder="24" min="6" max="60" value="24" style="font-size:0.85rem;"></div>
+                            <div><label style="font-size:0.72rem;color:var(--text-secondary);font-weight:700;display:block;margin-bottom:3px;">Renda mensal familiar</label><input type="text" id="fl-renda" class="form-control" placeholder="Ex: 8.000,00" oninput="Utils.maskMoney(this)" style="font-size:0.85rem;"></div>
+                            <div><label style="font-size:0.72rem;color:var(--text-secondary);font-weight:700;display:block;margin-bottom:3px;">Aluguel atual pago</label><input type="text" id="fl-aluguel" class="form-control" placeholder="Ex: 1.200,00" oninput="Utils.maskMoney(this)" style="font-size:0.85rem;"></div>
+                        </div>
+                        <button onclick="FluxoManual.simular()" style="margin-top:12px;width:100%;background:var(--primary);color:white;border:none;border-radius:10px;padding:12px;font-size:0.9rem;font-weight:700;cursor:pointer;"><i class="fas fa-chart-line"></i> Gerar Simulação</button>
+                    </div>
+                    <div id="fl-simulador-resultado" style="display:none;"></div>
+                </div>
+
+                <!-- Painel Guia Corretor -->
+                <div id="fl-panel-corretor" style="display:none;">
+                    <div id="fl-corretor-content"></div>
+                </div>
+
+                <!-- Painel Guia Cliente -->
+                <div id="fl-panel-cliente" style="display:none;">
+                    <div id="fl-cliente-content"></div>
+                </div>
+
+            </div>
+            <!-- END FLUXO VIEW -->
+
         </main>
 
         <!-- ── FAB Speed Dial ── -->
@@ -9681,6 +9751,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <i class="fas fa-chart-bar"></i> Perfis & Cenários
                     <span style="font-size:.6rem;background:rgba(39,174,96,0.12);color:var(--accent);padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
                 </button>
+                <button class="nav-panel-item" data-target="fluxo-view" onclick="UI.switchTab(this);FluxoManual.init();UI.closeNavDrawer();return false;">
+                    <i class="fas fa-stream"></i> Fluxo Financeiro
+                    <span style="font-size:.6rem;background:rgba(29,111,164,0.12);color:var(--primary);padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
+                </button>
                 <button class="nav-panel-item" data-target="coach-view" onclick="UI.switchTab(this);Coach.init();UI.closeNavDrawer();return false;">
                     <i class="fas fa-trophy"></i> Coach
                 </button>
@@ -9754,6 +9828,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </button>
                 <button class="nav-panel-item" data-target="perfis-view" onclick="UI.switchTab(this);PerfisModule.init();return false;">
                     <i class="fas fa-chart-bar"></i> Perfis & Cenários
+                </button>
+                <button class="nav-panel-item" data-target="fluxo-view" onclick="UI.switchTab(this);FluxoManual.init();return false;">
+                    <i class="fas fa-stream"></i> Fluxo Financeiro
                 </button>
                 <button class="nav-panel-item" data-target="coach-view" onclick="UI.switchTab(this);Coach.init();return false;">
                     <i class="fas fa-trophy"></i> Coach
@@ -15236,6 +15313,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 } else if (target === 'perfis-view') {
                     container.style.display = 'none';
                     PerfisModule.init();
+                } else if (target === 'fluxo-view') {
+                    container.style.display = 'none';
+                    FluxoManual.init();
                 } else {
                     container.style.display = 'none';
                 }
@@ -41297,7 +41377,949 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
     })();
 
     // ===================================================================
-    // MATCH MODULE — Melhor imóvel para o cliente
+    // FLUXO MANUAL — Manual do Fluxo Financeiro de Imóvel na Planta
+    // ===================================================================
+    const FluxoManual = (() => {
+        let _lastSim = null;
+
+        function init() {
+            switchTab('manual');
+        }
+
+        function switchTab(tab) {
+            ['manual','simulador','corretor','cliente'].forEach(t => {
+                const panel = document.getElementById(`fl-panel-${t}`);
+                const btn   = document.getElementById(`fl-tab-${t}`);
+                if (!panel || !btn) return;
+                if (t === tab) {
+                    panel.style.display = 'block';
+                    const cores = { manual:'var(--primary)', simulador:'#7C3AED', corretor:'#0891B2', cliente:'#27AE60' };
+                    btn.style.background = cores[t] || 'var(--primary)';
+                    btn.style.color = 'white';
+                    btn.style.border = 'none';
+                } else {
+                    panel.style.display = 'none';
+                    btn.style.background = 'white';
+                    btn.style.color = 'var(--text-secondary)';
+                    btn.style.border = '1.5px solid var(--border)';
+                }
+            });
+            if (tab === 'manual') _renderManual();
+            if (tab === 'corretor') _renderCorretor();
+            if (tab === 'cliente') _renderCliente();
+        }
+
+        // ── Seção genérica ────────────────────────────────────────────
+        function _sec(emoji, titulo, cor, conteudo) {
+            return `<div style="background:white;border-radius:14px;padding:15px;border:1.5px solid ${cor}30;box-shadow:var(--shadow-sm);margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:${cor}15;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">${emoji}</div>
+                    <div style="font-size:0.92rem;font-weight:900;color:var(--dark);">${titulo}</div>
+                </div>
+                ${conteudo}
+            </div>`;
+        }
+
+        function _item(icone, texto, cor) {
+            cor = cor || 'var(--primary)';
+            return `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+                <i class="fas fa-${icone}" style="color:${cor};margin-top:2px;flex-shrink:0;width:14px;"></i>
+                <div style="font-size:0.83rem;color:var(--dark);line-height:1.5;">${texto}</div>
+            </div>`;
+        }
+
+        function _alerta(tipo, texto) {
+            const cfg = {
+                warn:  { bg:'rgba(230,126,34,0.08)', border:'rgba(230,126,34,0.30)', cor:'#E67E22', icon:'exclamation-triangle' },
+                info:  { bg:'rgba(29,111,164,0.07)',  border:'rgba(29,111,164,0.25)',  cor:'#1D6FA4', icon:'info-circle' },
+                ok:    { bg:'rgba(39,174,96,0.07)',   border:'rgba(39,174,96,0.25)',   cor:'#27AE60', icon:'check-circle' },
+                danger:{ bg:'rgba(231,76,60,0.07)',   border:'rgba(231,76,60,0.25)',   cor:'#E74C3C', icon:'times-circle' },
+            };
+            const c = cfg[tipo] || cfg.info;
+            return `<div style="background:${c.bg};border:1px solid ${c.border};border-radius:9px;padding:10px 12px;margin:6px 0;display:flex;gap:10px;">
+                <i class="fas fa-${c.icon}" style="color:${c.cor};margin-top:2px;flex-shrink:0;"></i>
+                <div style="font-size:0.82rem;color:var(--dark);line-height:1.5;">${texto}</div>
+            </div>`;
+        }
+
+        function _renderManual() {
+            const div = document.getElementById('fl-manual-content');
+            if (!div) return;
+            div.innerHTML = `
+
+${_sec('🏗️', 'FASE 1 — Assinatura do Contrato com a Construtora', '#1D6FA4', `
+    ${_item('pen-fancy','O cliente assina o Contrato de Compra e Venda (CCV) com a construtora.','#1D6FA4')}
+    ${_item('money-bill-wave','Neste momento define-se: <strong>valor total do imóvel, entrada parcelada, sinal e o valor a ser financiado</strong>.','#1D6FA4')}
+    ${_item('calendar-alt','A entrada costuma ser parcelada em <strong>até 60 meses</strong> diretamente com a construtora — sem análise de crédito do banco ainda.','#1D6FA4')}
+    ${_item('percentage','Sobre as parcelas de entrada incide o <strong>INCC (Índice Nacional de Custo da Construção)</strong> até a entrega do imóvel.','#E67E22')}
+    ${_alerta('info','<strong>INCC 2024/2025:</strong> variação média de 0,4% a 0,6% ao mês. Em 24 meses, as parcelas sofrem correção acumulada de ~12% a 15% sobre o saldo devedor da entrada.')}
+`)}
+
+${_sec('🏦', 'FASE 2 — Assinatura com o Banco (Caixa Econômica / SBPE)', '#7C3AED', `
+    ${_item('file-contract','Geralmente ocorre <strong>próximo da entrega da obra</strong>, quando a vistoria e documentação do imóvel estão prontas.','#7C3AED')}
+    ${_item('clock','A partir de <strong>30 dias após a assinatura do contrato de financiamento</strong>, o banco começa a cobrar os <strong>juros de obra</strong>.','#E74C3C')}
+    ${_item('percentage','Os juros de obra incidem sobre o <strong>saldo devedor já liberado ao banco</strong> (proporcional ao andamento da obra), não sobre o valor total.','#E67E22')}
+    ${_alerta('warn','<strong>⚠️ Ponto crítico:</strong> O cliente começa a pagar <strong>juros de obra + parcelas de entrada (com INCC)</strong> ao mesmo tempo. Esse período é o de maior pressão financeira.')}
+    ${_item('chart-line','Os juros de obra variam conforme o contrato, tipicamente <strong>1% ao mês</strong> (12% ao ano) sobre o saldo liberado.','#E74C3C')}
+`)}
+
+${_sec('🏠', 'FASE 3 — Entrega do Imóvel (em média 24 meses após a assinatura)', '#27AE60', `
+    ${_item('key','A construtora entrega o imóvel. A partir deste momento, o banco passa a cobrar as <strong>parcelas regulares do financiamento</strong> (capital + juros) — em ~30 dias.','#27AE60')}
+    ${_item('door-open','O cliente pode <strong>se mudar e deixar de pagar aluguel</strong> — o que ajuda a absorver parte do custo das parcelas.','#27AE60')}
+    ${_item('file-invoice-dollar','Se a entrada foi parcelada em 60 meses, o cliente ainda paga <strong>mais ~36 meses de entrada (com IGPM + 1%)</strong> após a entrega do imóvel.','#E67E22')}
+    ${_alerta('warn','<strong>⚠️ Soma crítica pós-entrega:</strong> PARCELA DO BANCO + PARCELAS RESTANTES DA ENTRADA (IGPM+1%). Esse somatório pode comprometer 40–55% da renda em alguns cenários.')}
+    ${_alerta('ok','<strong>Compensação:</strong> O aluguel que o cliente pagava deixa de existir. Em geral, se o aluguel for maior que as parcelas de entrada residuais, o impacto líquido é positivo.')}
+`)}
+
+${_sec('📊', 'FASE 4 — Período de Sobreposição (pós-entrega até quitar a entrada)', '#E67E22', `
+    ${_item('calendar-check','Duração típica: de 1 a 3 anos após a entrega (dependendo do saldo de entrada restante).','#E67E22')}
+    ${_item('calculator','Neste período coexistem: <strong>(1) Parcelas do banco (SAC/Price)</strong> + <strong>(2) Parcelas residuais da entrada (IGPM + 1%/ano)</strong>.','#E74C3C')}
+    ${_item('trending-up','O IGPM histórico varia, mas pode atingir <strong>5% a 25% ao ano</strong>. Em anos de alta inflação, as parcelas de entrada crescem consideravelmente.','#E74C3C')}
+    ${_alerta('danger','Esse é o cenário que mais surpreende negativamente o cliente. O corretor que <strong>não explica este ponto com clareza</strong> cria insatisfação, inadimplência e perda de indicações.')}
+    ${_item('hand-holding-usd','Estratégia: incentivar o cliente a <strong>quitar antecipadamente as parcelas da construtora</strong> assim que puder — usa-se FGTS, 13º salário, bônus etc.','#27AE60')}
+`)}
+
+${_sec('📈', 'Resumo dos Índices e Encargos', '#155A8A', `
+    <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+        <thead>
+            <tr style="background:var(--primary);color:white;">
+                <th style="padding:8px;text-align:left;border-radius:8px 0 0 0;">Encargo</th>
+                <th style="padding:8px;text-align:left;">Quando incide</th>
+                <th style="padding:8px;text-align:left;">Referência</th>
+                <th style="padding:8px;text-align:left;border-radius:0 8px 0 0;">Impacto típico</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="background:#F8FAFC;"><td style="padding:8px;font-weight:700;">INCC</td><td style="padding:8px;">Da assinatura até entrega</td><td style="padding:8px;">~0,4–0,6%/mês</td><td style="padding:8px;color:#E67E22;font-weight:700;">+12–15% sobre entrada</td></tr>
+            <tr><td style="padding:8px;font-weight:700;">Juros de obra</td><td style="padding:8px;">30 dias após assinar banco</td><td style="padding:8px;">~1%/mês (12% a.a.)</td><td style="padding:8px;color:#E74C3C;font-weight:700;">R$ 300–1.500/mês</td></tr>
+            <tr style="background:#F8FAFC;"><td style="padding:8px;font-weight:700;">IGPM + 1%</td><td style="padding:8px;">Após entrega até quitar entrada</td><td style="padding:8px;">Variável (5–25%/a)</td><td style="padding:8px;color:#E67E22;font-weight:700;">Reajuste anual entrada</td></tr>
+            <tr><td style="padding:8px;font-weight:700;">Parcela Caixa</td><td style="padding:8px;">30 dias após entrega</td><td style="padding:8px;">Taxa SBPE/FGTS</td><td style="padding:8px;color:#1D6FA4;font-weight:700;">Até 30% da renda</td></tr>
+        </tbody>
+    </table>
+    </div>
+`)}`;
+        }
+
+        function _renderCorretor() {
+            const div = document.getElementById('fl-corretor-content');
+            if (!div) return;
+            div.innerHTML = `
+
+${_sec('🎯', 'Estratégia 1 — A Apresentação Completa (antes de fechar)', '#1D6FA4', `
+    ${_alerta('info','Apresente o fluxo completo <strong>antes da assinatura</strong>. O cliente informado fecha com confiança e raramente desiste depois.')}
+    ${_item('check-circle','Mostre uma linha do tempo com os 4 momentos financeiros: assinatura CCV → assinatura banco → entrega → quitação da entrada.','#27AE60')}
+    ${_item('chart-bar','Use o <strong>Simulador de Cenário</strong> desta tela para mostrar os valores estimados de cada fase.','#1D6FA4')}
+    ${_item('handshake','Destaque o ponto positivo: "Quando você receber as chaves, você para de pagar aluguel — esse valor compensa parte dos custos."','#27AE60')}
+    ${_item('file-pdf','Imprima ou envie o PDF deste manual para o cliente <strong>antes</strong> da assinatura — demonstra profissionalismo e transparência.','#7C3AED')}
+`)}
+
+${_sec('💬', 'Estratégia 2 — Script para Abordar os Juros de Obra', '#7C3AED', `
+    <div style="background:rgba(124,58,237,0.06);border-radius:10px;padding:12px;border:1px solid rgba(124,58,237,0.15);margin-bottom:8px;">
+        <div style="font-size:0.72rem;font-weight:800;color:#7C3AED;margin-bottom:6px;">💬 SCRIPT SUGERIDO AO CORRETOR:</div>
+        <div style="font-size:0.82rem;color:var(--dark);line-height:1.6;font-style:italic;">
+            "Sr(a). [Nome], além das parcelas de entrada que você vai pagar para a construtora, existe um item que preciso explicar com clareza: o <strong>juros de obra</strong>. Ele começa 30 dias após a assinatura com o banco e incide sobre o que já foi liberado. Normalmente são valores de R$ X a R$ Y por mês. Mas olha o que acontece quando você receber as chaves: você para de pagar aluguel — e isso pode compensar quase inteiramente esse valor. Vamos ver no simulador como isso funciona no seu caso específico?"
+        </div>
+    </div>
+    ${_item('lightbulb','Use o simulador para mostrar números reais: é muito mais fácil o cliente aceitar quando vê os valores concretos.','#E67E22')}
+    ${_item('shield-alt','Registre sempre em WhatsApp ou e-mail que você explicou o fluxo. Isso protege você e demonstra ética profissional.','#1D6FA4')}
+`)}
+
+${_sec('📅', 'Estratégia 3 — Planejamento de Reserva Financeira', '#27AE60', `
+    ${_item('piggy-bank','Oriente o cliente a criar uma <strong>reserva de 3 a 6 meses</strong> de parcelas estimadas antes da assinatura do banco.','#27AE60')}
+    ${_item('calendar-alt','Monte com o cliente um <strong>planejamento mensal</strong>: entrada + juros de obra + aluguel atual (até ter as chaves) = custo total mensal na fase de obra.','#27AE60')}
+    ${_item('coins','Sugira usar o <strong>13º salário e FGTS</strong> para amortizar as parcelas da construtora e reduzir o período de sobreposição pós-entrega.','#E67E22')}
+    ${_alerta('ok','Clientes que planejam a reserva financeira têm muito menor índice de distrato — o que protege sua comissão e a relação profissional.')}
+`)}
+
+${_sec('🔄', 'Estratégia 4 — Acompanhamento Pós-Venda', '#E67E22', `
+    ${_item('bell','<strong>6 meses antes da entrega:</strong> entre em contato para lembrar o cliente sobre a assinatura do banco, documentos e a chegada das parcelas.','#1D6FA4')}
+    ${_item('bell','<strong>30 dias antes da entrega:</strong> revisão do planejamento financeiro — mostre os valores atualizados com INCC acumulado.','#E67E22')}
+    ${_item('star','<strong>Na entrega das chaves:</strong> celebre com o cliente! Lembre-o de que agora para de pagar aluguel.','#27AE60')}
+    ${_item('envelope','<strong>12 meses após a entrega:</strong> contate o cliente para verificar se está confortável com os pagamentos. Peça indicações.','#7C3AED')}
+    ${_alerta('ok','O corretor que acompanha o pós-venda gera indicações espontâneas. 1 venda bem acompanhada = 2 a 3 indicações qualificadas.')}
+`)}
+
+${_sec('⚖️', 'Checklist do Corretor — Antes de Assinar', '#155A8A', `
+    <div style="display:flex;flex-direction:column;gap:6px;">
+        ${['Apresentei a linha do tempo dos 4 momentos financeiros ao cliente',
+           'Expliquei o INCC sobre as parcelas de entrada',
+           'Expliquei os juros de obra e quando começam',
+           'Mostrei a soma: parcela banco + entrada residual pós-entrega',
+           'Calculei o impacto líquido descontando o aluguel atual',
+           'Orientei sobre reserva financeira e uso do FGTS',
+           'Enviei este manual (PDF) ao cliente por escrito',
+           'Registrei a conversa por WhatsApp ou e-mail'].map(t =>
+            `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 10px;background:var(--bg-overlay);border-radius:8px;">
+                <i class="fas fa-square" style="color:var(--border);margin-top:2px;flex-shrink:0;"></i>
+                <span style="font-size:0.82rem;color:var(--dark);">${t}</span>
+            </div>`
+        ).join('')}
+    </div>
+`)}`;
+        }
+
+        function _renderCliente() {
+            const div = document.getElementById('fl-cliente-content');
+            if (!div) return;
+            div.innerHTML = `
+
+${_sec('👋', 'O que você precisa saber antes de assinar', '#1D6FA4', `
+    ${_alerta('info','Este guia foi preparado pelo seu corretor para que você compreenda <strong>todas as etapas e custos</strong> do financiamento de imóvel na planta. Conhecimento é proteção.')}
+    ${_item('home','Comprar um imóvel na planta é uma das melhores formas de construir patrimônio — mas exige <strong>planejamento financeiro cuidadoso</strong>.','#1D6FA4')}
+`)}
+
+${_sec('💸', 'O que você vai pagar — e quando', '#E67E22', `
+    <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="background:rgba(29,111,164,0.07);border-radius:10px;padding:12px;border-left:3px solid var(--primary);">
+            <div style="font-weight:800;font-size:0.85rem;color:var(--primary);margin-bottom:4px;">🏗️ DURANTE A OBRA (ex: 24 meses)</div>
+            <div style="font-size:0.82rem;color:var(--dark);line-height:1.6;">
+                • <strong>Parcelas de entrada</strong> para a construtora (com INCC mensal)<br>
+                • <strong>Juros de obra</strong> para o banco (a partir de 30 dias da assinatura)<br>
+                • <strong>Aluguel atual</strong> (até receber as chaves)
+            </div>
+        </div>
+        <div style="background:rgba(231,76,60,0.07);border-radius:10px;padding:12px;border-left:3px solid #E74C3C;">
+            <div style="font-weight:800;font-size:0.85rem;color:#E74C3C;margin-bottom:4px;">🔑 NOS PRIMEIROS ANOS APÓS A ENTREGA</div>
+            <div style="font-size:0.82rem;color:var(--dark);line-height:1.6;">
+                • <strong>Parcelas do banco</strong> (começa ~30 dias após receber as chaves)<br>
+                • <strong>Parcelas residuais da entrada</strong> (se a entrada for em 60x, ainda faltam ~36x com IGPM+1%)<br>
+                • ✅ <strong>Para de pagar aluguel</strong> — esse é o alívio!
+            </div>
+        </div>
+        <div style="background:rgba(39,174,96,0.07);border-radius:10px;padding:12px;border-left:3px solid #27AE60;">
+            <div style="font-weight:800;font-size:0.85rem;color:#27AE60;margin-bottom:4px;">🎉 APÓS QUITAR A ENTRADA</div>
+            <div style="font-size:0.82rem;color:var(--dark);line-height:1.6;">
+                • Apenas a <strong>parcela mensal do banco</strong> (com tendência de queda no SAC)<br>
+                • Patrimônio valorizado e custo mensal reduzindo ano a ano
+            </div>
+        </div>
+    </div>
+`)}
+
+${_sec('📌', 'Os 3 pontos que nunca podem ser ignorados', '#E74C3C', `
+    ${_alerta('warn','<strong>1. INCC:</strong> As parcelas que você paga à construtora sobem todo mês até a entrega da obra. Planeje com margem de 15% sobre o valor inicial.')}
+    ${_alerta('warn','<strong>2. Juros de obra:</strong> Você paga ao banco desde 30 dias após assinar — mesmo sem ter as chaves ainda.')}
+    ${_alerta('warn','<strong>3. Sobreposição pós-entrega:</strong> Por até 3 anos você pode pagar parcela do banco + parcela da construtora ao mesmo tempo. Use o simulador para ver seus números.')}
+`)}
+
+${_sec('✅', 'Dicas para se proteger financeiramente', '#27AE60', `
+    ${_item('piggy-bank','Tenha uma <strong>reserva de emergência equivalente a 6 meses</strong> das parcelas estimadas antes de assinar.','#27AE60')}
+    ${_item('coins','Use o <strong>FGTS para amortizar</strong> o saldo devedor da entrada ou do banco — isso reduz o prazo e os juros totais.','#27AE60')}
+    ${_item('calendar-alt','Use o <strong>13º salário anualmente</strong> para reduzir o saldo da construtora. Quanto antes quitar a entrada, menos tempo de sobreposição.','#27AE60')}
+    ${_item('chart-line','<strong>Nunca comprometa mais que 35% da sua renda</strong> com moradia durante a fase de obras. Se ultrapassar, reavalie.','#E67E22')}
+    ${_item('phone','Mantenha contato com seu corretor em todas as fases — ele é seu aliado para antecipar situações e encontrar soluções.','#1D6FA4')}
+`)}
+
+${_sec('❓', 'Perguntas frequentes', '#155A8A', `
+    ${['<strong>Posso usar o FGTS na compra na planta?</strong> Sim, para parte da entrada ou amortização. Consulte a Caixa para os critérios.',
+       '<strong>O que acontece se eu atrasar uma parcela?</strong> Multa de 2% + juros de mora de 0,033%/dia. Avise a construtora antes do vencimento.',
+       '<strong>Posso vender o imóvel antes da entrega?</strong> Sim, é a chamada "cessão de direitos". O lucro pode ser tributado pelo IR.',
+       '<strong>A parcela do banco vai mudar ao longo do tempo?</strong> No SAC ela cai mês a mês. Na Tabela Price ela é fixa. A Caixa usa principalmente o SAC.',
+       '<strong>O que é o MIP/DFI?</strong> São os seguros obrigatórios do financiamento: seguro de vida e seguro do imóvel. São embutidos na parcela.'
+    ].map(q => `<div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--dark);line-height:1.5;">${q}</div>`).join('')}
+`)}`;
+        }
+
+        function simular() {
+            const valorEl    = document.getElementById('fl-valor-imovel');
+            const pctEl      = document.getElementById('fl-pct-entrada');
+            const prazoEntEl = document.getElementById('fl-prazo-entrada');
+            const prazoFinEl = document.getElementById('fl-prazo-fin');
+            const taxaCxEl   = document.getElementById('fl-taxa-caixa');
+            const taxaObEl   = document.getElementById('fl-taxa-obra');
+            const inccEl     = document.getElementById('fl-incc');
+            const entregaEl  = document.getElementById('fl-entrega');
+            const rendaEl    = document.getElementById('fl-renda');
+            const aluguelEl  = document.getElementById('fl-aluguel');
+            if (!valorEl) return;
+
+            const valorImovel   = Utils.parseCurrency(valorEl.value) || 0;
+            const pctEntrada    = (parseFloat(pctEl?.value) || 20) / 100;
+            const prazoEntrada  = parseInt(prazoEntEl?.value) || 60;
+            const prazoFin      = parseInt(prazoFinEl?.value) || 360;
+            const taxaCaixa     = (parseFloat(taxaCxEl?.value) || 8.16) / 100 / 12;
+            const taxaObra      = (parseFloat(taxaObEl?.value) || 12) / 100 / 12;
+            const inccMes       = (parseFloat(inccEl?.value) || 0.5) / 100;
+            const entregaMeses  = parseInt(entregaEl?.value) || 24;
+            const renda         = Utils.parseCurrency(rendaEl?.value) || 0;
+            const aluguel       = Utils.parseCurrency(aluguelEl?.value) || 0;
+
+            if (valorImovel <= 0) { Utils.toast('Informe o valor do imóvel', 'error'); return; }
+
+            const valorEntrada   = valorImovel * pctEntrada;
+            const valorFinanc    = valorImovel - valorEntrada;
+
+            // Parcela de entrada (sem INCC ainda, base)
+            const parcEntradaBase = valorEntrada / prazoEntrada;
+
+            // INCC acumulado sobre saldo de entrada até a entrega
+            const fatorIncc = Math.pow(1 + inccMes, entregaMeses);
+            const saldoEntradaEntrega = (valorEntrada - parcEntradaBase * entregaMeses) * fatorIncc;
+            const parcEntradaAposEntrega = saldoEntradaEntrega > 0 ? saldoEntradaEntrega / (prazoEntrada - entregaMeses) : 0;
+            const mesesSobreposicao = Math.max(0, prazoEntrada - entregaMeses);
+
+            // Juros de obra (cobrados sobre saldo liberado — simplificado: sobre valorFinanc × % obra)
+            const jurosObraEstimado = valorFinanc * taxaObra; // mês típico durante obra
+
+            // Parcela banco SAC (após entrega)
+            const parcelaBancoInicial = (taxaCaixa > 0)
+                ? (valorFinanc / prazoFin) + valorFinanc * taxaCaixa
+                : valorFinanc / prazoFin;
+
+            // Impacto na renda
+            const custoFaseObra   = parcEntradaBase * fatorIncc * 0.5 + jurosObraEstimado + aluguel; // média fase obra
+            const custoFaseEntrega = parcelaBancoInicial + parcEntradaAposEntrega;
+            const custoFaseEntregaLiq = custoFaseEntrega - aluguel; // desconta aluguel que parou
+
+            const pctObra    = renda > 0 ? ((custoFaseObra) / renda * 100).toFixed(1) : '—';
+            const pctEntregaBruto = renda > 0 ? (custoFaseEntrega / renda * 100).toFixed(1) : '—';
+            const pctEntregaLiq   = renda > 0 ? (custoFaseEntregaLiq / renda * 100).toFixed(1) : '—';
+
+            const statusObra    = parseFloat(pctObra) <= 35 ? 'ok' : parseFloat(pctObra) <= 50 ? 'warn' : 'danger';
+            const statusEntrega = parseFloat(pctEntregaLiq) <= 35 ? 'ok' : parseFloat(pctEntregaLiq) <= 50 ? 'warn' : 'danger';
+
+            const corStatus = { ok: '#27AE60', warn: '#E67E22', danger: '#E74C3C' };
+
+            const resDiv = document.getElementById('fl-simulador-resultado');
+            if (!resDiv) return;
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = `
+                <div style="background:white;border-radius:14px;padding:15px;border:1px solid var(--border);box-shadow:var(--shadow-sm);margin-bottom:12px;">
+                    <div style="font-size:0.9rem;font-weight:900;color:var(--dark);margin-bottom:12px;">📊 Resultado da Simulação</div>
+
+                    <!-- Linha do tempo -->
+                    <div style="display:flex;gap:0;margin-bottom:16px;overflow-x:auto;">
+                        ${[
+                            { label:'Assinatura CCV', sub:'Mês 0', cor:'#1D6FA4', icon:'pen-fancy' },
+                            { label:'Assina Banco', sub:'Mês '+(entregaMeses-3 < 1 ? 1 : entregaMeses-3), cor:'#7C3AED', icon:'university' },
+                            { label:'Entrega da Obra', sub:'Mês '+entregaMeses, cor:'#27AE60', icon:'key' },
+                            { label:'Quitação Entrada', sub:'Mês '+prazoEntrada, cor:'#E67E22', icon:'check-double' },
+                        ].map((f, idx, arr) => `
+                            <div style="flex:1;min-width:60px;text-align:center;position:relative;">
+                                <div style="width:32px;height:32px;border-radius:50%;background:${f.cor};display:flex;align-items:center;justify-content:center;margin:0 auto 4px;"><i class="fas fa-${f.icon}" style="color:white;font-size:0.75rem;"></i></div>
+                                ${idx < arr.length-1 ? `<div style="position:absolute;top:15px;left:60%;width:80%;height:2px;background:linear-gradient(90deg,${f.cor},${arr[idx+1].cor});z-index:0;"></div>` : ''}
+                                <div style="font-size:0.65rem;font-weight:800;color:var(--dark);">${f.label}</div>
+                                <div style="font-size:0.6rem;color:var(--text-secondary);">${f.sub}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Cards de fases -->
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div style="border-radius:10px;border:1.5px solid rgba(29,111,164,0.25);overflow:hidden;">
+                            <div style="background:rgba(29,111,164,0.08);padding:8px 12px;font-weight:800;font-size:0.82rem;color:var(--primary);">🏗️ FASE DE OBRA (${entregaMeses} meses)</div>
+                            <div style="padding:10px 12px;display:flex;flex-direction:column;gap:5px;">
+                                <div style="display:flex;justify-content:space-between;font-size:0.82rem;"><span>Parcela de entrada (construtora)</span><strong>${Utils.formatCurrency(parcEntradaBase * (1 + inccMes * entregaMeses / 2))}/mês</strong></div>
+                                <div style="display:flex;justify-content:space-between;font-size:0.82rem;"><span>Juros de obra (banco)</span><strong style="color:#E74C3C;">${Utils.formatCurrency(jurosObraEstimado)}/mês</strong></div>
+                                ${aluguel > 0 ? `<div style="display:flex;justify-content:space-between;font-size:0.82rem;"><span>Aluguel atual</span><strong style="color:#E67E22;">${Utils.formatCurrency(aluguel)}/mês</strong></div>` : ''}
+                                <div style="display:flex;justify-content:space-between;font-size:0.85rem;border-top:1px solid var(--border);padding-top:6px;margin-top:2px;"><span style="font-weight:700;">Total estimado</span><strong style="color:${corStatus[statusObra]};">${Utils.formatCurrency(custoFaseObra)}/mês ${renda > 0 ? '('+pctObra+'% da renda)' : ''}</strong></div>
+                            </div>
+                        </div>
+
+                        <div style="border-radius:10px;border:1.5px solid rgba(231,76,60,0.25);overflow:hidden;">
+                            <div style="background:rgba(231,76,60,0.07);padding:8px 12px;font-weight:800;font-size:0.82rem;color:#E74C3C;">⚠️ PÓS-ENTREGA — FASE DE SOBREPOSIÇÃO (${mesesSobreposicao} meses)</div>
+                            <div style="padding:10px 12px;display:flex;flex-direction:column;gap:5px;">
+                                <div style="display:flex;justify-content:space-between;font-size:0.82rem;"><span>Parcela do banco (Caixa SAC)</span><strong style="color:var(--primary);">${Utils.formatCurrency(parcelaBancoInicial)}/mês</strong></div>
+                                ${mesesSobreposicao > 0 ? `<div style="display:flex;justify-content:space-between;font-size:0.82rem;"><span>Parcelas residuais de entrada (IGPM+1%)</span><strong style="color:#E67E22;">${Utils.formatCurrency(parcEntradaAposEntrega)}/mês</strong></div>` : ''}
+                                ${aluguel > 0 ? `<div style="display:flex;justify-content:space-between;font-size:0.82rem;color:#27AE60;"><span>✅ Aluguel que para</span><strong>- ${Utils.formatCurrency(aluguel)}/mês</strong></div>` : ''}
+                                <div style="display:flex;justify-content:space-between;font-size:0.85rem;border-top:1px solid var(--border);padding-top:6px;margin-top:2px;"><span style="font-weight:700;">Custo líquido estimado</span><strong style="color:${corStatus[statusEntrega]};">${Utils.formatCurrency(custoFaseEntregaLiq)}/mês ${renda > 0 ? '('+pctEntregaLiq+'% da renda)' : ''}</strong></div>
+                            </div>
+                        </div>
+
+                        <div style="border-radius:10px;border:1.5px solid rgba(39,174,96,0.25);overflow:hidden;">
+                            <div style="background:rgba(39,174,96,0.07);padding:8px 12px;font-weight:800;font-size:0.82rem;color:#27AE60;">✅ APÓS QUITAR A ENTRADA</div>
+                            <div style="padding:10px 12px;display:flex;flex-direction:column;gap:5px;">
+                                <div style="display:flex;justify-content:space-between;font-size:0.82rem;"><span>Parcela do banco (SAC, reduzindo)</span><strong style="color:var(--primary);">${Utils.formatCurrency(parcelaBancoInicial * 0.85)}/mês (aprox.)</strong></div>
+                                <div style="font-size:0.75rem;color:var(--text-secondary);">No SAC, a parcela cai ~0,3% ao mês ao longo dos anos</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${renda > 0 ? `
+                    <div style="margin-top:12px;padding:10px 12px;background:${parseFloat(pctEntregaLiq) > 35 ? 'rgba(231,76,60,0.07)' : 'rgba(39,174,96,0.07)'};border-radius:9px;border:1px solid ${parseFloat(pctEntregaLiq) > 35 ? 'rgba(231,76,60,0.20)' : 'rgba(39,174,96,0.20)'};">
+                        <div style="font-weight:800;font-size:0.85rem;color:${corStatus[statusEntrega]};">
+                            ${parseFloat(pctEntregaLiq) > 50 ? '🚨 Atenção: comprometimento acima de 50% da renda — risco alto de inadimplência' :
+                              parseFloat(pctEntregaLiq) > 35 ? '⚠️ Comprometimento elevado — oriente o cliente sobre reserva financeira e estratégias de quitação antecipada' :
+                              '✅ Comprometimento dentro do limite recomendado (até 35%)'}
+                        </div>
+                    </div>` : ''}
+
+                    <button onclick="FluxoManual.baixarPDFSimulacao()" style="margin-top:12px;width:100%;background:var(--primary);color:white;border:none;border-radius:10px;padding:11px;font-size:0.87rem;font-weight:700;cursor:pointer;"><i class="fas fa-file-pdf"></i> Baixar Simulação em PDF</button>
+                </div>
+            `;
+            // Store last simulation data for PDF
+            _lastSim = { valorImovel, pctEntrada, prazoEntrada, prazoFin, entregaMeses, parcEntradaBase, jurosObraEstimado, parcelaBancoInicial, parcEntradaAposEntrega, mesesSobreposicao, custoFaseObra, custoFaseEntregaLiq, aluguel, renda, pctObra, pctEntregaLiq, inccMes, fatorIncc, taxaCaixa: parseFloat(taxaCxEl?.value)||8.16, taxaObra: parseFloat(taxaObEl?.value)||12 };
+        }
+
+        // ── PDF do Manual Completo ────────────────────────────────────
+        function baixarPDF() {
+            const { jsPDF } = window.jspdf;
+            if (!jsPDF) { Utils.toast('jsPDF nao disponivel', 'error'); return; }
+
+            const doc  = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const W = 210, H = 297, M = 14, CW = W - M * 2;
+            const settings   = (UI.data && UI.data.settings) ? UI.data.settings : {};
+            const nomeCorr   = settings.nome        || 'Corretor(a)';
+            const creci      = settings.creci       || '';
+            const imob       = settings.imobiliaria || '';
+            const hoje       = new Date().toLocaleDateString('pt-BR', { day:'numeric', month:'long', year:'numeric' });
+            const SAFE_BOT   = H - 16;
+
+            // ── Paleta ───────────────────────────────────────────────────
+            const C = {
+                azul:    [29, 111, 164],   azulEsc: [12, 74, 110],
+                violeta: [124, 58, 237],   verde:   [39, 174, 96],
+                laranja: [230, 126, 34],   teal:    [8, 145, 178],
+                verm:    [231, 76, 60],    cinza:   [100, 116, 139],
+                fundo:   [245, 247, 250],  branco:  [255, 255, 255],
+                textEsc: [26, 35, 50],     textCin: [80, 100, 120],
+            };
+
+            // ── Helpers ──────────────────────────────────────────────────
+            const rgb  = (c) => doc.setTextColor(...c);
+            const fill = (c) => doc.setFillColor(...c);
+            const draw = (c) => doc.setDrawColor(...c);
+            const bold = (s)  => doc.setFont('helvetica', 'bold');
+            const norm = ()   => doc.setFont('helvetica', 'normal');
+            const itl  = ()   => doc.setFont('helvetica', 'italic');
+            const sz   = (n)  => doc.setFontSize(n);
+            const tx   = (t, x, y, opts) => doc.text(t, x, y, opts || {});
+
+            let y = 0;
+
+            // ── addPage helper with persistent footer ─────────────────
+            const drawFooter = () => {
+                fill(C.azulEsc); doc.rect(0, H-10, W, 10, 'F');
+                norm(); sz(7); rgb(C.branco);
+                const inf = 'ImobiPro · Manual do Fluxo Financeiro de Imovel na Planta';
+                tx(inf, M, H-4);
+                const pgs = doc.internal.getNumberOfPages();
+                tx(`Pag. ${pgs}`, W-M, H-4, { align:'right' });
+            };
+
+            const newPage = () => { doc.addPage(); drawFooter(); y = 18; };
+            const checkY  = (need) => { if (y + need > SAFE_BOT) newPage(); };
+
+            // ════════════════════════════════════════════════════════════
+            // CAPA — Pagina 1
+            // ════════════════════════════════════════════════════════════
+            // Fundo degradê simulado
+            fill(C.azulEsc); doc.rect(0, 0, W, H, 'F');
+            fill(C.azul);    doc.rect(0, 80, W, H-80, 'F');
+            fill(C.fundo);   doc.roundedRect(M, 75, CW, H-90, 8, 8, 'F');
+
+            // Faixa verde topo
+            fill(C.verde); doc.rect(0, 0, W, 4, 'F');
+
+            // Logo / marca
+            bold(); sz(28); rgb(C.branco);
+            tx('ImobiPro', M, 32);
+            norm(); sz(11); rgb([180, 220, 248]);
+            tx('Sistema de Gestao Imobiliaria', M, 42);
+
+            // Linha separadora
+            fill(C.verde); doc.rect(M, 48, 40, 2, 'F');
+            fill([255,255,255,50]); doc.rect(M+44, 49, CW-44, 0.5, 'F');
+
+            // Titulo principal
+            bold(); sz(22); rgb(C.branco);
+            tx('FLUXO FINANCEIRO', M, 63);
+            sz(13); rgb([180, 220, 248]);
+            norm(); tx('Imovel na Planta', M, 73);
+
+            // Caixa de conteudo da capa
+            const cx = M + 6, cy = 86, cw = CW - 12;
+            bold(); sz(11); rgb(C.azulEsc);
+            tx('MANUAL COMPLETO', cx, cy + 8);
+            sz(9); norm(); rgb(C.textCin);
+            tx('Para o Corretor e para o Cliente', cx, cy + 16);
+
+            // Divisor
+            fill(C.azul); doc.rect(cx, cy + 20, cw, 0.8, 'F');
+
+            // Indice visual da capa
+            const topics = [
+                { num: '01', titulo: 'Linha do Tempo Financeira',     sub: 'Os 4 momentos criticos do financiamento',        cor: C.azul },
+                { num: '02', titulo: 'INCC, Juros de Obra e IGPM',    sub: 'Como cada indice afeta o bolso do cliente',      cor: C.violeta },
+                { num: '03', titulo: 'Fase de Sobreposi\u00e7\u00e3o', sub: 'O periodo de maior pressao financeira',          cor: C.laranja },
+                { num: '04', titulo: 'Estrategias do Corretor',        sub: 'Scripts, checklist e acompanhamento pos-venda',  cor: C.teal },
+                { num: '05', titulo: 'Guia para o Cliente',            sub: 'Linguagem simples para quem vai comprar',        cor: C.verde },
+                { num: '06', titulo: 'Tabela de Encargos',             sub: 'Resumo de todos os custos por fase',             cor: C.verm },
+            ];
+            let ty = cy + 30;
+            topics.forEach(t => {
+                fill(t.cor); doc.roundedRect(cx, ty, 10, 10, 2, 2, 'F');
+                bold(); sz(9); rgb(C.branco); tx(t.num, cx+5, ty+6.5, { align:'center' });
+                bold(); sz(9.5); rgb(C.textEsc); tx(t.titulo, cx+14, ty+4.5);
+                norm(); sz(8); rgb(C.textCin);  tx(t.sub, cx+14, ty+9.5);
+                ty += 15;
+            });
+
+            // Rodape da capa
+            fill(C.azulEsc); doc.rect(M, H-50, CW, 0.5, 'F');
+            bold(); sz(9); rgb(C.azulEsc); tx(nomeCorr, M, H-42);
+            if (creci) { norm(); sz(8); rgb(C.textCin); tx('CRECI: ' + creci, M, H-36); }
+            if (imob)  { norm(); sz(8); rgb(C.textCin); tx(imob, M, H-30); }
+            norm(); sz(8); rgb(C.textCin); tx(hoje, W-M, H-42, { align:'right' });
+            // Faixa verde fundo
+            fill(C.verde); doc.rect(0, H-8, W, 8, 'F');
+            bold(); sz(7); rgb(C.branco); tx('CONFIDENCIAL — ELABORADO EXCLUSIVAMENTE PARA USO PROFISSIONAL DO CORRETOR', W/2, H-3.5, { align:'center' });
+
+            drawFooter();
+
+            // ════════════════════════════════════════════════════════════
+            // PAGINA 2 — Linha do Tempo + Fase 1 e 2
+            // ════════════════════════════════════════════════════════════
+            newPage();
+
+            // Titulo da pagina
+            fill(C.azulEsc); doc.roundedRect(M, y, CW, 14, 3, 3, 'F');
+            bold(); sz(13); rgb(C.branco); tx('LINHA DO TEMPO DO FINANCIAMENTO', M+6, y+9.5);
+            norm(); sz(8); rgb([180,220,248]); tx('Os 4 momentos financeiros que todo cliente precisa conhecer', W-M-4, y+9.5, { align:'right' });
+            y += 20;
+
+            // Linha do tempo horizontal
+            const fases = [
+                { num:'1', titulo:'Assinatura\nCCV', cor:C.azul,    sub:'Mes 0' },
+                { num:'2', titulo:'Assina\nBanco',   cor:C.violeta, sub:'~Mes 21' },
+                { num:'3', titulo:'Entrega\nda Obra', cor:C.verde,  sub:'~Mes 24' },
+                { num:'4', titulo:'Quit. da\nEntrada', cor:C.laranja, sub:'~Mes 60' },
+            ];
+            const lx = M, lw = CW, bw = lw / fases.length, bh = 28;
+            fases.forEach((f, i) => {
+                const bx = lx + i * bw;
+                fill(f.cor); doc.roundedRect(bx+2, y, bw-4, bh, 4, 4, 'F');
+                // Seta conectora
+                if (i < fases.length-1) {
+                    fill(C.fundo); doc.rect(bx+bw-4, y+bh/2-2, 6, 4, 'F');
+                    fill(C.cinza); doc.triangle(bx+bw+1, y+bh/2-3, bx+bw+1, y+bh/2+3, bx+bw+5, y+bh/2, 'F');
+                }
+                bold(); sz(16); rgb(C.branco); tx(f.num, bx+bw/2, y+8, { align:'center' });
+                sz(7.5);
+                const tlines = f.titulo.split('\n');
+                tlines.forEach((tl, ti) => tx(tl, bx+bw/2, y+14+ti*5, { align:'center' }));
+                norm(); sz(7); rgb([220,235,248]); tx(f.sub, bx+bw/2, y+bh-3, { align:'center' });
+            });
+            y += bh + 10;
+
+            // ── SECAO 1 ──────────────────────────────────────────────────
+            const secHeader = (titulo, sub, cor) => {
+                checkY(16);
+                fill(cor); doc.roundedRect(M, y, CW, 13, 3, 3, 'F');
+                bold(); sz(10.5); rgb(C.branco); tx(titulo, M+5, y+5.5);
+                if (sub) { norm(); sz(8); rgb([220,240,255]); tx(sub, M+5, y+11); }
+                y += 18;
+            };
+
+            const bullet = (txt, cor, isAlert) => {
+                const bCor = cor || C.azul;
+                const indent = M + 12;
+                const maxW   = CW - 14;
+                const lines  = doc.splitTextToSize(txt, maxW);
+                const boxH   = lines.length * 4.8 + 7;
+                checkY(boxH + 3);
+                if (isAlert) {
+                    fill([...bCor, 20]);
+                    doc.setFillColor(bCor[0], bCor[1], bCor[2], 18);
+                    doc.roundedRect(M, y, CW, boxH, 2.5, 2.5, 'F');
+                    draw(bCor); doc.setLineWidth(0.5);
+                    doc.roundedRect(M, y, CW, boxH, 2.5, 2.5, 'S');
+                    // Left accent bar
+                    fill(bCor); doc.rect(M, y, 3, boxH, 'F');
+                    bold(); sz(8); rgb(bCor);
+                    tx('ATENCAO:', indent, y+5);
+                    norm(); sz(8.5); rgb(C.textEsc);
+                    doc.text(lines, indent + 22, y+5);
+                } else {
+                    fill(C.fundo); doc.roundedRect(M, y, CW, boxH, 2, 2, 'F');
+                    fill(bCor); doc.circle(M+6, y+boxH/2, 1.8, 'F');
+                    norm(); sz(8.5); rgb(C.textEsc);
+                    doc.text(lines, indent, y+4.5);
+                }
+                doc.setLineWidth(0.2);
+                y += boxH + 2.5;
+            };
+
+            secHeader('FASE 1 — Assinatura do Contrato com a Construtora (CCV)', 'Definicao dos termos, entrada e valor a financiar', C.azul);
+            bullet('O cliente assina o Contrato de Compra e Venda (CCV) com a construtora, definindo: valor total do imovel, valor da entrada, sinal de negocio e o valor a ser financiado pelo banco.', C.azul);
+            bullet('A entrada e parcelada em ate 60 meses diretamente com a construtora. Neste momento, ainda nao ha analise de credito pelo banco — o compromisso e somente com a construtora.', C.azul);
+            bullet('Sobre as parcelas de entrada incide o INCC (Indice Nacional de Custo da Construcao) mensalmente, ate a data de entrega do imovel.', C.azul);
+            bullet('IMPACTO DO INCC: Com media de 0,4% a 0,6% ao mes, em 24 meses de obra o saldo devedor da entrada pode acumular de 12% a 15% de correcao. Uma entrada de R$ 60.000,00 pode se tornar R$ 67.500,00 ao final da obra.', C.laranja, true);
+            y += 4;
+
+            secHeader('FASE 2 — Assinatura do Contrato com o Banco (Caixa / SBPE)', 'Geralmente ocorre proximo a entrega da obra', C.violeta);
+            bullet('A assinatura com o banco ocorre apos a vistoria e aprovacao da documentacao do imovel, geralmente 30 a 60 dias antes da entrega das chaves.', C.violeta);
+            bullet('Os JUROS DE OBRA passam a ser cobrados 30 dias apos a assinatura com o banco. Eles incidem sobre o saldo ja liberado ao banco, proporcional ao andamento da obra — nao sobre o valor total do financiamento.', C.violeta);
+            bullet('PONTO CRITICO: Neste periodo, o cliente paga simultaneamente: (1) parcelas de entrada para a construtora com INCC + (2) juros de obra para o banco. Este e o momento de maior pressao financeira.', C.verm, true);
+            bullet('Taxa tipica dos juros de obra: 1% ao mes (12% ao ano) sobre o saldo liberado. Para um financiamento de R$ 240.000,00, isso representa aproximadamente R$ 200,00 a R$ 800,00/mes durante a fase de obra.', C.violeta);
+            y += 4;
+
+            // ════════════════════════════════════════════════════════════
+            // PAGINA 3 — Fase 3, 4 e Tabela de Encargos
+            // ════════════════════════════════════════════════════════════
+            newPage();
+
+            // Titulo
+            fill(C.verde); doc.roundedRect(M, y, CW, 13, 3, 3, 'F');
+            bold(); sz(10.5); rgb(C.branco); tx('FASE 3 — Entrega do Imovel (aproximadamente 24 meses apos a assinatura)', M+5, y+5.5);
+            norm(); sz(8); rgb([220,240,220]); tx('Inicio das parcelas do banco e fim do aluguel', M+5, y+11);
+            y += 18;
+            bullet('Apos a entrega das chaves, o banco inicia a cobranca das parcelas regulares (amortizacao + juros), geralmente 30 dias depois. No sistema SAC, a primeira parcela e a maior e vai decrescendo mensalmente.', C.verde);
+            bullet('O cliente se muda e DEIXA DE PAGAR ALUGUEL. Este e o principal ativo financeiro da fase: a economia do aluguel ajuda a absorver o custo das parcelas do banco.', C.verde);
+            bullet('Se a entrada foi parcelada em 60 meses e a obra levou 24 meses, ainda restam aproximadamente 36 meses de parcelas da entrada para serem pagas apos a entrega das chaves.', C.verde);
+            bullet('SOMA CRITICA POS-ENTREGA: O cliente pagara simultaneamente a PARCELA DO BANCO + as PARCELAS RESIDUAIS DA ENTRADA. Este somatorio e o principal ponto de atencao que o corretor deve abordar com clareza.', C.laranja, true);
+            bullet('COMPENSACAO: Em muitos casos, o valor do aluguel que cessa e suficiente para cobrir as parcelas residuais da entrada, resultando em impacto liquido neutro ou ate positivo para o cliente.', C.verde);
+            y += 6;
+
+            fill(C.laranja); doc.roundedRect(M, y, CW, 13, 3, 3, 'F');
+            bold(); sz(10.5); rgb(C.branco); tx('FASE 4 — Periodo de Sobreposicao (pos-entrega ate quitar a entrada)', M+5, y+5.5);
+            norm(); sz(8); rgb([255,235,200]); tx('O cenario que mais surpreende o cliente mal informado', M+5, y+11);
+            y += 18;
+            bullet('Duracao tipica: de 1 a 3 anos apos a entrega das chaves, dependendo do saldo restante das parcelas da construtora.', C.laranja);
+            bullet('Neste periodo coexistem: (1) Parcelas mensais do banco no sistema SAC — decrescentes; (2) Parcelas residuais da entrada para a construtora, reajustadas por IGPM + 1% ao ano.', C.laranja);
+            bullet('O IGPM historicamente varia de 5% a 25% ao ano. Em anos de alta inflacao, as parcelas da construtora sofrem reajuste expressivo. O corretor deve simular o pior cenario para o cliente estar preparado.', C.laranja);
+            bullet('ESTRATEGIA DE SAIDA: Incentivar o cliente a usar o saldo do FGTS, o 13o salario e bonificacoes anuais para amortizar e quitar antecipadamente as parcelas da construtora. Cada real amortizado reduz o tempo de sobreposicao e os juros futuros.', C.verde, true);
+            y += 8;
+
+            // Tabela de encargos
+            checkY(60);
+            fill(C.azulEsc); doc.roundedRect(M, y, CW, 10, 3, 3, 'F');
+            bold(); sz(10); rgb(C.branco); tx('TABELA DE ENCARGOS — RESUMO POR FASE', M+5, y+7);
+            y += 13;
+
+            const tbH = 9;
+            const cols = [46, 46, 36, 54]; // larguras
+            const headers = ['Encargo', 'Quando Incide', 'Referencia', 'Impacto Tipico'];
+            // Header da tabela
+            fill(C.azul); doc.roundedRect(M, y, CW, tbH, 2, 2, 'F');
+            let cx2 = M + 2;
+            headers.forEach((h, i) => {
+                bold(); sz(8); rgb(C.branco);
+                tx(h, cx2 + 2, y + 6);
+                cx2 += cols[i];
+            });
+            y += tbH;
+
+            const rows = [
+                ['INCC', 'Assinatura CCV ate entrega', '~0,4-0,6%/mes', '+12% a 15% sobre entrada em 24m'],
+                ['Juros de Obra', '30 dias apos assinar banco', '~1%/mes (12% a.a.)', 'R$ 200 a R$ 1.200/mes (proporcional)'],
+                ['IGPM + 1%/ano', 'Apos entrega ate quitar entrada', 'Varia 5% a 25%/ano', 'Reajuste anual das parcelas da constr.'],
+                ['Parcela Caixa (SAC)', '30 dias apos entrega das chaves', 'Taxa SBPE/FGTS', 'Ate 30% da renda — decrescente no SAC'],
+                ['Seguro MIP/DFI', 'Incluso na parcela do banco', 'Embutido na prestacao', 'Seguro de vida + danos fisicos do imovel'],
+            ];
+            rows.forEach((row, ri) => {
+                checkY(tbH + 1);
+                if (ri % 2 === 0) { fill([240, 246, 252]); } else { fill(C.branco); }
+                doc.rect(M, y, CW, tbH, 'F');
+                draw([200, 215, 230]); doc.setLineWidth(0.2);
+                doc.rect(M, y, CW, tbH, 'S');
+                let cx3 = M + 2;
+                row.forEach((cell, ci) => {
+                    const isBold = ci === 0 || ci === 3;
+                    if (isBold) { bold(); } else { norm(); }
+                    sz(7.8);
+                    const cellColor = ci === 3 ? C.verm : C.textEsc;
+                    if (ci === 3) rgb(C.verm); else rgb(C.textEsc);
+                    const cLines = doc.splitTextToSize(cell, cols[ci]-3);
+                    tx(cLines[0], cx3 + 2, y + 6);
+                    cx3 += cols[ci];
+                });
+                y += tbH;
+            });
+            y += 10;
+
+            // ════════════════════════════════════════════════════════════
+            // PAGINA 4 — Estrategias do Corretor
+            // ════════════════════════════════════════════════════════════
+            newPage();
+
+            fill(C.teal); doc.roundedRect(M, y, CW, 13, 3, 3, 'F');
+            bold(); sz(11); rgb(C.branco); tx('ESTRATEGIAS DO CORRETOR — Como apresentar o fluxo com confianca', M+5, y+5.5);
+            norm(); sz(8); rgb([200,240,248]); tx('Corretor que informa, nao perde venda. Perde quem esconde informacao.', M+5, y+11);
+            y += 20;
+
+            // Estrategia 1
+            fill(C.teal); doc.circle(M+6, y+4, 5, 'F');
+            bold(); sz(9); rgb(C.branco); tx('1', M+6, y+6, { align:'center' });
+            bold(); sz(9.5); rgb(C.teal); tx('Apresentacao Completa — Antes de Qualquer Assinatura', M+15, y+5.5);
+            y += 12;
+            bullet('Apresente a linha do tempo dos 4 momentos ANTES de mostrar o contrato. Use uma folha de papel ou o simulador digital. Cliente que entende o processo fecha mais rapido e com menos arrependimentos.', C.teal);
+            bullet('Mostre o impacto em numeros reais: "Com sua renda de R$ X, sua prestacao sera de R$ Y e o juros de obra durante a obra sera de aproximadamente R$ Z por mes."', C.teal);
+            bullet('Destaque sempre a compensacao: "Quando voce receber as chaves, voce para de pagar aluguel — esse valor compensa os juros de obra e ainda pode sobrar."', C.verde);
+            y += 4;
+
+            fill(C.teal); doc.circle(M+6, y+4, 5, 'F');
+            bold(); sz(9); rgb(C.branco); tx('2', M+6, y+6, { align:'center' });
+            bold(); sz(9.5); rgb(C.teal); tx('Script para Abordar os Juros de Obra', M+15, y+5.5);
+            y += 12;
+            // Caixa de script
+            checkY(32);
+            fill([235, 245, 255]); doc.roundedRect(M, y, CW, 30, 3, 3, 'F');
+            draw(C.teal); doc.setLineWidth(0.6);
+            doc.roundedRect(M, y, CW, 30, 3, 3, 'S');
+            fill(C.teal); doc.roundedRect(M, y, 22, 8, 2, 0, 'F');
+            bold(); sz(7); rgb(C.branco); tx('SCRIPT', M+4, y+5.5);
+            doc.setLineWidth(0.2);
+            norm(); sz(8.5); rgb(C.textEsc);
+            const script = '"Sr(a). [Nome], alem das parcelas de entrada que voce vai pagar para a construtora, existe um item que preciso explicar com clareza: o juros de obra. Ele comeca 30 dias apos a assinatura com o banco e incide sobre o saldo liberado. Normalmente sao valores entre R$ X e R$ Y por mes. Porem, quando voce receber as chaves, voce para de pagar aluguel — esse valor costuma compensar ou superar os juros de obra. Vamos ver esses numeros no simulador para o seu caso especifico?"';
+            const sLines = doc.splitTextToSize(script, CW - 10);
+            doc.text(sLines, M+5, y+13);
+            y += 34;
+            bullet('Registre sempre por escrito (WhatsApp ou e-mail) que voce explicou o fluxo financeiro completo ao cliente. Isso protege voce juridicamente e demonstra etica profissional.', C.teal);
+            y += 4;
+
+            fill(C.teal); doc.circle(M+6, y+4, 5, 'F');
+            bold(); sz(9); rgb(C.branco); tx('3', M+6, y+6, { align:'center' });
+            bold(); sz(9.5); rgb(C.teal); tx('Planejamento de Reserva Financeira', M+15, y+5.5);
+            y += 12;
+            bullet('Oriente o cliente a criar uma reserva de 3 a 6 meses de parcelas estimadas ANTES de assinar com o banco. Esta reserva e o seguro mais importante contra imprevistos na fase de obras.', C.teal);
+            bullet('Monte um planejamento mensal conjunto: entrada + juros de obra + aluguel atual = custo total na fase de obra. Com os numeros na mesa, o cliente nao e surpreendido.', C.verde);
+            bullet('Sugira o uso do 13o salario e do FGTS para amortizar as parcelas da construtora anualmente. A cada amortizacao, reduza o periodo de sobreposicao pos-entrega.', C.laranja);
+            y += 4;
+
+            fill(C.teal); doc.circle(M+6, y+4, 5, 'F');
+            bold(); sz(9); rgb(C.branco); tx('4', M+6, y+6, { align:'center' });
+            bold(); sz(9.5); rgb(C.teal); tx('Acompanhamento Pos-Venda — Agenda de Follow-up', M+15, y+5.5);
+            y += 12;
+
+            const followUp = [
+                ['6 meses antes da entrega', 'Lembrar sobre documentacao para o banco, simulacao atualizada e revisao financeira.', C.azul],
+                ['30 dias antes da entrega', 'Mostrar valores atualizados com INCC acumulado. Preparar para o inicio das parcelas do banco.', C.violeta],
+                ['Na entrega das chaves', 'Celebrar! Lembrar que o aluguel para. Reforcar o plano de amortizacao da entrada.', C.verde],
+                ['12 meses apos a entrega', 'Verificar conforto financeiro. Se houver folga, sugerir amortizacao. Pedir indicacoes.', C.laranja],
+            ];
+            followUp.forEach(([prazo, acao, cor]) => {
+                checkY(16);
+                fill([...cor, 15]); doc.setFillColor(cor[0], cor[1], cor[2], 12);
+                doc.roundedRect(M, y, CW, 13, 2, 2, 'F');
+                fill(cor); doc.roundedRect(M, y, 48, 13, 2, 0, 'F');
+                bold(); sz(7.5); rgb(C.branco); tx(prazo, M+3, y+5);
+                norm(); sz(8.5); rgb(C.textEsc);
+                const aLines = doc.splitTextToSize(acao, CW-54);
+                tx(aLines[0], M+52, y+5.5);
+                if (aLines[1]) tx(aLines[1], M+52, y+10);
+                y += 16;
+            });
+
+            // ════════════════════════════════════════════════════════════
+            // PAGINA 5 — Checklist + Guia do Cliente
+            // ════════════════════════════════════════════════════════════
+            newPage();
+
+            // Checklist
+            fill(C.teal); doc.roundedRect(M, y, CW, 10, 3, 3, 'F');
+            bold(); sz(10.5); rgb(C.branco); tx('CHECKLIST DO CORRETOR — Antes de Qualquer Assinatura', M+5, y+7);
+            y += 14;
+
+            const checks = [
+                'Apresentei a linha do tempo dos 4 momentos financeiros ao cliente',
+                'Expliquei o INCC sobre as parcelas de entrada e seu impacto acumulado',
+                'Expliquei os juros de obra, quando comecam e o valor estimado',
+                'Mostrei o somatorio critico: parcela banco + entrada residual pos-entrega',
+                'Calculei o impacto liquido descontando o aluguel que o cliente pagara',
+                'Orientei sobre a reserva financeira de 3 a 6 meses de parcelas',
+                'Orientei sobre o uso do FGTS e 13o para amortizacao antecipada',
+                'Enviei este manual (PDF) ao cliente por escrito antes da assinatura',
+                'Registrei a conversa por WhatsApp ou e-mail para comprovacao',
+                'Agendei o follow-up para 6 meses antes da entrega prevista',
+            ];
+
+            const colCheck = (CW - 4) / 2;
+            checks.forEach((chk, i) => {
+                const col = i % 2;
+                const row = Math.floor(i / 2);
+                if (col === 0) checkY(12);
+                const bx2 = M + col * (colCheck + 4);
+                fill([240,248,255]); doc.roundedRect(bx2, y + (col===0 ? 0 : -12), colCheck, 10, 2, 2, 'F');
+                draw(C.teal); doc.setLineWidth(0.3);
+                doc.roundedRect(bx2, y + (col===0 ? 0 : -12), colCheck, 10, 2, 2, 'S');
+                // Checkbox
+                fill(C.branco); doc.roundedRect(bx2+3, y+(col===0?3:-9), 5, 5, 1, 1, 'F');
+                draw(C.teal); doc.roundedRect(bx2+3, y+(col===0?3:-9), 5, 5, 1, 1, 'S');
+                norm(); sz(7.5); rgb(C.textEsc);
+                const cLines = doc.splitTextToSize(chk, colCheck-14);
+                tx(cLines[0], bx2+11, y+(col===0?6.5:-5.5));
+                if (col === 1) y += 13;
+            });
+            if (checks.length % 2 !== 0) y += 13;
+            y += 8;
+
+            // Guia do Cliente
+            checkY(16);
+            fill(C.verde); doc.roundedRect(M, y, CW, 13, 3, 3, 'F');
+            bold(); sz(11); rgb(C.branco); tx('GUIA PARA O CLIENTE — O que voce precisa saber antes de assinar', M+5, y+5.5);
+            norm(); sz(8); rgb([200,245,220]); tx('Conhecimento e a melhor protecao financeira', M+5, y+11);
+            y += 18;
+
+            bullet('DURANTE A OBRA: Voce pagara as parcelas de entrada (com INCC) + juros de obra para o banco (a partir de 30 dias da assinatura) + aluguel atual. Planeje seu orcamento para este periodo.', C.azul);
+            bullet('NA ENTREGA: O banco comeca a cobrar as parcelas regulares. Voce para de pagar aluguel — grande alivio! Porem, se a entrada foi em 60 meses, ainda restarao parcelas da construtora corrigidas por IGPM+1%.', C.verde);
+            bullet('DICA DE OURO: Use o 13o salario e o saldo do FGTS para amortizar as parcelas da construtora a cada ano. Quanto mais rapido voce quitar a entrada, menor sera o periodo de pagamentos duplos.', C.laranja, true);
+
+            y += 4;
+            // FAQ rapido
+            checkY(50);
+            fill(C.azulEsc); doc.roundedRect(M, y, CW, 9, 3, 3, 'F');
+            bold(); sz(9); rgb(C.branco); tx('PERGUNTAS FREQUENTES', M+5, y+6);
+            y += 12;
+
+            const faqs = [
+                ['Posso usar o FGTS?', 'Sim, para parte da entrada ou amortizacao do financiamento. Consulte a Caixa para os criterios especificos do seu caso.'],
+                ['O que e o MIP/DFI?', 'Sao os seguros obrigatorios: MIP (seguro de vida) e DFI (danos fisicos ao imovel). Sao embutidos na parcela do banco.'],
+                ['A parcela do banco muda?', 'No SAC ela cai todo mes (amortizacao fixa + juros sobre saldo). Na Price e fixa. A Caixa usa principalmente o SAC.'],
+                ['Posso vender antes da entrega?', 'Sim, via cessao de direitos. O lucro pode ser tributado pelo IR. Consulte um contador antes de formalizar.'],
+            ];
+            faqs.forEach((faq, i) => {
+                checkY(14);
+                fill(i%2===0 ? [240,246,252] : C.branco);
+                doc.roundedRect(M, y, CW, 12, 1.5, 1.5, 'F');
+                fill(C.azul); doc.roundedRect(M, y, 3, 12, 1, 0, 'F');
+                bold(); sz(8); rgb(C.azul); tx(faq[0], M+7, y+5);
+                norm(); sz(8); rgb(C.textCin);
+                const qLines = doc.splitTextToSize(faq[1], CW-10);
+                tx(qLines[0], M+7, y+10);
+                y += 14;
+            });
+
+            // ════════════════════════════════════════════════════════════
+            // Adiciona footer em todas as paginas
+            // ════════════════════════════════════════════════════════════
+            const nPgs = doc.internal.getNumberOfPages();
+            for (let p = 1; p <= nPgs; p++) {
+                doc.setPage(p);
+                // Reescreve o footer com numero de pagina correto
+                fill(C.azulEsc); doc.rect(0, H-10, W, 10, 'F');
+                norm(); sz(7); rgb(C.branco);
+                tx(`ImobiPro · Manual do Fluxo Financeiro · ${nomeCorr}${creci ? ' · CRECI: '+creci : ''}`, M, H-4);
+                tx(`Pag. ${p} / ${nPgs}`, W-M, H-4, { align:'right' });
+                // Faixa verde topo (exceto capa que ja tem)
+                if (p > 1) {
+                    fill(C.verde); doc.rect(0, 0, W, 3, 'F');
+                }
+            }
+
+            doc.save('FluxoFinanceiro_Manual_ImobiPro_' + new Date().toLocaleDateString('pt-BR').replace(/\//g,'-') + '.pdf');
+            Utils.toast('Manual PDF profissional gerado!', 'success');
+        }
+
+        // ── PDF da Simulação ──────────────────────────────────────────
+        function baixarPDFSimulacao() {
+            const sim = _lastSim;
+            if (!sim) { Utils.toast('Execute a simulação primeiro', 'error'); return; }
+            const { jsPDF } = window.jspdf;
+            if (!jsPDF) { Utils.toast('jsPDF não disponível', 'error'); return; }
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const W = 210, M = 14;
+            let y = 0;
+            const settings = (UI.data && UI.data.settings) ? UI.data.settings : {};
+            const nomeCorretor = settings.nome || 'Corretor(a)';
+
+            // Header
+            doc.setFillColor(12, 74, 110);
+            doc.rect(0, 0, W, 44, 'F');
+            doc.setFillColor(39, 174, 96);
+            doc.rect(0, 44, W, 4, 'F');
+            doc.setTextColor(255,255,255);
+            doc.setFont('helvetica','bold'); doc.setFontSize(18);
+            doc.text('SIMULAÇÃO DE FLUXO FINANCEIRO', M, 16);
+            doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(180,220,248);
+            doc.text('Imóvel na Planta · Análise de Impacto por Fases', M, 26);
+            doc.text(`${nomeCorretor} · ${new Date().toLocaleDateString('pt-BR')}`, W-M, 26, { align:'right' });
+            y = 54;
+
+            // Parâmetros
+            doc.setFillColor(235, 244, 251);
+            doc.roundedRect(M, y, W-M*2, 44, 4, 4, 'F');
+            doc.setDrawColor(29,111,164,60);
+            doc.roundedRect(M, y, W-M*2, 44, 4, 4, 'S');
+            doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(29,111,164);
+            doc.text('PARÂMETROS DA SIMULAÇÃO', M+4, y+8);
+            doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(50,70,90);
+            const half = (W - M*2 - 8) / 2;
+            doc.text(`Valor do imóvel: ${Utils.formatCurrency(sim.valorImovel)}`, M+4, y+18);
+            doc.text(`Entrada: ${(sim.pctEntrada*100).toFixed(0)}% = ${Utils.formatCurrency(sim.valorImovel*sim.pctEntrada)}`, M+4+half, y+18);
+            doc.text(`Prazo entrada: ${sim.prazoEntrada} meses`, M+4, y+26);
+            doc.text(`Prazo financiamento: ${sim.prazoFin} meses`, M+4+half, y+26);
+            doc.text(`Taxa Caixa: ${sim.taxaCaixa}% a.a.`, M+4, y+34);
+            doc.text(`Juros de obra: ${sim.taxaObra}% a.a. · Entrega: ${sim.entregaMeses} meses`, M+4+half, y+34);
+            y += 50;
+
+            // Fases
+            const fases = [
+                { titulo: 'FASE DE OBRA', cor: [29,111,164], items: [
+                    ['Parcelas de entrada (c/ INCC)', Utils.formatCurrency(sim.parcEntradaBase * (1+sim.inccMes*sim.entregaMeses/2)) + '/mês'],
+                    ['Juros de obra (banco)', Utils.formatCurrency(sim.jurosObraEstimado) + '/mês'],
+                    sim.aluguel > 0 ? ['Aluguel atual', Utils.formatCurrency(sim.aluguel) + '/mês'] : null,
+                    ['TOTAL FASE DE OBRA', Utils.formatCurrency(sim.custoFaseObra) + '/mês' + (sim.renda > 0 ? ' ('+sim.pctObra+'% da renda)' : '')],
+                ].filter(Boolean)},
+                { titulo: 'PÓS-ENTREGA — SOBREPOSIÇÃO ('+sim.mesesSobreposicao+' meses)', cor: [231,76,60], items: [
+                    ['Parcela do banco (SAC)', Utils.formatCurrency(sim.parcelaBancoInicial) + '/mês'],
+                    sim.mesesSobreposicao > 0 ? ['Parcelas residuais entrada (IGPM+1%)', Utils.formatCurrency(sim.parcEntradaAposEntrega) + '/mês'] : null,
+                    sim.aluguel > 0 ? ['Aluguel que PARA (economia)', '- ' + Utils.formatCurrency(sim.aluguel) + '/mês'] : null,
+                    ['CUSTO LÍQUIDO', Utils.formatCurrency(sim.custoFaseEntregaLiq) + '/mês' + (sim.renda > 0 ? ' ('+sim.pctEntregaLiq+'% da renda)' : '')],
+                ].filter(Boolean)},
+                { titulo: 'APÓS QUITAR A ENTRADA', cor: [39,174,96], items: [
+                    ['Parcela do banco (SAC decrescente)', Utils.formatCurrency(sim.parcelaBancoInicial * 0.85) + '/mês (aprox.)'],
+                    ['Patrimônio adquirido', Utils.formatCurrency(sim.valorImovel)],
+                ]},
+            ];
+
+            fases.forEach(fase => {
+                if (y > 240) { doc.addPage(); y = 16; }
+                doc.setFillColor(...fase.cor);
+                doc.roundedRect(M, y, W-M*2, 10, 3, 3, 'F');
+                doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(255,255,255);
+                doc.text(fase.titulo, M+4, y+6.5);
+                y += 12;
+                fase.items.forEach((item, idx) => {
+                    const isLast = idx === fase.items.length - 1;
+                    doc.setFillColor(isLast ? fase.cor[0] : 248, isLast ? fase.cor[1] : 250, isLast ? fase.cor[2] : 252);
+                    if (isLast) {
+                        doc.setFillColor(...fase.cor, 30);
+                    }
+                    doc.roundedRect(M, y, W-M*2, 10, 2, 2, 'F');
+                    doc.setFont(isLast ? 'helvetica' : 'helvetica', isLast ? 'bold' : 'normal');
+                    doc.setFontSize(9);
+                    doc.setTextColor(isLast ? fase.cor[0] : 50, isLast ? fase.cor[1] : 70, isLast ? fase.cor[2] : 90);
+                    doc.text(item[0], M+4, y+6.5);
+                    doc.setFont('helvetica','bold');
+                    doc.text(item[1], W-M-4, y+6.5, { align:'right' });
+                    y += 12;
+                });
+                y += 6;
+            });
+
+            // Alerta de comprometimento
+            if (sim.renda > 0 && y < 250) {
+                const pct = parseFloat(sim.pctEntregaLiq);
+                const cor = pct > 50 ? [231,76,60] : pct > 35 ? [230,126,34] : [39,174,96];
+                doc.setFillColor(...cor, 20);
+                doc.roundedRect(M, y, W-M*2, 16, 4, 4, 'F');
+                doc.setDrawColor(...cor);
+                doc.roundedRect(M, y, W-M*2, 16, 4, 4, 'S');
+                doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...cor);
+                const msg = pct > 50 ? '⚠ Comprometimento ALTO (>50%) — risco de dificuldade financeira' : pct > 35 ? '⚠ Comprometimento ELEVADO (>35%) — planejar reserva financeira' : '✓ Comprometimento ADEQUADO (≤35%) — dentro do limite recomendado';
+                doc.text(msg, M+6, y+10);
+                y += 22;
+            }
+
+            // Footer
+            const nPgs = doc.internal.getNumberOfPages();
+            for (let p = 1; p <= nPgs; p++) {
+                doc.setPage(p);
+                doc.setFillColor(12,74,110);
+                doc.rect(0, 287, W, 10, 'F');
+                doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(180,220,248);
+                doc.text(`ImobiPro · Simulação de Fluxo Financeiro · ${nomeCorretor}`, M, 293);
+                doc.text(`Pág ${p}/${nPgs}`, W-M, 293, { align:'right' });
+            }
+
+            doc.save(`FluxoFinanceiro_Simulacao_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf`);
+            Utils.toast('✅ PDF da simulação gerado!', 'success');
+        }
+
+        return { init, switchTab, simular, baixarPDF, baixarPDFSimulacao };
+    })();
     // ===================================================================
     const MatchModule = (() => {
         let _clienteSelecionado = null;
