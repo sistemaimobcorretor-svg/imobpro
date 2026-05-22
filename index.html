@@ -5777,6 +5777,9 @@
         .dash-nav-card.c-guia     { background: linear-gradient(135deg, #0C4A6E 0%, #1D6FA4 55%, #2E8BC0 100%); box-shadow: 0 4px 16px rgba(29,111,164,0.35); }
         .dash-nav-card.c-termo    { background: linear-gradient(135deg, #1E8449 0%, #27AE60 100%); box-shadow: 0 4px 16px rgba(39,174,96,0.32); }
         .dash-nav-card.c-autorizacoes { background: linear-gradient(135deg, #7B3F00 0%, #C4724A 60%, #D98A62 100%); box-shadow: 0 4px 16px rgba(196,114,74,0.35); }
+        .dash-nav-card.c-match    { background: linear-gradient(135deg, #0C3460 0%, #1D6FA4 55%, #2980B9 100%); box-shadow: 0 4px 16px rgba(29,111,164,0.38); }
+        .dash-nav-card.c-perfis   { background: linear-gradient(135deg, #1A5C35 0%, #27AE60 60%, #2ECC71 100%); box-shadow: 0 4px 16px rgba(39,174,96,0.38); }
+        .dash-nav-card.c-fluxo    { background: linear-gradient(135deg, #4A0E8F 0%, #7C3AED 60%, #9D5CEA 100%); box-shadow: 0 4px 16px rgba(124,58,237,0.38); }
 
         .dash-nav-icon {
             width: 42px; height: 42px;
@@ -7784,6 +7787,33 @@ if(document.readyState==='loading'){
                         <div class="dash-nav-text">
                             <span class="dash-nav-title">Autorizações</span>
                             <span class="dash-nav-sub">Venda e aluguel em PDF</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
+                    <div class="dash-nav-card c-match" onclick="(function(){var el=document.querySelector('.nav-panel-item[data-target=\'match-view\']');if(el){UI.switchTab(el);MatchModule.init();}})()">
+                        <div class="dash-nav-icon"><i class="fas fa-bullseye"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Match Imóvel</span>
+                            <span class="dash-nav-sub">Compatibilidade cliente × imóvel</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
+                    <div class="dash-nav-card c-perfis" onclick="(function(){var el=document.querySelector('.nav-panel-item[data-target=\'perfis-view\']');if(el){UI.switchTab(el);PerfisModule.init();}})()">
+                        <div class="dash-nav-icon"><i class="fas fa-users-cog"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Perfis &amp; Cenários</span>
+                            <span class="dash-nav-sub">Análise de perfis compradores</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
+                    <div class="dash-nav-card c-fluxo" onclick="(function(){var el=document.querySelector('.nav-panel-item[data-target=\'fluxo-view\']');if(el){UI.switchTab(el);FluxoManual.init();}})()">
+                        <div class="dash-nav-icon"><i class="fas fa-coins"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Fluxo Financeiro</span>
+                            <span class="dash-nav-sub">Manual da planta &amp; simulador</span>
                         </div>
                         <i class="fas fa-chevron-right dash-nav-arrow"></i>
                     </div>
