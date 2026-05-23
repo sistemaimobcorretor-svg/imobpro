@@ -9562,6 +9562,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <button id="pf-tab-cenarios" onclick="PerfisModule.switchTab('cenarios')" style="flex-shrink:0;padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:white;color:var(--text-secondary);font-size:0.82rem;font-weight:700;cursor:pointer;">
                         <i class="fas fa-chart-bar"></i> Comparar Cenários
                     </button>
+                    <button id="pf-tab-plano" onclick="PerfisModule.switchTab('plano')" style="flex-shrink:0;padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:white;color:var(--text-secondary);font-size:0.82rem;font-weight:700;cursor:pointer;">
+                        <i class="fas fa-calculator"></i> Plano de Pagamento
+                    </button>
                 </div>
 
                 <!-- Aba: Perfis Exemplo -->
@@ -9621,6 +9624,234 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         </button>
                     </div>
                     <div id="pf-resultado-personalizado" style="display:none;"></div>
+                </div>
+
+                <!-- Aba: Plano de Pagamento -->
+                <div id="pf-panel-plano" style="display:none;">
+                    <div id="pf-plano-content">
+                        <!-- Seletor — Perfil ou Cliente Cadastrado -->
+                        <div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);box-shadow:var(--shadow-sm);margin-bottom:14px;">
+                            <div style="font-size:0.82rem;font-weight:700;color:var(--dark);margin-bottom:10px;"><i class="fas fa-user-circle" style="color:var(--primary);margin-right:6px;"></i>1. Origem do Cliente</div>
+
+                            <!-- Toggle modo -->
+                            <div style="display:flex;gap:6px;margin-bottom:12px;">
+                                <button id="pp-modo-btn-perfil" onclick="PerfisModule.ppSetModo('perfil')" style="flex:1;padding:8px;border-radius:9px;font-size:0.8rem;font-weight:700;cursor:pointer;border:1.5px solid var(--primary);background:var(--primary);color:white;">
+                                    <i class="fas fa-users"></i> Perfil Exemplo
+                                </button>
+                                <button id="pp-modo-btn-cadastrado" onclick="PerfisModule.ppSetModo('cadastrado')" style="flex:1;padding:8px;border-radius:9px;font-size:0.8rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:white;color:var(--text-secondary);">
+                                    <i class="fas fa-address-book"></i> Cliente Cadastrado
+                                </button>
+                            </div>
+
+                            <!-- Painel: Perfil Exemplo -->
+                            <div id="pp-painel-perfil">
+                                <select id="pp-perfil-sel" onchange="PerfisModule.ppCarregarPerfil()" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:0.85rem;color:var(--dark);background:white;margin-bottom:10px;">
+                                    <option value="">-- Escolha um perfil exemplo --</option>
+                                </select>
+                            </div>
+
+                            <!-- Painel: Cliente Cadastrado -->
+                            <div id="pp-painel-cadastrado" style="display:none;">
+                                <div style="position:relative;margin-bottom:10px;">
+                                    <input type="text" id="pp-cliente-busca" placeholder="Buscar cliente por nome ou telefone..." oninput="PerfisModule.ppBuscarCliente(this.value)"
+                                        style="width:100%;padding:9px 12px 9px 36px;border-radius:9px;border:1.5px solid var(--border);font-size:0.85rem;box-sizing:border-box;">
+                                    <i class="fas fa-search" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.85rem;"></i>
+                                </div>
+                                <div id="pp-cliente-lista" style="max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:9px;display:none;background:white;"></div>
+                                <input type="hidden" id="pp-cliente-id">
+                            </div>
+
+                            <!-- Resumo unificado -->
+                            <div id="pp-perfil-resumo" style="display:none;background:var(--primary-ultra);border-radius:9px;padding:10px 12px;font-size:0.78rem;color:var(--dark);"></div>
+                        </div>
+                        <!-- Composição Financeira -->
+                        <div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);box-shadow:var(--shadow-sm);margin-bottom:14px;">
+                            <div style="font-size:0.82rem;font-weight:700;color:var(--dark);margin-bottom:4px;"><i class="fas fa-building" style="color:var(--accent);margin-right:6px;"></i>2. Composição Financeira</div>
+                            <div style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:12px;">VGV = Financiamento banco + Entrada total. A entrada é distribuída entre sinal, FGTS, parcelas mensais, intercaladas e chaves.</div>
+
+                            <!-- VGV + Financiamento -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Valor Total do Imóvel (VGV)</label>
+                                    <input type="text" id="pp-vgv" class="form-control" placeholder="Ex: 350.000,00" oninput="Utils.maskMoney(this);PerfisModule.ppLiveCalc()" style="font-size:0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Valor a ser Financiado (banco)</label>
+                                    <input type="text" id="pp-financiado" class="form-control" placeholder="Calculado auto" oninput="Utils.maskMoney(this);PerfisModule.ppLiveCalc()" style="font-size:0.85rem;">
+                                </div>
+                            </div>
+
+                            <!-- Barra de composição -->
+                            <div id="pp-barra-composicao" style="display:none;margin-bottom:12px;">
+                                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                                    <span style="font-size:0.7rem;font-weight:700;color:var(--dark);">Composição do VGV</span>
+                                    <span id="pp-barra-status" style="font-size:0.7rem;font-weight:700;"></span>
+                                </div>
+                                <div style="height:10px;border-radius:5px;overflow:hidden;background:var(--border);display:flex;">
+                                    <div id="pp-barra-banco"    style="height:100%;background:#1D6FA4;transition:width 0.3s;" title="Financiamento banco"></div>
+                                    <div id="pp-barra-sinal"   style="height:100%;background:#27AE60;transition:width 0.3s;" title="Sinal"></div>
+                                    <div id="pp-barra-fgts"    style="height:100%;background:#7C3AED;transition:width 0.3s;" title="FGTS"></div>
+                                    <div id="pp-barra-parcelas" style="height:100%;background:#0891B2;transition:width 0.3s;" title="Parcelas mensais"></div>
+                                    <div id="pp-barra-interc"  style="height:100%;background:#F59E0B;transition:width 0.3s;" title="Intercaladas"></div>
+                                    <div id="pp-barra-chaves"  style="height:100%;background:#E67E22;transition:width 0.3s;" title="Chaves"></div>
+                                    <div id="pp-barra-diff"    style="height:100%;background:#E74C3C;transition:width 0.3s;" title="Diferença"></div>
+                                </div>
+                                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="pp-barra-legenda"></div>
+                                <!-- Destaque entrada calculada -->
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+                                    <div style="background:rgba(230,126,34,0.07);border-radius:9px;padding:9px 11px;border:1px solid rgba(230,126,34,0.2);">
+                                        <div style="font-size:0.62rem;color:var(--text-secondary);font-weight:700;margin-bottom:2px;">ENTRADA NECESSÁRIA</div>
+                                        <div id="pp-val-entrada-calc" style="font-size:0.95rem;font-weight:900;color:#E67E22;">—</div>
+                                        <div id="pp-pct-entrada-calc" style="font-size:0.65rem;color:var(--text-secondary);">% do VGV</div>
+                                    </div>
+                                    <div style="background:rgba(29,111,164,0.06);border-radius:9px;padding:9px 11px;border:1px solid rgba(29,111,164,0.2);">
+                                        <div style="font-size:0.62rem;color:var(--text-secondary);font-weight:700;margin-bottom:2px;">SOMA DA ENTRADA</div>
+                                        <div id="pp-val-soma-entrada" style="font-size:0.95rem;font-weight:900;color:var(--primary);">—</div>
+                                        <div id="pp-diff-entrada" style="font-size:0.65rem;color:var(--text-secondary);">sinal+FGTS+parcelas+interc.+chaves</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FGTS + planta -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;">
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">FGTS disponível</label>
+                                    <input type="text" id="pp-fgts" class="form-control" placeholder="0,00" oninput="Utils.maskMoney(this);PerfisModule.ppLiveCalc()" style="font-size:0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Imóvel na planta?</label>
+                                    <select id="pp-planta" onchange="PerfisModule.ppTogglePlanta()" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:0.85rem;background:white;">
+                                        <option value="nao">Não (pronto/usado)</option>
+                                        <option value="sim">Sim (na planta)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Parâmetros da Construtora (aparece só se planta=sim) -->
+                        <div id="pp-bloco-construtora" style="display:none;background:white;border-radius:14px;padding:14px;border:1.5px solid rgba(124,58,237,0.25);box-shadow:var(--shadow-sm);margin-bottom:14px;">
+                            <div style="font-size:0.82rem;font-weight:700;color:#7C3AED;margin-bottom:4px;"><i class="fas fa-hard-hat" style="margin-right:6px;"></i>3. Parâmetros da Construtora</div>
+                            <div style="font-size:0.73rem;color:var(--text-secondary);margin-bottom:10px;">Configure prazo da obra, parcelas, correções e eventos especiais de pagamento.</div>
+
+                            <!-- Linha 1: obra + parcelas entrada -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Meses de obra (estimativa)</label>
+                                    <input type="number" id="pp-meses-obra" value="36" min="12" max="60" step="1" oninput="PerfisModule.ppRecalc()" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Parcelas mensais da entrada</label>
+                                    <input type="number" id="pp-parcelas-entrada" value="36" min="1" max="100" step="1" oninput="PerfisModule.ppRecalc()" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:0.85rem;">
+                                </div>
+                            </div>
+
+                            <!-- Linha 2: INCC + IGPM -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">INCC médio anual estimado (%)</label>
+                                    <input type="number" id="pp-incc" value="7" min="1" max="20" step="0.1" oninput="PerfisModule.ppRecalc()" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">IGP-M médio anual estimado (%)</label>
+                                    <input type="number" id="pp-igpm" value="5" min="1" max="25" step="0.1" oninput="PerfisModule.ppRecalc()" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:0.85rem;">
+                                </div>
+                            </div>
+
+                            <!-- Linha 3: sinal + aluguel -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Sinal à vista (ato da compra)</label>
+                                    <input type="text" id="pp-sinal" class="form-control" placeholder="0,00" oninput="Utils.maskMoney(this);PerfisModule.ppLiveCalc()" style="font-size:0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Aluguel atual pago (se houver)</label>
+                                    <input type="text" id="pp-aluguel" class="form-control" placeholder="0,00" oninput="Utils.maskMoney(this);PerfisModule.ppRecalc()" style="font-size:0.85rem;">
+                                </div>
+                            </div>
+
+                            <!-- INTERCALADAS -->
+                            <div style="border-top:1px solid var(--border);padding-top:12px;margin-bottom:12px;">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                                    <div style="font-size:0.78rem;font-weight:700;color:#0891B2;"><i class="fas fa-random" style="margin-right:5px;"></i>Parcelas Intercaladas</div>
+                                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.75rem;color:var(--text-secondary);">
+                                        <input type="checkbox" id="pp-tem-intercaladas" onchange="PerfisModule.ppToggleIntercaladas()" style="cursor:pointer;">
+                                        Ativar
+                                    </label>
+                                </div>
+                                <div id="pp-bloco-intercaladas" style="display:none;">
+                                    <div style="font-size:0.71rem;color:var(--text-secondary);margin-bottom:8px;">Parcelas extras pagas semestralmente ou anualmente durante a obra, além das mensais.</div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;">
+                                        <div>
+                                            <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Valor de cada intercalada</label>
+                                            <input type="text" id="pp-val-intercalada" class="form-control" placeholder="Ex: 5.000,00" oninput="Utils.maskMoney(this);PerfisModule.ppLiveCalc()" style="font-size:0.85rem;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Periodicidade</label>
+                                            <select id="pp-period-intercalada" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:0.85rem;background:white;">
+                                                <option value="6">Semestral (a cada 6 meses)</option>
+                                                <option value="12">Anual (a cada 12 meses)</option>
+                                                <option value="4">Quadrimestral (a cada 4 meses)</option>
+                                                <option value="3">Trimestral (a cada 3 meses)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                        <div>
+                                            <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Mês da 1ª intercalada</label>
+                                            <input type="number" id="pp-mes-ini-intercalada" value="6" min="1" max="60" step="1" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:0.85rem;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Corrigida por</label>
+                                            <select id="pp-idx-intercalada" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:0.85rem;background:white;">
+                                                <option value="incc">INCC (durante obra)</option>
+                                                <option value="igpm">IGP-M + 1% (pós-entrega)</option>
+                                                <option value="fixo">Valor fixo (sem correção)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CHAVES -->
+                            <div style="border-top:1px solid var(--border);padding-top:12px;">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                                    <div style="font-size:0.78rem;font-weight:700;color:#E67E22;"><i class="fas fa-key" style="margin-right:5px;"></i>Chaves (pagamento na entrega)</div>
+                                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.75rem;color:var(--text-secondary);">
+                                        <input type="checkbox" id="pp-tem-chaves" onchange="PerfisModule.ppToggleChaves()" style="cursor:pointer;">
+                                        Ativar
+                                    </label>
+                                </div>
+                                <div id="pp-bloco-chaves" style="display:none;">
+                                    <div style="font-size:0.71rem;color:var(--text-secondary);margin-bottom:8px;">Valor predefinido a ser pago na entrega das chaves, além do saldo a ser financiado pelo banco.</div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;">
+                                        <div>
+                                            <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Valor das chaves</label>
+                                            <input type="text" id="pp-val-chaves" class="form-control" placeholder="Ex: 20.000,00" oninput="Utils.maskMoney(this);PerfisModule.ppLiveCalc()" style="font-size:0.85rem;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Correção das chaves</label>
+                                            <select id="pp-idx-chaves" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:0.85rem;background:white;">
+                                                <option value="incc">INCC acumulado da obra</option>
+                                                <option value="igpm">IGP-M + 1% acumulado</option>
+                                                <option value="fixo">Valor fixo (sem correção)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div style="background:rgba(230,126,34,0.07);border-radius:8px;padding:8px;font-size:0.72rem;color:#7D4E00;">
+                                        <i class="fas fa-info-circle"></i> As chaves reduzem o saldo a ser financiado pelo banco, mas exigem disponibilidade de caixa na entrega. Verifique se o cliente tem reserva para este pagamento.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões de ação -->
+                        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:14px;">
+                            <button onclick="PerfisModule.ppCalcular()" style="background:var(--primary);color:white;border:none;border-radius:11px;padding:13px;font-size:0.92rem;font-weight:700;cursor:pointer;"><i class="fas fa-calculator"></i> Gerar Plano de Pagamento</button>
+                            <button onclick="PerfisModule.ppExportarPDF()" id="pp-btn-pdf" style="display:none;background:var(--danger);color:white;border:none;border-radius:11px;padding:13px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;" title="Baixar PDF"><i class="fas fa-file-pdf"></i></button>
+                        </div>
+
+                        <!-- Resultado -->
+                        <div id="pp-resultado" style="display:none;"></div>
+                    </div>
                 </div>
 
                 <!-- Aba: Comparar Cenários -->
@@ -43806,7 +44037,976 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             return d.toISOString().split('T')[0];
         }
 
-        return { init, analisarPerfil, analisarPersonalizado, switchTab };
+        // ═══════════════════════════════════════════════════════════
+        // MÓDULO: PLANO DE PAGAMENTO — Construtora + Banco + Perfil/Cliente
+        // ═══════════════════════════════════════════════════════════
+
+        let _ppModo = 'perfil';        // 'perfil' | 'cadastrado'
+        let _ppClienteAtivo = null;    // objeto cliente cadastrado selecionado
+        let _ppPerfilAtivo = null;     // objeto perfil exemplo selecionado
+        let _ppPlanoData = null;       // último resultado calculado (para PDF)
+
+        // ── helpers internos ─────────────────────────────────────────
+        function _ppRenda() {
+            if (_ppModo === 'cadastrado' && _ppClienteAtivo) {
+                return (_ppClienteAtivo.rendaMensal || 0);
+            }
+            if (_ppPerfilAtivo) {
+                return (_ppPerfilAtivo.renda || 0) + (_ppPerfilAtivo.rendaConjuge || 0);
+            }
+            return 0;
+        }
+        function _ppIdade() {
+            if (_ppModo === 'cadastrado' && _ppClienteAtivo) {
+                return Utils.calculateAge(_ppClienteAtivo.dataNascimento) || 35;
+            }
+            if (_ppPerfilAtivo) return _ppPerfilAtivo.idade || 35;
+            return 35;
+        }
+        function _ppNome() {
+            if (_ppModo === 'cadastrado' && _ppClienteAtivo) return _ppClienteAtivo.nome || 'Cliente';
+            if (_ppPerfilAtivo) return _ppPerfilAtivo.titulo || 'Perfil';
+            return '—';
+        }
+        function _ppDescricao() {
+            if (_ppModo === 'cadastrado' && _ppClienteAtivo) {
+                const c = _ppClienteAtivo;
+                const idade = Utils.calculateAge(c.dataNascimento);
+                const dep = c.dependentes > 0 ? ` · ${c.dependentes} dep.` : '';
+                const prof = c.profissao ? ` · ${c.profissao}` : '';
+                return `${idade ? idade + ' anos' : ''}${prof}${dep}`;
+            }
+            if (_ppPerfilAtivo) return _ppPerfilAtivo.descricao || '';
+            return '';
+        }
+
+        // ── ppInit: popula seletores ao abrir a aba ──────────────────
+        function ppInit() {
+            const sel = document.getElementById('pp-perfil-sel');
+            if (sel && sel.options.length <= 1) {
+                sel.innerHTML = '<option value="">-- Escolha um perfil exemplo --</option>';
+                PERFIS_EXEMPLO.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = p.emoji + ' ' + p.titulo + ' — ' + Utils.formatCurrency((p.renda||0)+(p.rendaConjuge||0)) + '/mês';
+                    sel.appendChild(opt);
+                });
+            }
+        }
+
+        // ── Alternar modo perfil / cadastrado ────────────────────────
+        function ppSetModo(modo) {
+            _ppModo = modo;
+            _ppClienteAtivo = null;
+            _ppPerfilAtivo = null;
+            const btnP = document.getElementById('pp-modo-btn-perfil');
+            const btnC = document.getElementById('pp-modo-btn-cadastrado');
+            const painelP = document.getElementById('pp-painel-perfil');
+            const painelC = document.getElementById('pp-painel-cadastrado');
+            const res = document.getElementById('pp-perfil-resumo');
+            if (!btnP || !btnC) return;
+            if (modo === 'perfil') {
+                btnP.style.background = 'var(--primary)'; btnP.style.color = 'white'; btnP.style.border = '1.5px solid var(--primary)';
+                btnC.style.background = 'white'; btnC.style.color = 'var(--text-secondary)'; btnC.style.border = '1.5px solid var(--border)';
+                if (painelP) painelP.style.display = 'block';
+                if (painelC) painelC.style.display = 'none';
+            } else {
+                btnC.style.background = 'var(--primary)'; btnC.style.color = 'white'; btnC.style.border = '1.5px solid var(--primary)';
+                btnP.style.background = 'white'; btnP.style.color = 'var(--text-secondary)'; btnP.style.border = '1.5px solid var(--border)';
+                if (painelP) painelP.style.display = 'none';
+                if (painelC) painelC.style.display = 'block';
+            }
+            if (res) res.style.display = 'none';
+        }
+
+        // ── Buscar cliente cadastrado ────────────────────────────────
+        function ppBuscarCliente(q) {
+            const lista = document.getElementById('pp-cliente-lista');
+            if (!lista) return;
+            const clientes = (UI.data && UI.data.clientes) ? UI.data.clientes : [];
+            if (!q || q.length < 2) { lista.style.display = 'none'; return; }
+            const termo = q.toLowerCase();
+            const filtrados = clientes.filter(c =>
+                (c.nome || '').toLowerCase().includes(termo) ||
+                (c.telefone || '').includes(termo) ||
+                (c.cpf || '').includes(termo)
+            ).slice(0, 10);
+            if (filtrados.length === 0) {
+                lista.style.display = 'block';
+                lista.innerHTML = '<div style="padding:12px;font-size:0.8rem;color:var(--text-muted);text-align:center;">Nenhum cliente encontrado</div>';
+                return;
+            }
+            lista.style.display = 'block';
+            lista.innerHTML = filtrados.map(c => {
+                const idade = c.dataNascimento ? Utils.calculateAge(c.dataNascimento) : null;
+                const renda = c.rendaMensal ? Utils.formatCurrency(c.rendaMensal) : '—';
+                const etapa = (UI.data.funilEtapas || []).find(e => e.id === c.etapaFunil);
+                const etapaNome = etapa ? etapa.nome : (c.etapaFunil || 'Lead');
+                return `<div onclick="PerfisModule.ppSelecionarCliente('${c.id}')" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='var(--primary-ultra)'" onmouseout="this.style.background='white'">
+                    <div style="width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;font-weight:700;flex-shrink:0;">${(c.nome||'?')[0].toUpperCase()}</div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:700;font-size:0.85rem;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nome || '—'}</div>
+                        <div style="font-size:0.72rem;color:var(--text-secondary);">${renda}/mês${idade ? ' · ' + idade + ' anos' : ''} · ${etapaNome}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function ppSelecionarCliente(id) {
+            const clientes = (UI.data && UI.data.clientes) ? UI.data.clientes : [];
+            const c = clientes.find(x => x.id === id);
+            if (!c) return;
+            _ppClienteAtivo = c;
+            document.getElementById('pp-cliente-busca').value = c.nome || '';
+            document.getElementById('pp-cliente-id').value = id;
+            const lista = document.getElementById('pp-cliente-lista');
+            if (lista) lista.style.display = 'none';
+            _ppMostrarResumoCliente(c);
+        }
+
+        function _ppMostrarResumoCliente(c) {
+            const res = document.getElementById('pp-perfil-resumo');
+            if (!res) return;
+            const renda = c.rendaMensal || 0;
+            const idade = c.dataNascimento ? Utils.calculateAge(c.dataNascimento) : null;
+            const prazoMax = idade ? Utils.getPrazoMaximoCaixa(idade) : 420;
+            const taxaInfo = Utils.getTaxaCaixa(renda);
+            const maxPrestacao = renda * 0.30;
+            const i = taxaInfo.taxa / 100 / 12;
+            const maxFinanciado = (i > 0 && prazoMax > 0) ? maxPrestacao * (1 - Math.pow(1+i,-prazoMax)) / i : 0;
+            const maxImovel = maxFinanciado / 0.8;
+            // auto-fill FGTS field se vazio
+            const fgtsEl = document.getElementById('pp-fgts');
+            if (fgtsEl && !fgtsEl.value) {
+                // clientes raramente têm FGTS salvo, deixar em branco para o corretor preencher
+            }
+            // Pré-preenche valor financiado com capacidade calculada
+            const finEl2 = document.getElementById('pp-financiado');
+            if (finEl2 && !finEl2.value && maxFinanciado > 0) {
+                finEl2.value = Math.round(maxFinanciado).toLocaleString('pt-BR',{minimumFractionDigits:2});
+                setTimeout(() => ppLiveCalc(), 50);
+            }
+            const dep = c.dependentes > 0 ? ` · ${c.dependentes} dependente(s)` : '';
+            const etapa = (UI.data.funilEtapas || []).find(e => e.id === c.etapaFunil);
+            res.style.display = 'block';
+            res.innerHTML = `
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                    <div style="width:38px;height:38px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:white;font-size:0.9rem;font-weight:700;flex-shrink:0;">${(c.nome||'?')[0].toUpperCase()}</div>
+                    <div>
+                        <div style="font-weight:700;font-size:0.88rem;color:var(--dark);">${c.nome || '—'}</div>
+                        <div style="font-size:0.72rem;color:var(--text-secondary);">${idade ? idade + ' anos' : ''}${c.profissao ? ' · ' + c.profissao : ''}${dep}${etapa ? ' · ' + etapa.nome : ''}</div>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                    <div><span style="color:var(--text-secondary);font-size:0.7rem;">Renda mensal</span><br><strong style="color:var(--primary);">${Utils.formatCurrency(renda)}/mês</strong></div>
+                    <div><span style="color:var(--text-secondary);font-size:0.7rem;">Parcela máx. (30%)</span><br><strong style="color:#E67E22;">${Utils.formatCurrency(maxPrestacao)}/mês</strong></div>
+                    <div><span style="color:var(--text-secondary);font-size:0.7rem;">Cap. imóvel (banco)</span><br><strong style="color:var(--accent);">${Utils.formatCurrency(maxImovel)}</strong></div>
+                    <div><span style="color:var(--text-secondary);font-size:0.7rem;">Taxa Caixa</span><br><strong style="color:#7C3AED;">${taxaInfo.taxa}% a.a.</strong></div>
+                </div>
+                ${!c.rendaMensal ? '<div style="margin-top:6px;padding:6px 8px;background:rgba(231,76,60,0.08);border-radius:6px;font-size:0.72rem;color:#C0392B;"><i class="fas fa-exclamation-triangle"></i> Renda não cadastrada — informe manualmente abaixo.</div>' : ''}
+                ${!c.dataNascimento ? '<div style="margin-top:6px;padding:6px 8px;background:rgba(230,126,34,0.08);border-radius:6px;font-size:0.72rem;color:#A04000;"><i class="fas fa-exclamation-circle"></i> Data de nascimento não cadastrada — o prazo será estimado em 35 anos.</div>' : ''}
+            `;
+        }
+
+        // ── ppCarregarPerfil (modo perfil exemplo) ───────────────────
+        function ppCarregarPerfil() {
+            const id = document.getElementById('pp-perfil-sel').value;
+            const res = document.getElementById('pp-perfil-resumo');
+            if (!id) { if(res) res.style.display='none'; return; }
+            const p = PERFIS_EXEMPLO.find(x => x.id === id);
+            if (!p) return;
+            _ppPerfilAtivo = p;
+            const calc = _calcPerfil(p);
+            const fgtsEl = document.getElementById('pp-fgts');
+            if (fgtsEl && p.fgts) fgtsEl.value = p.fgts.toLocaleString('pt-BR',{minimumFractionDigits:2});
+            // Pré-preenche valor financiado com a capacidade máxima do perfil
+            const finEl = document.getElementById('pp-financiado');
+            if (finEl && !finEl.value && calc.maxFinanciado > 0) {
+                finEl.value = Math.round(calc.maxFinanciado).toLocaleString('pt-BR',{minimumFractionDigits:2});
+            }
+            if (res) {
+                res.style.display = 'block';
+                res.innerHTML = `
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                        <div><span style="color:var(--text-secondary);font-size:0.7rem;">Renda familiar</span><br><strong style="color:var(--primary);">${Utils.formatCurrency(calc.rendaTotal)}/mês</strong></div>
+                        <div><span style="color:var(--text-secondary);font-size:0.7rem;">Parcela máx. (30%)</span><br><strong style="color:#E67E22;">${Utils.formatCurrency(calc.maxPrestacao)}/mês</strong></div>
+                        <div><span style="color:var(--text-secondary);font-size:0.7rem;">Cap. imóvel</span><br><strong style="color:var(--accent);">${Utils.formatCurrency(calc.maxImovel)}</strong></div>
+                        <div><span style="color:var(--text-secondary);font-size:0.7rem;">Cap. c/ FGTS</span><br><strong style="color:#7C3AED;">${Utils.formatCurrency(calc.maxComFgts)}</strong></div>
+                    </div>
+                    ${p.obs ? '<div style="margin-top:8px;font-size:0.72rem;color:var(--primary);border-top:1px solid rgba(29,111,164,0.15);padding-top:6px;"><i class="fas fa-info-circle"></i> ' + p.obs.split(' · ')[0] + '</div>' : ''}
+                `;
+            }
+        }
+
+        function ppTogglePlanta() {
+            const v = document.getElementById('pp-planta').value;
+            const bloco = document.getElementById('pp-bloco-construtora');
+            if (bloco) bloco.style.display = v === 'sim' ? 'block' : 'none';
+            ppLiveCalc();
+        }
+        function ppToggleIntercaladas() {
+            const cb = document.getElementById('pp-tem-intercaladas');
+            const bloco = document.getElementById('pp-bloco-intercaladas');
+            if (bloco) bloco.style.display = cb && cb.checked ? 'block' : 'none';
+            ppLiveCalc();
+        }
+        function ppToggleChaves() {
+            const cb = document.getElementById('pp-tem-chaves');
+            const bloco = document.getElementById('pp-bloco-chaves');
+            if (bloco) bloco.style.display = cb && cb.checked ? 'block' : 'none';
+            ppLiveCalc();
+        }
+        function ppRecalc() { ppLiveCalc(); }
+
+        // ── ppLiveCalc: atualiza barra de composição em tempo real ───
+        function ppLiveCalc() {
+            const vgv         = Utils.parseCurrency(document.getElementById('pp-vgv')?.value) || 0;
+            const financiado  = Utils.parseCurrency(document.getElementById('pp-financiado')?.value) || 0;
+            const fgts        = Utils.parseCurrency(document.getElementById('pp-fgts')?.value) || 0;
+            const sinal       = Utils.parseCurrency(document.getElementById('pp-sinal')?.value) || 0;
+            const planta      = document.getElementById('pp-planta')?.value || 'nao';
+            const parcelasEnt = parseInt(document.getElementById('pp-parcelas-entrada')?.value) || 0;
+            const temInterc   = document.getElementById('pp-tem-intercaladas')?.checked && planta === 'sim';
+            const valInterc   = Utils.parseCurrency(document.getElementById('pp-val-intercalada')?.value) || 0;
+            const periodInterc= parseInt(document.getElementById('pp-period-intercalada')?.value) || 6;
+            const mesIniInterc= parseInt(document.getElementById('pp-mes-ini-intercalada')?.value) || 6;
+            const mesesObra   = parseInt(document.getElementById('pp-meses-obra')?.value) || 36;
+            const inccAnual   = parseFloat(document.getElementById('pp-incc')?.value) || 7;
+            const temChaves   = document.getElementById('pp-tem-chaves')?.checked && planta === 'sim';
+            const valChaves   = Utils.parseCurrency(document.getElementById('pp-val-chaves')?.value) || 0;
+            const idxChaves   = document.getElementById('pp-idx-chaves')?.value || 'incc';
+            const igpmAnual   = parseFloat(document.getElementById('pp-igpm')?.value) || 5;
+
+            const barra = document.getElementById('pp-barra-composicao');
+            if (!vgv || vgv <= 0) { if (barra) barra.style.display='none'; return; }
+            if (barra) barra.style.display='block';
+
+            // Entrada = VGV - financiado (se financiado informado), senão usa 80% de financiamento máximo
+            const entradaNecessaria = financiado > 0 ? Math.max(0, vgv - financiado) : vgv * 0.20;
+            const finBanco = financiado > 0 ? financiado : vgv - entradaNecessaria;
+
+            // Estimar total intercaladas (sem correção para preview)
+            let totalInterc = 0;
+            if (temInterc && valInterc > 0) {
+                let cnt = 0;
+                for (let m = mesIniInterc; m <= mesesObra; m += periodInterc) cnt++;
+                totalInterc = valInterc * cnt;
+            }
+
+            // Corrigir chaves para preview
+            let chavesCorr = 0;
+            if (temChaves && valChaves > 0) {
+                if (idxChaves === 'incc') chavesCorr = valChaves * Math.pow(1+inccAnual/100, mesesObra/12);
+                else if (idxChaves === 'igpm') chavesCorr = valChaves * Math.pow(1+(igpmAnual+1)/100, mesesObra/12);
+                else chavesCorr = valChaves;
+            }
+
+            // Parcelas mensais brutas (entrada líquida / nº parcelas)
+            const entradaLiquida = Math.max(0, entradaNecessaria - sinal - fgts - totalInterc - chavesCorr);
+            const totalParcMensais = planta === 'sim' && parcelasEnt > 0 ? entradaLiquida : 0;
+
+            // Soma da entrada
+            const somaEntrada = sinal + fgts + totalParcMensais + totalInterc + chavesCorr;
+            const diff = somaEntrada - entradaNecessaria;
+            const fechou = Math.abs(diff) < 1;
+            const total = vgv;
+
+            // Percentuais para a barra
+            const pBanco    = total > 0 ? (finBanco / total * 100) : 0;
+            const pSinal    = total > 0 ? (sinal / total * 100) : 0;
+            const pFgts     = total > 0 ? (fgts / total * 100) : 0;
+            const pParcMens = total > 0 ? (totalParcMensais / total * 100) : 0;
+            const pInterc   = total > 0 ? (totalInterc / total * 100) : 0;
+            const pChaves   = total > 0 ? (chavesCorr / total * 100) : 0;
+            const pDiff     = total > 0 ? (Math.abs(diff) / total * 100) : 0;
+
+            const setW = (id, pct) => { const el=document.getElementById(id); if(el) el.style.width=Math.max(0,Math.min(100,pct)).toFixed(1)+'%'; };
+            setW('pp-barra-banco',    pBanco);
+            setW('pp-barra-sinal',    pSinal);
+            setW('pp-barra-fgts',     pFgts);
+            setW('pp-barra-parcelas', pParcMens);
+            setW('pp-barra-interc',   pInterc);
+            setW('pp-barra-chaves',   pChaves);
+            setW('pp-barra-diff',     diff > 0 ? 0 : pDiff); // vermelho só se falta valor
+
+            // Status
+            const statusEl = document.getElementById('pp-barra-status');
+            if (statusEl) {
+                if (fechou) { statusEl.textContent = '✓ Composição fechada'; statusEl.style.color='#27AE60'; }
+                else if (diff > 0) { statusEl.textContent = 'Excede em '+Utils.formatCurrency(Math.abs(diff)); statusEl.style.color='#E74C3C'; }
+                else { statusEl.textContent = 'Falta '+Utils.formatCurrency(Math.abs(diff)); statusEl.style.color='#E67E22'; }
+            }
+
+            // Legenda
+            const legEl = document.getElementById('pp-barra-legenda');
+            if (legEl) {
+                const items = [
+                    { label:'Banco', val:finBanco, cor:'#1D6FA4' },
+                    sinal>0    ? { label:'Sinal', val:sinal, cor:'#27AE60' } : null,
+                    fgts>0     ? { label:'FGTS', val:fgts, cor:'#7C3AED' } : null,
+                    totalParcMensais>0 ? { label:'Parcelas mens.', val:totalParcMensais, cor:'#0891B2' } : null,
+                    totalInterc>0 ? { label:'Intercaladas', val:totalInterc, cor:'#F59E0B' } : null,
+                    chavesCorr>0 ? { label:'Chaves', val:chavesCorr, cor:'#E67E22' } : null,
+                ].filter(Boolean);
+                legEl.innerHTML = items.map(it =>
+                    `<span style="display:flex;align-items:center;gap:4px;font-size:0.68rem;color:var(--dark);">
+                        <span style="width:8px;height:8px;border-radius:50%;background:${it.cor};flex-shrink:0;"></span>
+                        ${it.label}: <strong>${Utils.formatCurrency(it.val)}</strong>
+                    </span>`
+                ).join('');
+            }
+
+            // Métricas de entrada
+            const entEl = document.getElementById('pp-val-entrada-calc');
+            const pctEl = document.getElementById('pp-pct-entrada-calc');
+            const somaEl= document.getElementById('pp-val-soma-entrada');
+            const diffEl= document.getElementById('pp-diff-entrada');
+            if (entEl) entEl.textContent = Utils.formatCurrency(entradaNecessaria);
+            if (pctEl) pctEl.textContent = total > 0 ? (entradaNecessaria/total*100).toFixed(1)+'% do VGV' : '—';
+            if (somaEl) {
+                somaEl.textContent = Utils.formatCurrency(somaEntrada);
+                somaEl.style.color = fechou ? '#27AE60' : diff > 0 ? '#E74C3C' : '#E67E22';
+            }
+            if (diffEl) {
+                if (fechou) { diffEl.textContent = 'Composição equilibrada ✓'; diffEl.style.color='#27AE60'; }
+                else if (diff > 0) { diffEl.textContent = '⚠ Excede a entrada em '+Utils.formatCurrency(Math.abs(diff)); diffEl.style.color='#E74C3C'; }
+                else { diffEl.textContent = '⚠ Faltam '+Utils.formatCurrency(Math.abs(diff))+' para fechar'; diffEl.style.color='#E67E22'; }
+            }
+
+            // Auto-preenche % entrada oculto (para uso no cálculo principal)
+            const pctEntEl = document.getElementById('pp-pct-entrada');
+            if (pctEntEl && total > 0) pctEntEl.value = (entradaNecessaria/total*100).toFixed(2);
+        }
+
+        // ── ppCalcular: engine principal ─────────────────────────────
+        function ppCalcular() {
+            // Validação de origem
+            if (_ppModo === 'cadastrado' && !_ppClienteAtivo) {
+                Utils.toast('Selecione um cliente cadastrado', 'error'); return;
+            }
+            if (_ppModo === 'perfil' && !document.getElementById('pp-perfil-sel').value) {
+                Utils.toast('Selecione um perfil exemplo', 'error'); return;
+            }
+            const vgvRaw = document.getElementById('pp-vgv').value;
+            const vgv = Utils.parseCurrency(vgvRaw) || 0;
+            if (!vgv) { Utils.toast('Informe o valor do imóvel (VGV)', 'error'); return; }
+
+            // Valor financiado informado — se preenchido, define a entrada como diferença
+            const financiadoInformado = Utils.parseCurrency(document.getElementById('pp-financiado')?.value) || 0;
+            const entradaCalc   = financiadoInformado > 0 ? Math.max(0, vgv - financiadoInformado) : null;
+            const pctEntrada    = entradaCalc !== null
+                ? parseFloat(((entradaCalc / vgv) * 100).toFixed(2))
+                : parseFloat(document.getElementById('pp-pct-entrada')?.value) || 20;
+            const fgts          = Utils.parseCurrency(document.getElementById('pp-fgts').value) || 0;
+            const planta        = document.getElementById('pp-planta').value;
+            const aluguel       = Utils.parseCurrency(document.getElementById('pp-aluguel')?.value) || 0;
+            const sinal         = Utils.parseCurrency(document.getElementById('pp-sinal')?.value) || 0;
+            const mesesObra     = parseInt(document.getElementById('pp-meses-obra')?.value) || 36;
+            const parcelasEnt   = parseInt(document.getElementById('pp-parcelas-entrada')?.value) || 36;
+            const inccAnual     = parseFloat(document.getElementById('pp-incc')?.value) || 7;
+            const igpmAnual     = parseFloat(document.getElementById('pp-igpm')?.value) || 5;
+
+            // Intercaladas
+            const temIntercaladas = document.getElementById('pp-tem-intercaladas')?.checked && planta === 'sim';
+            const valIntercalada  = Utils.parseCurrency(document.getElementById('pp-val-intercalada')?.value) || 0;
+            const periodInterc    = parseInt(document.getElementById('pp-period-intercalada')?.value) || 6;
+            const mesIniInterc    = parseInt(document.getElementById('pp-mes-ini-intercalada')?.value) || 6;
+            const idxInterc       = document.getElementById('pp-idx-intercalada')?.value || 'incc';
+
+            // Chaves
+            const temChaves   = document.getElementById('pp-tem-chaves')?.checked && planta === 'sim';
+            const valChaves   = Utils.parseCurrency(document.getElementById('pp-val-chaves')?.value) || 0;
+            const idxChaves   = document.getElementById('pp-idx-chaves')?.value || 'incc';
+
+            // Renda e prazo a partir da origem selecionada
+            const renda      = _ppRenda();
+            const idade      = _ppIdade();
+            const nome       = _ppNome();
+            const descricao  = _ppDescricao();
+            if (!renda) { Utils.toast('Renda não informada no perfil/cliente selecionado', 'error'); return; }
+
+            // ── Validação de composição: sinal+FGTS+parcelas+interc+chaves deve = entrada
+            // (aviso não-bloqueante — calculamos mesmo assim)
+            const _entradaPreview = vgv * (pctEntrada / 100);
+            const _somaComp = (Utils.parseCurrency(document.getElementById('pp-sinal')?.value)||0)
+                            + fgts
+                            + (planta==='sim' ? (_entradaPreview - (Utils.parseCurrency(document.getElementById('pp-sinal')?.value)||0) - fgts) : 0);
+            // diff check is done in ppLiveCalc / visual — não bloquear aqui
+
+            const prazoMax   = Utils.getPrazoMaximoCaixa(idade);
+            const taxaInfo   = Utils.getTaxaCaixa(renda);
+            const maxPrestacao = renda * 0.30;
+
+            // ── Cálculo base ────────────────────────────────────────
+            const entradaTotal   = vgv * (pctEntrada / 100);
+            const entradaLiquida = Math.max(0, entradaTotal - sinal - fgts);
+            const parcelaMensalBase = planta === 'sim' && parcelasEnt > 0 ? entradaLiquida / parcelasEnt : 0;
+
+            // Correção INCC parcelas durante obra
+            const mesesComIncc   = Math.min(mesesObra, parcelasEnt);
+            const fatorInccMedio = mesesComIncc > 0 ? (Math.pow(1+inccAnual/100, mesesComIncc/12) + 1) / 2 : 1;
+            const parcelaEntObra = parcelaMensalBase * fatorInccMedio;
+
+            // Parcelas que ultrapassam a obra (pós-entrega, corrigidas por IGP-M+1%)
+            const parcelasPosEnt = Math.max(0, parcelasEnt - mesesObra);
+            const igpmEfetivo    = igpmAnual + 1;
+            const saldoResidual  = parcelasPosEnt > 0 ? entradaLiquida * (parcelasPosEnt / parcelasEnt) * Math.pow(1+igpmEfetivo/100, parcelasPosEnt/12) : 0;
+            const parcelaPosEnt  = parcelasPosEnt > 0 ? saldoResidual / parcelasPosEnt : 0;
+
+            // Intercaladas — cálculo por ocorrências na obra
+            let intercaladasNaObra = [];
+            let totalIntercaladasObra = 0;
+            if (temIntercaladas && valIntercalada > 0) {
+                for (let m = mesIniInterc; m <= mesesObra; m += periodInterc) {
+                    let val = valIntercalada;
+                    if (idxInterc === 'incc') val = valIntercalada * Math.pow(1+inccAnual/100, m/12);
+                    intercaladasNaObra.push({ mes: m, valor: val });
+                    totalIntercaladasObra += val;
+                }
+            }
+            const qtdIntercaladas = intercaladasNaObra.length;
+            const mediaIntercalada = qtdIntercaladas > 0 ? totalIntercaladasObra / qtdIntercaladas : 0;
+
+            // Chaves — valor corrigido na entrega
+            let valorChavesCorrigido = 0;
+            if (temChaves && valChaves > 0) {
+                if (idxChaves === 'incc') valorChavesCorrigido = valChaves * Math.pow(1+inccAnual/100, mesesObra/12);
+                else if (idxChaves === 'igpm') valorChavesCorrigido = valChaves * Math.pow(1+igpmEfetivo/100, mesesObra/12);
+                else valorChavesCorrigido = valChaves;
+            }
+
+            // Saldo a financiar pelo banco (descontando chaves)
+            const saldoBanco     = Math.max(0, vgv - entradaTotal - valorChavesCorrigido);
+            const taxaMensal     = taxaInfo.taxa / 100 / 12;
+            let parcelaBanco = 0;
+            if (taxaMensal > 0 && prazoMax > 0 && saldoBanco > 0) {
+                parcelaBanco = saldoBanco * taxaMensal / (1 - Math.pow(1+taxaMensal, -prazoMax));
+            }
+
+            // ── Comprometimentos por fase ───────────────────────────
+            const totalObra        = parcelaEntObra + aluguel;
+            const comprometObra    = renda > 0 ? (totalObra / renda) * 100 : 0;
+            const totalPosEnt      = parcelaBanco + parcelaPosEnt;
+            const comprometPosEnt  = renda > 0 ? (totalPosEnt / renda) * 100 : 0;
+            const semObra  = comprometObra   <= 30 ? 'verde' : comprometObra   <= 40 ? 'amarelo' : 'vermelho';
+            const semPosEnt= comprometPosEnt <= 30 ? 'verde' : comprometPosEnt <= 40 ? 'amarelo' : 'vermelho';
+            const corSem   = { verde:'#27AE60', amarelo:'#E67E22', vermelho:'#E74C3C' };
+            const bgSem    = { verde:'rgba(39,174,96,0.08)', amarelo:'rgba(230,126,34,0.08)', vermelho:'rgba(231,76,60,0.08)' };
+
+            // ── Alertas inteligentes ────────────────────────────────
+            const alertas = [];
+            if (parcelasPosEnt > 0) alertas.push({ tipo:'danger', icon:'fa-exclamation-triangle',
+                msg:`<strong>Sobreposição de dívidas:</strong> ${parcelasPosEnt} parcelas de entrada ainda vencerão APÓS a entrega, corrigidas por IGP-M+1% (${igpmEfetivo.toFixed(1)}% a.a.). Isso acumula parcela de entrada + financiamento bancário simultaneamente.`});
+            if (comprometPosEnt > 40) alertas.push({ tipo:'danger', icon:'fa-times-circle',
+                msg:`<strong>Comprometimento crítico pós-entrega: ${comprometPosEnt.toFixed(1)}% da renda.</strong> Limite saudável: 30%. Risco alto de inadimplência. Renegociar parcelas ou aumentar entrada.`});
+            else if (comprometPosEnt > 30) alertas.push({ tipo:'warning', icon:'fa-exclamation-circle',
+                msg:`<strong>Comprometimento elevado: ${comprometPosEnt.toFixed(1)}% da renda</strong> pós-entrega. Avaliar aumento de entrada ou prazo maior.`});
+            if (comprometObra > 35) alertas.push({ tipo:'warning', icon:'fa-hard-hat',
+                msg:`<strong>Fase de obra pesada: ${comprometObra.toFixed(1)}% da renda</strong> comprometida. Reserva de 4+ meses de despesas é imprescindível.`});
+            if (vgv > (maxPrestacao * (1 - Math.pow(1+taxaMensal,-prazoMax)) / taxaMensal / 0.8) * 1.15) alertas.push({ tipo:'danger', icon:'fa-ban',
+                msg:`<strong>Imóvel pode estar acima da capacidade financeira.</strong> Verificar aprovação bancária com antecedência.`});
+            if (fgts > 0 && planta === 'sim') alertas.push({ tipo:'info', icon:'fa-piggy-bank',
+                msg:`<strong>FGTS:</strong> Pode ser usado para abater parcelas durante a obra (CEF) ou integralmente na entrega para reduzir saldo devedor no banco.`});
+            if (temIntercaladas && qtdIntercaladas > 0) alertas.push({ tipo:'warning', icon:'fa-random',
+                msg:`<strong>${qtdIntercaladas} intercalada(s) prevista(s)</strong> com valor médio de ${Utils.formatCurrency(mediaIntercalada)} cada. Total estimado na obra: ${Utils.formatCurrency(totalIntercaladasObra)}. Exige planejamento de caixa semestral/anual.`});
+            if (temChaves && valorChavesCorrigido > 0) alertas.push({ tipo:'warning', icon:'fa-key',
+                msg:`<strong>Chaves: ${Utils.formatCurrency(valorChavesCorrigido)}</strong> na entrega (valor corrigido). Este desembolso exige reserva de caixa específica. Ele reduz o saldo financiado no banco em ${Utils.formatCurrency(valorChavesCorrigido)}.`});
+            if (parcelasEnt > 60) alertas.push({ tipo:'warning', icon:'fa-calendar-times',
+                msg:`<strong>Construtora parcelou a entrada em ${parcelasEnt} meses.</strong> Com obra de ${mesesObra} meses, ${parcelasPosEnt} parcelas caem pós-entrega com IGP-M+1%. Negocie converter saldo em financiamento bancário na entrega.`});
+
+            // alertas por tipo de cliente
+            if (_ppModo === 'cadastrado' && _ppClienteAtivo) {
+                const c = _ppClienteAtivo;
+                if ((c.dependentes||0) > 1 && totalPosEnt > maxPrestacao) alertas.push({ tipo:'danger', icon:'fa-baby',
+                    msg:`<strong>Cliente com ${c.dependentes} dependentes:</strong> margem efetiva menor que a calculada pelo banco. Limite recomendado: 25% da renda.`});
+                if (!c.dataNascimento) alertas.push({ tipo:'info', icon:'fa-calendar',
+                    msg:`Data de nascimento não cadastrada. O prazo foi estimado em ${prazoMax} meses. Cadastre para cálculo preciso.`});
+                if (c.profissao && (c.profissao.toLowerCase().includes('autôn') || c.profissao.toLowerCase().includes('mei'))) alertas.push({ tipo:'info', icon:'fa-file-invoice',
+                    msg:`<strong>Cliente autônomo/MEI:</strong> banco calcula com base na renda comprovada (DECORE/extrato). Simular com margem de 20% menor.`});
+            }
+
+            // ── Estratégia ──────────────────────────────────────────
+            let estrategia = '';
+            if (planta === 'nao') {
+                estrategia = `Financiamento direto. Entrada de ${pctEntrada}% (${Utils.formatCurrency(entradaTotal)}) paga no ato${fgts>0?' com FGTS '+Utils.formatCurrency(fgts):''}. Saldo ${Utils.formatCurrency(saldoBanco)} financiado em ${prazoMax} meses a ${taxaInfo.taxa}% a.a.`;
+            } else if (parcelasPosEnt === 0 && !temChaves) {
+                estrategia = `Entrada quitada antes da entrega. Pós-entrega: apenas parcela bancária (${Utils.formatCurrency(parcelaBanco)}/mês). Sem sobreposição.`;
+            } else {
+                const itens = [];
+                if (parcelasPosEnt > 0) itens.push(`quitar saldo residual com construtora na entrega usando FGTS/reserva para evitar IGP-M+1%`);
+                if (temChaves) itens.push(`reservar ${Utils.formatCurrency(valorChavesCorrigido)} para pagamento das chaves`);
+                estrategia = `Atenção ao acúmulo de obrigações na entrega. Estratégia recomendada: ${itens.join(' e ')}. Após quitar construtora, acionar o financiamento bancário para o saldo restante.`;
+            }
+
+            // ── Linha do tempo mensal (resumida) ────────────────────
+            const timeline = [];
+            for (let m = 1; m <= Math.min(mesesObra + 3, 60); m++) {
+                let parcEnt = m <= parcelasEnt ? parcelaEntObra : (m <= parcelasEnt && m > mesesObra ? parcelaPosEnt : 0);
+                if (m > mesesObra && m <= parcelasEnt) parcEnt = parcelaPosEnt;
+                if (m > parcelasEnt) parcEnt = 0;
+                const interc = (temIntercaladas && intercaladasNaObra.find(x => x.mes === m)) || null;
+                const chaves = (m === mesesObra && temChaves) ? valorChavesCorrigido : 0;
+                const banco  = m > mesesObra ? parcelaBanco : 0;
+                const alug   = m <= mesesObra ? aluguel : 0;
+                const total  = parcEnt + (interc ? interc.valor : 0) + chaves + banco + alug;
+                const tipo   = m === mesesObra ? 'entrega' : m <= mesesObra ? 'obra' : 'posEntrega';
+                timeline.push({ m, parcEnt, interc: interc ? interc.valor : 0, chaves, banco, alug, total, tipo });
+            }
+            const maxTotal = Math.max(...timeline.map(t => t.total), 1);
+
+            // ── Salvar para PDF ──────────────────────────────────────
+            // Composição da entrada para o resumo
+            const somaEntradaComp = sinal + fgts + (entradaLiquida) + totalIntercaladasObra + valorChavesCorrigido;
+            const diffEntrada = somaEntradaComp - entradaTotal;
+            _ppPlanoData = { nome, descricao, vgv, pctEntrada, entradaTotal, sinal, fgts, saldoBanco, parcelaBanco, prazoMax, taxaInfo, renda, maxPrestacao, planta, mesesObra, parcelasEnt, parcelasEnt, parcelaEntObra, parcelasPosEnt, parcelaPosEnt, inccAnual, igpmAnual, igpmEfetivo, aluguel, temIntercaladas, intercaladasNaObra, totalIntercaladasObra, mediaIntercalada, qtdIntercaladas, temChaves, valorChavesCorrigido, valChaves, idxChaves, comprometObra, comprometPosEnt, estrategia, alertas, timeline, financiadoInformado, entradaLiquida, somaEntradaComp, diffEntrada };
+
+            // ── Render ───────────────────────────────────────────────
+            const resDiv = document.getElementById('pp-resultado');
+            resDiv.style.display = 'block';
+            const pdfBtn = document.getElementById('pp-btn-pdf');
+            if (pdfBtn) pdfBtn.style.display = 'block';
+
+            resDiv.innerHTML = _ppRenderResultado(_ppPlanoData, corSem, bgSem, semObra, semPosEnt, maxTotal);
+            resDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // ── Render do resultado ──────────────────────────────────────
+        function _ppRenderResultado(d, corSem, bgSem, semObra, semPosEnt, maxTotal) {
+            const fmtC = v => Utils.formatCurrency(v);
+            const timelineRows = d.timeline.map(t => {
+                const barW = Math.round((t.total / maxTotal) * 100);
+                const cor  = t.tipo==='entrega' ? '#7C3AED' : t.tipo==='obra' ? '#1D6FA4' : '#27AE60';
+                const label= t.tipo==='entrega' ? 'ENTREGA' : t.tipo==='obra' ? `Mês ${t.m}` : `+${t.m - d.mesesObra}m`;
+                const pct  = d.renda > 0 ? Math.round((t.total/d.renda)*100) : 0;
+                const pctCor = pct <= 30 ? '#27AE60' : pct <= 40 ? '#E67E22' : '#E74C3C';
+                const extras = [];
+                if (t.interc > 0) extras.push(`<span style="background:rgba(8,145,178,0.12);color:#0891B2;padding:1px 5px;border-radius:4px;font-size:0.63rem;font-weight:700;">+ intercalada</span>`);
+                if (t.chaves > 0) extras.push(`<span style="background:rgba(230,126,34,0.12);color:#E67E22;padding:1px 5px;border-radius:4px;font-size:0.63rem;font-weight:700;">+ chaves</span>`);
+                return `<tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:5px 6px;font-size:0.72rem;color:${cor};font-weight:700;white-space:nowrap;">${label} ${extras.join('')}</td>
+                    <td style="padding:5px 6px;font-size:0.72rem;color:var(--dark);font-weight:700;">${fmtC(t.total)}</td>
+                    <td style="padding:5px 6px;"><div style="height:10px;background:var(--border);border-radius:5px;width:100%;"><div style="height:100%;width:${barW}%;background:${cor};border-radius:5px;"></div></div></td>
+                    <td style="padding:5px 6px;font-size:0.7rem;font-weight:700;color:${pctCor};">${pct}%</td>
+                </tr>`;
+            }).join('');
+
+            const alertasHTML = d.alertas.map(a => {
+                const s = a.tipo==='danger'?{bg:'rgba(231,76,60,0.07)',bc:'rgba(231,76,60,0.3)',tc:'#C0392B',lbl:'ALERTA'}
+                         :a.tipo==='warning'?{bg:'rgba(230,126,34,0.07)',bc:'rgba(230,126,34,0.3)',tc:'#A04000',lbl:'ATENÇÃO'}
+                         :{bg:'rgba(41,128,185,0.07)',bc:'rgba(41,128,185,0.3)',tc:'#1A5276',lbl:'DICA'};
+                return `<div style="padding:9px 12px;border-radius:9px;margin-bottom:7px;background:${s.bg};border:1px solid ${s.bc};color:${s.tc};">
+                    <div style="font-size:0.7rem;font-weight:800;margin-bottom:2px;"><i class="fas ${a.icon}"></i> ${s.lbl}</div>
+                    <div style="font-size:0.75rem;line-height:1.5;">${a.msg}</div>
+                </div>`;
+            }).join('');
+
+            return `
+            <div style="background:linear-gradient(135deg,var(--primary),#2E8BC0);border-radius:14px;padding:14px;color:white;margin-bottom:12px;">
+                <div style="font-size:0.72rem;opacity:0.85;margin-bottom:4px;"><i class="fas fa-calculator"></i> PLANO DE PAGAMENTO</div>
+                <div style="font-size:1rem;font-weight:900;">${d.nome}</div>
+                <div style="font-size:0.77rem;opacity:0.85;">${d.descricao}${d.planta==='sim' ? ' · Imóvel na planta — '+d.mesesObra+'m de obra' : ' · Imóvel pronto'}</div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+                <div style="background:white;border-radius:10px;padding:10px;border:1px solid var(--border);">
+                    <div style="font-size:0.6rem;color:var(--text-secondary);font-weight:700;">VGV DO IMÓVEL</div>
+                    <div style="font-size:0.9rem;font-weight:900;color:var(--dark);">${fmtC(d.vgv)}</div>
+                </div>
+                <div style="background:white;border-radius:10px;padding:10px;border:1px solid var(--border);">
+                    <div style="font-size:0.6rem;color:var(--text-secondary);font-weight:700;">ENTRADA (${d.pctEntrada}%)</div>
+                    <div style="font-size:0.9rem;font-weight:900;color:#E67E22;">${fmtC(d.entradaTotal)}</div>
+                </div>
+                ${d.temChaves && d.valorChavesCorrigido > 0 ? `
+                <div style="background:rgba(230,126,34,0.06);border-radius:10px;padding:10px;border:1px solid rgba(230,126,34,0.2);">
+                    <div style="font-size:0.6rem;color:var(--text-secondary);font-weight:700;">CHAVES (na entrega, corrigido)</div>
+                    <div style="font-size:0.9rem;font-weight:900;color:#E67E22;">${fmtC(d.valorChavesCorrigido)}</div>
+                </div>` : ''}
+                <div style="background:var(--primary-ultra);border-radius:10px;padding:10px;border:1px solid var(--border-accent);">
+                    <div style="font-size:0.6rem;color:var(--text-secondary);font-weight:700;">SALDO BANCO</div>
+                    <div style="font-size:0.9rem;font-weight:900;color:var(--primary);">${fmtC(d.saldoBanco)}</div>
+                    <div style="font-size:0.63rem;color:var(--text-secondary);">${d.taxaInfo.taxa}% a.a. · ${d.prazoMax}m</div>
+                </div>
+                <div style="background:rgba(39,174,96,0.07);border-radius:10px;padding:10px;border:1px solid rgba(39,174,96,0.2);">
+                    <div style="font-size:0.6rem;color:var(--text-secondary);font-weight:700;">PARCELA BANCO</div>
+                    <div style="font-size:0.9rem;font-weight:900;color:var(--accent);">${fmtC(d.parcelaBanco)}/mês</div>
+                </div>
+            </div>
+
+            ${d.planta === 'sim' ? `
+            <div style="font-size:0.8rem;font-weight:700;color:var(--dark);margin-bottom:8px;"><i class="fas fa-stream" style="color:#7C3AED;margin-right:5px;"></i>Fases do Pagamento</div>
+
+            <div style="background:white;border-radius:12px;border:1.5px solid rgba(29,111,164,0.3);padding:12px;margin-bottom:10px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <div style="font-size:0.78rem;font-weight:800;color:#1D6FA4;"><i class="fas fa-hard-hat"></i> Fase 1 — Obra (${d.mesesObra} meses)</div>
+                    <div style="padding:2px 9px;border-radius:20px;font-size:0.68rem;font-weight:700;background:${bgSem[semObra]};color:${corSem[semObra]};">${d.comprometObra.toFixed(1)}% renda</div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.75rem;">
+                    <div style="background:rgba(29,111,164,0.06);border-radius:8px;padding:8px;">
+                        <div style="color:var(--text-secondary);">Parcela entrada/mês</div>
+                        <div style="font-weight:800;color:#1D6FA4;">${fmtC(d.parcelaEntObra)}</div>
+                        <div style="font-size:0.63rem;color:var(--text-secondary);">c/ INCC ~${d.inccAnual}% a.a.</div>
+                    </div>
+                    <div style="background:rgba(230,126,34,0.06);border-radius:8px;padding:8px;">
+                        <div style="color:var(--text-secondary);">Aluguel paralelo</div>
+                        <div style="font-weight:800;color:#E67E22;">${fmtC(d.aluguel)}</div>
+                        <div style="font-size:0.63rem;color:var(--text-secondary);">custo simultâneo</div>
+                    </div>
+                    ${d.temIntercaladas && d.qtdIntercaladas > 0 ? `
+                    <div style="background:rgba(8,145,178,0.07);border-radius:8px;padding:8px;">
+                        <div style="color:var(--text-secondary);">Intercaladas (${d.qtdIntercaladas}x)</div>
+                        <div style="font-weight:800;color:#0891B2;">${fmtC(d.mediaIntercalada)} média</div>
+                        <div style="font-size:0.63rem;color:var(--text-secondary);">Total: ${fmtC(d.totalIntercaladasObra)}</div>
+                    </div>` : ''}
+                    ${d.temChaves && d.valorChavesCorrigido > 0 ? `
+                    <div style="background:rgba(230,126,34,0.07);border-radius:8px;padding:8px;">
+                        <div style="color:var(--text-secondary);">Chaves (mês ${d.mesesObra})</div>
+                        <div style="font-weight:800;color:#E67E22;">${fmtC(d.valorChavesCorrigido)}</div>
+                        <div style="font-size:0.63rem;color:var(--text-secondary);">desembolso único na entrega</div>
+                    </div>` : ''}
+                    <div style="background:${bgSem[semObra]};border-radius:8px;padding:8px;grid-column:span 2;">
+                        <div style="color:var(--text-secondary);">Total comprometido/mês (obra)</div>
+                        <div style="font-weight:900;font-size:0.92rem;color:${corSem[semObra]};">${fmtC(d.parcelaEntObra + d.aluguel)}</div>
+                        <div style="font-size:0.63rem;color:var(--text-secondary);">de ${fmtC(d.renda)}/mês · ${d.comprometObra.toFixed(1)}%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:white;border-radius:12px;border:1.5px solid ${d.parcelasPosEnt>0?'rgba(231,76,60,0.35)':'rgba(39,174,96,0.3)'};padding:12px;margin-bottom:10px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <div style="font-size:0.78rem;font-weight:800;color:${d.parcelasPosEnt>0?'#E74C3C':'#27AE60'};"><i class="fas fa-key"></i> Fase 2 — Pós-Entrega${d.parcelasPosEnt>0?' ⚠ sobreposição':''}</div>
+                    <div style="padding:2px 9px;border-radius:20px;font-size:0.68rem;font-weight:700;background:${bgSem[semPosEnt]};color:${corSem[semPosEnt]};">${d.comprometPosEnt.toFixed(1)}% renda</div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.75rem;">
+                    <div style="background:var(--primary-ultra);border-radius:8px;padding:8px;">
+                        <div style="color:var(--text-secondary);">Parcela banco/mês</div>
+                        <div style="font-weight:800;color:var(--primary);">${fmtC(d.parcelaBanco)}</div>
+                        <div style="font-size:0.63rem;color:var(--text-secondary);">${d.taxaInfo.taxa}% a.a. · ${d.prazoMax}m</div>
+                    </div>
+                    ${d.parcelasPosEnt > 0 ? `
+                    <div style="background:rgba(231,76,60,0.07);border-radius:8px;padding:8px;">
+                        <div style="color:var(--text-secondary);">Entrada restante (construtora)</div>
+                        <div style="font-weight:800;color:#E74C3C;">${fmtC(d.parcelaPosEnt)}/mês</div>
+                        <div style="font-size:0.63rem;color:#E74C3C;">IGP-M+1% · ${d.parcelasPosEnt}m</div>
+                    </div>` : `<div style="background:rgba(39,174,96,0.06);border-radius:8px;padding:8px;"><div style="color:var(--text-secondary);">Entrada construtora</div><div style="font-weight:800;color:var(--accent);">Quitada</div></div>`}
+                    <div style="background:${bgSem[semPosEnt]};border-radius:8px;padding:8px;grid-column:span 2;">
+                        <div style="color:var(--text-secondary);">Total pós-entrega/mês</div>
+                        <div style="font-weight:900;font-size:0.92rem;color:${corSem[semPosEnt]};">${fmtC(d.parcelaBanco + d.parcelaPosEnt)}</div>
+                        <div style="font-size:0.63rem;color:var(--text-secondary);">de ${fmtC(d.renda)}/mês · ${d.comprometPosEnt.toFixed(1)}% · limite saudável: 30%</div>
+                    </div>
+                </div>
+            </div>` : `
+            <div style="background:white;border-radius:12px;border:1.5px solid rgba(39,174,96,0.3);padding:12px;margin-bottom:10px;">
+                <div style="font-size:0.78rem;font-weight:800;color:var(--accent);margin-bottom:8px;"><i class="fas fa-check-circle"></i> Financiamento direto</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.75rem;">
+                    <div style="background:var(--primary-ultra);border-radius:8px;padding:8px;"><div style="color:var(--text-secondary);">Parcela banco/mês</div><div style="font-weight:800;color:var(--primary);">${fmtC(d.parcelaBanco)}</div><div style="font-size:0.63rem;color:var(--text-secondary);">${d.taxaInfo.taxa}% a.a. · ${d.prazoMax}m</div></div>
+                    <div style="background:${bgSem[semPosEnt]};border-radius:8px;padding:8px;"><div style="color:var(--text-secondary);">Comprometimento</div><div style="font-weight:800;font-size:0.92rem;color:${corSem[semPosEnt]};">${d.comprometPosEnt.toFixed(1)}%</div><div style="font-size:0.63rem;color:var(--text-secondary);">limite: 30%</div></div>
+                </div>
+            </div>`}
+
+            <!-- Composição da Entrada -->
+            <div style="background:white;border-radius:11px;border:1px solid var(--border);padding:12px;margin-bottom:10px;">
+                <div style="font-size:0.73rem;font-weight:700;color:var(--dark);margin-bottom:8px;"><i class="fas fa-layer-group" style="color:var(--primary);margin-right:4px;"></i>Composição da Entrada — VGV ${fmtC(d.vgv)}</div>
+                <div style="height:12px;border-radius:6px;overflow:hidden;background:var(--border);display:flex;margin-bottom:8px;">
+                    ${d.saldoBanco>0?`<div style="height:100%;width:${(d.saldoBanco/d.vgv*100).toFixed(1)}%;background:#1D6FA4;" title="Banco"></div>`:''}
+                    ${d.sinal>0?`<div style="height:100%;width:${(d.sinal/d.vgv*100).toFixed(1)}%;background:#27AE60;" title="Sinal"></div>`:''}
+                    ${d.fgts>0?`<div style="height:100%;width:${(d.fgts/d.vgv*100).toFixed(1)}%;background:#7C3AED;" title="FGTS"></div>`:''}
+                    ${d.entradaLiquida>0?`<div style="height:100%;width:${(d.entradaLiquida/d.vgv*100).toFixed(1)}%;background:#0891B2;" title="Parcelas mensais"></div>`:''}
+                    ${d.totalIntercaladasObra>0?`<div style="height:100%;width:${(d.totalIntercaladasObra/d.vgv*100).toFixed(1)}%;background:#F59E0B;" title="Intercaladas"></div>`:''}
+                    ${d.valorChavesCorrigido>0?`<div style="height:100%;width:${(d.valorChavesCorrigido/d.vgv*100).toFixed(1)}%;background:#E67E22;" title="Chaves"></div>`:''}
+                </div>
+                <table style="width:100%;font-size:0.73rem;border-collapse:collapse;">
+                    <tr style="border-bottom:1px solid var(--border);">
+                        <td style="padding:4px 0;display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:#1D6FA4;display:inline-block;"></span>Financiamento banco</td>
+                        <td style="text-align:right;font-weight:700;color:#1D6FA4;">${fmtC(d.saldoBanco)}</td>
+                        <td style="text-align:right;color:var(--text-secondary);padding-left:8px;">${d.vgv>0?(d.saldoBanco/d.vgv*100).toFixed(1):0}%</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid var(--border);">
+                        <td style="padding:4px 0;" colspan="3"><strong style="color:var(--dark);">Entrada (${(d.entradaTotal/d.vgv*100).toFixed(1)}% = ${fmtC(d.entradaTotal)})</strong></td>
+                    </tr>
+                    ${d.sinal>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 0 3px 12px;display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#27AE60;display:inline-block;"></span>Sinal à vista</td><td style="text-align:right;font-weight:700;color:#27AE60;">${fmtC(d.sinal)}</td><td style="text-align:right;color:var(--text-secondary);padding-left:8px;">${d.vgv>0?(d.sinal/d.vgv*100).toFixed(1):0}%</td></tr>`:''}
+                    ${d.fgts>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 0 3px 12px;display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#7C3AED;display:inline-block;"></span>FGTS</td><td style="text-align:right;font-weight:700;color:#7C3AED;">${fmtC(d.fgts)}</td><td style="text-align:right;color:var(--text-secondary);padding-left:8px;">${d.vgv>0?(d.fgts/d.vgv*100).toFixed(1):0}%</td></tr>`:''}
+                    ${d.entradaLiquida>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 0 3px 12px;display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#0891B2;display:inline-block;"></span>Parcelas mens. (${d.parcelasEnt}×)</td><td style="text-align:right;font-weight:700;color:#0891B2;">${fmtC(d.entradaLiquida)}</td><td style="text-align:right;color:var(--text-secondary);padding-left:8px;">${d.vgv>0?(d.entradaLiquida/d.vgv*100).toFixed(1):0}%</td></tr>`:''}
+                    ${d.totalIntercaladasObra>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 0 3px 12px;display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;display:inline-block;"></span>Intercaladas (${d.qtdIntercaladas}×)</td><td style="text-align:right;font-weight:700;color:#F59E0B;">${fmtC(d.totalIntercaladasObra)}</td><td style="text-align:right;color:var(--text-secondary);padding-left:8px;">${d.vgv>0?(d.totalIntercaladasObra/d.vgv*100).toFixed(1):0}%</td></tr>`:''}
+                    ${d.valorChavesCorrigido>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 0 3px 12px;display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#E67E22;display:inline-block;"></span>Chaves (na entrega)</td><td style="text-align:right;font-weight:700;color:#E67E22;">${fmtC(d.valorChavesCorrigido)}</td><td style="text-align:right;color:var(--text-secondary);padding-left:8px;">${d.vgv>0?(d.valorChavesCorrigido/d.vgv*100).toFixed(1):0}%</td></tr>`:''}
+                    <tr style="background:${Math.abs(d.diffEntrada||0)<1?'rgba(39,174,96,0.06)':'rgba(231,76,60,0.06)'};border-radius:6px;">
+                        <td style="padding:5px 6px;font-weight:700;color:var(--dark);">TOTAL VGV</td>
+                        <td style="text-align:right;font-weight:900;color:${Math.abs(d.diffEntrada||0)<1?'#27AE60':'#E74C3C'};">${fmtC(d.vgv)}</td>
+                        <td style="text-align:right;font-weight:700;color:${Math.abs(d.diffEntrada||0)<1?'#27AE60':'#E74C3C'};padding-left:8px;">${Math.abs(d.diffEntrada||0)<1?'✓ Fechado':('Dif: '+fmtC(Math.abs(d.diffEntrada||0)))}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="background:rgba(29,111,164,0.06);border-radius:10px;padding:11px;border:1px solid rgba(29,111,164,0.2);margin-bottom:10px;">
+                <div style="font-size:0.72rem;font-weight:800;color:var(--primary);margin-bottom:4px;"><i class="fas fa-lightbulb"></i> ESTRATÉGIA RECOMENDADA</div>
+                <div style="font-size:0.76rem;color:var(--dark);line-height:1.55;">${d.estrategia}</div>
+            </div>
+
+            ${alertasHTML || '<div style="padding:9px 12px;background:rgba(39,174,96,0.07);border-radius:9px;border:1px solid rgba(39,174,96,0.2);font-size:0.77rem;color:#1E8449;"><i class="fas fa-check-circle"></i> <strong>Nenhum alerta crítico.</strong> Perfil dentro dos parâmetros para este cenário.</div>'}
+
+            ${d.planta === 'sim' ? `
+            <div style="margin-top:12px;">
+                <div style="font-size:0.78rem;font-weight:700;color:var(--dark);margin-bottom:8px;"><i class="fas fa-chart-bar" style="color:var(--primary);margin-right:5px;"></i>Linha do tempo — comprometimento de renda</div>
+                <div style="background:white;border-radius:11px;border:1px solid var(--border);overflow:hidden;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead><tr style="background:var(--bg-base);">
+                            <th style="padding:6px 8px;font-size:0.67rem;color:var(--text-secondary);text-align:left;font-weight:700;">MÊS</th>
+                            <th style="padding:6px 8px;font-size:0.67rem;color:var(--text-secondary);text-align:left;font-weight:700;">TOTAL/MÊS</th>
+                            <th style="padding:6px 8px;font-size:0.67rem;color:var(--text-secondary);font-weight:700;"></th>
+                            <th style="padding:6px 8px;font-size:0.67rem;color:var(--text-secondary);text-align:right;font-weight:700;">% RENDA</th>
+                        </tr></thead>
+                        <tbody>${timelineRows}</tbody>
+                    </table>
+                </div>
+            </div>` : ''}
+
+            <div style="background:white;border-radius:11px;border:1px solid var(--border);padding:12px;margin-top:10px;">
+                <div style="font-size:0.73rem;font-weight:700;color:var(--dark);margin-bottom:8px;"><i class="fas fa-table" style="color:var(--primary);margin-right:4px;"></i>Resumo Executivo</div>
+                <table style="width:100%;font-size:0.74rem;border-collapse:collapse;">
+                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">Renda familiar</td><td style="text-align:right;font-weight:700;">${fmtC(d.renda)}/mês</td></tr>
+                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">VGV do imóvel</td><td style="text-align:right;font-weight:700;">${fmtC(d.vgv)}</td></tr>
+                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">Entrada (${d.pctEntrada}%)</td><td style="text-align:right;font-weight:700;color:#E67E22;">${fmtC(d.entradaTotal)}</td></tr>
+                    ${d.sinal>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">(-) Sinal à vista</td><td style="text-align:right;font-weight:700;color:#E67E22;">- ${fmtC(d.sinal)}</td></tr>`:''}
+                    ${d.fgts>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">(-) FGTS</td><td style="text-align:right;font-weight:700;color:var(--accent);">- ${fmtC(d.fgts)}</td></tr>`:''}
+                    ${d.planta==='sim'?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">Parcela entrada obra (c/ INCC)</td><td style="text-align:right;font-weight:700;color:#1D6FA4;">${fmtC(d.parcelaEntObra)}/mês × ${Math.min(d.parcelasEnt,d.mesesObra)}m</td></tr>`:''}
+                    ${d.parcelasPosEnt>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:#E74C3C;">Entrada pós-entrega (IGP-M+1%)</td><td style="text-align:right;font-weight:700;color:#E74C3C;">${fmtC(d.parcelaPosEnt)}/mês × ${d.parcelasPosEnt}m</td></tr>`:''}
+                    ${d.temIntercaladas&&d.qtdIntercaladas>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:#0891B2;">Intercaladas (${d.qtdIntercaladas}x)</td><td style="text-align:right;font-weight:700;color:#0891B2;">Total ${fmtC(d.totalIntercaladasObra)}</td></tr>`:''}
+                    ${d.temChaves&&d.valorChavesCorrigido>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:#E67E22;">Chaves na entrega (corrigido)</td><td style="text-align:right;font-weight:700;color:#E67E22;">${fmtC(d.valorChavesCorrigido)}</td></tr>`:''}
+                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">Saldo banco (${d.taxaInfo.taxa}% a.a. · ${d.prazoMax}m)</td><td style="text-align:right;font-weight:700;color:var(--primary);">${fmtC(d.saldoBanco)}</td></tr>
+                    <tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">Parcela bancária/mês</td><td style="text-align:right;font-weight:700;color:var(--primary);">${fmtC(d.parcelaBanco)}/mês</td></tr>
+                    <tr><td style="padding:5px 0;font-weight:700;">Comprometimento pós-entrega</td><td style="text-align:right;font-weight:900;font-size:0.85rem;color:${corSem[semPosEnt]};">${d.comprometPosEnt.toFixed(1)}% da renda</td></tr>
+                </table>
+            </div>`;
+        }
+
+        // ── ppExportarPDF ────────────────────────────────────────────
+        function ppExportarPDF() {
+            if (!_ppPlanoData) { Utils.toast('Gere o plano primeiro', 'error'); return; }
+            const d   = _ppPlanoData;
+            const doc = new window.jspdf.jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+            const pw  = doc.internal.pageSize.getWidth();
+            const ph  = doc.internal.pageSize.getHeight();
+            const M   = 14;
+            const cW  = pw - M * 2;
+            let y     = M;
+
+            const fmtC = v => Utils.formatCurrency(v);
+            const corP = [29,111,164], corG = [39,174,96], corW = [230,126,34], corR = [231,76,60], corV = [124,58,237];
+
+            // Cabeçalho
+            doc.setFillColor(...corP);
+            doc.roundedRect(M, y, cW, 28, 3, 3, 'F');
+            doc.setTextColor(255,255,255);
+            doc.setFontSize(13); doc.setFont('helvetica','bold');
+            doc.text('PLANO DE PAGAMENTO — ImobiPro', M+6, y+9);
+            doc.setFontSize(9); doc.setFont('helvetica','normal');
+            doc.text(d.nome, M+6, y+16);
+            doc.text(d.descricao || '', M+6, y+22);
+            doc.setFontSize(8);
+            doc.text('Gerado em ' + new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}), pw-M-2, y+9, {align:'right'});
+            y += 34;
+
+            // Grid de valores
+            const cells = [
+                ['VGV DO IMÓVEL', fmtC(d.vgv), corP],
+                ['ENTRADA ('+d.pctEntrada+'%)', fmtC(d.entradaTotal), corW],
+                ['SALDO BANCO', fmtC(d.saldoBanco), corP],
+                ['PARCELA BANCO/MÊS', fmtC(d.parcelaBanco)+'/mês', corG],
+                ['RENDA FAMILIAR', fmtC(d.renda)+'/mês', [100,100,100]],
+                ['TAXA / PRAZO', d.taxaInfo.taxa+'% a.a. · '+d.prazoMax+'m', corV],
+            ];
+            if (d.temChaves && d.valorChavesCorrigido>0) cells.push(['CHAVES (na entrega)', fmtC(d.valorChavesCorrigido), corW]);
+            if (d.temIntercaladas && d.qtdIntercaladas>0) cells.push(['INTERCALADAS ('+d.qtdIntercaladas+'x)', 'Total: '+fmtC(d.totalIntercaladasObra), [8,145,178]]);
+
+            const cols = 3;
+            const cH = 16; const cGap = 3;
+            const cCW = (cW - cGap*(cols-1)) / cols;
+            cells.forEach((cell, idx) => {
+                const col = idx % cols;
+                const row = Math.floor(idx / cols);
+                const cx = M + col*(cCW+cGap);
+                const cy = y + row*(cH+cGap);
+                doc.setFillColor(245,247,250);
+                doc.roundedRect(cx, cy, cCW, cH, 2, 2, 'F');
+                doc.setTextColor(...cell[2]);
+                doc.setFontSize(6.5); doc.setFont('helvetica','bold');
+                doc.text(cell[0], cx+4, cy+5.5);
+                doc.setFontSize(9); doc.setFont('helvetica','bold');
+                doc.text(cell[1], cx+4, cy+12);
+            });
+            y += Math.ceil(cells.length/cols)*(cH+cGap) + 6;
+
+            // Fases (se planta)
+            if (d.planta === 'sim') {
+                doc.setFontSize(9); doc.setFont('helvetica','bold');
+                doc.setTextColor(...corP);
+                doc.text('FASES DO PAGAMENTO', M, y+4);
+                y += 8;
+
+                // Fase 1
+                doc.setFillColor(235,244,251);
+                doc.roundedRect(M, y, cW, 22, 2, 2, 'F');
+                doc.setTextColor(...corP); doc.setFontSize(8); doc.setFont('helvetica','bold');
+                doc.text('Fase 1 — Obra ('+d.mesesObra+' meses)', M+4, y+5.5);
+                doc.setTextColor(80,80,80); doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+                doc.text('Parcela entrada: '+fmtC(d.parcelaEntObra)+'/mês (INCC ~'+d.inccAnual+'% a.a.)', M+4, y+11);
+                doc.text('Aluguel paralelo: '+fmtC(d.aluguel)+'/mês', M+4, y+16.5);
+                const pctObraStr = d.comprometObra.toFixed(1)+'% da renda';
+                const corObraRGB = d.comprometObra<=30 ? corG : d.comprometObra<=40 ? corW : corR;
+                doc.setTextColor(...corObraRGB); doc.setFont('helvetica','bold');
+                doc.text(pctObraStr, pw-M-4, y+11, {align:'right'});
+                y += 26;
+
+                // Fase 2
+                const cor2 = d.parcelasPosEnt>0 ? corR : corG;
+                doc.setFillColor(d.parcelasPosEnt>0?252:233, d.parcelasPosEnt>0?235:247, d.parcelasPosEnt>0?235:233);
+                doc.roundedRect(M, y, cW, 22, 2, 2, 'F');
+                doc.setTextColor(...cor2); doc.setFontSize(8); doc.setFont('helvetica','bold');
+                doc.text('Fase 2 — Pós-Entrega'+(d.parcelasPosEnt>0?' (SOBREPOSIÇÃO!)':''), M+4, y+5.5);
+                doc.setTextColor(80,80,80); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+                doc.text('Parcela banco: '+fmtC(d.parcelaBanco)+'/mês ('+d.taxaInfo.taxa+'% a.a. · '+d.prazoMax+'m)', M+4, y+11);
+                if (d.parcelasPosEnt>0) doc.text('Entrada restante: '+fmtC(d.parcelaPosEnt)+'/mês × '+d.parcelasPosEnt+'m (IGP-M+1% = '+d.igpmEfetivo.toFixed(1)+'% a.a.)', M+4, y+16.5);
+                const pctPosStr = d.comprometPosEnt.toFixed(1)+'% da renda';
+                const corPosRGB = d.comprometPosEnt<=30 ? corG : d.comprometPosEnt<=40 ? corW : corR;
+                doc.setTextColor(...corPosRGB); doc.setFont('helvetica','bold');
+                doc.text(pctPosStr, pw-M-4, y+11, {align:'right'});
+                y += 28;
+            }
+
+            // Composição da Entrada
+            if (y + 12 > ph - 20) { doc.addPage(); y = M; }
+            doc.setTextColor(...corP); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+            doc.text('COMPOSICAO FINANCEIRA — VGV = Banco + Entrada', M, y);
+            y += 6;
+            const compRows = [
+                ['Financiamento banco', Utils.formatCurrency(d.saldoBanco), (d.vgv>0?(d.saldoBanco/d.vgv*100).toFixed(1):0)+'%'],
+            ];
+            if (d.sinal>0)              compRows.push(['  Sinal à vista', Utils.formatCurrency(d.sinal), (d.vgv>0?(d.sinal/d.vgv*100).toFixed(1):0)+'%']);
+            if (d.fgts>0)               compRows.push(['  FGTS', Utils.formatCurrency(d.fgts), (d.vgv>0?(d.fgts/d.vgv*100).toFixed(1):0)+'%']);
+            if (d.entradaLiquida>0)     compRows.push(['  Parcelas mensais ('+d.parcelasEnt+'×)', Utils.formatCurrency(d.entradaLiquida), (d.vgv>0?(d.entradaLiquida/d.vgv*100).toFixed(1):0)+'%']);
+            if (d.totalIntercaladasObra>0) compRows.push(['  Intercaladas ('+d.qtdIntercaladas+'×)', Utils.formatCurrency(d.totalIntercaladasObra), (d.vgv>0?(d.totalIntercaladasObra/d.vgv*100).toFixed(1):0)+'%']);
+            if (d.valorChavesCorrigido>0)  compRows.push(['  Chaves (entrega, corrigido)', Utils.formatCurrency(d.valorChavesCorrigido), (d.vgv>0?(d.valorChavesCorrigido/d.vgv*100).toFixed(1):0)+'%']);
+            const diffOk = Math.abs(d.diffEntrada||0) < 1;
+            compRows.push(['TOTAL VGV', Utils.formatCurrency(d.vgv), diffOk ? '✓ Fechado' : 'Dif: '+Utils.formatCurrency(Math.abs(d.diffEntrada||0))]);
+            doc.autoTable({
+                startY: y, margin: { left:M, right:M },
+                head: [['Componente','Valor','% VGV']],
+                body: compRows,
+                styles: { fontSize:7.5, cellPadding:3 },
+                headStyles: { fillColor:corP, textColor:255, fontStyle:'bold', fontSize:7.5 },
+                alternateRowStyles: { fillColor:[248,250,252] },
+                columnStyles: { 0:{cellWidth:cW*0.55}, 1:{cellWidth:cW*0.28,halign:'right',fontStyle:'bold'}, 2:{cellWidth:cW*0.17,halign:'right'} },
+                didParseCell: function(data) {
+                    if (data.row.index === compRows.length - 1) {
+                        data.cell.styles.fontStyle = 'bold';
+                        data.cell.styles.fillColor = diffOk ? [233,247,233] : [252,235,235];
+                        data.cell.styles.textColor = diffOk ? [30,132,73] : [192,57,43];
+                    }
+                }
+            });
+            y = doc.lastAutoTable.finalY + 8;
+
+            // Estratégia
+            doc.setFillColor(235,244,251);
+            doc.roundedRect(M, y, cW, 3, 1, 1, 'F');
+            doc.setTextColor(...corP); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+            doc.text('ESTRATEGIA RECOMENDADA', M, y+8);
+            y += 11;
+            doc.setTextColor(40,40,40); doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+            const lines = doc.splitTextToSize(d.estrategia.replace(/<[^>]+>/g,''), cW);
+            doc.text(lines, M, y);
+            y += lines.length * 4.2 + 6;
+
+            // Alertas
+            if (d.alertas.length > 0) {
+                doc.setTextColor(...corP); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+                doc.text('ALERTAS E OBSERVACOES', M, y);
+                y += 6;
+                d.alertas.forEach(a => {
+                    const cor = a.tipo==='danger' ? corR : a.tipo==='warning' ? corW : [41,128,185];
+                    const bgR = a.tipo==='danger' ? [252,235,235] : a.tipo==='warning' ? [254,243,220] : [232,244,253];
+                    const txt = a.msg.replace(/<[^>]+>/g,'');
+                    const tLines = doc.splitTextToSize(txt, cW-8);
+                    const bH = tLines.length * 4 + 6;
+                    if (y + bH > ph - 20) { doc.addPage(); y = M; }
+                    doc.setFillColor(...bgR);
+                    doc.roundedRect(M, y, cW, bH, 2, 2, 'F');
+                    doc.setTextColor(...cor); doc.setFontSize(7); doc.setFont('helvetica','bold');
+                    doc.text((a.tipo==='danger'?'ALERTA':a.tipo==='warning'?'ATENCAO':'DICA'), M+3, y+4.5);
+                    doc.setFont('helvetica','normal'); doc.setFontSize(7.2); doc.setTextColor(40,40,40);
+                    doc.text(tLines, M+3, y+9);
+                    y += bH + 4;
+                });
+            }
+
+            // Tabela resumo
+            if (y + 60 > ph - 10) { doc.addPage(); y = M; }
+            doc.setTextColor(...corP); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+            doc.text('RESUMO EXECUTIVO', M, y);
+            y += 6;
+            const resumoRows = [
+                ['Renda familiar', fmtC(d.renda)+'/mês'],
+                ['VGV do imóvel', fmtC(d.vgv)],
+                ['Entrada ('+d.pctEntrada+'%)', fmtC(d.entradaTotal)],
+            ];
+            if (d.sinal>0) resumoRows.push(['(-) Sinal à vista', '- '+fmtC(d.sinal)]);
+            if (d.fgts>0)  resumoRows.push(['(-) FGTS', '- '+fmtC(d.fgts)]);
+            if (d.planta==='sim') resumoRows.push(['Parcela entrada obra (INCC)', fmtC(d.parcelaEntObra)+'/mês × '+Math.min(d.parcelasEnt,d.mesesObra)+'m']);
+            if (d.parcelasPosEnt>0) resumoRows.push(['Entrada pós-entrega (IGP-M+1%)', fmtC(d.parcelaPosEnt)+'/mês × '+d.parcelasPosEnt+'m']);
+            if (d.temIntercaladas&&d.qtdIntercaladas>0) resumoRows.push(['Intercaladas ('+d.qtdIntercaladas+'x)', 'Total '+fmtC(d.totalIntercaladasObra)]);
+            if (d.temChaves&&d.valorChavesCorrigido>0) resumoRows.push(['Chaves na entrega', fmtC(d.valorChavesCorrigido)]);
+            resumoRows.push(['Saldo banco ('+d.taxaInfo.taxa+'% a.a. · '+d.prazoMax+'m)', fmtC(d.saldoBanco)]);
+            resumoRows.push(['Parcela bancária/mês', fmtC(d.parcelaBanco)+'/mês']);
+            resumoRows.push(['Comprometimento pós-entrega', d.comprometPosEnt.toFixed(1)+'% da renda']);
+
+            doc.autoTable({
+                startY: y, margin: { left:M, right:M },
+                head: [['Item','Valor']],
+                body: resumoRows,
+                styles: { fontSize:7.5, cellPadding:3 },
+                headStyles: { fillColor:corP, textColor:255, fontStyle:'bold', fontSize:7.5 },
+                alternateRowStyles: { fillColor:[248,250,252] },
+                columnStyles: { 0:{cellWidth:cW*0.62}, 1:{cellWidth:cW*0.38, halign:'right', fontStyle:'bold'} }
+            });
+
+            // Rodapé
+            const pageCount = doc.getNumberOfPages();
+            for (let i=1; i<=pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(7); doc.setTextColor(150,150,150);
+                doc.text('ImobiPro — Consultoria Financeira Imobiliária', M, ph-5);
+                doc.text('Pág. '+i+'/'+pageCount, pw-M, ph-5, {align:'right'});
+            }
+
+            const safeName = (d.nome||'cliente').replace(/[^a-zA-Z0-9]/g,'_');
+            doc.save('PlanoPagemento_'+safeName+'_'+new Date().toISOString().split('T')[0]+'.pdf');
+            Utils.toast('PDF gerado com sucesso!', 'success');
+        }
+
+        // ── switchTab atualizado ─────────────────────────────────────
+        const _switchTabOrig = switchTab;
+        switchTab = function(tab) {
+            ['exemplos', 'personalizado', 'cenarios', 'plano'].forEach(t => {
+                const panel = document.getElementById('pf-panel-' + t);
+                const btn   = document.getElementById('pf-tab-' + t);
+                if (!panel || !btn) return;
+                if (t === tab) {
+                    panel.style.display = 'block';
+                    const colors = { plano:'#1D6FA4', cenarios:'#7C3AED', personalizado:'#1D6FA4', exemplos:'var(--accent)' };
+                    btn.style.background = colors[t] || 'var(--accent)';
+                    btn.style.color = 'white';
+                    btn.style.border = 'none';
+                } else {
+                    panel.style.display = 'none';
+                    btn.style.background = 'white';
+                    btn.style.color = 'var(--text-secondary)';
+                    btn.style.border = '1.5px solid var(--border)';
+                }
+            });
+            if (tab === 'cenarios') _renderCenarios();
+            if (tab === 'plano') ppInit();
+        };
+
+        return { init, analisarPerfil, analisarPersonalizado, switchTab, ppSetModo, ppCarregarPerfil, ppBuscarCliente, ppSelecionarCliente, ppTogglePlanta, ppToggleIntercaladas, ppToggleChaves, ppRecalc, ppCalcular, ppExportarPDF };
     })();
 
     // Patch: clicking agenda cards opens VerTarefa instead of edit form directly
