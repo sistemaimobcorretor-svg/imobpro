@@ -5780,6 +5780,7 @@
         .dash-nav-card.c-match    { background: linear-gradient(135deg, #0C3460 0%, #1D6FA4 55%, #2980B9 100%); box-shadow: 0 4px 16px rgba(29,111,164,0.38); }
         .dash-nav-card.c-perfis   { background: linear-gradient(135deg, #1A5C35 0%, #27AE60 60%, #2ECC71 100%); box-shadow: 0 4px 16px rgba(39,174,96,0.38); }
         .dash-nav-card.c-fluxo    { background: linear-gradient(135deg, #4A0E8F 0%, #7C3AED 60%, #9D5CEA 100%); box-shadow: 0 4px 16px rgba(124,58,237,0.38); }
+        .dash-nav-card.c-captacao { background: linear-gradient(135deg, #7B1200 0%, #C0392B 60%, #E74C3C 100%); box-shadow: 0 4px 16px rgba(192,57,43,0.38); }
 
         .dash-nav-icon {
             width: 42px; height: 42px;
@@ -7047,6 +7048,90 @@
 
         /* ═══════════════ FIM FINANCEIRO CSS v2 ═══════════════ */
 
+        /* ===== MÓDULO CAPTAÇÃO DE IMÓVEIS DE RUA ===== */
+        .dash-nav-card.c-captacao { background: linear-gradient(135deg, #7B1200 0%, #C0392B 60%, #E74C3C 100%); box-shadow: 0 4px 16px rgba(192,57,43,0.38); }
+        #captacao-view .cap-hero {
+            background: linear-gradient(135deg, #7B1200 0%, #C0392B 55%, #E74C3C 100%);
+            border-radius: 18px; padding: 20px; margin-bottom: 18px;
+            position: relative; overflow: hidden;
+            box-shadow: 0 6px 24px rgba(192,57,43,0.30);
+            display: flex; align-items: center; gap: 14px;
+        }
+        #captacao-view .cap-hero::before {
+            content: ''; position: absolute; top: -30px; right: -20px;
+            width: 120px; height: 120px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        #captacao-view .cap-hero-icon {
+            width: 54px; height: 54px; background: rgba(255,255,255,0.18);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; flex-shrink: 0;
+        }
+        #captacao-view .cap-hero-text h2 { font-size: 1.05rem; font-weight: 900; color: #fff; margin-bottom: 3px; }
+        #captacao-view .cap-hero-text p { font-size: 0.75rem; color: rgba(255,255,255,0.70); line-height: 1.4; }
+        .cap-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+        .cap-stat { background: var(--bg-raised); border: 1px solid var(--border); border-radius: 14px; padding: 14px 10px; text-align: center; box-shadow: var(--shadow-sm); }
+        .cap-stat-val { font-size: 1.5rem; font-weight: 900; color: var(--dark); line-height: 1; }
+        .cap-stat-lbl { font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .cap-card { background: var(--bg-raised); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; box-shadow: var(--shadow-sm); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+        .cap-card:active { transform: scale(0.98); }
+        .cap-card-img-wrap { width: 100%; height: 160px; position: relative; background: linear-gradient(135deg, #CBD5E1, #94A3B8); overflow: hidden; }
+        .cap-card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .cap-card-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: rgba(255,255,255,0.6); }
+        .cap-card-tipo-badge { position: absolute; top: 10px; left: 10px; padding: 4px 10px; border-radius: 20px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .cap-badge-venda { background: #E74C3C; color: #fff; }
+        .cap-badge-aluguel { background: #27AE60; color: #fff; }
+        .cap-badge-ambos { background: #E67E22; color: #fff; }
+        .cap-card-status-badge { position: absolute; top: 10px; right: 10px; padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; }
+        .cap-status-novo { background: rgba(29,111,164,0.9); color: #fff; }
+        .cap-status-contatado { background: rgba(39,174,96,0.9); color: #fff; }
+        .cap-status-autorizado { background: rgba(124,58,237,0.9); color: #fff; }
+        .cap-status-descartado { background: rgba(100,116,139,0.6); color: #fff; }
+        .cap-card-body { padding: 14px 16px 12px; }
+        .cap-card-endereco { font-size: 0.9rem; font-weight: 800; color: var(--dark); margin-bottom: 5px; line-height: 1.3; }
+        .cap-card-info { font-size: 0.78rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+        .cap-card-info i { color: var(--primary); width: 14px; flex-shrink: 0; }
+        .cap-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 6px; }
+        .cap-tag { background: var(--primary-ultra); color: var(--primary); border: 1px solid var(--border-accent); border-radius: 20px; padding: 3px 10px; font-size: 0.68rem; font-weight: 700; }
+        .cap-card-actions { display: flex; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--border); }
+        .cap-action-btn { flex: 1; padding: 8px 6px; border: none; border-radius: 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; font-family: 'Inter', sans-serif; transition: all 0.18s; }
+        .cap-action-btn:active { transform: scale(0.93); }
+        .cap-action-btn.primary { background: var(--primary); color: #fff; }
+        .cap-action-btn.success { background: var(--accent); color: #fff; }
+        .cap-action-btn.danger { background: rgba(231,76,60,0.10); color: var(--danger); border: 1px solid rgba(231,76,60,0.25); }
+        .cap-action-btn.secondary { background: var(--bg-overlay); color: var(--text-secondary); border: 1px solid var(--border); }
+        .cap-fab-captacao { position: fixed; bottom: calc(24px + var(--safe-bottom, 0px)); right: 20px; width: 58px; height: 58px; background: linear-gradient(135deg, #C0392B, #E74C3C); border-radius: 18px; display: none; align-items: center; justify-content: center; font-size: 1.4rem; color: #fff; box-shadow: 0 6px 20px rgba(192,57,43,0.45); cursor: pointer; z-index: 50; border: none; transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s; }
+        /* Esconde o FAB principal enquanto o painel de captação estiver ativo */
+        body.captacao-ativa #fab-container { display: none !important; }
+        .cap-fab-captacao:active { transform: scale(0.92); box-shadow: 0 10px 28px rgba(192,57,43,0.55); }
+        .cap-filter-row { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; }
+        .cap-filter-row::-webkit-scrollbar { display: none; }
+        .cap-filter-chip { flex-shrink: 0; padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--bg-raised); color: var(--text-secondary); font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: all 0.18s; font-family: 'Inter', sans-serif; white-space: nowrap; }
+        .cap-filter-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(29,111,164,0.25); }
+        .cap-filter-chip:active { transform: scale(0.95); }
+        .cap-empty { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+        .cap-empty-icon { width: 72px; height: 72px; border-radius: 22px; background: rgba(192,57,43,0.08); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 14px; }
+        .cap-empty-title { font-size: 0.95rem; font-weight: 800; color: var(--dark); margin-bottom: 6px; }
+        .cap-empty-sub { font-size: 0.78rem; color: var(--text-muted); max-width: 220px; margin: 0 auto 20px; line-height: 1.5; }
+        #sheet-captacao-form .cap-photo-area { width: 100%; height: 180px; border: 2px dashed var(--border-strong); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; background: var(--bg-overlay); overflow: hidden; position: relative; transition: border-color 0.2s; margin-bottom: 16px; }
+        #sheet-captacao-form .cap-photo-area:hover { border-color: var(--primary); }
+        #sheet-captacao-form .cap-photo-area img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+        #sheet-captacao-form .cap-photo-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; gap: 8px; color: #fff; font-size: 0.85rem; font-weight: 700; }
+        #sheet-captacao-form .cap-photo-placeholder { font-size: 2rem; color: var(--text-muted); }
+        #sheet-captacao-form .cap-photo-placeholder-text { font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); }
+        #sheet-captacao-form .cap-photo-placeholder-sub { font-size: 0.72rem; color: var(--text-muted); }
+        #sheet-captacao-detail .cap-detail-img { width: 100%; height: 200px; object-fit: cover; border-radius: 14px; margin-bottom: 14px; }
+        #sheet-captacao-detail .cap-detail-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        #sheet-captacao-detail .cap-detail-section { background: var(--bg-overlay); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+        #sheet-captacao-detail .cap-detail-label { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        #sheet-captacao-detail .cap-detail-value { font-size: 0.9rem; font-weight: 600; color: var(--dark); line-height: 1.4; }
+        #sheet-captacao-detail .cap-detail-phone-btn { display: flex; align-items: center; gap: 10px; background: var(--accent-ultra); border: 1px solid rgba(39,174,96,0.25); border-radius: 12px; padding: 14px 16px; cursor: pointer; margin-bottom: 10px; transition: background 0.2s; }
+        #sheet-captacao-detail .cap-detail-phone-btn:active { transform: scale(0.97); }
+        #sheet-captacao-detail .cap-detail-phone-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+        #sheet-captacao-detail .cap-detail-phone-label { font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); }
+        #sheet-captacao-detail .cap-detail-phone-number { font-size: 1rem; font-weight: 800; color: var(--dark); }
+
     </style>
 
 <style>
@@ -7818,6 +7903,15 @@ if(document.readyState==='loading'){
                         <i class="fas fa-chevron-right dash-nav-arrow"></i>
                     </div>
 
+                    <div class="dash-nav-card c-captacao" onclick="CaptacaoModule.open()">
+                        <div class="dash-nav-icon"><i class="fas fa-camera"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Captação de Rua</span>
+                            <span class="dash-nav-sub">Imóveis com placa encontrados</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
                 </div>
 
                 <!-- Mini Chart de desempenho -->
@@ -7873,7 +7967,48 @@ if(document.readyState==='loading'){
 
             </div>
 
-            <div id="imoveis-view" class="view">
+            
+            <!-- ===== PAINEL CAPTAÇÃO DE IMÓVEIS DE RUA ===== -->
+            <div id="captacao-view" class="view" style="display:none;">
+
+                <div class="cap-hero">
+                    <div class="cap-hero-icon">📷</div>
+                    <div class="cap-hero-text">
+                        <h2>Captação de Imóveis de Rua</h2>
+                        <p>Registre imóveis com placa, anote o contato e solicite autorização para comercializar</p>
+                    </div>
+                </div>
+
+                <div class="cap-stats-row">
+                    <div class="cap-stat">
+                        <div class="cap-stat-val" id="cap-stat-total">0</div>
+                        <div class="cap-stat-lbl">Registrados</div>
+                    </div>
+                    <div class="cap-stat">
+                        <div class="cap-stat-val" id="cap-stat-novos" style="color:var(--primary)">0</div>
+                        <div class="cap-stat-lbl">Novos</div>
+                    </div>
+                    <div class="cap-stat">
+                        <div class="cap-stat-val" id="cap-stat-autorizados" style="color:#7C3AED">0</div>
+                        <div class="cap-stat-lbl">Autorizados</div>
+                    </div>
+                </div>
+
+                <div class="cap-filter-row" id="cap-filters">
+                    <button class="cap-filter-chip active" onclick="CaptacaoModule.filter('todos', this)">Todos</button>
+                    <button class="cap-filter-chip" onclick="CaptacaoModule.filter('novo', this)">🔵 Novos</button>
+                    <button class="cap-filter-chip" onclick="CaptacaoModule.filter('contatado', this)">🟢 Contatados</button>
+                    <button class="cap-filter-chip" onclick="CaptacaoModule.filter('autorizado', this)">🟣 Autorizados</button>
+                    <button class="cap-filter-chip" onclick="CaptacaoModule.filter('descartado', this)">⚫ Descartados</button>
+                    <button class="cap-filter-chip" onclick="CaptacaoModule.filter('venda', this)">🔴 Venda</button>
+                    <button class="cap-filter-chip" onclick="CaptacaoModule.filter('aluguel', this)">🟩 Aluguel</button>
+                </div>
+
+                <div id="cap-list"></div>
+
+            </div>
+
+<div id="imoveis-view" class="view">
                 <div class="section-title">
                     Imóveis
                     <div style="display: flex; gap: 8px;">
@@ -9933,8 +10068,14 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
         </main>
 
+        <!-- FAB Captação de Rua -->
+        <button class="cap-fab-captacao" id="cap-fab-btn" onclick="CaptacaoModule.novaCaptura()" title="Registrar imóvel de rua" style="display:none;">
+            <i class="fas fa-camera"></i>
+        </button>
+
+
         <!-- ── FAB Speed Dial ── -->
-        <div id="fab-container">
+        <div id="fab-container" style="display:none;">
             <!-- Botão principal -->
             <button class="fab" id="main-fab" onclick="UI.onFabClick()">
                 <i class="fas fa-plus" id="fab-icon"></i>
@@ -10015,6 +10156,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <button class="nav-panel-item" data-target="fluxo-view" onclick="UI.switchTab(this);FluxoManual.init();UI.closeNavDrawer();return false;">
                     <i class="fas fa-stream"></i> Fluxo Financeiro
                     <span style="font-size:.6rem;background:rgba(29,111,164,0.12);color:var(--primary);padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
+                </button>
+                <button class="nav-panel-item" onclick="CaptacaoModule.open();UI.closeNavDrawer();return false;">
+                    <i class="fas fa-camera" style="color:#E74C3C"></i> Captação de Rua
+                    <span style="font-size:.6rem;background:rgba(192,57,43,0.12);color:#C0392B;padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
                 </button>
                 <button class="nav-panel-item" data-target="coach-view" onclick="UI.switchTab(this);Coach.init();UI.closeNavDrawer();return false;">
                     <i class="fas fa-trophy"></i> Coach
@@ -10585,6 +10730,169 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <i class="fas fa-file-archive"></i> Baixar Documentos (ZIP) também
             </button>
             <button type="button" class="btn-block" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.60);margin-top:8px;" onclick="UI.closeModals()">Cancelar</button>
+        </div>
+
+        <!-- ===== MODAL CAPTAÇÃO — NOVO REGISTRO ===== -->
+        <div class="modal-overlay" id="overlay-captacao-form" onclick="UI.closeModal('captacao-form')"></div>
+        <div class="modal-sheet" id="sheet-captacao-form" style="max-height:92vh;overflow-y:auto;">
+            <div class="sheet-handle"></div>
+            <h3 class="section-title" style="margin-bottom:16px;">
+                <span id="cap-form-title">📷 Novo Imóvel Captado</span>
+            </h3>
+
+            <input type="hidden" id="cap-edit-id">
+
+            <!-- Foto -->
+            <div class="cap-photo-area" id="cap-photo-area" onclick="document.getElementById('cap-photo-input').click()">
+                <div class="cap-photo-placeholder">📷</div>
+                <div class="cap-photo-placeholder-text">Tirar foto / Selecionar imagem</div>
+                <div class="cap-photo-placeholder-sub">Toque para abrir a câmera</div>
+            </div>
+            <input type="file" id="cap-photo-input" accept="image/*" capture="environment" style="display:none" onchange="CaptacaoModule.onPhotoSelected(this)">
+
+            <!-- Tipo de negócio -->
+            <div class="form-group">
+                <label class="form-label">Tipo de Negócio <span style="color:var(--danger)">*</span></label>
+                <select id="cap-tipo" class="form-control">
+                    <option value="venda">🔴 Venda</option>
+                    <option value="aluguel">🟩 Aluguel</option>
+                    <option value="ambos">🟡 Venda e Aluguel</option>
+                </select>
+            </div>
+
+            <!-- Telefone -->
+            <div class="form-group">
+                <label class="form-label">Telefone da Placa <span style="color:var(--danger)">*</span></label>
+                <input type="tel" id="cap-telefone" class="form-control" placeholder="(82) 99999-9999" oninput="Utils.maskPhone(this)" inputmode="tel">
+            </div>
+
+            <!-- Endereço / Localização -->
+            <div class="form-group">
+                <label class="form-label">Endereço / Localização <span style="color:var(--danger)">*</span></label>
+                <input type="text" id="cap-endereco" class="form-control" placeholder="Ex: Rua das Flores, 123 — Ponta Verde">
+            </div>
+
+            <!-- Bairro -->
+            <div class="form-group">
+                <label class="form-label">Bairro</label>
+                <input type="text" id="cap-bairro" class="form-control" placeholder="Ex: Ponta Verde, Jatiúca, Pajuçara">
+            </div>
+
+            <!-- Tipo de imóvel -->
+            <div class="form-group">
+                <label class="form-label">Tipo do Imóvel</label>
+                <select id="cap-tipo-imovel" class="form-control">
+                    <option value="">— Selecione —</option>
+                    <option value="Casa">Casa</option>
+                    <option value="Apartamento">Apartamento</option>
+                    <option value="Terreno">Terreno</option>
+                    <option value="Comercial">Comercial</option>
+                    <option value="Cobertura">Cobertura</option>
+                    <option value="Outro">Outro</option>
+                </select>
+            </div>
+
+            <!-- Locais próximos -->
+            <div class="form-group">
+                <label class="form-label">Pontos de Referência / Locais Próximos</label>
+                <input type="text" id="cap-referencias" class="form-control" placeholder="Ex: próximo ao Shopping Iguatemi, perto da praia">
+            </div>
+
+            <!-- Características observadas -->
+            <div class="form-group">
+                <label class="form-label">Características Observadas</label>
+                <textarea id="cap-caracteristicas" class="form-control" rows="3" placeholder="Ex: 3 quartos, garagem, muro alto, terraço, portão eletrônico..."></textarea>
+            </div>
+
+            <!-- Valor aproximado -->
+            <div class="form-group">
+                <label class="form-label">Valor Estimado (R$)</label>
+                <input type="text" id="cap-valor" class="form-control" placeholder="0,00" inputmode="numeric" onkeydown="Utils.keydownMoneyReais(event, this)" readonly onfocus="this.removeAttribute('readonly')">
+            </div>
+
+            <!-- Observações extras -->
+            <div class="form-group">
+                <label class="form-label">Observações</label>
+                <textarea id="cap-obs" class="form-control" rows="2" placeholder="Outras anotações importantes..."></textarea>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:4px;">
+                <button type="button" class="btn-block" style="background:linear-gradient(135deg,#C0392B,#E74C3C);" onclick="CaptacaoModule.salvar()">
+                    <i class="fas fa-save"></i> Salvar Registro
+                </button>
+                <button type="button" class="btn-block" style="background:var(--bg-overlay);color:var(--text-secondary);border:1px solid var(--border);max-width:120px;" onclick="UI.closeModal('captacao-form')">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== MODAL CAPTAÇÃO — DETALHE / VISUALIZAÇÃO ===== -->
+        <div class="modal-overlay" id="overlay-captacao-detail" onclick="UI.closeModal('captacao-detail')"></div>
+        <div class="modal-sheet" id="sheet-captacao-detail" style="max-height:92vh;overflow-y:auto;">
+            <div class="sheet-handle"></div>
+
+            <div id="cap-detail-img-wrap" style="display:none;">
+                <img class="cap-detail-img" id="cap-detail-img" src="" alt="Foto do imóvel">
+            </div>
+
+            <div class="cap-detail-badges" id="cap-detail-badges"></div>
+
+            <div class="cap-detail-section">
+                <div class="cap-detail-label">Endereço / Localização</div>
+                <div class="cap-detail-value" id="cap-detail-endereco">—</div>
+            </div>
+
+            <div id="cap-detail-phone-wrap" class="cap-detail-phone-btn" onclick="CaptacaoModule.ligar()">
+                <div class="cap-detail-phone-icon"><i class="fas fa-phone-alt"></i></div>
+                <div class="cap-detail-phone-info">
+                    <div class="cap-detail-phone-label">Telefone da Placa</div>
+                    <div class="cap-detail-phone-number" id="cap-detail-telefone">—</div>
+                </div>
+                <i class="fas fa-chevron-right" style="margin-left:auto;color:var(--text-muted);font-size:0.8rem;"></i>
+            </div>
+
+            <div id="cap-detail-refs-wrap" class="cap-detail-section" style="display:none;">
+                <div class="cap-detail-label">Pontos de Referência</div>
+                <div class="cap-detail-value" id="cap-detail-refs">—</div>
+            </div>
+
+            <div id="cap-detail-caract-wrap" class="cap-detail-section" style="display:none;">
+                <div class="cap-detail-label">Características</div>
+                <div class="cap-detail-value" id="cap-detail-caract">—</div>
+            </div>
+
+            <div id="cap-detail-valor-wrap" class="cap-detail-section" style="display:none;">
+                <div class="cap-detail-label">Valor Estimado</div>
+                <div class="cap-detail-value" id="cap-detail-valor">—</div>
+            </div>
+
+            <div id="cap-detail-obs-wrap" class="cap-detail-section" style="display:none;">
+                <div class="cap-detail-label">Observações</div>
+                <div class="cap-detail-value" id="cap-detail-obs">—</div>
+            </div>
+
+            <div class="cap-detail-section">
+                <div class="cap-detail-label">Status</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;" id="cap-detail-status-btns">
+                    <button onclick="CaptacaoModule.setStatus('novo')" style="background:rgba(29,111,164,0.12);border:1px solid rgba(29,111,164,0.3);color:var(--primary);border-radius:8px;padding:7px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;">🔵 Novo</button>
+                    <button onclick="CaptacaoModule.setStatus('contatado')" style="background:rgba(39,174,96,0.12);border:1px solid rgba(39,174,96,0.3);color:var(--accent);border-radius:8px;padding:7px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;">🟢 Contatado</button>
+                    <button onclick="CaptacaoModule.setStatus('autorizado')" style="background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.3);color:#7C3AED;border-radius:8px;padding:7px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;">🟣 Autorizado</button>
+                    <button onclick="CaptacaoModule.setStatus('descartado')" style="background:rgba(100,116,139,0.12);border:1px solid rgba(100,116,139,0.3);color:var(--text-secondary);border-radius:8px;padding:7px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;">⚫ Descartar</button>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:8px;">
+                <button type="button" class="btn-block" style="background:var(--primary);" onclick="CaptacaoModule.editarAtual()">
+                    <i class="fas fa-edit"></i> Editar
+                </button>
+                <button type="button" class="btn-block" style="background:rgba(39,174,96,0.15);color:var(--accent);border:1px solid rgba(39,174,96,0.3);" onclick="CaptacaoModule.whatsapp()">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
+                <button type="button" class="btn-block" style="background:rgba(231,76,60,0.10);color:var(--danger);border:1px solid rgba(231,76,60,0.25);max-width:52px;padding:0;" onclick="CaptacaoModule.excluirAtual()">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <button type="button" class="btn-block" style="background:var(--bg-overlay);color:var(--text-secondary);border:1px solid var(--border);margin-top:8px;" onclick="UI.closeModal('captacao-detail')">Fechar</button>
         </div>
 
         <!-- ===== MODAL CORRESPONDENTES BANCÁRIOS ===== -->
@@ -15452,7 +15760,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     document.getElementById('loading').style.display = 'none';
                     if (sesAtiva) {
                         document.getElementById('app').style.display = 'flex';
-                        UI.setFabSpeedDial(); // dashboard é a view inicial — speed dial
+                        // Dashboard é a view inicial — mostra FAB speed dial
+                        const _initFabContainer = document.getElementById('fab-container');
+                        if (_initFabContainer) _initFabContainer.style.display = 'flex';
+                        UI.setFabSpeedDial();
                         UI.renderDashboard();
                         UI.renderFunil();
                         UI.verificarLancamentos();
@@ -15535,52 +15846,53 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 if (viewEl) viewEl.classList.add('active');
 
                 UI.closeFabMenu();
+
+                // Ao trocar de painel, sai do modo captação
+                document.body.classList.remove('captacao-ativa');
+                const capFab = document.getElementById('cap-fab-btn');
+                if (capFab) capFab.style.display = 'none';
+
                 const fab = document.getElementById('main-fab');
                 const container = document.getElementById('fab-container');
-                if (target === 'dashboard-view') {
-                    container.style.display = 'flex';
-                    UI.setFabSpeedDial();
-                } else if (target === 'imoveis-view') {
-                    container.style.display = 'flex';
-                    UI.setFabDirect(UI.openNewImovel);
-                } else if (target === 'clientes-view') {
-                    container.style.display = 'flex';
-                    UI.setFabDirect(() => UI.openNewCliente(false));
-                } else if (target === 'agenda-view') {
-                    container.style.display = 'flex';
-                    UI.setFabDirect(UI.openNewVisita);
-                } else if (target === 'links-view') {
-                    container.style.display = 'flex';
-                    UI.setFabDirect(UI.openNewLink);
-                } else if (target === 'funil-view') {
-                    container.style.display = 'none';
-                    UI.renderFunil();
-                } else if (target === 'coach-view') {
-                    container.style.display = 'none';
-                } else if (target === 'financeiro-view') {
-                    container.style.display = 'none';
-                } else if (target === 'venda-certa-view') {
-                    container.style.display = 'none';
-                    VendaCerta.init();
-                } else if (target === 'simulador-view') {
-                    container.style.display = 'none';
-                    Simulador.init();
-                } else if (target === 'mercado-view') {
-                    container.style.display = 'none';
-                    MarketPanel.load(false);
-                } else if (target === 'match-view') {
-                    container.style.display = 'none';
-                    MatchModule.init();
-                } else if (target === 'perfis-view') {
-                    container.style.display = 'none';
-                    PerfisModule.init();
-                } else if (target === 'fluxo-view') {
-                    container.style.display = 'none';
-                    FluxoManual.init();
+
+                // Helper: configura ícone e cor do FAB principal
+                function _fabIcon(icon, color) {
+                    if (fab) fab.innerHTML = '<i class="fas fa-' + icon + '"></i>';
+                    if (fab) fab.style.background = color || 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)';
+                }
+
+                // ── Mapa FAB por painel: 'flex' = exibe personalizado | 'none' = oculta ──
+                const _fabMap = {
+                    // PRINCIPAL — FAB visível e personalizado
+                    'dashboard-view':    () => { container.style.display='flex'; _fabIcon('plus',''); UI.setFabSpeedDial(); },
+                    'imoveis-view':      () => { container.style.display='flex'; _fabIcon('building','linear-gradient(135deg,#27AE60,#1E8449)'); UI.setFabDirect(UI.openNewImovel); },
+                    'clientes-view':     () => { container.style.display='flex'; _fabIcon('user-plus','linear-gradient(135deg,var(--primary),var(--primary-dark))'); UI.setFabDirect(()=>UI.openNewCliente(false)); },
+                    'agenda-view':       () => { container.style.display='flex'; _fabIcon('calendar-plus','linear-gradient(135deg,#E67E22,#D35400)'); UI.setFabDirect(UI.openNewVisita); },
+                    'links-view':        () => { container.style.display='flex'; _fabIcon('link','linear-gradient(135deg,#0891B2,#0369A1)'); UI.setFabDirect(UI.openNewLink); },
+                    // FERRAMENTAS — sem FAB principal (cada um tem seu próprio botão ou não precisa)
+                    'funil-view':        () => { container.style.display='none'; UI.renderFunil(); },
+                    'relatorios-view':   () => { container.style.display='none'; },
+                    'coach-view':        () => { container.style.display='none'; },
+                    'financeiro-view':   () => { container.style.display='none'; },
+                    'venda-certa-view':  () => { container.style.display='none'; VendaCerta.init(); },
+                    'simulador-view':    () => { container.style.display='none'; Simulador.init(); },
+                    'mercado-view':      () => { container.style.display='none'; MarketPanel.load(false); },
+                    'match-view':        () => { container.style.display='none'; MatchModule.init(); },
+                    'perfis-view':       () => { container.style.display='none'; PerfisModule.init(); },
+                    'fluxo-view':        () => { container.style.display='none'; FluxoManual.init(); },
+                    'notas-view':        () => { container.style.display='none'; if(typeof Notas!=='undefined') Notas.init(); },
+                    'leitura-view':      () => { container.style.display='none'; if(typeof Leitura!=='undefined') Leitura.init(); },
+                    'captacao-view':     () => { container.style.display='none'; /* FAB próprio vermelho é gerenciado pelo CaptacaoModule */ },
+                };
+
+                if (_fabMap[target]) {
+                    _fabMap[target]();
                 } else {
+                    // Qualquer painel não mapeado: oculta o FAB (seguro por padrão)
                     container.style.display = 'none';
                 }
 
+                // Renders adicionais por painel
                 if(target === 'dashboard-view') UI.renderDashboard();
                 if(target === 'clientes-view') UI.renderClientes();
                 if(target === 'imoveis-view') UI.renderImoveis();
@@ -45008,6 +45320,376 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
         return { init, analisarPerfil, analisarPersonalizado, switchTab, ppSetModo, ppCarregarPerfil, ppBuscarCliente, ppSelecionarCliente, ppTogglePlanta, ppToggleIntercaladas, ppToggleChaves, ppRecalc, ppCalcular, ppExportarPDF };
     })();
+
+    // ═══════════════ MÓDULO CAPTAÇÃO DE IMÓVEIS DE RUA ═══════════════
+    const CaptacaoModule = (function() {
+        const STORAGE_KEY = 'imobipro_captacoes_v1';
+        let _dados = [];
+        let _filtroAtual = 'todos';
+        let _idAtual = null;
+        let _fotoAtual = null; // base64
+
+        function _load() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                _dados = raw ? JSON.parse(raw) : [];
+            } catch(e) { _dados = []; }
+        }
+
+        function _save() {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_dados)); } catch(e) {}
+        }
+
+        function _uid() {
+            return 'cap_' + Date.now() + '_' + Math.random().toString(36).substr(2,6);
+        }
+
+        function open() {
+            _load();
+            // Show the captacao view via a nav hack
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            const v = document.getElementById('captacao-view');
+            if (v) { v.style.display = ''; v.classList.add('active'); }
+            // Hide main FAB, show captacao FAB
+            const mainFab = document.getElementById('fab-container');
+            if (mainFab) mainFab.style.display = 'none';
+            const fab = document.getElementById('cap-fab-btn');
+            if (fab) fab.style.display = 'flex';
+            document.body.classList.add('captacao-ativa');
+            // Update stats
+            _renderStats();
+            // Render list
+            _renderList();
+        }
+
+        function _renderStats() {
+            const total = _dados.length;
+            const novos = _dados.filter(d => d.status === 'novo' || !d.status).length;
+            const autorizados = _dados.filter(d => d.status === 'autorizado').length;
+            const el = id => { const e = document.getElementById(id); return e; };
+            if (el('cap-stat-total')) el('cap-stat-total').textContent = total;
+            if (el('cap-stat-novos')) el('cap-stat-novos').textContent = novos;
+            if (el('cap-stat-autorizados')) el('cap-stat-autorizados').textContent = autorizados;
+        }
+
+        function filter(tipo, btn) {
+            _filtroAtual = tipo;
+            document.querySelectorAll('.cap-filter-chip').forEach(c => c.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            _renderList();
+        }
+
+        function _renderList() {
+            const container = document.getElementById('cap-list');
+            if (!container) return;
+
+            let lista = [..._dados].reverse(); // mais recentes primeiro
+
+            if (_filtroAtual !== 'todos') {
+                if (['novo','contatado','autorizado','descartado'].includes(_filtroAtual)) {
+                    lista = lista.filter(d => (d.status || 'novo') === _filtroAtual);
+                } else if (_filtroAtual === 'venda') {
+                    lista = lista.filter(d => d.tipo === 'venda' || d.tipo === 'ambos');
+                } else if (_filtroAtual === 'aluguel') {
+                    lista = lista.filter(d => d.tipo === 'aluguel' || d.tipo === 'ambos');
+                }
+            }
+
+            if (lista.length === 0) {
+                container.innerHTML = `
+                    <div class="cap-empty">
+                        <div class="cap-empty-icon">📷</div>
+                        <div class="cap-empty-title">Nenhum imóvel encontrado</div>
+                        <div class="cap-empty-sub">Toque no botão vermelho para registrar um imóvel com placa que você encontrou na rua</div>
+                        <button onclick="CaptacaoModule.novaCaptura()" style="background:linear-gradient(135deg,#C0392B,#E74C3C);color:#fff;border:none;border-radius:12px;padding:12px 22px;font-size:0.85rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;">
+                            <i class="fas fa-camera"></i> Registrar Imóvel
+                        </button>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = lista.map(d => _cardHtml(d)).join('');
+        }
+
+        function _badgeTipo(tipo) {
+            const map = { venda: ['cap-badge-venda','Venda'], aluguel: ['cap-badge-aluguel','Aluguel'], ambos: ['cap-badge-ambos','V+A'] };
+            const [cls, label] = map[tipo] || ['cap-badge-venda','Venda'];
+            return `<span class="cap-card-tipo-badge ${cls}">${label}</span>`;
+        }
+
+        function _badgeStatus(status) {
+            const map = {
+                novo: ['cap-status-novo', '🔵 Novo'],
+                contatado: ['cap-status-contatado', '🟢 Contatado'],
+                autorizado: ['cap-status-autorizado', '🟣 Autorizado'],
+                descartado: ['cap-status-descartado', '⚫ Descartado']
+            };
+            const [cls, label] = map[status || 'novo'] || ['cap-status-novo','🔵 Novo'];
+            return `<span class="cap-card-status-badge ${cls}">${label}</span>`;
+        }
+
+        function _cardHtml(d) {
+            const imgHtml = d.foto
+                ? `<img src="${d.foto}" alt="Foto">`
+                : `<div class="cap-card-img-placeholder">🏠</div>`;
+
+            const tipoImovel = d.tipoImovel ? `<div class="cap-card-info"><i class="fas fa-home"></i>${d.tipoImovel}</div>` : '';
+            const bairro = d.bairro ? `<div class="cap-card-info"><i class="fas fa-map-marker-alt"></i>${d.bairro}</div>` : '';
+            const refs = d.referencias ? `<div class="cap-card-info"><i class="fas fa-map-pin"></i>${d.referencias}</div>` : '';
+            const data = d.data ? `<div class="cap-card-info"><i class="fas fa-calendar-alt"></i>${new Date(d.data).toLocaleDateString('pt-BR')}</div>` : '';
+
+            const tags = [];
+            if (d.tipoImovel) tags.push(d.tipoImovel);
+            if (d.bairro) tags.push(d.bairro);
+            const tagsHtml = tags.map(t => `<span class="cap-tag">${t}</span>`).join('');
+
+            return `<div class="cap-card" onclick="CaptacaoModule.verDetalhe('${d.id}')">
+                <div class="cap-card-img-wrap">
+                    ${imgHtml}
+                    ${_badgeTipo(d.tipo)}
+                    ${_badgeStatus(d.status)}
+                </div>
+                <div class="cap-card-body">
+                    <div class="cap-card-endereco"><i class="fas fa-map-marker-alt" style="color:var(--danger);margin-right:5px;font-size:0.8rem;"></i>${d.endereco || 'Endereço não informado'}</div>
+                    <div class="cap-card-info"><i class="fas fa-phone-alt"></i><strong>${d.telefone || 'Sem telefone'}</strong></div>
+                    ${tipoImovel}${refs}${data}
+                    ${tagsHtml ? `<div class="cap-card-tags">${tagsHtml}</div>` : ''}
+                </div>
+                <div class="cap-card-actions">
+                    <button class="cap-action-btn primary" onclick="event.stopPropagation();CaptacaoModule.ligarDireto('${d.id}')"><i class="fas fa-phone-alt"></i> Ligar</button>
+                    <button class="cap-action-btn success" onclick="event.stopPropagation();CaptacaoModule.whatsappDireto('${d.id}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                    <button class="cap-action-btn secondary" onclick="event.stopPropagation();CaptacaoModule.verDetalhe('${d.id}')"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>`;
+        }
+
+        function novaCaptura() {
+            _idAtual = null;
+            _fotoAtual = null;
+            document.getElementById('cap-edit-id').value = '';
+            document.getElementById('cap-form-title').textContent = '📷 Novo Imóvel Captado';
+            document.getElementById('cap-tipo').value = 'venda';
+            document.getElementById('cap-telefone').value = '';
+            document.getElementById('cap-endereco').value = '';
+            document.getElementById('cap-bairro').value = '';
+            document.getElementById('cap-tipo-imovel').value = '';
+            document.getElementById('cap-referencias').value = '';
+            document.getElementById('cap-caracteristicas').value = '';
+            document.getElementById('cap-valor').value = '';
+            document.getElementById('cap-obs').value = '';
+            _resetPhotoArea();
+            UI.openModal('captacao-form');
+            setTimeout(() => { document.getElementById('cap-telefone').focus(); }, 350);
+        }
+
+        function _resetPhotoArea() {
+            const area = document.getElementById('cap-photo-area');
+            if (!area) return;
+            area.innerHTML = `
+                <div class="cap-photo-placeholder">📷</div>
+                <div class="cap-photo-placeholder-text">Tirar foto / Selecionar imagem</div>
+                <div class="cap-photo-placeholder-sub">Toque para abrir a câmera</div>`;
+            const inp = document.getElementById('cap-photo-input');
+            if (inp) inp.value = '';
+        }
+
+        function onPhotoSelected(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                _fotoAtual = e.target.result;
+                const area = document.getElementById('cap-photo-area');
+                if (area) {
+                    area.innerHTML = `<img src="${_fotoAtual}" alt="Foto"><div class="cap-photo-overlay"><i class="fas fa-camera"></i> Trocar foto</div>`;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function salvar() {
+            const telefone = document.getElementById('cap-telefone').value.trim();
+            const endereco = document.getElementById('cap-endereco').value.trim();
+
+            if (!telefone && !endereco) {
+                Utils.toast('Informe pelo menos o telefone ou o endereço', 'error');
+                return;
+            }
+
+            const editId = document.getElementById('cap-edit-id').value;
+            const isEdit = !!editId;
+
+            const obj = {
+                id: isEdit ? editId : _uid(),
+                tipo: document.getElementById('cap-tipo').value,
+                telefone: telefone,
+                endereco: endereco,
+                bairro: document.getElementById('cap-bairro').value.trim(),
+                tipoImovel: document.getElementById('cap-tipo-imovel').value,
+                referencias: document.getElementById('cap-referencias').value.trim(),
+                caracteristicas: document.getElementById('cap-caracteristicas').value.trim(),
+                valor: document.getElementById('cap-valor').value.trim(),
+                obs: document.getElementById('cap-obs').value.trim(),
+                foto: _fotoAtual,
+                data: isEdit ? ((_dados.find(d=>d.id===editId)||{}).data || new Date().toISOString()) : new Date().toISOString(),
+                status: isEdit ? ((_dados.find(d=>d.id===editId)||{}).status || 'novo') : 'novo'
+            };
+
+            if (isEdit) {
+                const idx = _dados.findIndex(d => d.id === editId);
+                if (idx >= 0) _dados[idx] = obj;
+            } else {
+                _dados.push(obj);
+            }
+            _save();
+            UI.closeModal('captacao-form');
+            _renderStats();
+            _renderList();
+            Utils.toast(isEdit ? 'Imóvel atualizado!' : 'Imóvel captado com sucesso! 📷', 'success');
+        }
+
+        function verDetalhe(id) {
+            _load();
+            const d = _dados.find(x => x.id === id);
+            if (!d) return;
+            _idAtual = id;
+
+            // Image
+            const imgWrap = document.getElementById('cap-detail-img-wrap');
+            const img = document.getElementById('cap-detail-img');
+            if (d.foto) { img.src = d.foto; imgWrap.style.display = ''; }
+            else { imgWrap.style.display = 'none'; }
+
+            // Badges
+            document.getElementById('cap-detail-badges').innerHTML =
+                _badgeTipo(d.tipo) + ' ' + _badgeStatus(d.status);
+
+            document.getElementById('cap-detail-endereco').textContent = d.endereco || 'Não informado';
+            document.getElementById('cap-detail-telefone').textContent = d.telefone || 'Não informado';
+
+            const show = (wrapId, valId, val) => {
+                const el = document.getElementById(wrapId);
+                if (val) { document.getElementById(valId).textContent = val; el.style.display = ''; }
+                else { el.style.display = 'none'; }
+            };
+
+            show('cap-detail-refs-wrap', 'cap-detail-refs', d.referencias);
+            show('cap-detail-caract-wrap', 'cap-detail-caract', d.caracteristicas);
+            show('cap-detail-obs-wrap', 'cap-detail-obs', d.obs);
+
+            const valorWrap = document.getElementById('cap-detail-valor-wrap');
+            if (d.valor) {
+                document.getElementById('cap-detail-valor').textContent = 'R$ ' + d.valor;
+                valorWrap.style.display = '';
+            } else { valorWrap.style.display = 'none'; }
+
+            UI.openModal('captacao-detail');
+        }
+
+        function ligar() {
+            const d = _dados.find(x => x.id === _idAtual);
+            if (d && d.telefone) window.location.href = 'tel:' + d.telefone.replace(/\D/g,'');
+        }
+
+        function ligarDireto(id) {
+            _load();
+            const d = _dados.find(x => x.id === id);
+            if (d && d.telefone) window.location.href = 'tel:' + d.telefone.replace(/\D/g,'');
+        }
+
+        function whatsapp() {
+            const d = _dados.find(x => x.id === _idAtual);
+            if (!d || !d.telefone) { Utils.toast('Telefone não informado', 'error'); return; }
+            const num = d.telefone.replace(/\D/g,'');
+            const end = d.endereco || 'imóvel que vi na rua';
+            const msg = encodeURIComponent(`Olá! Vi a placa do seu imóvel (${end}) e gostaria de conversar sobre a possibilidade de comercializá-lo pela nossa imobiliária. Podemos conversar?`);
+            window.open('https://wa.me/55' + num + '?text=' + msg, '_blank');
+        }
+
+        function whatsappDireto(id) {
+            _load();
+            const d = _dados.find(x => x.id === id);
+            if (!d || !d.telefone) { Utils.toast('Telefone não informado', 'error'); return; }
+            const num = d.telefone.replace(/\D/g,'');
+            const end = d.endereco || 'imóvel que vi na rua';
+            const msg = encodeURIComponent(`Olá! Vi a placa do seu imóvel (${end}) e gostaria de conversar sobre a possibilidade de comercializá-lo pela nossa imobiliária. Podemos conversar?`);
+            window.open('https://wa.me/55' + num + '?text=' + msg, '_blank');
+        }
+
+        function setStatus(status) {
+            if (!_idAtual) return;
+            const idx = _dados.findIndex(d => d.id === _idAtual);
+            if (idx < 0) return;
+            _dados[idx].status = status;
+            _save();
+            // Refresh badge in detail
+            verDetalhe(_idAtual);
+            _renderStats();
+            _renderList();
+            const labels = { novo: 'Novo', contatado: 'Contatado', autorizado: 'Autorizado ✅', descartado: 'Descartado' };
+            Utils.toast('Status: ' + (labels[status] || status), 'success');
+        }
+
+        function editarAtual() {
+            if (!_idAtual) return;
+            const d = _dados.find(x => x.id === _idAtual);
+            if (!d) return;
+            UI.closeModal('captacao-detail');
+            setTimeout(() => {
+                document.getElementById('cap-edit-id').value = d.id;
+                document.getElementById('cap-form-title').textContent = '✏️ Editar Imóvel Captado';
+                document.getElementById('cap-tipo').value = d.tipo || 'venda';
+                document.getElementById('cap-telefone').value = d.telefone || '';
+                document.getElementById('cap-endereco').value = d.endereco || '';
+                document.getElementById('cap-bairro').value = d.bairro || '';
+                document.getElementById('cap-tipo-imovel').value = d.tipoImovel || '';
+                document.getElementById('cap-referencias').value = d.referencias || '';
+                document.getElementById('cap-caracteristicas').value = d.caracteristicas || '';
+                document.getElementById('cap-valor').value = d.valor || '';
+                document.getElementById('cap-obs').value = d.obs || '';
+                _fotoAtual = d.foto || null;
+                const area = document.getElementById('cap-photo-area');
+                if (_fotoAtual && area) {
+                    area.innerHTML = `<img src="${_fotoAtual}" alt="Foto"><div class="cap-photo-overlay"><i class="fas fa-camera"></i> Trocar foto</div>`;
+                } else { _resetPhotoArea(); }
+                UI.openModal('captacao-form');
+            }, 350);
+        }
+
+        function excluirAtual() {
+            if (!_idAtual) return;
+            if (!confirm('Excluir este registro de captação?')) return;
+            _dados = _dados.filter(d => d.id !== _idAtual);
+            _save();
+            _idAtual = null;
+            UI.closeModal('captacao-detail');
+            _renderStats();
+            _renderList();
+            Utils.toast('Registro excluído', 'success');
+        }
+
+        // Show/hide FABs based on active view
+        (function watchView() {
+            const obs = new MutationObserver(() => {
+                const cv = document.getElementById('captacao-view');
+                const isActive = cv && cv.classList.contains('active');
+                const capFab = document.getElementById('cap-fab-btn');
+                const mainFab = document.getElementById('fab-container');
+                if (capFab) capFab.style.display = isActive ? 'flex' : 'none';
+                // Ao sair da captação, o main FAB só reaparece se o switchTab mandar
+                // — nunca restauramos automaticamente para evitar aparecer em painéis errados
+                if (isActive && mainFab) mainFab.style.display = 'none';
+                if (isActive) document.body.classList.add('captacao-ativa');
+                else document.body.classList.remove('captacao-ativa');
+            });
+            const target = document.getElementById('captacao-view');
+            if (target) obs.observe(target, { attributes: true, attributeFilter: ['class','style'] });
+        })();
+
+        return { open, filter, novaCaptura, onPhotoSelected, salvar, verDetalhe, ligar, ligarDireto, whatsapp, whatsappDireto, setStatus, editarAtual, excluirAtual };
+    })();
+
+    // ═══════════════ FIM MÓDULO CAPTAÇÃO ═══════════════
 
     // Patch: clicking agenda cards opens VerTarefa instead of edit form directly
     // Override createVisitaCard onclick to use VerTarefa
