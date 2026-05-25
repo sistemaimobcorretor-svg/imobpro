@@ -8055,22 +8055,28 @@ if(document.readyState==='loading'){
             </div>
 
             <div id="clientes-view" class="view">
-                <div class="section-title">
+                <div class="section-title" style="margin-bottom:10px;">
                     Clientes
-                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                        <button class="icon-btn" style="background: #25D366; color: white; border-radius: 8px; padding: 8px;" onclick="UI.openEnvioMassa()">
-                            <i class="fab fa-whatsapp"></i> Envio em Massa
-                        </button>
-                        <button class="icon-btn" style="background: var(--primary); color: white; border-radius: 8px; padding: 8px;" onclick="UI.openEnvioMassaEmail()">
-                            <i class="fas fa-envelope"></i> E-mail em Massa
-                        </button>
-                        <button class="icon-btn" style="background: linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%); color: white; border-radius: 8px; padding: 8px;" onclick="UI.openInformativoMassa()">
-                            <i class="fas fa-newspaper"></i> Informativo
-                        </button>
-                        <button class="icon-btn" style="background: linear-gradient(135deg,#7C3AED,#EC4899); color: white; border-radius: 8px; padding: 8px;" onclick="Novidades.openPanel()">
-                            <i class="fas fa-bell"></i> Novidades
-                        </button>
-                    </div>
+                </div>
+
+                <!-- ── Barra de ações em massa ── -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+                    <button onclick="UI.openEnvioMassa()" style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 3px 10px rgba(37,211,102,0.30);transition:transform 0.15s,box-shadow 0.15s;" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform=''">
+                        <span style="width:30px;height:30px;background:rgba(255,255,255,0.20);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;"><i class="fab fa-whatsapp"></i></span>
+                        <span style="line-height:1.25;">Envio em<br><span style="font-size:0.75rem;opacity:0.85;font-weight:600;">Massa WhatsApp</span></span>
+                    </button>
+                    <button onclick="UI.openEnvioMassaEmail()" style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:linear-gradient(135deg,#1D6FA4,#155A8A);color:#fff;border:none;border-radius:12px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 3px 10px rgba(29,111,164,0.28);transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform=''">
+                        <span style="width:30px;height:30px;background:rgba(255,255,255,0.20);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;"><i class="fas fa-envelope"></i></span>
+                        <span style="line-height:1.25;">E-mail em<br><span style="font-size:0.75rem;opacity:0.85;font-weight:600;">Massa</span></span>
+                    </button>
+                    <button onclick="UI.openInformativoMassa()" style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:linear-gradient(135deg,#0891B2,#27AE60);color:#fff;border:none;border-radius:12px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 3px 10px rgba(8,145,178,0.25);transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform=''">
+                        <span style="width:30px;height:30px;background:rgba(255,255,255,0.20);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;"><i class="fas fa-newspaper"></i></span>
+                        <span style="line-height:1.25;">Informativo<br><span style="font-size:0.75rem;opacity:0.85;font-weight:600;">em Massa</span></span>
+                    </button>
+                    <button onclick="Novidades.openPanel()" style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;border:none;border-radius:12px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 3px 10px rgba(124,58,237,0.28);transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform=''">
+                        <span style="width:30px;height:30px;background:rgba(255,255,255,0.20);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;"><i class="fas fa-bell"></i></span>
+                        <span style="line-height:1.25;">Novidades<br><span style="font-size:0.75rem;opacity:0.85;font-weight:600;">do Mercado</span></span>
+                    </button>
                 </div>
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
