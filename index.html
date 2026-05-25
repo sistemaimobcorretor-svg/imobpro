@@ -8521,6 +8521,20 @@ if(document.readyState==='loading'){
                     display:flex; align-items:center; gap:8px;
                 }
                 .rp-section-hd i { color:var(--primary); }
+                /* ── Ícones de cards de relatório ─────────────────────────── */
+                .rp-card-icon.bg-green { background:#E9F7EF;color:var(--accent); }
+                .rp-card-icon.bg-blue  { background:var(--primary-ultra);color:var(--primary); }
+                .rp-card-icon.bg-purple{ background:#F5EEF8;color:#8E44AD; }
+                .rp-card-icon.bg-orange{ background:#FEF3E7;color:var(--warning); }
+                .rp-card-icon.bg-red   { background:#FDEDEC;color:var(--danger); }
+                .rp-card-icon.bg-pink  { background:rgba(236,72,153,0.10);color:#EC4899; }
+                .rp-card-icon.bg-sky   { background:#F0F9FF;color:#0EA5E9; }
+                .rp-card-icon.bg-teal  { background:#F0FDFA;color:var(--teal); }
+                .rp-card-icon.bg-cyan  { background:#E8F8F5;color:var(--teal); }
+                .rp-card-icon.bg-amber { background:#FFFBEB;color:var(--amber); }
+                .rp-card-icon.bg-indigo{ background:#EEF2FF;color:var(--indigo); }
+                .rp-card-icon.bg-violet{ background:#F5F3FF;color:var(--violet); }
+                .rp-card-icon.bg-coral { background:rgba(248,113,113,0.10);color:var(--coral); }
 
                 /* ── Card resultado simples ──────────────────────── */
                 .rp-result-card {
@@ -8706,6 +8720,29 @@ if(document.readyState==='loading'){
                         <div class="rp-card-icon bg-pink"><i class="fas fa-map"></i></div>
                         <div class="rp-card-name">Captação por Bairro</div>
                         <div class="rp-card-desc">Distribuição geográfica das captações</div>
+                    </div>
+                    <!-- Clientes -->
+                    <div class="rp-card" data-cat="clientes" onclick="ReportPanel.open('aniversariantes')">
+                        <div class="rp-card-icon bg-pink"><i class="fas fa-birthday-cake"></i></div>
+                        <div class="rp-card-name">Aniversariantes</div>
+                        <div class="rp-card-desc">Clientes que fazem aniversário no período</div>
+                    </div>
+                    <div class="rp-card" data-cat="clientes" onclick="ReportPanel.open('clientes-inativos')">
+                        <div class="rp-card-icon bg-red"><i class="fas fa-user-times"></i></div>
+                        <div class="rp-card-name">Clientes Inativos</div>
+                        <div class="rp-card-desc">Sem atividade há mais de 60 dias</div>
+                    </div>
+                    <!-- Imóveis -->
+                    <div class="rp-card" data-cat="imoveis" onclick="ReportPanel.open('imoveis-tempo-mercado')">
+                        <div class="rp-card-icon bg-orange"><i class="fas fa-hourglass-half"></i></div>
+                        <div class="rp-card-name">Tempo no Mercado</div>
+                        <div class="rp-card-desc">Imóveis parados há mais tempo sem venda</div>
+                    </div>
+                    <!-- Operacional -->
+                    <div class="rp-card" data-cat="operacional" onclick="ReportPanel.open('follow-up')">
+                        <div class="rp-card-icon bg-sky"><i class="fas fa-sync-alt"></i></div>
+                        <div class="rp-card-name">Follow-up Pendente</div>
+                        <div class="rp-card-desc">Clientes aguardando retorno de contato</div>
                     </div>
                 </div>
 
@@ -18997,24 +19034,39 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 const endDate = document.getElementById('report-date-end').value;
                 const reportType = document.getElementById('report-type').value;
                 
-                // Relatórios que não dependem de período de datas
-                const semData = ['funil-travado','lista-ligacoes','lista-mensagens'];
+                // Relatórios sem período de datas (não precisam de datas)
+                const semData = [
+                    'funil-travado','lista-ligacoes','lista-mensagens',
+                    'funil-saude','perfil-compradores','estoque',
+                    'imoveis-sem-visita','imoveis-price',
+                    'captacao-status','captacao-bairro'
+                ];
+                // Relatórios com apenas data-início (data única)
+                const soInicio = ['plantao'];
                 
                 if (!semData.includes(reportType)) {
-                    if (!startDate || !endDate) {
-                        Utils.toast('Selecione um período válido', 'error');
-                        return;
-                    }
-                    const start = new Date(startDate);
-                    const end = new Date(endDate);
-                    if (start > end) {
-                        Utils.toast('Data inicial não pode ser maior que data final', 'error');
-                        return;
+                    if (soInicio.includes(reportType)) {
+                        if (!startDate) {
+                            Utils.toast('Selecione uma data', 'error');
+                            return;
+                        }
+                    } else {
+                        if (!startDate) {
+                            Utils.toast('Selecione a data de início', 'error');
+                            return;
+                        }
+                        const endVal = endDate || startDate;
+                        const start = new Date(startDate);
+                        const end = new Date(endVal);
+                        if (start > end) {
+                            Utils.toast('Data inicial não pode ser maior que data final', 'error');
+                            return;
+                        }
                     }
                 }
                 
-                const start = startDate ? new Date(startDate) : new Date();
-                const end = endDate ? new Date(endDate) : new Date();
+                const start = startDate ? new Date(startDate + 'T00:00:00') : new Date();
+                const end = endDate ? new Date(endDate + 'T23:59:59') : new Date();
                 
                 let reportData = null;
                 
@@ -19045,6 +19097,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         break;
                     case 'lista-mensagens':
                         reportData = UI.generateListaMensagensReport();
+                        break;
+                    // Novos tipos delegados ao ReportPanel
+                    default:
                         break;
                 }
                 
@@ -19369,9 +19424,22 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             },
             
             generateSalesReport: (start, end) => {
+                // Encontra etapas de venda — suporta etapas customizadas
+                const etapasVenda = new Set(['venda']);
+                if (UI.data.funilEtapas) {
+                    UI.data.funilEtapas.forEach(e => {
+                        if ((e.nome||'').toLowerCase().includes('venda') || (e.nome||'').toLowerCase().includes('fechad') || (e.nome||'').toLowerCase().includes('conclu')) {
+                            etapasVenda.add(e.id);
+                        }
+                    });
+                }
                 const vendas = UI.data.clientes.filter(cliente => {
-                    if (cliente.etapaFunil !== 'venda' || !cliente.dataEntradaFunil || !cliente.imovelInteresseId) return false;
-                    const dataVenda = new Date(cliente.dataEntradaFunil);
+                    if (!etapasVenda.has(cliente.etapaFunil)) return false;
+                    if (!cliente.imovelInteresseId) return false;
+                    // Aceita dataEntradaFunil, dataVenda, dataCriacao como fallback
+                    const dataRef = cliente.dataEntradaFunil || cliente.dataVenda || cliente.dataAtualizacao;
+                    if (!dataRef) return false;
+                    const dataVenda = new Date(dataRef);
                     return dataVenda >= start && dataVenda <= end;
                 });
                 
@@ -19584,8 +19652,16 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             },
             
             generateSalesFunnelReport: (start, end) => {
+                // Suporta etapas de venda customizadas
+                const etapasVendaIds = new Set(['venda']);
+                if (UI.data.funilEtapas) {
+                    UI.data.funilEtapas.forEach(e => {
+                        const n = (e.nome||'').toLowerCase();
+                        if (n.includes('venda') || n.includes('fechad') || n.includes('conclu')) etapasVendaIds.add(e.id);
+                    });
+                }
                 const clientesVendaConcluida = UI.data.clientes.filter(cliente => 
-                    cliente.etapaFunil === 'venda'
+                    etapasVendaIds.has(cliente.etapaFunil)
                 );
                 
                 const imoveisVendidos = UI.data.imoveis.filter(imovel => {
@@ -19728,8 +19804,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     return dataVisita >= start && dataVisita <= end;
                 }).length;
                 
+                const _pvIdsP = new Set(['venda']);
+                if (UI.data.funilEtapas) UI.data.funilEtapas.forEach(e => { const n=(e.nome||'').toLowerCase(); if(n.includes('venda')||n.includes('fechad')||n.includes('conclu')) _pvIdsP.add(e.id); });
                 const clientesVendaConcluidaPeriodo = UI.data.clientes.filter(cliente => {
-                    if (cliente.etapaFunil !== 'venda' || !cliente.dataEntradaFunil) return false;
+                    if (!_pvIdsP.has(cliente.etapaFunil) || !cliente.dataEntradaFunil) return false;
                     const dataVenda = new Date(cliente.dataEntradaFunil);
                     return dataVenda >= start && dataVenda <= end;
                 }).length;
@@ -20123,7 +20201,95 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 if (t === 'lista-ligacoes') { UI.exportListaPDF('ligacoes', UI.currentReport.data); return; }
                 if (t === 'lista-mensagens') { UI.exportListaPDF('mensagens', UI.currentReport.data); return; }
                 if (t === 'funil-travado') { UI.exportFunilTravadoPDF(UI.currentReport.data); return; }
+                // Novos tipos — exportar via janela de impressão/PDF do navegador
+                const tiposHtml = ['funil-saude','perfil-compradores','estoque','imoveis-sem-visita',
+                    'imoveis-price','ranking-imoveis','comissoes','produtividade',
+                    'captacao-status','captacao-bairro','dre','fluxo-caixa',
+                    'aniversariantes','clientes-inativos','imoveis-tempo-mercado','follow-up'];
+                if (tiposHtml.includes(t)) {
+                    UI._exportHtmlReport(UI.currentReport);
+                    return;
+                }
                 Utils.generateReportPDF(UI.currentReport.data, UI.currentReport.type);
+            },
+
+            _exportHtmlReport: (report) => {
+                try {
+                    const titles = {
+                        'funil-saude':'Saúde do Funil','perfil-compradores':'Perfil dos Compradores',
+                        'estoque':'Estoque de Imóveis','imoveis-sem-visita':'Imóveis Sem Visita',
+                        'imoveis-price':'Análise de Preços','ranking-imoveis':'Ranking de Imóveis',
+                        'comissoes':'Comissões','produtividade':'Produtividade',
+                        'captacao-status':'Status de Captações','captacao-bairro':'Captação por Bairro',
+                        'dre':'DRE Simplificado','fluxo-caixa':'Fluxo de Caixa',
+                        'plantao':'Relatório de Plantão','aniversariantes':'Aniversariantes do Mês',
+                        'clientes-inativos':'Clientes Inativos','imoveis-tempo-mercado':'Tempo no Mercado',
+                        'follow-up':'Follow-up Pendente'
+                    };
+                    const title = titles[report.type] || 'Relatório ImobiPro';
+                    const printWin = window.open('','_blank','width=900,height=700');
+                    if (!printWin) { Utils.toast('Permita pop-ups para exportar o relatório', 'error'); return; }
+                    printWin.document.write(`<!DOCTYPE html><html lang="pt-br"><head>
+                        <meta charset="UTF-8"><title>${title} - ImobiPro</title>
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                        <style>
+                            body{font-family:Arial,sans-serif;padding:20px;color:#1A2332;max-width:900px;margin:0 auto;}
+                            @media print{.no-print{display:none!important;} body{padding:5px;}}
+                            h1{color:#1D6FA4;border-bottom:3px solid #1D6FA4;padding-bottom:8px;font-size:1.4rem;}
+                            table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12px;}
+                            th{background:#1D6FA4;color:white;padding:8px 10px;text-align:left;}
+                            td{padding:7px 10px;border-bottom:1px solid #E2E8F0;}
+                            tr:nth-child(even) td{background:#F8FAFC;}
+                            .rp-highlight{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;}
+                            .rp-hl-box{border:1px solid #E2E8F0;padding:10px 16px;border-radius:8px;text-align:center;min-width:100px;}
+                            .rp-hl-num{font-size:1.4rem;font-weight:900;}
+                            .rp-hl-lbl{font-size:0.65rem;color:#64748B;text-transform:uppercase;}
+                            .rp-rank-row{display:flex;align-items:center;padding:8px 10px;border:1px solid #E2E8F0;border-radius:8px;margin:4px 0;gap:10px;}
+                            .rp-rank-info{flex:1}.rp-rank-name{font-weight:700;font-size:13px;}
+                            .rp-rank-val{font-weight:800;color:#1D6FA4;}
+                            .rp-progress{height:5px;background:#E2E8F0;border-radius:3px;margin-top:4px;overflow:hidden;}
+                            .rp-progress-fill{height:100%;border-radius:3px;}
+                            .rp-tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;}
+                            .rp-tag-green{background:#E9F7EF;color:#1E8449;}
+                            .rp-tag-blue{background:#EBF4FB;color:#155A8A;}
+                            .rp-tag-orange{background:#FEF3E7;color:#D35400;}
+                            .rp-tag-red{background:#FDEDEC;color:#E74C3C;}
+                            .rp-tag-gray{background:#F1F5F9;color:#64748B;}
+                            .rp-section-hd{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px;border-bottom:2px solid #E2E8F0;padding-bottom:6px;}
+                            .rp-kpi-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0;}
+                            .rp-kpi-box{border:1px solid #E2E8F0;border-radius:8px;padding:10px;text-align:center;}
+                            .rp-kpi-val{font-size:1.3rem;font-weight:900;}
+                            .rp-kpi-lbl{font-size:.6rem;color:#94A3B8;text-transform:uppercase;}
+                            .print-btn{background:#1D6FA4;color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;margin-bottom:16px;}
+                            .empty-state{text-align:center;padding:40px;color:#94A3B8;}
+                            .rp-funil-bar{display:flex;flex-direction:column;gap:4px;}
+                            .rp-funil-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+                            .rp-funil-label{font-size:12px;font-weight:700;min-width:120px;}
+                            .rp-funil-track{flex:1;height:16px;background:#F1F5F9;border-radius:4px;overflow:hidden;}
+                            .rp-funil-fill{height:100%;border-radius:4px;}
+                            .rp-funil-count{font-size:12px;font-weight:800;min-width:28px;text-align:right;}
+                            .rp-table-wrap{overflow-x:auto;}
+                            .rp-table{width:100%;border-collapse:collapse;min-width:400px;}
+                            .rp-table th{background:#F0F4F8;padding:8px 10px;text-align:left;font-weight:700;font-size:11px;border-bottom:2px solid #E2E8F0;color:#1A2332;}
+                            .rp-table td{padding:7px 10px;border-bottom:1px solid #E2E8F0;font-size:12px;}
+                            .rp-result-card{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:12px;margin-bottom:8px;}
+                            .rp-result-card-hd{display:flex;justify-content:space-between;margin-bottom:6px;}
+                            .rp-result-card-name{font-weight:700;font-size:.9rem;}
+                            .rp-result-card-body{font-size:.78rem;color:#64748B;line-height:1.5;}
+                        </style>
+                    </head><body>
+                        <button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Salvar como PDF</button>
+                        <h1>📊 ${title}</h1>
+                        <p style="color:#64748B;font-size:13px;margin-bottom:12px;">ImobiPro · Gerado em ${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</p>
+                        <hr style="border:none;border-top:1px solid #E2E8F0;margin:12px 0 16px;">
+                        ${report.html}
+                    </body></html>`);
+                    printWin.document.close();
+                    Utils.toast('Janela aberta! Use Ctrl+P para salvar como PDF', 'success');
+                } catch(e) {
+                    console.error('Exportar relatório erro:', e);
+                    Utils.toast('Erro ao exportar. Tente novamente.', 'error');
+                }
             },
 
             // =========================================================
@@ -46401,7 +46567,11 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             'fluxo-caixa':     { label: '↔️ Fluxo de Caixa',           periodo: true,  single: false },
             produtividade:     { label: '⚡ Produtividade',             periodo: true,  single: false },
             'captacao-status': { label: '📍 Status de Captações',      periodo: false, single: false },
-            'captacao-bairro': { label: '🗺️ Captação por Bairro',      periodo: false, single: false },
+            'captacao-bairro':      { label: '🗺️ Captação por Bairro',      periodo: false, single: false },
+            'aniversariantes':      { label: '🎂 Aniversariantes',            periodo: false, single: false },
+            'clientes-inativos':    { label: '😴 Clientes Inativos',          periodo: false, single: false },
+            'imoveis-tempo-mercado':{ label: '⏳ Tempo no Mercado',           periodo: false, single: false },
+            'follow-up':            { label: '🔄 Follow-up Pendente',         periodo: false, single: false },
         };
 
         function open(type) {
@@ -47169,19 +47339,222 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             return { html, type: 'captacao-bairro', data: sorted };
         }
 
-        // ── Hook para gerar relatórios novos no switch do UI ──────────
+        // ── Aniversariantes do período ────────────────────────────────
+        // ── Aniversariantes do mês ───────────────────────────────
+        function generateAniversariantes() {
+            var clientes = UI.data.clientes || [];
+            var hoje = new Date();
+            var mesAtual = hoje.getMonth() + 1;
+            var meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            var mesNome = meses[mesAtual - 1];
+            var anivers = clientes.filter(function(c) {
+                if (!c.dataNascimento) return false;
+                var parts = c.dataNascimento.split('-');
+                return parseInt(parts[1]) === mesAtual;
+            }).sort(function(a, b) {
+                return parseInt(a.dataNascimento.split('-')[2]) - parseInt(b.dataNascimento.split('-')[2]);
+            });
+
+            if (anivers.length === 0) {
+                return { html: '<div class="rp-highlight"><div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--pink)">0</div><div class="rp-hl-lbl">Aniversariantes em ' + mesNome + '</div></div></div><div class="empty-state"><i class="fas fa-birthday-cake"></i><p>Nenhum cliente com data de nascimento cadastrada em ' + mesNome + '.<br><small>Cadastre as datas de nascimento nos perfis dos clientes.</small></p></div>', type: 'aniversariantes', data: [] };
+            }
+
+            var rows = anivers.map(function(c) {
+                var dia = parseInt(c.dataNascimento.split('-')[2]);
+                var eHoje = (dia === hoje.getDate());
+                var etapa = (UI.data.funilEtapas||[]).find(function(e){ return e.id===c.etapaFunil; });
+                var fone = c.telefone ? c.telefone.replace(/\D/g,'') : '';
+                var primeiroNome = c.nome.split(' ')[0];
+                var msgText = 'Olá ' + primeiroNome + '! Feliz aniversário! Que este novo ano de vida seja repleto de realizações! Grande abraço, ImobiPro.';
+                var wppLink = fone ? 'https://wa.me/55' + fone + '?text=' + encodeURIComponent(msgText) : '';
+                var btnWpp = fone ? '<button onclick="window.open(\'' + wppLink + '\',\'_blank\')" style="background:#25D366;color:white;border:none;border-radius:6px;padding:4px 8px;font-size:0.7rem;font-weight:700;cursor:pointer;"><i class=\'fab fa-whatsapp\'></i> Parabenizar</button>' : '—';
+                return '<tr style="' + (eHoje ? 'background:#FFF9F0;font-weight:700;' : '') + '">' +
+                    '<td style="font-size:1.1rem;font-weight:800;color:var(--primary);">' + String(dia).padStart(2,'0') + '/' + String(mesAtual).padStart(2,'0') + (eHoje ? ' 🎂' : '') + '</td>' +
+                    '<td>' + c.nome + '</td>' +
+                    '<td>' + (c.telefone||'—') + '</td>' +
+                    '<td><span class="rp-tag rp-tag-blue">' + (etapa ? etapa.nome : (c.etapaFunil||'—')) + '</span></td>' +
+                    '<td>' + btnWpp + '</td></tr>';
+            }).join('');
+
+            var html = '<div class="rp-highlight">' +
+                '<div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--pink)">' + anivers.length + '</div><div class="rp-hl-lbl">Aniversariantes em ' + mesNome + '</div></div>' +
+                '<div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--primary)">' + anivers.filter(function(c){return parseInt(c.dataNascimento.split('-')[2])>=hoje.getDate();}).length + '</div><div class="rp-hl-lbl">Ainda não passaram</div></div>' +
+                '<div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--accent)">' + anivers.filter(function(c){return parseInt(c.dataNascimento.split('-')[2])===hoje.getDate();}).length + '</div><div class="rp-hl-lbl">Hoje 🎂</div></div>' +
+                '</div>' +
+                '<div class="rp-section-hd"><i class="fas fa-birthday-cake"></i> Aniversariantes de ' + mesNome + '</div>' +
+                '<div class="rp-table-wrap"><table class="rp-table">' +
+                '<thead><tr><th>Dia</th><th>Cliente</th><th>Telefone</th><th>Etapa</th><th>Ação</th></tr></thead>' +
+                '<tbody>' + rows + '</tbody></table></div>' +
+                '<div style="background:rgba(236,72,153,0.06);border:1px solid rgba(236,72,153,0.2);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:0.78rem;color:var(--text-secondary);">' +
+                '💡 <strong>Dica:</strong> Mensagens de aniversário aumentam em até 40% as chances de reativação de clientes inativos.</div>';
+            return { html: html, type: 'aniversariantes', data: anivers };
+        }
+
+        // ── Clientes Inativos (+60 dias sem atividade) ────────────────
+        function generateClientesInativos() {
+            var clientes = UI.data.clientes || [];
+            var visitas  = UI.data.visitas || [];
+            var agora    = new Date();
+            var LIMITE   = 60;
+
+            var inativos = clientes.filter(function(c) {
+                var e = (c.etapaFunil||'').toLowerCase();
+                if (e.indexOf('venda')>=0 || e.indexOf('cancelad')>=0 || e.indexOf('inativ')>=0 || e.indexOf('descart')>=0) return false;
+                var ultimaAtiv = visitas.filter(function(v){ return v.clienteId===c.id; })
+                    .sort(function(a,b){ return new Date(b.data)-new Date(a.data); })[0];
+                var ref = ultimaAtiv ? ultimaAtiv.data : (c.dataAtualizacao || c.dataCriacao || '');
+                if (!ref) return true;
+                var dias = Math.floor((agora - new Date(ref)) / 86400000);
+                return dias >= LIMITE;
+            }).map(function(c) {
+                var ultimaAtiv = visitas.filter(function(v){ return v.clienteId===c.id; })
+                    .sort(function(a,b){ return new Date(b.data)-new Date(a.data); })[0];
+                var ref = ultimaAtiv ? ultimaAtiv.data : (c.dataAtualizacao || c.dataCriacao || '');
+                var dias = ref ? Math.floor((agora - new Date(ref)) / 86400000) : 999;
+                return Object.assign({}, c, { diasInativo: dias });
+            }).sort(function(a,b){ return b.diasInativo - a.diasInativo; });
+
+            if (inativos.length === 0) {
+                return { html: '<div class="empty-state"><i class="fas fa-check-circle" style="color:var(--success)"></i><p>Nenhum cliente inativo há mais de ' + LIMITE + ' dias! ✅</p></div>', type: 'clientes-inativos', data: [] };
+            }
+
+            var rows = inativos.slice(0,50).map(function(c) {
+                var etapa = (UI.data.funilEtapas||[]).find(function(e){ return e.id===c.etapaFunil; });
+                var fone = c.telefone ? c.telefone.replace(/\D/g,'') : '';
+                var urg = c.diasInativo >= 120 ? ['rp-tag-red','🔴 Crítico'] : c.diasInativo >= 90 ? ['rp-tag-orange','🟡 Alto'] : ['rp-tag-gray','📌 Médio'];
+                var primeiroNome = c.nome.split(' ')[0];
+                var msgText = 'Olá ' + primeiroNome + '! Tudo bem? Sou da ImobiPro e queria saber se ainda tem interesse em um imóvel. Tenho novidades!';
+                var wppLink = fone ? 'https://wa.me/55' + fone + '?text=' + encodeURIComponent(msgText) : '';
+                var btnWpp = fone ? '<button onclick="window.open(\'' + wppLink + '\',\'_blank\')" style="background:#25D366;color:white;border:none;border-radius:6px;padding:4px 8px;font-size:0.7rem;font-weight:700;cursor:pointer;"><i class=\'fab fa-whatsapp\'></i></button>' : '';
+                return '<tr>' +
+                    '<td style="font-weight:600;">' + c.nome + '</td>' +
+                    '<td>' + (c.telefone||'—') + '</td>' +
+                    '<td><span class="rp-tag rp-tag-blue" style="font-size:0.6rem;">' + (etapa ? etapa.nome : (c.etapaFunil||'—')) + '</span></td>' +
+                    '<td style="font-weight:800;color:var(--danger);">' + c.diasInativo + 'd</td>' +
+                    '<td><span class="rp-tag ' + urg[0] + '">' + urg[1] + '</span></td>' +
+                    '<td>' + btnWpp + '</td></tr>';
+            }).join('');
+
+            var mediaInativo = Math.round(inativos.reduce(function(s,c){ return s+c.diasInativo; }, 0) / inativos.length);
+            var html = '<div class="rp-highlight">' +
+                '<div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--danger)">' + inativos.length + '</div><div class="rp-hl-lbl">Clientes Inativos</div></div>' +
+                '<div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--warning)">' + inativos.filter(function(c){return c.diasInativo>=90;}).length + '</div><div class="rp-hl-lbl">+90 dias</div></div>' +
+                '<div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--text-muted)">' + mediaInativo + 'd</div><div class="rp-hl-lbl">Média Inativo</div></div>' +
+                '</div>' +
+                '<div style="background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.2);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:0.78rem;color:var(--text-secondary);">⚠️ Clientes ativos no funil sem atividade há mais de ' + LIMITE + ' dias. Clientes sem follow-up têm 7x menos chance de fechar.</div>' +
+                '<div class="rp-table-wrap"><table class="rp-table">' +
+                '<thead><tr><th>Cliente</th><th>Telefone</th><th>Etapa</th><th>Dias Inativo</th><th>Urgência</th><th>Ação</th></tr></thead>' +
+                '<tbody>' + rows + '</tbody></table></div>';
+            return { html: html, type: 'clientes-inativos', data: inativos };
+        }
+
+        // ── Imóveis por Tempo no Mercado ──────────────────────────────
+        function generateImoveisTempoMercado() {
+            var imoveis = (UI.data.imoveis || []).filter(function(i){ return !i.vendido && i.status !== 'vendido'; });
+            var agora = new Date();
+            var comTempo = imoveis.map(function(im) {
+                var ref = im.dataCadastro || im.dataCriacao || agora.toISOString();
+                var dias = Math.floor((agora - new Date(ref)) / 86400000);
+                return Object.assign({}, im, { diasMercado: dias });
+            }).sort(function(a,b){ return b.diasMercado - a.diasMercado; });
+
+            var media = comTempo.length ? Math.round(comTempo.reduce(function(s,i){ return s+i.diasMercado; },0)/comTempo.length) : 0;
+
+            var rows = comTempo.slice(0,50).map(function(im) {
+                var alerta = im.diasMercado > 180 ? ['rp-tag-red','🔴 Revise preço'] : im.diasMercado > 90 ? ['rp-tag-orange','⚠️ Atenção'] : ['rp-tag-green','✅ Normal'];
+                var precoRaw = parseFloat((im.preco||im.valor||'0').toString().replace(/[^0-9.,]/g,'').replace(',','.')) || 0;
+                return '<tr>' +
+                    '<td style="font-weight:700;color:var(--primary);">#' + (im.ref||im.id||'—') + '</td>' +
+                    '<td>' + (im.titulo||im.endereco||'—').substring(0,25) + '</td>' +
+                    '<td>' + (im.tipo||im.tipoImovel||'—') + '</td>' +
+                    '<td>' + (im.bairro||'—') + '</td>' +
+                    '<td style="white-space:nowrap;">' + (precoRaw>0 ? _fmtMoney(precoRaw) : '—') + '</td>' +
+                    '<td style="font-weight:800;">' + im.diasMercado + 'd</td>' +
+                    '<td><span class="rp-tag ' + alerta[0] + '">' + alerta[1] + '</span></td></tr>';
+            }).join('');
+
+            var html = '<div class="rp-highlight">' +
+                '<div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--primary)">' + comTempo.length + '</div><div class="rp-hl-lbl">Disponíveis</div></div>' +
+                '<div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--warning)">' + comTempo.filter(function(i){return i.diasMercado>90;}).length + '</div><div class="rp-hl-lbl">+90 dias</div></div>' +
+                '<div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--text-muted)">' + media + 'd</div><div class="rp-hl-lbl">Média no Mercado</div></div>' +
+                '</div>' +
+                '<div style="background:rgba(230,126,34,0.07);border:1px solid rgba(230,126,34,0.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:0.78rem;color:var(--text-secondary);">💡 Imóveis acima de 90 dias no mercado geralmente precisam de revisão de preço ou ações de marketing ativas.</div>' +
+                '<div class="rp-table-wrap"><table class="rp-table">' +
+                '<thead><tr><th>Ref.</th><th>Imóvel</th><th>Tipo</th><th>Bairro</th><th>Valor</th><th>Dias</th><th>Alerta</th></tr></thead>' +
+                '<tbody>' + rows + '</tbody></table></div>';
+            return { html: html, type: 'imoveis-tempo-mercado', data: comTempo };
+        }
+
+        // ── Follow-up Pendente (sem contato há +7 dias) ───────────────
+        function generateFollowUp() {
+            var clientes = UI.data.clientes || [];
+            var visitas  = UI.data.visitas || [];
+            var agora    = new Date();
+            var LIMITE   = 7;
+
+            var pendentes = clientes.filter(function(c) {
+                var e = (c.etapaFunil||'').toLowerCase();
+                if (e.indexOf('venda')>=0 || e.indexOf('cancelad')>=0 || e.indexOf('inativ')>=0 || e.indexOf('descart')>=0) return false;
+                var ultimoContato = visitas.filter(function(v){
+                    return v.clienteId===c.id && (v.tipo==='ligacao'||v.tipo==='whatsapp');
+                }).sort(function(a,b){ return new Date(b.data)-new Date(a.data); })[0];
+                var ref = ultimoContato ? ultimoContato.data : (c.dataAtualizacao || c.dataCriacao || '');
+                var dias = ref ? Math.floor((agora - new Date(ref)) / 86400000) : 999;
+                return dias >= LIMITE;
+            }).map(function(c) {
+                var ultimoContato = visitas.filter(function(v){
+                    return v.clienteId===c.id && (v.tipo==='ligacao'||v.tipo==='whatsapp');
+                }).sort(function(a,b){ return new Date(b.data)-new Date(a.data); })[0];
+                var ref = ultimoContato ? ultimoContato.data : (c.dataAtualizacao || c.dataCriacao || '');
+                var dias = ref ? Math.floor((agora - new Date(ref)) / 86400000) : 999;
+                return Object.assign({}, c, { diasSemContato: dias });
+            }).sort(function(a,b){ return b.diasSemContato - a.diasSemContato; });
+
+            var rows = pendentes.slice(0,60).map(function(c) {
+                var etapa = (UI.data.funilEtapas||[]).find(function(e){ return e.id===c.etapaFunil; });
+                var fone = c.telefone ? c.telefone.replace(/\D/g,'') : '';
+                var prio = c.diasSemContato >= 30 ? ['rp-tag-red','🔴 Alta'] : c.diasSemContato >= 14 ? ['rp-tag-orange','🟡 Média'] : ['rp-tag-gray','📌 Normal'];
+                var primeiroNome = c.nome.split(' ')[0];
+                var msgText = 'Olá ' + primeiroNome + '! Tudo bem? Sou da ImobiPro e queria dar um retorno. Você ainda tem interesse? Posso te ajudar a encontrar o imóvel ideal!';
+                var wppLink = fone ? 'https://wa.me/55' + fone + '?text=' + encodeURIComponent(msgText) : '';
+                var btnWpp = fone ? '<button onclick="window.open(\'' + wppLink + '\',\'_blank\')" style="background:#25D366;color:white;border:none;border-radius:6px;padding:4px 8px;font-size:0.7rem;cursor:pointer;"><i class=\'fab fa-whatsapp\'></i></button>' : '';
+                var btnTel = fone ? '<button onclick="navigator.clipboard&&navigator.clipboard.writeText(\'' + (c.telefone||'') + '\').then(function(){Utils.toast(\'Tel copiado!\')})" style="background:var(--primary);color:white;border:none;border-radius:6px;padding:4px 8px;font-size:0.7rem;cursor:pointer;margin-left:4px;"><i class=\'fas fa-phone\'></i></button>' : '';
+                return '<tr>' +
+                    '<td style="font-weight:600;">' + c.nome + '</td>' +
+                    '<td>' + (c.telefone||'—') + '</td>' +
+                    '<td><span class="rp-tag rp-tag-blue" style="font-size:0.6rem;">' + (etapa ? etapa.nome : (c.etapaFunil||'—')) + '</span></td>' +
+                    '<td style="font-weight:700;">' + (c.diasSemContato === 999 ? 'N/D' : c.diasSemContato + 'd') + '</td>' +
+                    '<td><span class="rp-tag ' + prio[0] + '">' + prio[1] + '</span></td>' +
+                    '<td>' + btnWpp + btnTel + '</td></tr>';
+            }).join('');
+
+            var html = '<div class="rp-highlight">' +
+                '<div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--warning)">' + pendentes.length + '</div><div class="rp-hl-lbl">Aguardam Follow-up</div></div>' +
+                '<div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--danger)">' + pendentes.filter(function(c){return c.diasSemContato>=30;}).length + '</div><div class="rp-hl-lbl">+30 dias sem contato</div></div>' +
+                '<div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--primary)">' + pendentes.filter(function(c){return c.diasSemContato<14;}).length + '</div><div class="rp-hl-lbl">Urgente (7-14 dias)</div></div>' +
+                '</div>' +
+                '<div class="rp-table-wrap"><table class="rp-table">' +
+                '<thead><tr><th>Cliente</th><th>Telefone</th><th>Etapa</th><th>Dias s/ contato</th><th>Prioridade</th><th>Ação</th></tr></thead>' +
+                '<tbody>' + rows + '</tbody></table></div>';
+            return { html: html, type: 'follow-up', data: pendentes };
+        }
+
         function handleNewTypes(type, start, end) {
             switch(type) {
-                case 'funil-saude':         return generateFunilSaude();
-                case 'perfil-compradores':  return generatePerfilCompradores();
-                case 'estoque':             return generateEstoque();
-                case 'imoveis-sem-visita':  return generateImoveisSemVisita();
-                case 'imoveis-price':       return generateImoveisPrice();
-                case 'ranking-imoveis':     return generateRankingImoveis(start, end);
-                case 'comissoes':           return generateComissoes(start, end);
-                case 'produtividade':       return generateProdutividade(start, end);
-                case 'captacao-status':     return generateCaptacaoStatus();
-                case 'captacao-bairro':     return generateCaptacaoBairro();
+                case 'funil-saude':             return generateFunilSaude();
+                case 'perfil-compradores':      return generatePerfilCompradores();
+                case 'estoque':                 return generateEstoque();
+                case 'imoveis-sem-visita':      return generateImoveisSemVisita();
+                case 'imoveis-price':           return generateImoveisPrice();
+                case 'ranking-imoveis':         return generateRankingImoveis(start, end);
+                case 'comissoes':               return generateComissoes(start, end);
+                case 'produtividade':           return generateProdutividade(start, end);
+                case 'captacao-status':         return generateCaptacaoStatus();
+                case 'captacao-bairro':         return generateCaptacaoBairro();
+                case 'aniversariantes':         return generateAniversariantes();
+                case 'clientes-inativos':       return generateClientesInativos();
+                case 'imoveis-tempo-mercado':   return generateImoveisTempoMercado();
+                case 'follow-up':               return generateFollowUp();
                 default: return null;
             }
         }
@@ -47200,10 +47573,10 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         const origGenerate = UI.generateReport;
         UI.generateReport = async function() {
             const type = (document.getElementById('report-type')||{}).value || '';
-            const newTypes = ['funil-saude','perfil-compradores','estoque','imoveis-sem-visita','imoveis-price','ranking-imoveis','comissoes','produtividade','captacao-status','captacao-bairro','dre','fluxo-caixa'];
+            const newTypes = ['funil-saude','perfil-compradores','estoque','imoveis-sem-visita','imoveis-price','ranking-imoveis','comissoes','produtividade','captacao-status','captacao-bairro','dre','fluxo-caixa','aniversariantes','clientes-inativos','imoveis-tempo-mercado','follow-up'];
             if (!newTypes.includes(type)) { origGenerate.call(UI); return; }
 
-            const semData = ['funil-saude','perfil-compradores','estoque','imoveis-sem-visita','imoveis-price','captacao-status','captacao-bairro'];
+            const semData = ['funil-saude','perfil-compradores','estoque','imoveis-sem-visita','imoveis-price','captacao-status','captacao-bairro','aniversariantes','clientes-inativos','imoveis-tempo-mercado','follow-up'];
             let start = new Date(), end = new Date();
             if (!semData.includes(type)) {
                 const sv = document.getElementById('report-date-start').value;
@@ -47262,3 +47635,4 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
     </script>
 
 </body>
+</html>
