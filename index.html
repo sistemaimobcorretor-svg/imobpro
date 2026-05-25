@@ -10264,13 +10264,17 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                     <input type="number" id="pf-idade-conjuge" class="form-control" placeholder="—" min="18" max="79" style="font-size:0.85rem;">
                                 </div>
                             </div>
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
                                 <div>
-                                    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">FGTS disponível</label>
+                                    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">FGTS</label>
                                     <input type="text" id="pf-fgts" class="form-control" placeholder="0,00" oninput="Utils.maskMoney(this)" style="font-size:0.85rem;">
                                 </div>
                                 <div>
-                                    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">Tipo de imóvel preferido</label>
+                                    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">Recursos Próprios</label>
+                                    <input type="text" id="pf-recursos" class="form-control" placeholder="0,00" oninput="Utils.maskMoney(this)" style="font-size:0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;display:block;">Tipo Imóvel</label>
                                     <select id="pf-tipo-pref" class="form-control" style="font-size:0.85rem;">
                                         <option value="">Qualquer</option>
                                         <option value="apartamento">Apartamento</option>
@@ -10356,6 +10360,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                     <div id="pp-barra-banco"    style="height:100%;background:#1D6FA4;transition:width 0.3s;" title="Financiamento banco"></div>
                                     <div id="pp-barra-sinal"   style="height:100%;background:#27AE60;transition:width 0.3s;" title="Sinal"></div>
                                     <div id="pp-barra-fgts"    style="height:100%;background:#7C3AED;transition:width 0.3s;" title="FGTS"></div>
+                                    <div id="pp-barra-recursos" style="height:100%;background:#10B981;transition:width 0.3s;" title="Recursos Próprios"></div>
                                     <div id="pp-barra-parcelas" style="height:100%;background:#0891B2;transition:width 0.3s;" title="Parcelas mensais"></div>
                                     <div id="pp-barra-interc"  style="height:100%;background:#F59E0B;transition:width 0.3s;" title="Intercaladas"></div>
                                     <div id="pp-barra-chaves"  style="height:100%;background:#E67E22;transition:width 0.3s;" title="Chaves"></div>
@@ -10377,11 +10382,15 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 </div>
                             </div>
 
-                            <!-- FGTS + planta -->
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;">
+                            <!-- FGTS + Recursos + planta -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:0;">
                                 <div>
-                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">FGTS disponível</label>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Saldo FGTS</label>
                                     <input type="text" id="pp-fgts" class="form-control" placeholder="0,00" oninput="Utils.maskMoney(this);PerfisModule.ppLiveCalc()" style="font-size:0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Recursos Próprios</label>
+                                    <input type="text" id="pp-recursos" class="form-control" placeholder="0,00" oninput="Utils.maskMoney(this);PerfisModule.ppLiveCalc()" style="font-size:0.85rem;">
                                 </div>
                                 <div>
                                     <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Imóvel na planta?</label>
@@ -10430,6 +10439,23 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 <div>
                                     <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Aluguel atual pago (se houver)</label>
                                     <input type="text" id="pp-aluguel" class="form-control" placeholder="0,00" oninput="Utils.maskMoney(this);PerfisModule.ppRecalc()" style="font-size:0.85rem;">
+                                </div>
+                            </div>
+
+                            <!-- Juros de Obra e Taxa Bancária -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;padding:10px;background:rgba(29,111,164,0.05);border-radius:9px;border:1px dashed rgba(29,111,164,0.2);">
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Juros de Obra (Evolução %)</label>
+                                    <div style="display:flex;align-items:center;gap:5px;">
+                                        <input type="number" id="pp-juros-obra-pct" value="100" min="0" max="100" step="1" oninput="PerfisModule.ppRecalc()" style="width:100%;padding:7px 10px;border-radius:7px;border:1.5px solid var(--border);font-size:0.8rem;">
+                                        <span style="font-size:0.7rem;color:var(--text-secondary);">%</span>
+                                    </div>
+                                    <div style="font-size:0.6rem;color:var(--text-secondary);margin-top:2px;">Percentual do financiamento liberado gradualmente.</div>
+                                </div>
+                                <div>
+                                    <label style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:3px;display:block;">Taxa Assinatura Banco</label>
+                                    <input type="text" id="pp-taxa-assinatura" class="form-control" value="750,00" oninput="Utils.maskMoney(this);PerfisModule.ppRecalc()" style="font-size:0.8rem;padding:7px 10px;">
+                                    <div style="font-size:0.6rem;color:var(--text-secondary);margin-top:2px;">Cobrada no mês da assinatura com o banco.</div>
                                 </div>
                             </div>
 
@@ -44837,8 +44863,9 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             const maxImovel = maxFinanciado / 0.8;
             const entradaMin = maxImovel * 0.2;
             const fgts = p.fgts || 0;
-            const maxComFgts = maxImovel + fgts;
-            return { rendaTotal, idadeMaisVelho, prazoMax, maxPrestacao, taxaInfo, maxImovel, maxFinanciado, entradaMin, fgts, maxComFgts };
+            const recursos = p.recursos || 0;
+            const maxComRecursos = maxImovel + fgts + recursos;
+            return { rendaTotal, idadeMaisVelho, prazoMax, maxPrestacao, taxaInfo, maxImovel, maxFinanciado, entradaMin, fgts, recursos, maxComRecursos };
         }
 
         function analisarPerfil(id) {
@@ -44849,7 +44876,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             const imovelCompativeis = imoveis.filter(i => {
                 if (i.status === 'vendido' || i.status === 'alugado') return false;
                 if (!i.precoVenda) return false;
-                return i.precoVenda <= calc.maxComFgts * 1.1;
+                return i.precoVenda <= calc.maxComRecursos * 1.1;
             }).sort((a, b) => {
                 const ra = Math.abs(a.precoVenda / calc.maxImovel - 0.85);
                 const rb = Math.abs(b.precoVenda / calc.maxImovel - 0.85);
@@ -44895,7 +44922,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                         ${calc.fgts > 0 ? `<span style="margin-left:10px;font-weight:700;color:#7C3AED;">+ FGTS: ${Utils.formatCurrency(calc.fgts)}</span>` : ''}
                     </div>
                     <div style="padding:8px 10px;background:var(--primary-ultra);border-radius:8px;border:1px solid var(--border-accent);font-size:0.8rem;font-weight:700;color:var(--primary);">
-                        💰 Com FGTS: capacidade total até ${Utils.formatCurrency(calc.maxComFgts)}
+                        💰 Com Recursos: capacidade total até ${Utils.formatCurrency(calc.maxComRecursos)}
                     </div>
                 </div>
 
@@ -44934,6 +44961,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             const idadeEl = document.getElementById('pf-idade');
             const idadeConjEl = document.getElementById('pf-idade-conjuge');
             const fgtsEl = document.getElementById('pf-fgts');
+            const recursosEl = document.getElementById('pf-recursos');
             const tipoPrefEl = document.getElementById('pf-tipo-pref');
             const nomeEl = document.getElementById('pf-nome');
             if (!rendaEl || !idadeEl) { Utils.toast('Formulário não carregado', 'error'); return; }
@@ -44943,24 +44971,26 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             const idade = parseInt(idadeEl.value) || null;
             const idadeConj = idadeConjEl ? (parseInt(idadeConjEl.value) || null) : null;
             const fgtsStr = fgtsEl ? fgtsEl.value : '';
+            const recursosStr = recursosEl ? recursosEl.value : '';
             const tipoPref = tipoPrefEl ? tipoPrefEl.value : '';
             const nome = (nomeEl ? nomeEl.value : '') || 'Perfil Personalizado';
 
             const renda = Utils.parseCurrency(rendaStr) || 0;
             const rendaConj = Utils.parseCurrency(rendaConjStr) || 0;
             const fgts = Utils.parseCurrency(fgtsStr) || 0;
+            const recursos = Utils.parseCurrency(recursosStr) || 0;
 
             if (!renda && !rendaConj) { Utils.toast('Informe ao menos a renda mensal', 'error'); return; }
             if (!idade) { Utils.toast('Informe a idade do proponente', 'error'); return; }
 
-            const perfil = { id: 'personalizado', emoji: '📋', titulo: nome, descricao: `Renda ${Utils.formatCurrency(renda + rendaConj)}/mês · ${idade} anos`, renda, rendaConjuge: rendaConj, idade, idadeConjuge: idadeConj, fgts, cor: '#1D6FA4' };
+            const perfil = { id: 'personalizado', emoji: '📋', titulo: nome, descricao: `Renda ${Utils.formatCurrency(renda + rendaConj)}/mês · ${idade} anos`, renda, rendaConjuge: rendaConj, idade, idadeConjuge: idadeConj, fgts, recursos, cor: '#1D6FA4' };
             const calc = _calcPerfil(perfil);
             const imoveis = (UI.data && UI.data.imoveis) ? UI.data.imoveis : [];
             const imovelCompativeis = imoveis.filter(i => {
                 if (i.status === 'vendido' || i.status === 'alugado') return false;
                 if (tipoPref && i.tipo !== tipoPref) return false;
                 if (!i.precoVenda) return false;
-                return i.precoVenda <= calc.maxComFgts * 1.1;
+                return i.precoVenda <= calc.maxComRecursos * 1.1;
             }).sort((a, b) => Math.abs(a.precoVenda / calc.maxImovel - 0.85) - Math.abs(b.precoVenda / calc.maxImovel - 0.85)).slice(0, 8);
 
             const resDiv = document.getElementById('pf-resultado-personalizado');
@@ -44977,7 +45007,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                         <div style="background:rgba(39,174,96,0.08);border-radius:9px;padding:9px;"><div style="font-size:0.62rem;color:var(--text-secondary);font-weight:700;">VALOR MÁX. IMÓVEL</div><div style="font-size:0.9rem;font-weight:900;color:var(--accent);">${Utils.formatCurrency(calc.maxImovel)}</div></div>
                         <div style="background:rgba(124,58,237,0.08);border-radius:9px;padding:9px;"><div style="font-size:0.62rem;color:var(--text-secondary);font-weight:700;">PRAZO MÁX.</div><div style="font-size:0.9rem;font-weight:900;color:#7C3AED;">${calc.prazoMax}m · ${prazoAnos}a</div><div style="font-size:0.6rem;color:var(--text-secondary);">Proponente+velho: ${calc.idadeMaisVelho}a</div></div>
                     </div>
-                    <div style="padding:7px 10px;background:var(--primary-ultra);border-radius:8px;font-size:0.77rem;font-weight:700;color:var(--primary);">💰 Com FGTS: até ${Utils.formatCurrency(calc.maxComFgts)} · Taxa: ${calc.taxaInfo.taxa}% a.a.</div>
+                    <div style="padding:7px 10px;background:var(--primary-ultra);border-radius:8px;font-size:0.77rem;font-weight:700;color:var(--primary);">💰 Com Recursos: até ${Utils.formatCurrency(calc.maxComRecursos)} · Taxa: ${calc.taxaInfo.taxa}% a.a.</div>
                 </div>
                 <div style="font-weight:700;font-size:0.85rem;color:var(--dark);margin-bottom:8px;">${imovelCompativeis.length > 0 ? `🏠 Melhores imóveis (${imovelCompativeis.length}):` : '⚠️ Nenhum imóvel cadastrado se encaixa neste perfil.'}</div>
                 ${imovelCompativeis.map(i => {
@@ -45018,7 +45048,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             imovelAmostra.forEach(imovel => {
                 const perfisEncaixam = PERFIS_EXEMPLO.map(p => {
                     const calc = _calcPerfil(p);
-                    const encaixa = imovel.precoVenda <= calc.maxComFgts * 1.1;
+                    const encaixa = imovel.precoVenda <= calc.maxComRecursos * 1.1;
                     return { ...p, calc, encaixa };
                 });
                 const qtdEncaixa = perfisEncaixam.filter(p => p.encaixa).length;
@@ -45294,6 +45324,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             const vgv         = Utils.parseCurrency(document.getElementById('pp-vgv')?.value) || 0;
             const financiado  = Utils.parseCurrency(document.getElementById('pp-financiado')?.value) || 0;
             const fgts        = Utils.parseCurrency(document.getElementById('pp-fgts')?.value) || 0;
+            const recursos    = Utils.parseCurrency(document.getElementById('pp-recursos')?.value) || 0;
             const sinal       = Utils.parseCurrency(document.getElementById('pp-sinal')?.value) || 0;
             const planta      = document.getElementById('pp-planta')?.value || 'nao';
             const parcelasEnt = parseInt(document.getElementById('pp-parcelas-entrada')?.value) || 0;
@@ -45333,11 +45364,11 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             }
 
             // Parcelas mensais brutas (entrada líquida / nº parcelas)
-            const entradaLiquida = Math.max(0, entradaNecessaria - sinal - fgts - totalInterc - chavesCorr);
+            const entradaLiquida = Math.max(0, entradaNecessaria - sinal - fgts - recursos - totalInterc - chavesCorr);
             const totalParcMensais = planta === 'sim' && parcelasEnt > 0 ? entradaLiquida : 0;
 
             // Soma da entrada
-            const somaEntrada = sinal + fgts + totalParcMensais + totalInterc + chavesCorr;
+            const somaEntrada = sinal + fgts + recursos + totalParcMensais + totalInterc + chavesCorr;
             const diff = somaEntrada - entradaNecessaria;
             const fechou = Math.abs(diff) < 1;
             const total = vgv;
@@ -45346,6 +45377,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             const pBanco    = total > 0 ? (finBanco / total * 100) : 0;
             const pSinal    = total > 0 ? (sinal / total * 100) : 0;
             const pFgts     = total > 0 ? (fgts / total * 100) : 0;
+            const pRecursos = total > 0 ? (recursos / total * 100) : 0;
             const pParcMens = total > 0 ? (totalParcMensais / total * 100) : 0;
             const pInterc   = total > 0 ? (totalInterc / total * 100) : 0;
             const pChaves   = total > 0 ? (chavesCorr / total * 100) : 0;
@@ -45355,6 +45387,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             setW('pp-barra-banco',    pBanco);
             setW('pp-barra-sinal',    pSinal);
             setW('pp-barra-fgts',     pFgts);
+            setW('pp-barra-recursos', pRecursos);
             setW('pp-barra-parcelas', pParcMens);
             setW('pp-barra-interc',   pInterc);
             setW('pp-barra-chaves',   pChaves);
@@ -45375,6 +45408,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                     { label:'Banco', val:finBanco, cor:'#1D6FA4' },
                     sinal>0    ? { label:'Sinal', val:sinal, cor:'#27AE60' } : null,
                     fgts>0     ? { label:'FGTS', val:fgts, cor:'#7C3AED' } : null,
+                    recursos>0 ? { label:'Recursos Próprios', val:recursos, cor:'#10B981' } : null,
                     totalParcMensais>0 ? { label:'Parcelas mens.', val:totalParcMensais, cor:'#0891B2' } : null,
                     totalInterc>0 ? { label:'Intercaladas', val:totalInterc, cor:'#F59E0B' } : null,
                     chavesCorr>0 ? { label:'Chaves', val:chavesCorr, cor:'#E67E22' } : null,
@@ -45429,6 +45463,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 ? parseFloat(((entradaCalc / vgv) * 100).toFixed(2))
                 : parseFloat(document.getElementById('pp-pct-entrada')?.value) || 20;
             const fgts          = Utils.parseCurrency(document.getElementById('pp-fgts').value) || 0;
+            const recursos      = Utils.parseCurrency(document.getElementById('pp-recursos').value) || 0;
             const planta        = document.getElementById('pp-planta').value;
             const aluguel       = Utils.parseCurrency(document.getElementById('pp-aluguel')?.value) || 0;
             const sinal         = Utils.parseCurrency(document.getElementById('pp-sinal')?.value) || 0;
@@ -45436,6 +45471,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             const parcelasEnt   = parseInt(document.getElementById('pp-parcelas-entrada')?.value) || 36;
             const inccAnual     = parseFloat(document.getElementById('pp-incc')?.value) || 7;
             const igpmAnual     = parseFloat(document.getElementById('pp-igpm')?.value) || 5;
+            const jurosObraPct  = parseFloat(document.getElementById('pp-juros-obra-pct')?.value) || 100;
+            const taxaAssinatura= Utils.parseCurrency(document.getElementById('pp-taxa-assinatura')?.value) || 750;
 
             // Intercaladas
             const temIntercaladas = document.getElementById('pp-tem-intercaladas')?.checked && planta === 'sim';
@@ -45470,7 +45507,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
             // ── Cálculo base ────────────────────────────────────────
             const entradaTotal   = vgv * (pctEntrada / 100);
-            const entradaLiquida = Math.max(0, entradaTotal - sinal - fgts);
+            const entradaLiquida = Math.max(0, entradaTotal - sinal - fgts - recursos);
             const parcelaMensalBase = planta === 'sim' && parcelasEnt > 0 ? entradaLiquida / parcelasEnt : 0;
 
             // Correção INCC parcelas durante obra
@@ -45571,25 +45608,52 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
             // ── Linha do tempo mensal (resumida) ────────────────────
             const timeline = [];
+            const mesAssinatura = 4; // Estimativa média de assinatura com o banco (mês 4 da obra)
+            
             for (let m = 1; m <= Math.min(mesesObra + 3, 60); m++) {
                 let parcEnt = m <= parcelasEnt ? parcelaEntObra : (m <= parcelasEnt && m > mesesObra ? parcelaPosEnt : 0);
                 if (m > mesesObra && m <= parcelasEnt) parcEnt = parcelaPosEnt;
                 if (m > parcelasEnt) parcEnt = 0;
+                
                 const interc = (temIntercaladas && intercaladasNaObra.find(x => x.mes === m)) || null;
                 const chaves = (m === mesesObra && temChaves) ? valorChavesCorrigido : 0;
                 const banco  = m > mesesObra ? parcelaBanco : 0;
                 const alug   = m <= mesesObra ? aluguel : 0;
-                const total  = parcEnt + (interc ? interc.valor : 0) + chaves + banco + alug;
+                
+                // Juros de Obra (Evolução de Obra)
+                // Regra: Cobrado após assinatura, aumenta conforme a obra avança
+                // Simplificação: Progressão linear do saldo devedor liberado até o limite (jurosObraPct)
+                let jurosObra = 0;
+                if (planta === 'sim' && m >= mesAssinatura && m <= mesesObra) {
+                    const mesesPosAssinatura = m - mesAssinatura + 1;
+                    const totalMesesObraPosAssinatura = mesesObra - mesAssinatura + 1;
+                    const evolucaoObra = (mesesPosAssinatura / totalMesesObraPosAssinatura) * (jurosObraPct / 100);
+                    const saldoLiberado = saldoBanco * evolucaoObra;
+                    jurosObra = saldoLiberado * taxaMensal;
+                }
+                
+                // Taxa de Assinatura (mês 4)
+                const taxaAssin = (planta === 'sim' && m === mesAssinatura) ? taxaAssinatura : 0;
+                
+                const total  = parcEnt + (interc ? interc.valor : 0) + chaves + banco + alug + jurosObra + taxaAssin;
                 const tipo   = m === mesesObra ? 'entrega' : m <= mesesObra ? 'obra' : 'posEntrega';
-                timeline.push({ m, parcEnt, interc: interc ? interc.valor : 0, chaves, banco, alug, total, tipo });
+                
+                timeline.push({ 
+                    m, parcEnt, 
+                    interc: interc ? interc.valor : 0, 
+                    chaves, banco, alug, 
+                    jurosObra, taxaAssin,
+                    total, tipo 
+                });
             }
             const maxTotal = Math.max(...timeline.map(t => t.total), 1);
 
             // ── Salvar para PDF ──────────────────────────────────────
             // Composição da entrada para o resumo
-            const somaEntradaComp = sinal + fgts + (entradaLiquida) + totalIntercaladasObra + valorChavesCorrigido;
+            const somaEntradaComp = sinal + fgts + recursos + (entradaLiquida) + totalIntercaladasObra + valorChavesCorrigido;
             const diffEntrada = somaEntradaComp - entradaTotal;
-            _ppPlanoData = { nome, descricao, vgv, pctEntrada, entradaTotal, sinal, fgts, saldoBanco, parcelaBanco, prazoMax, taxaInfo, renda, maxPrestacao, planta, mesesObra, parcelasEnt, parcelasEnt, parcelaEntObra, parcelasPosEnt, parcelaPosEnt, inccAnual, igpmAnual, igpmEfetivo, aluguel, temIntercaladas, intercaladasNaObra, totalIntercaladasObra, mediaIntercalada, qtdIntercaladas, temChaves, valorChavesCorrigido, valChaves, idxChaves, comprometObra, comprometPosEnt, estrategia, alertas, timeline, financiadoInformado, entradaLiquida, somaEntradaComp, diffEntrada };
+            const totalJurosObra = timeline.reduce((acc, t) => acc + (t.jurosObra || 0), 0);
+            _ppPlanoData = { nome, descricao, vgv, pctEntrada, entradaTotal, sinal, fgts, recursos, saldoBanco, parcelaBanco, prazoMax, taxaInfo, renda, maxPrestacao, planta, mesesObra, parcelasEnt, parcelasEnt, parcelaEntObra, parcelasPosEnt, parcelaPosEnt, inccAnual, igpmAnual, igpmEfetivo, aluguel, temIntercaladas, intercaladasNaObra, totalIntercaladasObra, mediaIntercalada, qtdIntercaladas, temChaves, valorChavesCorrigido, valChaves, idxChaves, comprometObra, comprometPosEnt, estrategia, alertas, timeline, financiadoInformado, entradaLiquida, somaEntradaComp, diffEntrada, jurosObraPct, taxaAssinatura, totalJurosObra };
 
             // ── Render ───────────────────────────────────────────────
             const resDiv = document.getElementById('pp-resultado');
@@ -45604,6 +45668,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         // ── Render do resultado ──────────────────────────────────────
         function _ppRenderResultado(d, corSem, bgSem, semObra, semPosEnt, maxTotal) {
             const fmtC = v => Utils.formatCurrency(v);
+            const recursos = d.recursos || 0;
             const timelineRows = d.timeline.map(t => {
                 const barW = Math.round((t.total / maxTotal) * 100);
                 const cor  = t.tipo==='entrega' ? '#7C3AED' : t.tipo==='obra' ? '#1D6FA4' : '#27AE60';
@@ -45613,6 +45678,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 const extras = [];
                 if (t.interc > 0) extras.push(`<span style="background:rgba(8,145,178,0.12);color:#0891B2;padding:1px 5px;border-radius:4px;font-size:0.63rem;font-weight:700;">+ intercalada</span>`);
                 if (t.chaves > 0) extras.push(`<span style="background:rgba(230,126,34,0.12);color:#E67E22;padding:1px 5px;border-radius:4px;font-size:0.63rem;font-weight:700;">+ chaves</span>`);
+                if (t.jurosObra > 0) extras.push(`<span style="background:rgba(124,58,237,0.12);color:#7C3AED;padding:1px 5px;border-radius:4px;font-size:0.63rem;font-weight:700;">+ juros obra</span>`);
+                if (t.taxaAssin > 0) extras.push(`<span style="background:rgba(231,76,60,0.12);color:#E74C3C;padding:1px 5px;border-radius:4px;font-size:0.63rem;font-weight:700;">+ taxa banco</span>`);
                 return `<tr style="border-bottom:1px solid var(--border);">
                     <td style="padding:5px 6px;font-size:0.72rem;color:${cor};font-weight:700;white-space:nowrap;">${label} ${extras.join('')}</td>
                     <td style="padding:5px 6px;font-size:0.72rem;color:var(--dark);font-weight:700;">${fmtC(t.total)}</td>
@@ -45741,6 +45808,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                     ${d.saldoBanco>0?`<div style="height:100%;width:${(d.saldoBanco/d.vgv*100).toFixed(1)}%;background:#1D6FA4;" title="Banco"></div>`:''}
                     ${d.sinal>0?`<div style="height:100%;width:${(d.sinal/d.vgv*100).toFixed(1)}%;background:#27AE60;" title="Sinal"></div>`:''}
                     ${d.fgts>0?`<div style="height:100%;width:${(d.fgts/d.vgv*100).toFixed(1)}%;background:#7C3AED;" title="FGTS"></div>`:''}
+                    ${recursos>0?`<div style="height:100%;width:${(recursos/d.vgv*100).toFixed(1)}%;background:#10B981;" title="Recursos Próprios"></div>`:''}
                     ${d.entradaLiquida>0?`<div style="height:100%;width:${(d.entradaLiquida/d.vgv*100).toFixed(1)}%;background:#0891B2;" title="Parcelas mensais"></div>`:''}
                     ${d.totalIntercaladasObra>0?`<div style="height:100%;width:${(d.totalIntercaladasObra/d.vgv*100).toFixed(1)}%;background:#F59E0B;" title="Intercaladas"></div>`:''}
                     ${d.valorChavesCorrigido>0?`<div style="height:100%;width:${(d.valorChavesCorrigido/d.vgv*100).toFixed(1)}%;background:#E67E22;" title="Chaves"></div>`:''}
@@ -45756,6 +45824,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                     </tr>
                     ${d.sinal>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 0 3px 12px;display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#27AE60;display:inline-block;"></span>Sinal à vista</td><td style="text-align:right;font-weight:700;color:#27AE60;">${fmtC(d.sinal)}</td><td style="text-align:right;color:var(--text-secondary);padding-left:8px;">${d.vgv>0?(d.sinal/d.vgv*100).toFixed(1):0}%</td></tr>`:''}
                     ${d.fgts>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 0 3px 12px;display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#7C3AED;display:inline-block;"></span>FGTS</td><td style="text-align:right;font-weight:700;color:#7C3AED;">${fmtC(d.fgts)}</td><td style="text-align:right;color:var(--text-secondary);padding-left:8px;">${d.vgv>0?(d.fgts/d.vgv*100).toFixed(1):0}%</td></tr>`:''}
+                    ${recursos>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 0 3px 12px;display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#10B981;display:inline-block;"></span>Recursos Próprios</td><td style="text-align:right;font-weight:700;color:#10B981;">${fmtC(recursos)}</td><td style="text-align:right;color:var(--text-secondary);padding-left:8px;">${d.vgv>0?(recursos/d.vgv*100).toFixed(1):0}%</td></tr>`:''}
                     ${d.entradaLiquida>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 0 3px 12px;display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#0891B2;display:inline-block;"></span>Parcelas mens. (${d.parcelasEnt}×)</td><td style="text-align:right;font-weight:700;color:#0891B2;">${fmtC(d.entradaLiquida)}</td><td style="text-align:right;color:var(--text-secondary);padding-left:8px;">${d.vgv>0?(d.entradaLiquida/d.vgv*100).toFixed(1):0}%</td></tr>`:''}
                     ${d.totalIntercaladasObra>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 0 3px 12px;display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;display:inline-block;"></span>Intercaladas (${d.qtdIntercaladas}×)</td><td style="text-align:right;font-weight:700;color:#F59E0B;">${fmtC(d.totalIntercaladasObra)}</td><td style="text-align:right;color:var(--text-secondary);padding-left:8px;">${d.vgv>0?(d.totalIntercaladasObra/d.vgv*100).toFixed(1):0}%</td></tr>`:''}
                     ${d.valorChavesCorrigido>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 0 3px 12px;display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#E67E22;display:inline-block;"></span>Chaves (na entrega)</td><td style="text-align:right;font-weight:700;color:#E67E22;">${fmtC(d.valorChavesCorrigido)}</td><td style="text-align:right;color:var(--text-secondary);padding-left:8px;">${d.vgv>0?(d.valorChavesCorrigido/d.vgv*100).toFixed(1):0}%</td></tr>`:''}
@@ -45798,7 +45867,12 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                     <tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">Entrada (${d.pctEntrada}%)</td><td style="text-align:right;font-weight:700;color:#E67E22;">${fmtC(d.entradaTotal)}</td></tr>
                     ${d.sinal>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">(-) Sinal à vista</td><td style="text-align:right;font-weight:700;color:#E67E22;">- ${fmtC(d.sinal)}</td></tr>`:''}
                     ${d.fgts>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">(-) FGTS</td><td style="text-align:right;font-weight:700;color:var(--accent);">- ${fmtC(d.fgts)}</td></tr>`:''}
-                    ${d.planta==='sim'?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">Parcela entrada obra (c/ INCC)</td><td style="text-align:right;font-weight:700;color:#1D6FA4;">${fmtC(d.parcelaEntObra)}/mês × ${Math.min(d.parcelasEnt,d.mesesObra)}m</td></tr>`:''}
+                    ${recursos>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">(-) Recursos Próprios</td><td style="text-align:right;font-weight:700;color:var(--accent);">- ${fmtC(recursos)}</td></tr>`:''}
+                    ${d.planta==='sim'?`
+                        <tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">Parcela entrada obra (c/ INCC)</td><td style="text-align:right;font-weight:700;color:#1D6FA4;">${fmtC(d.parcelaEntObra)}/mês</td></tr>
+                        <tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">Taxa Assinatura Banco</td><td style="text-align:right;font-weight:700;color:#E74C3C;">${fmtC(d.taxaAssinatura)}</td></tr>
+                        <tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:var(--text-secondary);">Juros de Obra (total est.)</td><td style="text-align:right;font-weight:700;color:#7C3AED;">~ ${fmtC(d.totalJurosObra)}</td></tr>
+                    `:''}
                     ${d.parcelasPosEnt>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:#E74C3C;">Entrada pós-entrega (IGP-M+1%)</td><td style="text-align:right;font-weight:700;color:#E74C3C;">${fmtC(d.parcelaPosEnt)}/mês × ${d.parcelasPosEnt}m</td></tr>`:''}
                     ${d.temIntercaladas&&d.qtdIntercaladas>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:#0891B2;">Intercaladas (${d.qtdIntercaladas}x)</td><td style="text-align:right;font-weight:700;color:#0891B2;">Total ${fmtC(d.totalIntercaladasObra)}</td></tr>`:''}
                     ${d.temChaves&&d.valorChavesCorrigido>0?`<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;color:#E67E22;">Chaves na entrega (corrigido)</td><td style="text-align:right;font-weight:700;color:#E67E22;">${fmtC(d.valorChavesCorrigido)}</td></tr>`:''}
