@@ -11309,6 +11309,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     </div>
                 </div>
                 <input type="file" id="cap-photo-input" accept="image/*" capture="environment" style="display:none" multiple onchange="CaptacaoModule.onPhotosSelected(this)">
+                <input type="file" id="cap-photo-input-gallery" accept="image/*" style="display:none" multiple onchange="CaptacaoModule.onPhotosSelected(this)">
             </div>
 
             <!-- ── Tipo de negócio ── -->
@@ -11327,10 +11328,15 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <input type="text" id="cap-proprietario" class="form-control" placeholder="Ex: João Silva">
             </div>
 
-            <!-- ── Telefone ── -->
+            <!-- ── Telefones ── -->
             <div class="form-group">
-                <label class="form-label">Telefone da Placa <span style="color:var(--danger)">*</span></label>
-                <input type="tel" id="cap-telefone" class="form-control" placeholder="(82) 99999-9999" oninput="Utils.maskPhone(this)" inputmode="tel">
+                <label class="form-label">Telefone(s) da Placa <span style="color:var(--danger)">*</span></label>
+                <div id="cap-telefones-list"></div>
+                <button type="button" onclick="CaptacaoModule.addTelefone()" style="margin-top:6px;background:var(--primary-ultra);border:1px dashed var(--primary);color:var(--primary);border-radius:10px;padding:7px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;">
+                    <i class="fas fa-plus"></i> Adicionar telefone
+                </button>
+                <!-- campo hidden para compatibilidade -->
+                <input type="hidden" id="cap-telefone">
             </div>
 
             <!-- ── Endereço ── -->
@@ -11447,14 +11453,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <div class="cap-detail-value" id="cap-detail-endereco">—</div>
             </div>
 
-            <div id="cap-detail-phone-wrap" class="cap-detail-phone-btn" onclick="CaptacaoModule.ligar()">
-                <div class="cap-detail-phone-icon"><i class="fas fa-phone-alt"></i></div>
-                <div class="cap-detail-phone-info">
-                    <div class="cap-detail-phone-label">Telefone da Placa</div>
-                    <div class="cap-detail-phone-number" id="cap-detail-telefone">—</div>
-                </div>
-                <i class="fas fa-chevron-right" style="margin-left:auto;color:var(--text-muted);font-size:0.8rem;"></i>
-            </div>
+            <!-- Múltiplos telefones -->
+            <div id="cap-detail-phones-container"></div>
 
             <div id="cap-detail-refs-wrap" class="cap-detail-section" style="display:none;">
                 <div class="cap-detail-label">Pontos de Referência</div>
@@ -46213,7 +46213,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 <div class="cap-card-body">
                     <div class="cap-card-endereco"><i class="fas fa-map-marker-alt" style="color:var(--danger);margin-right:5px;font-size:0.8rem;"></i>${d.endereco||'Endereço não informado'}</div>
                     ${propHtml}
-                    <div class="cap-card-info"><i class="fas fa-phone-alt"></i><strong>${d.telefone||'Sem telefone'}</strong></div>
+                    <div class="cap-card-info"><i class="fas fa-phone-alt"></i><strong>${(() => { const tels=(d.telefones&&d.telefones.length)?d.telefones:(d.telefone?[d.telefone]:[]); return tels.length===0?'Sem telefone':tels[0]+(tels.length>1?' <span style="font-size:0.65rem;background:var(--primary-ultra);color:var(--primary);border-radius:10px;padding:1px 6px;font-weight:700;">+'+' '+(tels.length-1)+'</span>':''); })()}</strong></div>
                     ${bairro}${dataStr}
                     ${tagsHtml||agendBadge ? `<div class="cap-card-tags">${tagsHtml}${agendBadge}</div>` : ''}
                 </div>
@@ -46226,12 +46226,32 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         }
 
         // ── Nova captura ─────────────────────────────────────────────────
+        let _telefones = ['']; // array de strings de telefone
+
+        function _renderTelefonesList() {
+            const list = document.getElementById('cap-telefones-list');
+            if (!list) return;
+            list.innerHTML = _telefones.map((tel, i) =>
+                `<div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;">
+                    <input type="tel" class="form-control cap-tel-input" value="${tel}" placeholder="(82) 99999-9999"
+                        inputmode="tel" oninput="CaptacaoModule.onTelChange(this,${i}); Utils.maskPhone(this)"
+                        style="flex:1;">
+                    ${_telefones.length > 1 ? `<button type="button" onclick="CaptacaoModule.removeTelefone(${i})" style="flex-shrink:0;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:rgba(231,76,60,0.10);color:var(--danger);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;" title="Remover"><i class='fas fa-trash-alt'></i></button>` : ''}
+                </div>`
+            ).join('');
+        }
+
+        function onTelChange(input, idx) { _telefones[idx] = input.value; }
+        function addTelefone() { _telefones.push(''); _renderTelefonesList(); setTimeout(()=>{ const inputs=document.querySelectorAll('.cap-tel-input'); if(inputs.length) inputs[inputs.length-1].focus(); },80); }
+        function removeTelefone(idx) { _telefones.splice(idx,1); if(!_telefones.length) _telefones=[''];  _renderTelefonesList(); }
+
         function novaCaptura() {
             _idAtual = null;
             _fotos = [];
+            _telefones = [''];
             document.getElementById('cap-edit-id').value = '';
             document.getElementById('cap-form-title').textContent = '📷 Novo Imóvel Captado';
-            ['cap-tipo','cap-telefone','cap-endereco','cap-bairro','cap-referencias','cap-caracteristicas','cap-valor','cap-obs','cap-proprietario'].forEach(id => {
+            ['cap-tipo','cap-endereco','cap-bairro','cap-referencias','cap-caracteristicas','cap-valor','cap-obs','cap-proprietario'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = el.tagName==='SELECT' ? el.options[0].value : '';
             });
@@ -46241,8 +46261,9 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             document.getElementById('cap-agend-hora').value = '09:00';
             document.getElementById('cap-agend-obs').value = '';
             _renderPhotoGrid();
+            _renderTelefonesList();
             UI.openModal('captacao-form');
-            setTimeout(() => { document.getElementById('cap-telefone').focus(); }, 350);
+            setTimeout(() => { const inp = document.querySelector('.cap-tel-input'); if(inp) inp.focus(); }, 350);
         }
 
         function toggleAgendForm(checked) {
@@ -46259,8 +46280,11 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                     <div class="cap-photo-thumb-del" onclick="CaptacaoModule.removePhoto(${i})"><i class="fas fa-times"></i></div>
                 </div>`
             ).join('') +
-            `<div class="cap-photo-add-btn" onclick="document.getElementById('cap-photo-input').click()">
-                <i class="fas fa-camera"></i><span>Adicionar</span>
+            `<div class="cap-photo-add-btn" onclick="document.getElementById('cap-photo-input').click()" title="Tirar foto com a câmera">
+                <i class="fas fa-camera"></i><span>Câmera</span>
+            </div>
+            <div class="cap-photo-add-btn" onclick="document.getElementById('cap-photo-input-gallery').click()" title="Anexar foto da galeria" style="border-color:var(--accent);color:var(--accent);">
+                <i class="fas fa-image"></i><span>Galeria</span>
             </div>`;
         }
 
@@ -46287,7 +46311,10 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
         // ── Salvar ───────────────────────────────────────────────────────
         function salvar() {
-            const telefone = document.getElementById('cap-telefone').value.trim();
+            // Sync _telefones from DOM inputs
+            document.querySelectorAll('.cap-tel-input').forEach((inp,i) => { if(_telefones[i]!==undefined) _telefones[i]=inp.value; });
+            const telefonesValidos = _telefones.map(t=>t.trim()).filter(Boolean);
+            const telefone = telefonesValidos[0] || '';
             const endereco  = document.getElementById('cap-endereco').value.trim();
             if (!telefone && !endereco) { Utils.toast('Informe pelo menos o telefone ou o endereço', 'error'); return; }
 
@@ -46300,6 +46327,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 tipo: document.getElementById('cap-tipo').value,
                 proprietario: document.getElementById('cap-proprietario').value.trim(),
                 telefone,
+                telefones: telefonesValidos,
                 endereco,
                 bairro: document.getElementById('cap-bairro').value.trim(),
                 tipoImovel: document.getElementById('cap-tipo-imovel').value,
@@ -46333,7 +46361,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                         dataCriacao: new Date().toISOString(),
                         captacaoId: obj.id,
                         outroDescricao: 'Captação de Imóvel',
-                        outroDetalhes: `Proprietário: ${obj.proprietario||'—'} | Tel: ${telefone} | Endereço: ${endereco}`
+                        outroDetalhes: `Proprietário: ${obj.proprietario||'—'} | Tel: ${telefonesValidos.join(', ')||'—'} | Endereço: ${endereco}`
                     };
                     // Salvar na agenda do sistema
                     if (UI && UI.data && UI.data.visitas) {
@@ -46385,7 +46413,29 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             else propWrap.style.display='none';
 
             document.getElementById('cap-detail-endereco').textContent = d.endereco || 'Não informado';
-            document.getElementById('cap-detail-telefone').textContent = d.telefone || 'Não informado';
+
+            // Render múltiplos telefones
+            const tels = (d.telefones && d.telefones.length) ? d.telefones : (d.telefone ? [d.telefone] : []);
+            const phonesContainer = document.getElementById('cap-detail-phones-container');
+            if (phonesContainer) {
+                if (tels.length === 0) {
+                    phonesContainer.innerHTML = `<div class="cap-detail-section" style="color:var(--text-muted);font-size:0.82rem;">Nenhum telefone cadastrado</div>`;
+                } else {
+                    phonesContainer.innerHTML = tels.map((tel, i) => {
+                        const num = tel.replace(/\D/g,'');
+                        return `<div class="cap-detail-phone-btn" style="margin-bottom:${i<tels.length-1?'8px':'0'};">
+                            <div class="cap-detail-phone-icon" onclick="window.location.href='tel:${num}'" style="cursor:pointer;"><i class="fas fa-phone-alt"></i></div>
+                            <div class="cap-detail-phone-info" onclick="window.location.href='tel:${num}'" style="cursor:pointer;flex:1;">
+                                <div class="cap-detail-phone-label">${tels.length>1?'Telefone '+(i+1):'Telefone da Placa'}</div>
+                                <div class="cap-detail-phone-number">${tel}</div>
+                            </div>
+                            <button onclick="window.open('https://wa.me/55${num}','_blank')" style="background:#E9F7EF;border:1px solid rgba(39,174,96,0.3);color:var(--accent);border-radius:8px;padding:5px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;" title="WhatsApp"><i class='fab fa-whatsapp'></i></button>
+                        </div>`;
+                    }).join('');
+                }
+            }
+            // Compat: manter hidden field
+            document.getElementById('cap-detail-telefone') && (document.getElementById('cap-detail-telefone').textContent = tels[0] || 'Não informado');
 
             const show = (wrapId, valId, val) => {
                 const el = document.getElementById(wrapId);
@@ -46472,15 +46522,17 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         // ── Ligar / WhatsApp ─────────────────────────────────────────────
         function ligar() {
             const d = _dados.find(x=>x.id===_idAtual);
-            if (d && d.telefone) window.location.href = 'tel:'+d.telefone.replace(/\D/g,'');
+            const tel = (d && ((d.telefones&&d.telefones[0]) || d.telefone)) || '';
+            if (tel) window.location.href = 'tel:'+tel.replace(/\D/g,'');
         }
         function ligarDireto(id) {
             _load();
             const d = _dados.find(x=>x.id===id);
-            if (d && d.telefone) window.location.href = 'tel:'+d.telefone.replace(/\D/g,'');
+            const tel = d && ((d.telefones&&d.telefones[0]) || d.telefone);
+            if (tel) window.location.href = 'tel:'+tel.replace(/\D/g,'');
         }
         function _wppMsg(d) {
-            const num = (d.telefone||'').replace(/\D/g,'');
+            const num = ((d.telefones&&d.telefones[0]) || d.telefone||'').replace(/\D/g,'');
             const end = d.endereco || 'imóvel que vi na rua';
             const prop = d.proprietario ? `, ${d.proprietario}` : '';
             const msg = encodeURIComponent(`Olá${prop}! Vi a placa do seu imóvel (${end}) e gostaria de conversar sobre a possibilidade de comercializá-lo pela nossa imobiliária. Podemos conversar?`);
@@ -46514,7 +46566,9 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 document.getElementById('cap-form-title').textContent = '✏️ Editar Imóvel Captado';
                 document.getElementById('cap-tipo').value = d.tipo||'venda';
                 document.getElementById('cap-proprietario').value = d.proprietario||'';
-                document.getElementById('cap-telefone').value = d.telefone||'';
+                // Restaurar múltiplos telefones
+                _telefones = (d.telefones && d.telefones.length) ? [...d.telefones] : (d.telefone ? [d.telefone] : ['']);
+                document.getElementById('cap-telefone').value = _telefones[0]||'';
                 document.getElementById('cap-endereco').value = d.endereco||'';
                 document.getElementById('cap-bairro').value = d.bairro||'';
                 document.getElementById('cap-tipo-imovel').value = d.tipoImovel||'';
@@ -46526,6 +46580,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 document.getElementById('cap-agend-fields').style.display = 'none';
                 _fotos = [...(d.fotos||(d.foto?[d.foto]:[]))];
                 _renderPhotoGrid();
+                _renderTelefonesList();
                 UI.openModal('captacao-form');
             }, 350);
         }
