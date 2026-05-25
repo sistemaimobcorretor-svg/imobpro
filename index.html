@@ -7131,6 +7131,67 @@
         #sheet-captacao-detail .cap-detail-phone-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
         #sheet-captacao-detail .cap-detail-phone-label { font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); }
         #sheet-captacao-detail .cap-detail-phone-number { font-size: 1rem; font-weight: 800; color: var(--dark); }
+        /* ── Multi-foto galeria ── */
+        .cap-photos-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .cap-photo-thumb {
+            width: 80px; height: 80px; border-radius: 10px; object-fit: cover;
+            border: 2px solid var(--border); cursor: pointer; position: relative;
+            flex-shrink: 0; transition: transform 0.15s;
+        }
+        .cap-photo-thumb:active { transform: scale(0.93); }
+        .cap-photo-add-btn {
+            width: 80px; height: 80px; border-radius: 10px;
+            border: 2px dashed var(--border-strong); background: var(--bg-overlay);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 4px; cursor: pointer; flex-shrink: 0; transition: border-color 0.2s;
+            font-size: 0.6rem; font-weight: 700; color: var(--text-muted);
+        }
+        .cap-photo-add-btn i { font-size: 1.1rem; }
+        .cap-photo-add-btn:active { background: var(--primary-ultra); border-color: var(--primary); color: var(--primary); }
+        .cap-photo-thumb-wrap { position: relative; flex-shrink: 0; }
+        .cap-photo-thumb-del {
+            position: absolute; top: -6px; right: -6px;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: var(--danger); color: #fff; border: 2px solid #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.55rem; cursor: pointer; z-index: 2;
+        }
+        /* ── Agendamento captação ── */
+        .cap-agend-box {
+            background: linear-gradient(135deg, rgba(29,111,164,0.06), rgba(39,174,96,0.04));
+            border: 1.5px solid var(--border-accent);
+            border-radius: 14px; padding: 14px 16px; margin-bottom: 4px;
+        }
+        .cap-agend-title {
+            font-size: 0.8rem; font-weight: 800; color: var(--primary);
+            display: flex; align-items: center; gap: 6px; margin-bottom: 12px;
+        }
+        .cap-agend-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        /* ── Detail galeria ── */
+        .cap-detail-gallery {
+            display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+            margin-bottom: 14px; padding-bottom: 2px;
+        }
+        .cap-detail-gallery::-webkit-scrollbar { display: none; }
+        .cap-detail-gallery img {
+            width: 120px; height: 90px; object-fit: cover;
+            border-radius: 10px; flex-shrink: 0; cursor: pointer;
+            border: 2px solid var(--border);
+        }
+        /* ── Agendamentos na ficha ── */
+        .cap-detail-agend-item {
+            background: var(--primary-ultra); border: 1px solid var(--border-accent);
+            border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .cap-detail-agend-icon {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--primary); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; flex-shrink: 0;
+        }
+        .cap-detail-agend-date { font-size: 0.82rem; font-weight: 800; color: var(--dark); }
+        .cap-detail-agend-obs { font-size: 0.72rem; color: var(--text-secondary); margin-top: 1px; }
 
     </style>
 
@@ -8229,40 +8290,466 @@ if(document.readyState==='loading'){
             </div>
 
             <div id="relatorios-view" class="view">
-                <div class="section-title">Relatórios</div>
-                
-                <div class="report-filters">
-                    <div style="width: 100%; display: flex; flex-direction: column; gap: 5px;">
-                        <label style="font-size: 0.8rem; color: var(--secondary);">Período / Data do Plantão:</label>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="date" id="report-date-start" class="form-control report-date-input">
-                            <input type="date" id="report-date-end" class="form-control report-date-input">
-                        </div>
+                <!-- ══════ PAINEL DE RELATÓRIOS IMOBIPRO ══════ -->
+                <style>
+                /* ── Painel Relatórios ──────────────────────────── */
+                .rp-hero {
+                    background: linear-gradient(135deg, #065F46 0%, #059669 55%, #10B981 100%);
+                    border-radius: 18px;
+                    padding: 18px 20px 16px;
+                    margin-bottom: 18px;
+                    position: relative;
+                    overflow: hidden;
+                    box-shadow: 0 6px 24px rgba(5,150,105,0.28);
+                }
+                .rp-hero::before {
+                    content:'';position:absolute;top:-40px;right:-24px;width:140px;height:140px;
+                    border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.13) 0%,transparent 70%);
+                }
+                .rp-hero-title { font-size:1.15rem;font-weight:900;color:#fff;letter-spacing:-0.4px; }
+                .rp-hero-sub { font-size:0.75rem;color:rgba(255,255,255,0.68);margin-top:2px; }
+
+                /* ── Category pills ──────────────────────────────── */
+                .rp-cat-scroll {
+                    display: flex;
+                    gap: 8px;
+                    overflow-x: auto;
+                    padding-bottom: 4px;
+                    margin-bottom: 14px;
+                    scrollbar-width: none;
+                }
+                .rp-cat-scroll::-webkit-scrollbar { display: none; }
+                .rp-cat-pill {
+                    flex-shrink: 0;
+                    padding: 7px 14px;
+                    border-radius: 20px;
+                    border: 1.5px solid var(--border);
+                    background: #fff;
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    color: var(--text-secondary);
+                    cursor: pointer;
+                    transition: all 0.18s;
+                    white-space: nowrap;
+                }
+                .rp-cat-pill.active {
+                    background: var(--primary);
+                    border-color: var(--primary);
+                    color: #fff;
+                    box-shadow: var(--shadow-blue);
+                }
+
+                /* ── Report card grid ────────────────────────────── */
+                .rp-cards-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                    margin-bottom: 18px;
+                }
+                @media (min-width: 640px) { .rp-cards-grid { grid-template-columns: repeat(3, 1fr); } }
+                @media (min-width: 1024px) { .rp-cards-grid { grid-template-columns: repeat(4, 1fr); } }
+
+                .rp-card {
+                    background: #fff;
+                    border-radius: 14px;
+                    padding: 14px 12px 12px;
+                    border: 1.5px solid var(--border);
+                    cursor: pointer;
+                    transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
+                    display: flex;
+                    flex-direction: column;
+                    gap: 6px;
+                    box-shadow: var(--shadow-sm);
+                }
+                .rp-card:hover, .rp-card:active {
+                    border-color: var(--primary);
+                    transform: translateY(-2px);
+                    box-shadow: var(--shadow-blue);
+                }
+                .rp-card-icon {
+                    width: 36px; height: 36px;
+                    border-radius: 10px;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 1rem;
+                    margin-bottom: 2px;
+                }
+                .rp-card-name {
+                    font-size: 0.78rem;
+                    font-weight: 700;
+                    color: var(--dark);
+                    line-height: 1.3;
+                }
+                .rp-card-desc {
+                    font-size: 0.65rem;
+                    color: var(--text-muted);
+                    line-height: 1.35;
+                }
+
+                /* ── Gerador ─────────────────────────────────────── */
+                .rp-generator {
+                    background: #fff;
+                    border-radius: 16px;
+                    border: 1px solid var(--border);
+                    padding: 16px;
+                    margin-bottom: 16px;
+                    box-shadow: var(--shadow-sm);
+                }
+                .rp-gen-title {
+                    font-size: 0.8rem;
+                    font-weight: 800;
+                    color: var(--dark);
+                    margin-bottom: 12px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                .rp-gen-title i { color: var(--primary); }
+                .rp-gen-row {
+                    display: flex;
+                    gap: 8px;
+                    align-items: flex-end;
+                    flex-wrap: wrap;
+                    margin-bottom: 10px;
+                }
+                .rp-gen-field {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                    flex: 1;
+                    min-width: 120px;
+                }
+                .rp-gen-field label { font-size: 0.68rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.4px; }
+                .rp-gen-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    padding: 10px 18px;
+                    font-size: 0.82rem;
+                    font-weight: 700;
+                    cursor: pointer;
+                    white-space: nowrap;
+                    box-shadow: var(--shadow-blue);
+                    transition: opacity 0.15s;
+                    flex-shrink: 0;
+                    height: 40px;
+                }
+                .rp-gen-btn:active { opacity: 0.88; }
+
+                /* ── Período rápido ──────────────────────────────── */
+                .rp-quick-period {
+                    display: flex;
+                    gap: 6px;
+                    flex-wrap: wrap;
+                    margin-bottom: 12px;
+                }
+                .rp-qp-btn {
+                    padding: 5px 11px;
+                    border-radius: 20px;
+                    border: 1.5px solid var(--border);
+                    background: var(--bg-overlay);
+                    font-size: 0.7rem;
+                    font-weight: 700;
+                    color: var(--text-secondary);
+                    cursor: pointer;
+                    transition: all 0.15s;
+                }
+                .rp-qp-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-ultra); }
+
+                /* ── Resultado ───────────────────────────────────── */
+                #report-content { min-height: 120px; }
+
+                /* ── Barra de KPIs rápida ────────────────────────── */
+                .rp-kpi-bar {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 8px;
+                    margin-bottom: 16px;
+                }
+                @media (max-width: 480px) { .rp-kpi-bar { grid-template-columns: repeat(2,1fr); } }
+                .rp-kpi-box {
+                    background: #fff;
+                    border-radius: 12px;
+                    padding: 12px 10px;
+                    text-align: center;
+                    border: 1px solid var(--border);
+                    box-shadow: var(--shadow-sm);
+                }
+                .rp-kpi-val { font-size: 1.3rem; font-weight: 900; color: var(--dark); line-height: 1; }
+                .rp-kpi-lbl { font-size: 0.6rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 3px; }
+
+                /* ── Funil visual ─────────────────────────────────── */
+                .rp-funil-bar { display:flex; flex-direction:column; gap:4px; }
+                .rp-funil-row { display:flex; align-items:center; gap:8px; }
+                .rp-funil-label { font-size:0.72rem; font-weight:700; color:var(--dark); min-width:90px; }
+                .rp-funil-track { flex:1; height:20px; background:var(--bg-overlay); border-radius:6px; overflow:hidden; }
+                .rp-funil-fill { height:100%; border-radius:6px; transition:width 0.6s ease; }
+                .rp-funil-count { font-size:0.72rem; font-weight:800; color:var(--dark); min-width:28px; text-align:right; }
+
+                /* ── Gráfico de barras inline ─────────────────────── */
+                .rp-bar-chart { display:flex; flex-direction:column; gap:10px; }
+                .rp-bar-row { display:flex; align-items:center; gap:8px; }
+                .rp-bar-month { font-size:0.68rem; font-weight:700; color:var(--text-secondary); min-width:36px; }
+                .rp-bar-track { flex:1; height:16px; background:var(--bg-overlay); border-radius:4px; overflow:hidden; }
+                .rp-bar-fill { height:100%; border-radius:4px; background:var(--primary); transition:width 0.5s ease; }
+                .rp-bar-val { font-size:0.68rem; font-weight:800; color:var(--dark); min-width:30px; text-align:right; }
+
+                /* ── Tabela responsiva ───────────────────────────── */
+                .rp-table-wrap { overflow-x:auto; border-radius:10px; border:1px solid var(--border); }
+                .rp-table { width:100%; border-collapse:collapse; min-width:400px; }
+                .rp-table th { background:var(--bg-overlay); padding:10px 12px; text-align:left; font-weight:700; color:var(--dark); border-bottom:2px solid var(--border); font-size:0.78rem; white-space:nowrap; }
+                .rp-table td { padding:9px 12px; border-bottom:1px solid var(--border); font-size:0.8rem; color:var(--dark); }
+                .rp-table tr:last-child td { border-bottom:none; }
+                .rp-table tr:hover td { background:var(--primary-ultra); }
+
+                /* ── Tag de status ───────────────────────────────── */
+                .rp-tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:0.65rem; font-weight:700; }
+                .rp-tag-green { background:var(--accent-ultra); color:var(--accent-dark); }
+                .rp-tag-blue  { background:var(--primary-ultra); color:var(--primary-dark); }
+                .rp-tag-orange { background:#FEF3E7; color:#D35400; }
+                .rp-tag-red { background:#FDEDEC; color:var(--danger); }
+                .rp-tag-gray { background:#F1F5F9; color:var(--text-secondary); }
+
+                /* ── Seção de título dentro do resultado ─────────── */
+                .rp-section-hd {
+                    font-size:0.8rem; font-weight:800; color:var(--dark);
+                    text-transform:uppercase; letter-spacing:0.5px;
+                    margin:16px 0 10px;
+                    display:flex; align-items:center; gap:8px;
+                }
+                .rp-section-hd i { color:var(--primary); }
+
+                /* ── Card resultado simples ──────────────────────── */
+                .rp-result-card {
+                    background:#fff; border:1px solid var(--border);
+                    border-radius:12px; padding:14px;
+                    box-shadow:var(--shadow-sm);
+                    margin-bottom:10px;
+                }
+                .rp-result-card-hd { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
+                .rp-result-card-name { font-weight:700; font-size:0.9rem; color:var(--dark); }
+                .rp-result-card-meta { font-size:0.73rem; color:var(--text-secondary); margin-top:2px; }
+                .rp-result-card-body { font-size:0.78rem; color:var(--text-secondary); line-height:1.5; }
+
+                /* ── Highlight box ──────────────────────────────── */
+                .rp-highlight {
+                    display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+                    margin-bottom:16px;
+                }
+                @media (max-width:480px) { .rp-highlight { grid-template-columns:1fr 1fr; } }
+                .rp-hl-box {
+                    background:#fff; border-radius:12px; padding:12px;
+                    border:1px solid var(--border);
+                    text-align:center;
+                }
+                .rp-hl-num { font-size:1.4rem; font-weight:900; }
+                .rp-hl-lbl { font-size:0.62rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; margin-top:2px; }
+
+                /* ── Barra de progresso ──────────────────────────── */
+                .rp-progress { height:6px; background:var(--bg-overlay); border-radius:4px; overflow:hidden; margin-top:6px; }
+                .rp-progress-fill { height:100%; border-radius:4px; }
+
+                /* ── Linha de ranking ─────────────────────────────── */
+                .rp-rank-row {
+                    display:flex; align-items:center; gap:10px;
+                    padding:10px 12px;
+                    background:#fff; border-radius:10px;
+                    border:1px solid var(--border);
+                    margin-bottom:6px;
+                }
+                .rp-rank-num { font-size:0.78rem; font-weight:800; color:var(--text-muted); min-width:22px; }
+                .rp-rank-info { flex:1; min-width:0; }
+                .rp-rank-name { font-size:0.82rem; font-weight:700; color:var(--dark); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+                .rp-rank-sub { font-size:0.68rem; color:var(--text-secondary); }
+                .rp-rank-val { font-size:0.85rem; font-weight:800; color:var(--primary); flex-shrink:0; }
+
+                /* ── Captação report ─────────────────────────────── */
+                .rp-cap-badge {
+                    display:inline-flex; align-items:center; gap:4px;
+                    padding:3px 9px; border-radius:20px;
+                    font-size:0.65rem; font-weight:700;
+                }
+                </style>
+
+                <!-- Hero -->
+                <div class="rp-hero">
+                    <div class="rp-hero-title">📊 Central de Relatórios</div>
+                    <div class="rp-hero-sub">Análises completas para gestão imobiliária profissional</div>
+                </div>
+
+                <!-- KPIs rápidos do momento -->
+                <div class="rp-kpi-bar" id="rp-kpis-live"></div>
+
+                <!-- Categorias -->
+                <div class="rp-cat-scroll" id="rp-cat-pills">
+                    <button class="rp-cat-pill active" onclick="ReportPanel.filterCat('todos',this)">🗂 Todos</button>
+                    <button class="rp-cat-pill" onclick="ReportPanel.filterCat('comercial',this)">💼 Comercial</button>
+                    <button class="rp-cat-pill" onclick="ReportPanel.filterCat('clientes',this)">👥 Clientes</button>
+                    <button class="rp-cat-pill" onclick="ReportPanel.filterCat('imoveis',this)">🏠 Imóveis</button>
+                    <button class="rp-cat-pill" onclick="ReportPanel.filterCat('financeiro',this)">💰 Financeiro</button>
+                    <button class="rp-cat-pill" onclick="ReportPanel.filterCat('operacional',this)">⚙️ Operacional</button>
+                    <button class="rp-cat-pill" onclick="ReportPanel.filterCat('captacao',this)">📍 Captação</button>
+                </div>
+
+                <!-- Grid de relatórios disponíveis -->
+                <div class="rp-cards-grid" id="rp-cards-grid">
+                    <!-- Comercial -->
+                    <div class="rp-card" data-cat="comercial" onclick="ReportPanel.open('vendas')">
+                        <div class="rp-card-icon bg-green"><i class="fas fa-handshake"></i></div>
+                        <div class="rp-card-name">Vendas do Período</div>
+                        <div class="rp-card-desc">Negócios fechados, valores e comissões</div>
                     </div>
-                    
-                    <div style="width: 100%; display: flex; gap: 8px; align-items: center; margin-top: 8px;">
-                        <select id="report-type" class="form-control" style="flex: 1;" onchange="UI.toggleReportInputs(this.value)">
-                            <option value="clientes">Relatório de Clientes</option>
-                            <option value="agendamentos">Relatório de Agendamentos</option>
-                            <option value="vendas">Relatório de Vendas</option>
-                            <option value="vendas-funil">Relatório de Vendas pelo Funil</option>
-                            <option value="performance">Performance</option>
-                            <option value="plantao">Relatório de Plantão (Diário)</option>
-                            <option value="funil-travado">⚠️ Clientes Travados no Funil (+30 dias)</option>
-                            <option value="lista-ligacoes">📞 Lista Diária de Ligações</option>
-                            <option value="lista-mensagens">💬 Lista Diária de Mensagens</option>
-                        </select>
-                        <button style="display:flex;align-items:center;gap:6px;background:var(--primary);color:white;border:none;border-radius:10px;padding:9px 16px;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-blue);flex-shrink:0;" onclick="UI.generateReport()">
+                    <div class="rp-card" data-cat="comercial" onclick="ReportPanel.open('vendas-funil')">
+                        <div class="rp-card-icon bg-blue"><i class="fas fa-filter"></i></div>
+                        <div class="rp-card-name">Vendas pelo Funil</div>
+                        <div class="rp-card-desc">Evolução das etapas até o fechamento</div>
+                    </div>
+                    <div class="rp-card" data-cat="comercial" onclick="ReportPanel.open('performance')">
+                        <div class="rp-card-icon bg-purple"><i class="fas fa-chart-line"></i></div>
+                        <div class="rp-card-name">Performance Geral</div>
+                        <div class="rp-card-desc">KPIs mensais, conversão e evolução</div>
+                    </div>
+                    <div class="rp-card" data-cat="comercial" onclick="ReportPanel.open('ranking-imoveis')">
+                        <div class="rp-card-icon bg-amber"><i class="fas fa-trophy"></i></div>
+                        <div class="rp-card-name">Ranking de Imóveis</div>
+                        <div class="rp-card-desc">Mais visitados, mais contatos e mais vendidos</div>
+                    </div>
+                    <!-- Clientes -->
+                    <div class="rp-card" data-cat="clientes" onclick="ReportPanel.open('clientes')">
+                        <div class="rp-card-icon bg-blue"><i class="fas fa-users"></i></div>
+                        <div class="rp-card-name">Cadastro de Clientes</div>
+                        <div class="rp-card-desc">Novos clientes por período e perfil</div>
+                    </div>
+                    <div class="rp-card" data-cat="clientes" onclick="ReportPanel.open('funil-saude')">
+                        <div class="rp-card-icon bg-teal"><i class="fas fa-heartbeat"></i></div>
+                        <div class="rp-card-name">Saúde do Funil</div>
+                        <div class="rp-card-desc">Distribuição por etapa e taxa de avanço</div>
+                    </div>
+                    <div class="rp-card" data-cat="clientes" onclick="ReportPanel.open('funil-travado')">
+                        <div class="rp-card-icon bg-red"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="rp-card-name">Clientes Travados</div>
+                        <div class="rp-card-desc">+30 dias sem mudança de etapa</div>
+                    </div>
+                    <div class="rp-card" data-cat="clientes" onclick="ReportPanel.open('perfil-compradores')">
+                        <div class="rp-card-icon bg-indigo"><i class="fas fa-user-tag"></i></div>
+                        <div class="rp-card-name">Perfil dos Compradores</div>
+                        <div class="rp-card-desc">Faixa de preço, tipo, bairro de interesse</div>
+                    </div>
+                    <!-- Imóveis -->
+                    <div class="rp-card" data-cat="imoveis" onclick="ReportPanel.open('estoque')">
+                        <div class="rp-card-icon bg-green"><i class="fas fa-building"></i></div>
+                        <div class="rp-card-name">Estoque de Imóveis</div>
+                        <div class="rp-card-desc">Disponíveis, vendidos, por tipo e bairro</div>
+                    </div>
+                    <div class="rp-card" data-cat="imoveis" onclick="ReportPanel.open('imoveis-sem-visita')">
+                        <div class="rp-card-icon bg-orange"><i class="fas fa-eye-slash"></i></div>
+                        <div class="rp-card-name">Imóveis Sem Visita</div>
+                        <div class="rp-card-desc">Portfólio sem atividade recente</div>
+                    </div>
+                    <div class="rp-card" data-cat="imoveis" onclick="ReportPanel.open('imoveis-price')">
+                        <div class="rp-card-icon bg-sky"><i class="fas fa-tags"></i></div>
+                        <div class="rp-card-name">Análise de Preços</div>
+                        <div class="rp-card-desc">Ticket médio por tipo e bairro</div>
+                    </div>
+                    <!-- Financeiro -->
+                    <div class="rp-card" data-cat="financeiro" onclick="ReportPanel.open('dre')">
+                        <div class="rp-card-icon bg-green"><i class="fas fa-coins"></i></div>
+                        <div class="rp-card-name">DRE Simplificado</div>
+                        <div class="rp-card-desc">Receitas, despesas e resultado líquido</div>
+                    </div>
+                    <div class="rp-card" data-cat="financeiro" onclick="ReportPanel.open('comissoes')">
+                        <div class="rp-card-icon bg-amber"><i class="fas fa-percent"></i></div>
+                        <div class="rp-card-name">Comissões</div>
+                        <div class="rp-card-desc">Comissões recebidas e a receber</div>
+                    </div>
+                    <div class="rp-card" data-cat="financeiro" onclick="ReportPanel.open('fluxo-caixa')">
+                        <div class="rp-card-icon bg-teal"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="rp-card-name">Fluxo de Caixa</div>
+                        <div class="rp-card-desc">Entradas e saídas por período</div>
+                    </div>
+                    <!-- Operacional -->
+                    <div class="rp-card" data-cat="operacional" onclick="ReportPanel.open('agendamentos')">
+                        <div class="rp-card-icon bg-orange"><i class="fas fa-calendar-check"></i></div>
+                        <div class="rp-card-name">Agendamentos</div>
+                        <div class="rp-card-desc">Visitas, ligações e reuniões realizadas</div>
+                    </div>
+                    <div class="rp-card" data-cat="operacional" onclick="ReportPanel.open('plantao')">
+                        <div class="rp-card-icon bg-cyan"><i class="fas fa-clipboard-list"></i></div>
+                        <div class="rp-card-name">Relatório de Plantão</div>
+                        <div class="rp-card-desc">Atendimentos do dia com observações</div>
+                    </div>
+                    <div class="rp-card" data-cat="operacional" onclick="ReportPanel.open('lista-ligacoes')">
+                        <div class="rp-card-icon bg-sky"><i class="fas fa-phone"></i></div>
+                        <div class="rp-card-name">Lista de Ligações</div>
+                        <div class="rp-card-desc">Prioridades de contato do dia</div>
+                    </div>
+                    <div class="rp-card" data-cat="operacional" onclick="ReportPanel.open('lista-mensagens')">
+                        <div class="rp-card-icon" style="background:#E7F9EF;color:#25D366"><i class="fab fa-whatsapp"></i></div>
+                        <div class="rp-card-name">Lista de Mensagens</div>
+                        <div class="rp-card-desc">Clientes para contato via WhatsApp</div>
+                    </div>
+                    <div class="rp-card" data-cat="operacional" onclick="ReportPanel.open('produtividade')">
+                        <div class="rp-card-icon bg-violet"><i class="fas fa-bolt"></i></div>
+                        <div class="rp-card-name">Produtividade</div>
+                        <div class="rp-card-desc">Atividades por dia, mês e tipo</div>
+                    </div>
+                    <!-- Captação -->
+                    <div class="rp-card" data-cat="captacao" onclick="ReportPanel.open('captacao-status')">
+                        <div class="rp-card-icon bg-coral"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="rp-card-name">Status de Captações</div>
+                        <div class="rp-card-desc">Novos, contatados, autorizados e descartados</div>
+                    </div>
+                    <div class="rp-card" data-cat="captacao" onclick="ReportPanel.open('captacao-bairro')">
+                        <div class="rp-card-icon bg-pink"><i class="fas fa-map"></i></div>
+                        <div class="rp-card-name">Captação por Bairro</div>
+                        <div class="rp-card-desc">Distribuição geográfica das captações</div>
+                    </div>
+                </div>
+
+                <!-- ── Gerador de relatório ── -->
+                <div class="rp-generator" id="rp-generator" style="display:none;">
+                    <div class="rp-gen-title" id="rp-gen-label"><i class="fas fa-sliders-h"></i> Configurar Relatório</div>
+
+                    <!-- Atalhos de período -->
+                    <div class="rp-quick-period" id="rp-qperiod">
+                        <button class="rp-qp-btn" onclick="ReportPanel.setPeriod(7)">Últimos 7 dias</button>
+                        <button class="rp-qp-btn" onclick="ReportPanel.setPeriod(30)">Últimos 30 dias</button>
+                        <button class="rp-qp-btn" onclick="ReportPanel.setPeriod(90)">Últimos 90 dias</button>
+                        <button class="rp-qp-btn" onclick="ReportPanel.setThisMonth()">Este mês</button>
+                        <button class="rp-qp-btn" onclick="ReportPanel.setLastMonth()">Mês anterior</button>
+                        <button class="rp-qp-btn" onclick="ReportPanel.setThisYear()">Este ano</button>
+                    </div>
+
+                    <div class="rp-gen-row">
+                        <div class="rp-gen-field" id="rp-field-start">
+                            <label>Data início</label>
+                            <input type="date" id="report-date-start" class="form-control">
+                        </div>
+                        <div class="rp-gen-field" id="rp-field-end">
+                            <label>Data fim</label>
+                            <input type="date" id="report-date-end" class="form-control">
+                        </div>
+                        <input type="hidden" id="report-type" value="clientes">
+                        <button class="rp-gen-btn" onclick="UI.generateReport()">
                             <i class="fas fa-chart-bar"></i> Gerar
                         </button>
                     </div>
-                </div>
-                
-                <div id="report-content">
-                    <div class="empty-state">
-                        <i class="fas fa-chart-line"></i>
-                        <p>Selecione um período e tipo de relatório para gerar</p>
+                    <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;">
+                        <button onclick="ReportPanel.backToMenu()" style="background:none;border:none;color:var(--text-secondary);font-size:0.75rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;padding:0;">
+                            <i class="fas fa-arrow-left"></i> Voltar aos relatórios
+                        </button>
+                        <button onclick="UI.exportReport()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:0.73rem;font-weight:700;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;gap:5px;">
+                            <i class="fas fa-file-pdf" style="color:var(--danger)"></i> Exportar PDF
+                        </button>
                     </div>
+                </div>
+
+                <!-- ── Conteúdo do relatório gerado ── -->
+                <div id="report-content">
+                    <!-- populated by JS -->
                 </div>
             </div>
 
@@ -10748,15 +11235,20 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
             <input type="hidden" id="cap-edit-id">
 
-            <!-- Foto -->
-            <div class="cap-photo-area" id="cap-photo-area" onclick="document.getElementById('cap-photo-input').click()">
-                <div class="cap-photo-placeholder">📷</div>
-                <div class="cap-photo-placeholder-text">Tirar foto / Selecionar imagem</div>
-                <div class="cap-photo-placeholder-sub">Toque para abrir a câmera</div>
+            <!-- ── Galeria de Fotos ── -->
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-camera" style="color:var(--primary);margin-right:5px;"></i>Fotos do Imóvel</label>
+                <div class="cap-photos-grid" id="cap-photos-grid">
+                    <!-- miniaturas injetadas pelo JS -->
+                    <div class="cap-photo-add-btn" onclick="document.getElementById('cap-photo-input').click()">
+                        <i class="fas fa-camera"></i>
+                        <span>Adicionar</span>
+                    </div>
+                </div>
+                <input type="file" id="cap-photo-input" accept="image/*" capture="environment" style="display:none" multiple onchange="CaptacaoModule.onPhotosSelected(this)">
             </div>
-            <input type="file" id="cap-photo-input" accept="image/*" capture="environment" style="display:none" onchange="CaptacaoModule.onPhotoSelected(this)">
 
-            <!-- Tipo de negócio -->
+            <!-- ── Tipo de negócio ── -->
             <div class="form-group">
                 <label class="form-label">Tipo de Negócio <span style="color:var(--danger)">*</span></label>
                 <select id="cap-tipo" class="form-control">
@@ -10766,25 +11258,31 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </select>
             </div>
 
-            <!-- Telefone -->
+            <!-- ── Proprietário (opcional) ── -->
+            <div class="form-group">
+                <label class="form-label">Nome do Proprietário <span style="font-size:0.7rem;color:var(--text-muted);font-weight:500;">(opcional)</span></label>
+                <input type="text" id="cap-proprietario" class="form-control" placeholder="Ex: João Silva">
+            </div>
+
+            <!-- ── Telefone ── -->
             <div class="form-group">
                 <label class="form-label">Telefone da Placa <span style="color:var(--danger)">*</span></label>
                 <input type="tel" id="cap-telefone" class="form-control" placeholder="(82) 99999-9999" oninput="Utils.maskPhone(this)" inputmode="tel">
             </div>
 
-            <!-- Endereço / Localização -->
+            <!-- ── Endereço ── -->
             <div class="form-group">
                 <label class="form-label">Endereço / Localização <span style="color:var(--danger)">*</span></label>
                 <input type="text" id="cap-endereco" class="form-control" placeholder="Ex: Rua das Flores, 123 — Ponta Verde">
             </div>
 
-            <!-- Bairro -->
+            <!-- ── Bairro ── -->
             <div class="form-group">
                 <label class="form-label">Bairro</label>
                 <input type="text" id="cap-bairro" class="form-control" placeholder="Ex: Ponta Verde, Jatiúca, Pajuçara">
             </div>
 
-            <!-- Tipo de imóvel -->
+            <!-- ── Tipo de imóvel ── -->
             <div class="form-group">
                 <label class="form-label">Tipo do Imóvel</label>
                 <select id="cap-tipo-imovel" class="form-control">
@@ -10798,31 +11296,62 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </select>
             </div>
 
-            <!-- Locais próximos -->
+            <!-- ── Referências ── -->
             <div class="form-group">
                 <label class="form-label">Pontos de Referência / Locais Próximos</label>
                 <input type="text" id="cap-referencias" class="form-control" placeholder="Ex: próximo ao Shopping Iguatemi, perto da praia">
             </div>
 
-            <!-- Características observadas -->
+            <!-- ── Características ── -->
             <div class="form-group">
                 <label class="form-label">Características Observadas</label>
                 <textarea id="cap-caracteristicas" class="form-control" rows="3" placeholder="Ex: 3 quartos, garagem, muro alto, terraço, portão eletrônico..."></textarea>
             </div>
 
-            <!-- Valor aproximado -->
+            <!-- ── Valor ── -->
             <div class="form-group">
                 <label class="form-label">Valor Estimado (R$)</label>
                 <input type="text" id="cap-valor" class="form-control" placeholder="0,00" inputmode="numeric" onkeydown="Utils.keydownMoneyReais(event, this)" readonly onfocus="this.removeAttribute('readonly')">
             </div>
 
-            <!-- Observações extras -->
+            <!-- ── Observações ── -->
             <div class="form-group">
                 <label class="form-label">Observações</label>
                 <textarea id="cap-obs" class="form-control" rows="2" placeholder="Outras anotações importantes..."></textarea>
             </div>
 
-            <div style="display:flex;gap:8px;margin-top:4px;">
+            <!-- ── Agendamento de Contato ── -->
+            <div class="cap-agend-box">
+                <div class="cap-agend-title">
+                    <i class="fas fa-calendar-check"></i> Agendar Contato com o Proprietário
+                    <span style="margin-left:auto;font-size:0.65rem;font-weight:600;color:var(--text-muted);">opcional</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                    <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:0.82rem;font-weight:600;color:var(--dark);">
+                        <input type="checkbox" id="cap-agend-ativo" onchange="CaptacaoModule.toggleAgendForm(this.checked)"
+                            style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;">
+                        Criar agendamento na agenda geral
+                    </label>
+                </div>
+                <div id="cap-agend-fields" style="display:none;">
+                    <div class="cap-agend-row">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Data <span style="color:var(--danger)">*</span></label>
+                            <input type="date" id="cap-agend-data" class="form-control">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Horário</label>
+                            <input type="time" id="cap-agend-hora" class="form-control" value="09:00">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top:8px;">
+                        <label class="form-label">Observação do agendamento</label>
+                        <input type="text" id="cap-agend-obs" class="form-control" placeholder="Ex: Ligar para negociar autorização de venda">
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:14px;">
                 <button type="button" class="btn-block" style="background:linear-gradient(135deg,#C0392B,#E74C3C);" onclick="CaptacaoModule.salvar()">
                     <i class="fas fa-save"></i> Salvar Registro
                 </button>
@@ -10837,14 +11366,21 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
         <div class="modal-sheet" id="sheet-captacao-detail" style="max-height:92vh;overflow-y:auto;">
             <div class="sheet-handle"></div>
 
-            <div id="cap-detail-img-wrap" style="display:none;">
-                <img class="cap-detail-img" id="cap-detail-img" src="" alt="Foto do imóvel">
+            <!-- Galeria de fotos -->
+            <div id="cap-detail-gallery-wrap" style="display:none;margin-bottom:14px;">
+                <div class="cap-detail-gallery" id="cap-detail-gallery"></div>
             </div>
 
             <div class="cap-detail-badges" id="cap-detail-badges"></div>
 
+            <!-- Proprietário -->
+            <div id="cap-detail-prop-wrap" class="cap-detail-section" style="display:none;">
+                <div class="cap-detail-label"><i class="fas fa-user" style="margin-right:4px;color:var(--primary);"></i>Proprietário</div>
+                <div class="cap-detail-value" id="cap-detail-proprietario">—</div>
+            </div>
+
             <div class="cap-detail-section">
-                <div class="cap-detail-label">Endereço / Localização</div>
+                <div class="cap-detail-label"><i class="fas fa-map-marker-alt" style="margin-right:4px;color:var(--danger);"></i>Endereço / Localização</div>
                 <div class="cap-detail-value" id="cap-detail-endereco">—</div>
             </div>
 
@@ -10877,6 +11413,17 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <div class="cap-detail-value" id="cap-detail-obs">—</div>
             </div>
 
+            <!-- Agendamentos vinculados -->
+            <div id="cap-detail-agend-wrap" style="display:none;margin-bottom:10px;">
+                <div style="font-size:0.72rem;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                    <i class="fas fa-calendar-check" style="color:var(--primary);"></i> Agendamentos de Contato
+                    <button onclick="CaptacaoModule.novoAgendamento()" style="margin-left:auto;background:var(--primary-ultra);border:1px solid var(--border-accent);color:var(--primary);border-radius:8px;padding:4px 10px;font-size:0.68rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:'Inter',sans-serif;">
+                        <i class="fas fa-plus"></i> Novo
+                    </button>
+                </div>
+                <div id="cap-detail-agend-list"></div>
+            </div>
+
             <div class="cap-detail-section">
                 <div class="cap-detail-label">Status</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;" id="cap-detail-status-btns">
@@ -10887,7 +11434,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </div>
             </div>
 
-            <div style="display:flex;gap:8px;margin-top:8px;">
+            <div style="display:flex;gap:8px;margin-top:10px;">
                 <button type="button" class="btn-block" style="background:var(--primary);" onclick="CaptacaoModule.editarAtual()">
                     <i class="fas fa-edit"></i> Editar
                 </button>
@@ -18423,13 +18970,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 const container = document.getElementById('report-content');
                 if (!container) return;
                 
+                // Init the new ReportPanel if available
+                if (typeof ReportPanel !== 'undefined') {
+                    setTimeout(() => ReportPanel.init(), 50);
+                }
+                
                 if (!UI.currentReport) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-chart-line"></i>
-                            <p>Selecione um período e tipo de relatório para gerar</p>
-                        </div>
-                    `;
+                    container.innerHTML = '';
                     return;
                 }
                 
@@ -45333,51 +45880,40 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         let _dados = [];
         let _filtroAtual = 'todos';
         let _idAtual = null;
-        let _fotoAtual = null; // base64
+        let _fotos = []; // array de base64
 
         function _load() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                _dados = raw ? JSON.parse(raw) : [];
-            } catch(e) { _dados = []; }
+            try { _dados = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { _dados = []; }
         }
-
         function _save() {
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_dados)); } catch(e) {}
         }
+        function _uid() { return 'cap_' + Date.now() + '_' + Math.random().toString(36).substr(2,6); }
 
-        function _uid() {
-            return 'cap_' + Date.now() + '_' + Math.random().toString(36).substr(2,6);
-        }
-
+        // ── Abrir painel ────────────────────────────────────────────────
         function open() {
             _load();
-            // Show the captacao view via a nav hack
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             const v = document.getElementById('captacao-view');
             if (v) { v.style.display = ''; v.classList.add('active'); }
-            // Hide main FAB, show captacao FAB
             const mainFab = document.getElementById('fab-container');
             if (mainFab) mainFab.style.display = 'none';
             const fab = document.getElementById('cap-fab-btn');
             if (fab) fab.style.display = 'flex';
             document.body.classList.add('captacao-ativa');
-            // Update stats
             _renderStats();
-            // Render list
             _renderList();
         }
 
+        // ── Stats ────────────────────────────────────────────────────────
         function _renderStats() {
-            const total = _dados.length;
-            const novos = _dados.filter(d => d.status === 'novo' || !d.status).length;
-            const autorizados = _dados.filter(d => d.status === 'autorizado').length;
-            const el = id => { const e = document.getElementById(id); return e; };
-            if (el('cap-stat-total')) el('cap-stat-total').textContent = total;
-            if (el('cap-stat-novos')) el('cap-stat-novos').textContent = novos;
-            if (el('cap-stat-autorizados')) el('cap-stat-autorizados').textContent = autorizados;
+            const el = id => document.getElementById(id);
+            if (el('cap-stat-total')) el('cap-stat-total').textContent = _dados.length;
+            if (el('cap-stat-novos')) el('cap-stat-novos').textContent = _dados.filter(d => (d.status||'novo') === 'novo').length;
+            if (el('cap-stat-autorizados')) el('cap-stat-autorizados').textContent = _dados.filter(d => d.status === 'autorizado').length;
         }
 
+        // ── Filtro ───────────────────────────────────────────────────────
         function filter(tipo, btn) {
             _filtroAtual = tipo;
             document.querySelectorAll('.cap-filter-chip').forEach(c => c.classList.remove('active'));
@@ -45385,81 +45921,61 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             _renderList();
         }
 
+        // ── Render lista ─────────────────────────────────────────────────
         function _renderList() {
             const container = document.getElementById('cap-list');
             if (!container) return;
-
-            let lista = [..._dados].reverse(); // mais recentes primeiro
-
+            let lista = [..._dados].reverse();
             if (_filtroAtual !== 'todos') {
-                if (['novo','contatado','autorizado','descartado'].includes(_filtroAtual)) {
-                    lista = lista.filter(d => (d.status || 'novo') === _filtroAtual);
-                } else if (_filtroAtual === 'venda') {
-                    lista = lista.filter(d => d.tipo === 'venda' || d.tipo === 'ambos');
-                } else if (_filtroAtual === 'aluguel') {
-                    lista = lista.filter(d => d.tipo === 'aluguel' || d.tipo === 'ambos');
-                }
+                if (['novo','contatado','autorizado','descartado'].includes(_filtroAtual))
+                    lista = lista.filter(d => (d.status||'novo') === _filtroAtual);
+                else if (_filtroAtual === 'venda')   lista = lista.filter(d => d.tipo==='venda'||d.tipo==='ambos');
+                else if (_filtroAtual === 'aluguel') lista = lista.filter(d => d.tipo==='aluguel'||d.tipo==='ambos');
             }
-
             if (lista.length === 0) {
-                container.innerHTML = `
-                    <div class="cap-empty">
-                        <div class="cap-empty-icon">📷</div>
-                        <div class="cap-empty-title">Nenhum imóvel encontrado</div>
-                        <div class="cap-empty-sub">Toque no botão vermelho para registrar um imóvel com placa que você encontrou na rua</div>
-                        <button onclick="CaptacaoModule.novaCaptura()" style="background:linear-gradient(135deg,#C0392B,#E74C3C);color:#fff;border:none;border-radius:12px;padding:12px 22px;font-size:0.85rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;">
-                            <i class="fas fa-camera"></i> Registrar Imóvel
-                        </button>
-                    </div>`;
+                container.innerHTML = `<div class="cap-empty">
+                    <div class="cap-empty-icon">📷</div>
+                    <div class="cap-empty-title">Nenhum imóvel encontrado</div>
+                    <div class="cap-empty-sub">Toque no botão vermelho para registrar um imóvel com placa encontrado na rua</div>
+                    <button onclick="CaptacaoModule.novaCaptura()" style="background:linear-gradient(135deg,#C0392B,#E74C3C);color:#fff;border:none;border-radius:12px;padding:12px 22px;font-size:0.85rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;"><i class="fas fa-camera"></i> Registrar Imóvel</button>
+                </div>`;
                 return;
             }
-
             container.innerHTML = lista.map(d => _cardHtml(d)).join('');
         }
 
         function _badgeTipo(tipo) {
-            const map = { venda: ['cap-badge-venda','Venda'], aluguel: ['cap-badge-aluguel','Aluguel'], ambos: ['cap-badge-ambos','V+A'] };
-            const [cls, label] = map[tipo] || ['cap-badge-venda','Venda'];
+            const map = { venda:['cap-badge-venda','Venda'], aluguel:['cap-badge-aluguel','Aluguel'], ambos:['cap-badge-ambos','V+A'] };
+            const [cls, label] = map[tipo]||['cap-badge-venda','Venda'];
             return `<span class="cap-card-tipo-badge ${cls}">${label}</span>`;
         }
-
         function _badgeStatus(status) {
-            const map = {
-                novo: ['cap-status-novo', '🔵 Novo'],
-                contatado: ['cap-status-contatado', '🟢 Contatado'],
-                autorizado: ['cap-status-autorizado', '🟣 Autorizado'],
-                descartado: ['cap-status-descartado', '⚫ Descartado']
-            };
-            const [cls, label] = map[status || 'novo'] || ['cap-status-novo','🔵 Novo'];
+            const map = { novo:['cap-status-novo','🔵 Novo'], contatado:['cap-status-contatado','🟢 Contatado'], autorizado:['cap-status-autorizado','🟣 Autorizado'], descartado:['cap-status-descartado','⚫ Descartado'] };
+            const [cls, label] = map[status||'novo']||['cap-status-novo','🔵 Novo'];
             return `<span class="cap-card-status-badge ${cls}">${label}</span>`;
         }
 
         function _cardHtml(d) {
-            const imgHtml = d.foto
-                ? `<img src="${d.foto}" alt="Foto">`
+            const fotos = d.fotos || (d.foto ? [d.foto] : []);
+            const imgHtml = fotos.length > 0
+                ? `<img src="${fotos[0]}" alt="Foto" style="width:100%;height:100%;object-fit:cover;">`
                 : `<div class="cap-card-img-placeholder">🏠</div>`;
-
-            const tipoImovel = d.tipoImovel ? `<div class="cap-card-info"><i class="fas fa-home"></i>${d.tipoImovel}</div>` : '';
+            const fotoCount = fotos.length > 1 ? `<span style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.60);color:#fff;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:700;"><i class="fas fa-images"></i> ${fotos.length}</span>` : '';
+            const propHtml = d.proprietario ? `<div class="cap-card-info"><i class="fas fa-user"></i>${d.proprietario}</div>` : '';
             const bairro = d.bairro ? `<div class="cap-card-info"><i class="fas fa-map-marker-alt"></i>${d.bairro}</div>` : '';
-            const refs = d.referencias ? `<div class="cap-card-info"><i class="fas fa-map-pin"></i>${d.referencias}</div>` : '';
-            const data = d.data ? `<div class="cap-card-info"><i class="fas fa-calendar-alt"></i>${new Date(d.data).toLocaleDateString('pt-BR')}</div>` : '';
-
-            const tags = [];
-            if (d.tipoImovel) tags.push(d.tipoImovel);
-            if (d.bairro) tags.push(d.bairro);
-            const tagsHtml = tags.map(t => `<span class="cap-tag">${t}</span>`).join('');
-
+            const dataStr = d.data ? `<div class="cap-card-info"><i class="fas fa-calendar-alt"></i>${new Date(d.data).toLocaleDateString('pt-BR')}</div>` : '';
+            const agendCount = (d.agendamentos||[]).length;
+            const agendBadge = agendCount > 0 ? `<span style="background:var(--primary-ultra);color:var(--primary);border:1px solid var(--border-accent);border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fas fa-calendar-check"></i> ${agendCount}</span>` : '';
+            const tags = [d.tipoImovel, d.bairro].filter(Boolean);
+            const tagsHtml = tags.map(t=>`<span class="cap-tag">${t}</span>`).join('');
             return `<div class="cap-card" onclick="CaptacaoModule.verDetalhe('${d.id}')">
-                <div class="cap-card-img-wrap">
-                    ${imgHtml}
-                    ${_badgeTipo(d.tipo)}
-                    ${_badgeStatus(d.status)}
-                </div>
+                <div class="cap-card-img-wrap">${imgHtml}${fotoCount}${_badgeTipo(d.tipo)}${_badgeStatus(d.status)}</div>
                 <div class="cap-card-body">
-                    <div class="cap-card-endereco"><i class="fas fa-map-marker-alt" style="color:var(--danger);margin-right:5px;font-size:0.8rem;"></i>${d.endereco || 'Endereço não informado'}</div>
-                    <div class="cap-card-info"><i class="fas fa-phone-alt"></i><strong>${d.telefone || 'Sem telefone'}</strong></div>
-                    ${tipoImovel}${refs}${data}
-                    ${tagsHtml ? `<div class="cap-card-tags">${tagsHtml}</div>` : ''}
+                    <div class="cap-card-endereco"><i class="fas fa-map-marker-alt" style="color:var(--danger);margin-right:5px;font-size:0.8rem;"></i>${d.endereco||'Endereço não informado'}</div>
+                    ${propHtml}
+                    <div class="cap-card-info"><i class="fas fa-phone-alt"></i><strong>${d.telefone||'Sem telefone'}</strong></div>
+                    ${bairro}${dataStr}
+                    ${tagsHtml||agendBadge ? `<div class="cap-card-tags">${tagsHtml}${agendBadge}</div>` : ''}
                 </div>
                 <div class="cap-card-actions">
                     <button class="cap-action-btn primary" onclick="event.stopPropagation();CaptacaoModule.ligarDireto('${d.id}')"><i class="fas fa-phone-alt"></i> Ligar</button>
@@ -45469,77 +45985,125 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             </div>`;
         }
 
+        // ── Nova captura ─────────────────────────────────────────────────
         function novaCaptura() {
             _idAtual = null;
-            _fotoAtual = null;
+            _fotos = [];
             document.getElementById('cap-edit-id').value = '';
             document.getElementById('cap-form-title').textContent = '📷 Novo Imóvel Captado';
-            document.getElementById('cap-tipo').value = 'venda';
-            document.getElementById('cap-telefone').value = '';
-            document.getElementById('cap-endereco').value = '';
-            document.getElementById('cap-bairro').value = '';
-            document.getElementById('cap-tipo-imovel').value = '';
-            document.getElementById('cap-referencias').value = '';
-            document.getElementById('cap-caracteristicas').value = '';
-            document.getElementById('cap-valor').value = '';
-            document.getElementById('cap-obs').value = '';
-            _resetPhotoArea();
+            ['cap-tipo','cap-telefone','cap-endereco','cap-bairro','cap-referencias','cap-caracteristicas','cap-valor','cap-obs','cap-proprietario'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = el.tagName==='SELECT' ? el.options[0].value : '';
+            });
+            document.getElementById('cap-agend-ativo').checked = false;
+            document.getElementById('cap-agend-fields').style.display = 'none';
+            document.getElementById('cap-agend-data').value = Utils.getToday ? Utils.getToday() : new Date().toISOString().split('T')[0];
+            document.getElementById('cap-agend-hora').value = '09:00';
+            document.getElementById('cap-agend-obs').value = '';
+            _renderPhotoGrid();
             UI.openModal('captacao-form');
             setTimeout(() => { document.getElementById('cap-telefone').focus(); }, 350);
         }
 
-        function _resetPhotoArea() {
-            const area = document.getElementById('cap-photo-area');
-            if (!area) return;
-            area.innerHTML = `
-                <div class="cap-photo-placeholder">📷</div>
-                <div class="cap-photo-placeholder-text">Tirar foto / Selecionar imagem</div>
-                <div class="cap-photo-placeholder-sub">Toque para abrir a câmera</div>`;
-            const inp = document.getElementById('cap-photo-input');
-            if (inp) inp.value = '';
+        function toggleAgendForm(checked) {
+            document.getElementById('cap-agend-fields').style.display = checked ? 'block' : 'none';
         }
 
-        function onPhotoSelected(input) {
-            if (!input.files || !input.files[0]) return;
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                _fotoAtual = e.target.result;
-                const area = document.getElementById('cap-photo-area');
-                if (area) {
-                    area.innerHTML = `<img src="${_fotoAtual}" alt="Foto"><div class="cap-photo-overlay"><i class="fas fa-camera"></i> Trocar foto</div>`;
-                }
-            };
-            reader.readAsDataURL(file);
+        // ── Render grade de fotos no formulário ──────────────────────────
+        function _renderPhotoGrid() {
+            const grid = document.getElementById('cap-photos-grid');
+            if (!grid) return;
+            grid.innerHTML = _fotos.map((src, i) =>
+                `<div class="cap-photo-thumb-wrap">
+                    <img class="cap-photo-thumb" src="${src}" onclick="UI.openFullscreenSingle('${src}')">
+                    <div class="cap-photo-thumb-del" onclick="CaptacaoModule.removePhoto(${i})"><i class="fas fa-times"></i></div>
+                </div>`
+            ).join('') +
+            `<div class="cap-photo-add-btn" onclick="document.getElementById('cap-photo-input').click()">
+                <i class="fas fa-camera"></i><span>Adicionar</span>
+            </div>`;
         }
 
+        function onPhotosSelected(input) {
+            if (!input.files || !input.files.length) return;
+            const files = Array.from(input.files);
+            let loaded = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    _fotos.push(e.target.result);
+                    loaded++;
+                    if (loaded === files.length) _renderPhotoGrid();
+                };
+                reader.readAsDataURL(file);
+            });
+            input.value = '';
+        }
+
+        function removePhoto(idx) {
+            _fotos.splice(idx, 1);
+            _renderPhotoGrid();
+        }
+
+        // ── Salvar ───────────────────────────────────────────────────────
         function salvar() {
             const telefone = document.getElementById('cap-telefone').value.trim();
-            const endereco = document.getElementById('cap-endereco').value.trim();
-
-            if (!telefone && !endereco) {
-                Utils.toast('Informe pelo menos o telefone ou o endereço', 'error');
-                return;
-            }
+            const endereco  = document.getElementById('cap-endereco').value.trim();
+            if (!telefone && !endereco) { Utils.toast('Informe pelo menos o telefone ou o endereço', 'error'); return; }
 
             const editId = document.getElementById('cap-edit-id').value;
             const isEdit = !!editId;
+            const existing = isEdit ? (_dados.find(d=>d.id===editId)||{}) : {};
 
             const obj = {
                 id: isEdit ? editId : _uid(),
                 tipo: document.getElementById('cap-tipo').value,
-                telefone: telefone,
-                endereco: endereco,
+                proprietario: document.getElementById('cap-proprietario').value.trim(),
+                telefone,
+                endereco,
                 bairro: document.getElementById('cap-bairro').value.trim(),
                 tipoImovel: document.getElementById('cap-tipo-imovel').value,
                 referencias: document.getElementById('cap-referencias').value.trim(),
                 caracteristicas: document.getElementById('cap-caracteristicas').value.trim(),
                 valor: document.getElementById('cap-valor').value.trim(),
                 obs: document.getElementById('cap-obs').value.trim(),
-                foto: _fotoAtual,
-                data: isEdit ? ((_dados.find(d=>d.id===editId)||{}).data || new Date().toISOString()) : new Date().toISOString(),
-                status: isEdit ? ((_dados.find(d=>d.id===editId)||{}).status || 'novo') : 'novo'
+                fotos: _fotos.length > 0 ? _fotos : (existing.fotos || []),
+                data: isEdit ? (existing.data || new Date().toISOString()) : new Date().toISOString(),
+                status: isEdit ? (existing.status || 'novo') : 'novo',
+                agendamentos: existing.agendamentos || []
             };
+
+            // ── Criar agendamento na agenda geral ──────────────────────
+            const agendAtivo = document.getElementById('cap-agend-ativo').checked;
+            if (agendAtivo) {
+                const agData = document.getElementById('cap-agend-data').value;
+                const agHora = document.getElementById('cap-agend-hora').value;
+                const agObs  = document.getElementById('cap-agend-obs').value.trim();
+                if (agData) {
+                    const agId = _uid() + '_ag';
+                    const novoAg = {
+                        id: agId,
+                        tipo: 'ligacao',
+                        clienteId: null,
+                        imovelId: null,
+                        data: agData,
+                        horario: agHora,
+                        observacoes: agObs || `Contato captação: ${endereco||telefone}${obj.proprietario ? ' — '+obj.proprietario : ''}`,
+                        status: 'agendado',
+                        dataCriacao: new Date().toISOString(),
+                        captacaoId: obj.id,
+                        outroDescricao: 'Captação de Imóvel',
+                        outroDetalhes: `Proprietário: ${obj.proprietario||'—'} | Tel: ${telefone} | Endereço: ${endereco}`
+                    };
+                    // Salvar na agenda do sistema
+                    if (UI && UI.data && UI.data.visitas) {
+                        UI.data.visitas.push(novoAg);
+                        if (typeof DB !== 'undefined') DB.put('visitas', novoAg).catch(()=>{});
+                    }
+                    obj.agendamentos = [...(obj.agendamentos||[]), { id: agId, data: agData, hora: agHora, obs: novoAg.observacoes }];
+                    Utils.toast('Agendamento criado na agenda! 📅', 'success');
+                }
+            }
 
             if (isEdit) {
                 const idx = _dados.findIndex(d => d.id === editId);
@@ -45551,121 +46115,186 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             UI.closeModal('captacao-form');
             _renderStats();
             _renderList();
-            Utils.toast(isEdit ? 'Imóvel atualizado!' : 'Imóvel captado com sucesso! 📷', 'success');
+            Utils.toast(isEdit ? 'Imóvel atualizado!' : 'Imóvel captado! 📷', 'success');
         }
 
+        // ── Ver detalhe ──────────────────────────────────────────────────
         function verDetalhe(id) {
             _load();
             const d = _dados.find(x => x.id === id);
             if (!d) return;
             _idAtual = id;
 
-            // Image
-            const imgWrap = document.getElementById('cap-detail-img-wrap');
-            const img = document.getElementById('cap-detail-img');
-            if (d.foto) { img.src = d.foto; imgWrap.style.display = ''; }
-            else { imgWrap.style.display = 'none'; }
+            // Galeria
+            const fotos = d.fotos || (d.foto ? [d.foto] : []);
+            const galWrap = document.getElementById('cap-detail-gallery-wrap');
+            const gal = document.getElementById('cap-detail-gallery');
+            if (fotos.length > 0) {
+                gal.innerHTML = fotos.map((src,i) =>
+                    `<img src="${src}" onclick="CaptacaoModule._viewFullPhoto(${i}, ${JSON.stringify(fotos).replace(/"/g,'&quot;')})" title="Ampliar">`
+                ).join('');
+                galWrap.style.display = '';
+            } else { galWrap.style.display = 'none'; }
 
             // Badges
-            document.getElementById('cap-detail-badges').innerHTML =
-                _badgeTipo(d.tipo) + ' ' + _badgeStatus(d.status);
+            document.getElementById('cap-detail-badges').innerHTML = _badgeTipo(d.tipo) + ' ' + _badgeStatus(d.status);
+
+            // Proprietário
+            const propWrap = document.getElementById('cap-detail-prop-wrap');
+            if (d.proprietario) { document.getElementById('cap-detail-proprietario').textContent = d.proprietario; propWrap.style.display=''; }
+            else propWrap.style.display='none';
 
             document.getElementById('cap-detail-endereco').textContent = d.endereco || 'Não informado';
             document.getElementById('cap-detail-telefone').textContent = d.telefone || 'Não informado';
 
             const show = (wrapId, valId, val) => {
                 const el = document.getElementById(wrapId);
-                if (val) { document.getElementById(valId).textContent = val; el.style.display = ''; }
-                else { el.style.display = 'none'; }
+                if (val) { document.getElementById(valId).textContent = val; el.style.display=''; }
+                else el.style.display='none';
             };
+            show('cap-detail-refs-wrap','cap-detail-refs', d.referencias);
+            show('cap-detail-caract-wrap','cap-detail-caract', d.caracteristicas);
+            show('cap-detail-obs-wrap','cap-detail-obs', d.obs);
 
-            show('cap-detail-refs-wrap', 'cap-detail-refs', d.referencias);
-            show('cap-detail-caract-wrap', 'cap-detail-caract', d.caracteristicas);
-            show('cap-detail-obs-wrap', 'cap-detail-obs', d.obs);
+            const valWrap = document.getElementById('cap-detail-valor-wrap');
+            if (d.valor) { document.getElementById('cap-detail-valor').textContent = 'R$ '+d.valor; valWrap.style.display=''; }
+            else valWrap.style.display='none';
 
-            const valorWrap = document.getElementById('cap-detail-valor-wrap');
-            if (d.valor) {
-                document.getElementById('cap-detail-valor').textContent = 'R$ ' + d.valor;
-                valorWrap.style.display = '';
-            } else { valorWrap.style.display = 'none'; }
+            // Agendamentos
+            _renderDetailAgendamentos(d);
 
             UI.openModal('captacao-detail');
         }
 
-        function ligar() {
-            const d = _dados.find(x => x.id === _idAtual);
-            if (d && d.telefone) window.location.href = 'tel:' + d.telefone.replace(/\D/g,'');
+        function _renderDetailAgendamentos(d) {
+            const wrap = document.getElementById('cap-detail-agend-wrap');
+            const list = document.getElementById('cap-detail-agend-list');
+            if (!wrap || !list) return;
+            const ags = d.agendamentos || [];
+            wrap.style.display = '';
+            if (ags.length === 0) {
+                list.innerHTML = `<div style="text-align:center;padding:14px 0;color:var(--text-muted);font-size:0.78rem;">Nenhum agendamento ainda
+                    <br><button onclick="CaptacaoModule.novoAgendamento()" style="margin-top:8px;background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;"><i class="fas fa-plus"></i> Agendar Contato</button>
+                </div>`;
+                return;
+            }
+            list.innerHTML = ags.map(ag => {
+                const dateStr = ag.data ? new Date(ag.data+'T00:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'}) : '—';
+                const hora = ag.hora || '';
+                return `<div class="cap-detail-agend-item">
+                    <div class="cap-detail-agend-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div style="flex:1;min-width:0;">
+                        <div class="cap-detail-agend-date">${dateStr}${hora?' às '+hora:''}</div>
+                        <div class="cap-detail-agend-obs">${ag.obs||'Contato com proprietário'}</div>
+                    </div>
+                    <button onclick="CaptacaoModule._verAgendaItem('${ag.id}')" style="background:var(--primary-ultra);border:1px solid var(--border-accent);color:var(--primary);border-radius:8px;padding:5px 9px;font-size:0.7rem;font-weight:700;cursor:pointer;flex-shrink:0;font-family:'Inter',sans-serif;" title="Ver na Agenda"><i class="fas fa-external-link-alt"></i></button>
+                </div>`;
+            }).join('');
         }
 
+        // ── Novo agendamento direto da ficha ─────────────────────────────
+        function novoAgendamento() {
+            if (!_idAtual) return;
+            const d = _dados.find(x=>x.id===_idAtual);
+            if (!d) return;
+            // Fecha o detalhe, abre form de agendamento com campos pré-preenchidos
+            UI.closeModal('captacao-detail');
+            setTimeout(() => {
+                // Pré-preenche o form do sistema
+                UI.openNewVisita();
+                setTimeout(() => {
+                    const obs = document.getElementById('v-observacoes');
+                    const tipo = document.getElementById('v-tipo');
+                    if (tipo) tipo.value = 'ligacao';
+                    if (typeof UI.toggleVisitaFields === 'function') UI.toggleVisitaFields();
+                    if (obs) obs.value = `Captação: ${d.endereco||d.telefone}${d.proprietario?' — '+d.proprietario:''}`;
+                }, 300);
+            }, 350);
+        }
+
+        function _verAgendaItem(agId) {
+            UI.closeModal('captacao-detail');
+            setTimeout(() => {
+                UI.navigate('agenda');
+                setTimeout(() => {
+                    if (typeof App !== 'undefined' && App.agenda) App.agenda.edit(agId);
+                }, 400);
+            }, 350);
+        }
+
+        function _viewFullPhoto(idx, fotos) {
+            try { UI.openFullscreenImages(fotos, idx); } catch(e) {
+                // fallback simples
+                window.open(fotos[idx], '_blank');
+            }
+        }
+
+        // ── Ligar / WhatsApp ─────────────────────────────────────────────
+        function ligar() {
+            const d = _dados.find(x=>x.id===_idAtual);
+            if (d && d.telefone) window.location.href = 'tel:'+d.telefone.replace(/\D/g,'');
+        }
         function ligarDireto(id) {
             _load();
-            const d = _dados.find(x => x.id === id);
-            if (d && d.telefone) window.location.href = 'tel:' + d.telefone.replace(/\D/g,'');
+            const d = _dados.find(x=>x.id===id);
+            if (d && d.telefone) window.location.href = 'tel:'+d.telefone.replace(/\D/g,'');
         }
-
-        function whatsapp() {
-            const d = _dados.find(x => x.id === _idAtual);
-            if (!d || !d.telefone) { Utils.toast('Telefone não informado', 'error'); return; }
-            const num = d.telefone.replace(/\D/g,'');
+        function _wppMsg(d) {
+            const num = (d.telefone||'').replace(/\D/g,'');
             const end = d.endereco || 'imóvel que vi na rua';
-            const msg = encodeURIComponent(`Olá! Vi a placa do seu imóvel (${end}) e gostaria de conversar sobre a possibilidade de comercializá-lo pela nossa imobiliária. Podemos conversar?`);
-            window.open('https://wa.me/55' + num + '?text=' + msg, '_blank');
+            const prop = d.proprietario ? `, ${d.proprietario}` : '';
+            const msg = encodeURIComponent(`Olá${prop}! Vi a placa do seu imóvel (${end}) e gostaria de conversar sobre a possibilidade de comercializá-lo pela nossa imobiliária. Podemos conversar?`);
+            window.open('https://wa.me/55'+num+'?text='+msg, '_blank');
         }
+        function whatsapp() { const d=_dados.find(x=>x.id===_idAtual); if(d&&d.telefone) _wppMsg(d); else Utils.toast('Telefone não informado','error'); }
+        function whatsappDireto(id) { _load(); const d=_dados.find(x=>x.id===id); if(d&&d.telefone) _wppMsg(d); else Utils.toast('Telefone não informado','error'); }
 
-        function whatsappDireto(id) {
-            _load();
-            const d = _dados.find(x => x.id === id);
-            if (!d || !d.telefone) { Utils.toast('Telefone não informado', 'error'); return; }
-            const num = d.telefone.replace(/\D/g,'');
-            const end = d.endereco || 'imóvel que vi na rua';
-            const msg = encodeURIComponent(`Olá! Vi a placa do seu imóvel (${end}) e gostaria de conversar sobre a possibilidade de comercializá-lo pela nossa imobiliária. Podemos conversar?`);
-            window.open('https://wa.me/55' + num + '?text=' + msg, '_blank');
-        }
-
+        // ── Status ───────────────────────────────────────────────────────
         function setStatus(status) {
             if (!_idAtual) return;
-            const idx = _dados.findIndex(d => d.id === _idAtual);
-            if (idx < 0) return;
+            const idx = _dados.findIndex(d=>d.id===_idAtual);
+            if (idx<0) return;
             _dados[idx].status = status;
             _save();
-            // Refresh badge in detail
             verDetalhe(_idAtual);
             _renderStats();
             _renderList();
-            const labels = { novo: 'Novo', contatado: 'Contatado', autorizado: 'Autorizado ✅', descartado: 'Descartado' };
-            Utils.toast('Status: ' + (labels[status] || status), 'success');
+            const labels = {novo:'Novo',contatado:'Contatado',autorizado:'Autorizado ✅',descartado:'Descartado'};
+            Utils.toast('Status: '+(labels[status]||status), 'success');
         }
 
+        // ── Editar ───────────────────────────────────────────────────────
         function editarAtual() {
             if (!_idAtual) return;
-            const d = _dados.find(x => x.id === _idAtual);
+            const d = _dados.find(x=>x.id===_idAtual);
             if (!d) return;
             UI.closeModal('captacao-detail');
             setTimeout(() => {
                 document.getElementById('cap-edit-id').value = d.id;
                 document.getElementById('cap-form-title').textContent = '✏️ Editar Imóvel Captado';
-                document.getElementById('cap-tipo').value = d.tipo || 'venda';
-                document.getElementById('cap-telefone').value = d.telefone || '';
-                document.getElementById('cap-endereco').value = d.endereco || '';
-                document.getElementById('cap-bairro').value = d.bairro || '';
-                document.getElementById('cap-tipo-imovel').value = d.tipoImovel || '';
-                document.getElementById('cap-referencias').value = d.referencias || '';
-                document.getElementById('cap-caracteristicas').value = d.caracteristicas || '';
-                document.getElementById('cap-valor').value = d.valor || '';
-                document.getElementById('cap-obs').value = d.obs || '';
-                _fotoAtual = d.foto || null;
-                const area = document.getElementById('cap-photo-area');
-                if (_fotoAtual && area) {
-                    area.innerHTML = `<img src="${_fotoAtual}" alt="Foto"><div class="cap-photo-overlay"><i class="fas fa-camera"></i> Trocar foto</div>`;
-                } else { _resetPhotoArea(); }
+                document.getElementById('cap-tipo').value = d.tipo||'venda';
+                document.getElementById('cap-proprietario').value = d.proprietario||'';
+                document.getElementById('cap-telefone').value = d.telefone||'';
+                document.getElementById('cap-endereco').value = d.endereco||'';
+                document.getElementById('cap-bairro').value = d.bairro||'';
+                document.getElementById('cap-tipo-imovel').value = d.tipoImovel||'';
+                document.getElementById('cap-referencias').value = d.referencias||'';
+                document.getElementById('cap-caracteristicas').value = d.caracteristicas||'';
+                document.getElementById('cap-valor').value = d.valor||'';
+                document.getElementById('cap-obs').value = d.obs||'';
+                document.getElementById('cap-agend-ativo').checked = false;
+                document.getElementById('cap-agend-fields').style.display = 'none';
+                _fotos = [...(d.fotos||(d.foto?[d.foto]:[]))];
+                _renderPhotoGrid();
                 UI.openModal('captacao-form');
             }, 350);
         }
 
+        // ── Excluir ──────────────────────────────────────────────────────
         function excluirAtual() {
             if (!_idAtual) return;
             if (!confirm('Excluir este registro de captação?')) return;
-            _dados = _dados.filter(d => d.id !== _idAtual);
+            _dados = _dados.filter(d=>d.id!==_idAtual);
             _save();
             _idAtual = null;
             UI.closeModal('captacao-detail');
@@ -45674,7 +46303,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             Utils.toast('Registro excluído', 'success');
         }
 
-        // Show/hide FABs based on active view
+        // ── MutationObserver FAB ─────────────────────────────────────────
         (function watchView() {
             const obs = new MutationObserver(() => {
                 const cv = document.getElementById('captacao-view');
@@ -45682,8 +46311,6 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 const capFab = document.getElementById('cap-fab-btn');
                 const mainFab = document.getElementById('fab-container');
                 if (capFab) capFab.style.display = isActive ? 'flex' : 'none';
-                // Ao sair da captação, o main FAB só reaparece se o switchTab mandar
-                // — nunca restauramos automaticamente para evitar aparecer em painéis errados
                 if (isActive && mainFab) mainFab.style.display = 'none';
                 if (isActive) document.body.classList.add('captacao-ativa');
                 else document.body.classList.remove('captacao-ativa');
@@ -45692,10 +46319,933 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             if (target) obs.observe(target, { attributes: true, attributeFilter: ['class','style'] });
         })();
 
-        return { open, filter, novaCaptura, onPhotoSelected, salvar, verDetalhe, ligar, ligarDireto, whatsapp, whatsappDireto, setStatus, editarAtual, excluirAtual };
+        return { open, filter, novaCaptura, toggleAgendForm, onPhotosSelected, removePhoto, salvar, verDetalhe, ligar, ligarDireto, whatsapp, whatsappDireto, setStatus, editarAtual, excluirAtual, novoAgendamento, _viewFullPhoto, _verAgendaItem };
     })();
 
     // ═══════════════ FIM MÓDULO CAPTAÇÃO ═══════════════
+
+    // ═══════════════════════════════════════════════════════════════
+    //  REPORT PANEL — Painel Central de Relatórios ImobiPro
+    // ═══════════════════════════════════════════════════════════════
+    const ReportPanel = (() => {
+        // ── helpers de data ──────────────────────────────────────────
+        function _today() { return new Date().toISOString().split('T')[0]; }
+        function _daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().split('T')[0]; }
+        function _fmtDate(s) { if(!s) return '—'; const [y,m,d] = s.split('-'); return `${d}/${m}/${y}`; }
+        function _fmtMoney(v) {
+            if (!v && v !== 0) return 'R$ —';
+            return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function _pct(a, b) { return b ? ((a / b) * 100).toFixed(1) + '%' : '0%'; }
+        function _clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
+
+        // ── KPIs ao vivo ─────────────────────────────────────────────
+        function renderLiveKPIs() {
+            const el = document.getElementById('rp-kpis-live');
+            if (!el || !UI.data) return;
+            const c = UI.data.clientes || [];
+            const v = UI.data.visitas || [];
+            const im = UI.data.imoveis || [];
+            const etapas = UI.data.funilEtapas || [];
+            const vendas = c.filter(x => {
+                const e = etapas.find(et => et.id === x.etapaFunil);
+                return e && (e.id === 'venda' || (e.nome||'').toLowerCase().includes('venda'));
+            }).length;
+            const hoje = _today();
+            const atividadesHoje = v.filter(x => (x.data||'').startsWith(hoje)).length;
+            const imoDisp = im.filter(x => !x.vendido && x.status !== 'vendido').length;
+            const ativos = c.filter(x => {
+                const e = (x.etapaFunil||'').toLowerCase();
+                return !e.includes('venda') && !e.includes('inativ') && !e.includes('cancelad') && !e.includes('descart');
+            }).length;
+            el.innerHTML = [
+                { v: c.length, l: 'Clientes', c: '#1D6FA4' },
+                { v: ativos, l: 'Ativos no Funil', c: '#27AE60' },
+                { v: vendas, l: 'Vendas', c: '#E67E22' },
+                { v: atividadesHoje, l: 'Atividades Hoje', c: '#7C3AED' },
+            ].map(k => `
+                <div class="rp-kpi-box">
+                    <div class="rp-kpi-val" style="color:${k.c}">${k.v}</div>
+                    <div class="rp-kpi-lbl">${k.l}</div>
+                </div>`).join('');
+        }
+
+        // ── Filtro por categoria ──────────────────────────────────────
+        function filterCat(cat, btn) {
+            document.querySelectorAll('.rp-cat-pill').forEach(p => p.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            document.querySelectorAll('.rp-card[data-cat]').forEach(card => {
+                card.style.display = (cat === 'todos' || card.dataset.cat === cat) ? '' : 'none';
+            });
+        }
+
+        // ── Abre o gerador para um tipo específico ────────────────────
+        const CONFIG = {
+            clientes:          { label: '👥 Cadastro de Clientes',     periodo: true,  single: false },
+            agendamentos:      { label: '📅 Agendamentos',             periodo: true,  single: false },
+            vendas:            { label: '🤝 Vendas do Período',        periodo: true,  single: false },
+            'vendas-funil':    { label: '🔽 Vendas pelo Funil',        periodo: true,  single: false },
+            performance:       { label: '📈 Performance Geral',        periodo: true,  single: false },
+            plantao:           { label: '📋 Relatório de Plantão',     periodo: true,  single: true  },
+            'funil-travado':   { label: '⚠️ Clientes Travados (+30d)', periodo: false, single: false },
+            'lista-ligacoes':  { label: '📞 Lista de Ligações',        periodo: false, single: false },
+            'lista-mensagens': { label: '💬 Lista de Mensagens',       periodo: false, single: false },
+            'funil-saude':     { label: '💓 Saúde do Funil',           periodo: false, single: false },
+            'perfil-compradores': { label: '🏷️ Perfil dos Compradores', periodo: false, single: false },
+            estoque:           { label: '🏠 Estoque de Imóveis',       periodo: false, single: false },
+            'imoveis-sem-visita': { label: '👁️ Imóveis Sem Visita',   periodo: false, single: false },
+            'imoveis-price':   { label: '🏷️ Análise de Preços',        periodo: false, single: false },
+            'ranking-imoveis': { label: '🏆 Ranking de Imóveis',       periodo: true,  single: false },
+            dre:               { label: '💰 DRE Simplificado',          periodo: true,  single: false },
+            comissoes:         { label: '💸 Comissões',                 periodo: true,  single: false },
+            'fluxo-caixa':     { label: '↔️ Fluxo de Caixa',           periodo: true,  single: false },
+            produtividade:     { label: '⚡ Produtividade',             periodo: true,  single: false },
+            'captacao-status': { label: '📍 Status de Captações',      periodo: false, single: false },
+            'captacao-bairro': { label: '🗺️ Captação por Bairro',      periodo: false, single: false },
+        };
+
+        function open(type) {
+            const cfg = CONFIG[type] || { label: 'Relatório', periodo: true, single: false };
+            document.getElementById('rp-gen-label').innerHTML = `<i class="fas fa-sliders-h"></i> ${cfg.label}`;
+            document.getElementById('report-type').value = type;
+
+            const fieldEnd = document.getElementById('rp-field-end');
+            const qPeriod  = document.getElementById('rp-qperiod');
+            if (!cfg.periodo) {
+                fieldEnd.style.display = 'none';
+                document.getElementById('rp-field-start').style.display = 'none';
+                qPeriod.style.display = 'none';
+            } else if (cfg.single) {
+                fieldEnd.style.display = 'none';
+                document.getElementById('rp-field-start').style.display = '';
+                qPeriod.style.display = 'none';
+                document.getElementById('report-date-start').value = _today();
+            } else {
+                fieldEnd.style.display = '';
+                document.getElementById('rp-field-start').style.display = '';
+                qPeriod.style.display = '';
+                if (!document.getElementById('report-date-start').value) setPeriod(30);
+            }
+
+            // Hide cards, show generator
+            document.getElementById('rp-cards-grid').style.display = 'none';
+            document.getElementById('rp-cat-pills').style.display = 'none';
+            document.getElementById('rp-kpis-live').style.display = 'none';
+            document.getElementById('rp-generator').style.display = 'block';
+            document.getElementById('report-content').innerHTML = '';
+
+            // Auto-generate for types that don't need period
+            if (!cfg.periodo) {
+                setTimeout(() => UI.generateReport(), 100);
+            }
+        }
+
+        function backToMenu() {
+            document.getElementById('rp-cards-grid').style.display = '';
+            document.getElementById('rp-cat-pills').style.display = '';
+            document.getElementById('rp-kpis-live').style.display = '';
+            document.getElementById('rp-generator').style.display = 'none';
+            document.getElementById('report-content').innerHTML = '';
+            UI.currentReport = null;
+            renderLiveKPIs();
+        }
+
+        // ── Atalhos de período ────────────────────────────────────────
+        function setPeriod(days) {
+            document.getElementById('report-date-start').value = _daysAgo(days);
+            document.getElementById('report-date-end').value   = _today();
+        }
+        function setThisMonth() {
+            const n = new Date();
+            const y = n.getFullYear(), m = String(n.getMonth()+1).padStart(2,'0');
+            document.getElementById('report-date-start').value = `${y}-${m}-01`;
+            document.getElementById('report-date-end').value   = _today();
+        }
+        function setLastMonth() {
+            const n = new Date(); n.setMonth(n.getMonth()-1);
+            const y = n.getFullYear(), m = String(n.getMonth()+1).padStart(2,'0');
+            const last = new Date(y, n.getMonth()+1, 0);
+            document.getElementById('report-date-start').value = `${y}-${m}-01`;
+            document.getElementById('report-date-end').value   = last.toISOString().split('T')[0];
+        }
+        function setThisYear() {
+            const y = new Date().getFullYear();
+            document.getElementById('report-date-start').value = `${y}-01-01`;
+            document.getElementById('report-date-end').value   = _today();
+        }
+
+        // ── Init ──────────────────────────────────────────────────────
+        function init() {
+            renderLiveKPIs();
+            filterCat('todos', null);
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        //  NOVOS GERADORES DE RELATÓRIO
+        // ─────────────────────────────────────────────────────────────
+
+        // ── Saúde do Funil ────────────────────────────────────────────
+        function generateFunilSaude() {
+            const clientes = UI.data.clientes || [];
+            const etapas   = UI.data.funilEtapas || [];
+            const total    = clientes.length;
+            const agora    = new Date();
+
+            const porEtapa = {};
+            etapas.forEach(e => { porEtapa[e.id] = { nome: e.nome, cor: e.cor || '#888', count: 0, dias: [] }; });
+            clientes.forEach(c => {
+                if (!porEtapa[c.etapaFunil]) return;
+                porEtapa[c.etapaFunil].count++;
+                const ref = c.dataEntradaEtapa || c.dataAtualizacao || c.dataCriacao;
+                if (ref) porEtapa[c.etapaFunil].dias.push(Math.floor((agora - new Date(ref)) / 86400000));
+            });
+
+            const vendaEtapa = etapas.find(e => e.id === 'venda' || (e.nome||'').toLowerCase().includes('venda'));
+            const vendas = vendaEtapa ? (porEtapa[vendaEtapa.id]||{}).count || 0 : 0;
+            const taxaConv = total > 0 ? ((vendas / total)*100).toFixed(1) : 0;
+            const travados = clientes.filter(c => {
+                const ref = c.dataEntradaEtapa || c.dataAtualizacao || c.dataCriacao;
+                if (!ref) return false;
+                const dias = Math.floor((agora - new Date(ref)) / 86400000);
+                const e = (c.etapaFunil||'').toLowerCase();
+                return dias >= 30 && !e.includes('venda') && !e.includes('inativ');
+            }).length;
+
+            let bars = etapas.map(e => {
+                const d = porEtapa[e.id] || { count: 0, dias: [] };
+                const avg = d.dias.length ? Math.round(d.dias.reduce((a,b)=>a+b,0)/d.dias.length) : 0;
+                const pct = total > 0 ? Math.round((d.count/total)*100) : 0;
+                return { nome: e.nome, cor: e.cor || '#1D6FA4', count: d.count, avg, pct };
+            });
+            const maxCount = Math.max(...bars.map(b => b.count), 1);
+
+            let html = `
+                <div class="rp-highlight">
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--primary)">${total}</div><div class="rp-hl-lbl">Total Clientes</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--accent)">${taxaConv}%</div><div class="rp-hl-lbl">Taxa Conversão</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--danger)">${travados}</div><div class="rp-hl-lbl">Travados (+30d)</div></div>
+                </div>
+                <div class="rp-section-hd"><i class="fas fa-filter"></i> Distribuição por Etapa do Funil</div>
+                <div style="background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+                    <div class="rp-funil-bar">`;
+            bars.forEach(b => {
+                const fillPct = Math.round((b.count / maxCount)*100);
+                html += `
+                    <div class="rp-funil-row">
+                        <div class="rp-funil-label">${b.nome}</div>
+                        <div class="rp-funil-track">
+                            <div class="rp-funil-fill" style="width:${fillPct}%;background:${b.cor};"></div>
+                        </div>
+                        <div class="rp-funil-count">${b.count}</div>
+                        <div style="font-size:0.62rem;color:var(--text-muted);min-width:38px;text-align:right;">${b.pct}%</div>
+                    </div>`;
+            });
+            html += `</div></div>
+                <div class="rp-section-hd" style="margin-top:16px;"><i class="fas fa-clock"></i> Tempo Médio por Etapa (dias)</div>
+                <div class="rp-table-wrap">
+                    <table class="rp-table">
+                        <thead><tr><th>Etapa</th><th>Clientes</th><th>% do Total</th><th>Tempo Médio</th><th>Saúde</th></tr></thead>
+                        <tbody>`;
+            bars.forEach(b => {
+                const saude = b.avg < 14 ? ['rp-tag-green','✅ Saudável'] : b.avg < 30 ? ['rp-tag-orange','⚠️ Atenção'] : ['rp-tag-red','🔴 Crítico'];
+                html += `<tr>
+                    <td><span style="display:inline-block;width:10px;height:10px;background:${b.cor};border-radius:3px;margin-right:6px;"></span>${b.nome}</td>
+                    <td>${b.count}</td>
+                    <td>${b.pct}%</td>
+                    <td>${b.avg > 0 ? b.avg + ' dias' : '—'}</td>
+                    <td><span class="rp-tag ${saude[0]}">${saude[1]}</span></td>
+                </tr>`;
+            });
+            html += `</tbody></table></div>`;
+            return { html, type: 'funil-saude', data: bars };
+        }
+
+        // ── Perfil dos Compradores ────────────────────────────────────
+        function generatePerfilCompradores() {
+            const clientes = (UI.data.clientes || []).filter(c => c.tipo === 'comprador' || c.tipo === 'ambos' || !c.tipo);
+            const imoveis  = UI.data.imoveis || [];
+            const total    = clientes.length;
+            if (total === 0) return { html: `<div class="empty-state"><i class="fas fa-users"></i><p>Nenhum comprador cadastrado.</p></div>`, type: 'perfil-compradores', data: [] };
+
+            // Faixa de preço
+            const faixas = {};
+            clientes.forEach(c => { const f = c.faixaPreco || 'Não informado'; faixas[f] = (faixas[f]||0)+1; });
+            const topFaixas = Object.entries(faixas).sort((a,b)=>b[1]-a[1]).slice(0,6);
+
+            // Tipo de imóvel de interesse
+            const tipos = {};
+            clientes.forEach(c => {
+                const itr = c.imovelInteresseId ? (imoveis.find(i=>i.id===c.imovelInteresseId)||{}).tipo : null;
+                const t = itr || c.tipoInteresse || 'Não informado';
+                tipos[t] = (tipos[t]||0)+1;
+            });
+            const topTipos = Object.entries(tipos).sort((a,b)=>b[1]-a[1]).slice(0,6);
+
+            // Bairro de interesse
+            const bairros = {};
+            clientes.forEach(c => {
+                if (c.bairroInteresse) bairros[c.bairroInteresse] = (bairros[c.bairroInteresse]||0)+1;
+                else if (c.imovelInteresseId) {
+                    const im = imoveis.find(i=>i.id===c.imovelInteresseId);
+                    if (im && im.bairro) bairros[im.bairro] = (bairros[im.bairro]||0)+1;
+                }
+            });
+            const topBairros = Object.entries(bairros).sort((a,b)=>b[1]-a[1]).slice(0,6);
+
+            function barList(arr, color) {
+                const max = arr[0]?.[1] || 1;
+                return arr.map(([k,v]) => `
+                    <div class="rp-rank-row">
+                        <div class="rp-rank-info">
+                            <div class="rp-rank-name">${k}</div>
+                            <div class="rp-progress"><div class="rp-progress-fill" style="width:${Math.round(v/max*100)}%;background:${color};"></div></div>
+                        </div>
+                        <div class="rp-rank-val" style="color:${color};">${v}</div>
+                    </div>`).join('');
+            }
+
+            const html = `
+                <div class="rp-highlight">
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--indigo)">${total}</div><div class="rp-hl-lbl">Compradores</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--accent)">${topFaixas.length}</div><div class="rp-hl-lbl">Faixas de Preço</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--primary)">${topBairros.length}</div><div class="rp-hl-lbl">Bairros de Interesse</div></div>
+                </div>
+                <div class="rp-section-hd"><i class="fas fa-money-bill-wave"></i> Faixa de Preço Desejada</div>
+                ${barList(topFaixas, '#27AE60')}
+                <div class="rp-section-hd" style="margin-top:14px;"><i class="fas fa-home"></i> Tipo de Imóvel de Interesse</div>
+                ${barList(topTipos, '#1D6FA4')}
+                <div class="rp-section-hd" style="margin-top:14px;"><i class="fas fa-map-marker-alt"></i> Bairros Mais Desejados</div>
+                ${topBairros.length ? barList(topBairros, '#7C3AED') : '<div class="rp-result-card"><div class="rp-result-card-body">Bairros de interesse não informados.</div></div>'}
+            `;
+            return { html, type: 'perfil-compradores', data: clientes };
+        }
+
+        // ── Estoque de Imóveis ────────────────────────────────────────
+        function generateEstoque() {
+            const imoveis = UI.data.imoveis || [];
+            const total   = imoveis.length;
+            const disponiveis = imoveis.filter(i => !i.vendido && i.status !== 'vendido');
+            const vendidos    = imoveis.filter(i => i.vendido || i.status === 'vendido');
+            const aluguel     = disponiveis.filter(i => (i.finalidade||i.tipo_negocio||'').toLowerCase().includes('aluguel') || (i.finalidade||i.tipo_negocio||'').toLowerCase().includes('locação'));
+            const venda       = disponiveis.filter(i => !(i.finalidade||i.tipo_negocio||'').toLowerCase().includes('aluguel'));
+
+            // Por tipo
+            const porTipo = {};
+            disponiveis.forEach(i => { const t = i.tipo||i.tipoImovel||'Não informado'; porTipo[t]=(porTipo[t]||0)+1; });
+            const topTipos = Object.entries(porTipo).sort((a,b)=>b[1]-a[1]);
+
+            // Por bairro
+            const porBairro = {};
+            disponiveis.forEach(i => { const b = i.bairro||'Não informado'; porBairro[b]=(porBairro[b]||0)+1; });
+            const topBairros = Object.entries(porBairro).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+            // Ticket médio
+            const precos = disponiveis.map(i => parseFloat((i.preco||i.valor||'0').toString().replace(/\D/g,''))).filter(v=>v>0);
+            const ticketMedio = precos.length ? precos.reduce((a,b)=>a+b,0)/precos.length : 0;
+            const maxPreco = precos.length ? Math.max(...precos) : 0;
+            const minPreco = precos.length ? Math.min(...precos) : 0;
+
+            const maxBairro = topBairros[0]?.[1] || 1;
+
+            const html = `
+                <div class="rp-highlight">
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--primary)">${disponiveis.length}</div><div class="rp-hl-lbl">Disponíveis</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--accent)">${vendidos.length}</div><div class="rp-hl-lbl">Vendidos</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--warning)">${total}</div><div class="rp-hl-lbl">Total Portfólio</div></div>
+                </div>
+                <div class="rp-kpi-bar" style="grid-template-columns:1fr 1fr;">
+                    <div class="rp-kpi-box"><div class="rp-kpi-val" style="color:var(--accent);font-size:0.95rem;">${_fmtMoney(ticketMedio)}</div><div class="rp-kpi-lbl">Ticket Médio</div></div>
+                    <div class="rp-kpi-box"><div class="rp-kpi-val" style="color:var(--primary);font-size:0.85rem;">${_pct(vendidos.length,total)}</div><div class="rp-kpi-lbl">Taxa de Venda</div></div>
+                </div>
+                <div class="rp-section-hd"><i class="fas fa-home"></i> Por Tipo de Imóvel</div>
+                ${topTipos.map(([k,v]) => `<div class="rp-rank-row"><div class="rp-rank-info"><div class="rp-rank-name">${k}</div><div class="rp-progress"><div class="rp-progress-fill" style="width:${Math.round(v/(topTipos[0]?.[1]||1)*100)}%;background:var(--primary);"></div></div></div><div class="rp-rank-val">${v}</div></div>`).join('')}
+                <div class="rp-section-hd" style="margin-top:14px;"><i class="fas fa-map-marker-alt"></i> Por Bairro (Top 8)</div>
+                ${topBairros.map(([k,v]) => `<div class="rp-rank-row"><div class="rp-rank-info"><div class="rp-rank-name">${k}</div><div class="rp-progress"><div class="rp-progress-fill" style="width:${Math.round(v/maxBairro*100)}%;background:var(--teal);"></div></div></div><div class="rp-rank-val" style="color:var(--teal);">${v}</div></div>`).join('')}
+                <div class="rp-section-hd" style="margin-top:14px;"><i class="fas fa-list"></i> Detalhamento do Portfólio</div>
+                <div class="rp-table-wrap">
+                    <table class="rp-table">
+                        <thead><tr><th>Ref.</th><th>Título</th><th>Tipo</th><th>Bairro</th><th>Valor</th><th>Status</th></tr></thead>
+                        <tbody>${imoveis.slice(0,50).map(i => {
+                            const st = (i.vendido||i.status==='vendido') ? ['rp-tag-gray','Vendido'] : ['rp-tag-green','Disponível'];
+                            return `<tr><td style="font-weight:700;color:var(--primary);">#${i.ref||i.id||'—'}</td><td>${(i.titulo||i.endereco||'—').substring(0,30)}</td><td>${i.tipo||i.tipoImovel||'—'}</td><td>${i.bairro||'—'}</td><td style="white-space:nowrap;">${i.preco||i.valor?_fmtMoney(parseFloat((i.preco||i.valor||'0').toString().replace(/\D/g,''))):'—'}</td><td><span class="rp-tag ${st[0]}">${st[1]}</span></td></tr>`;
+                        }).join('')}</tbody>
+                    </table>
+                </div>`;
+            return { html, type: 'estoque', data: imoveis };
+        }
+
+        // ── Imóveis Sem Visita ────────────────────────────────────────
+        function generateImoveisSemVisita() {
+            const imoveis  = (UI.data.imoveis || []).filter(i => !i.vendido && i.status !== 'vendido');
+            const visitas  = UI.data.visitas || [];
+            const agora    = new Date();
+            const LIMITE   = 30;
+
+            const resultado = imoveis.map(im => {
+                const ultimaVisita = visitas
+                    .filter(v => v.imovelId === im.id && v.tipo === 'visita')
+                    .sort((a,b) => new Date(b.data) - new Date(a.data))[0];
+                const diasSemVisita = ultimaVisita
+                    ? Math.floor((agora - new Date(ultimaVisita.data)) / 86400000)
+                    : Math.floor((agora - new Date(im.dataCadastro || im.dataCriacao || agora)) / 86400000);
+                return { ...im, diasSemVisita, ultimaVisita };
+            }).filter(im => im.diasSemVisita >= LIMITE).sort((a,b) => b.diasSemVisita - a.diasSemVisita);
+
+            if (resultado.length === 0) {
+                return { html: `<div class="empty-state"><i class="fas fa-check-circle" style="color:var(--success)"></i><p>Todos os imóveis tiveram visita nos últimos ${LIMITE} dias! ✅</p></div>`, type: 'imoveis-sem-visita', data: [] };
+            }
+
+            const html = `
+                <div class="rp-highlight">
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--danger)">${resultado.length}</div><div class="rp-hl-lbl">Sem Visita ${LIMITE}d+</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--warning)">${resultado.filter(i=>i.diasSemVisita>=90).length}</div><div class="rp-hl-lbl">+90 dias</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--text-muted)">${resultado[0]?.diasSemVisita||0}d</div><div class="rp-hl-lbl">Mais tempo</div></div>
+                </div>
+                <div class="rp-table-wrap">
+                    <table class="rp-table">
+                        <thead><tr><th>Ref.</th><th>Imóvel</th><th>Bairro</th><th>Valor</th><th>Dias sem visita</th><th>Alerta</th></tr></thead>
+                        <tbody>${resultado.map(im => {
+                            const alerta = im.diasSemVisita >= 90 ? ['rp-tag-red','🔴 Crítico'] : im.diasSemVisita >= 60 ? ['rp-tag-orange','🟡 Atenção'] : ['rp-tag-gray','📌 Monitorar'];
+                            return `<tr>
+                                <td style="font-weight:700;color:var(--primary);">#${im.ref||im.id||'—'}</td>
+                                <td>${(im.titulo||im.endereco||'—').substring(0,28)}</td>
+                                <td>${im.bairro||'—'}</td>
+                                <td style="white-space:nowrap;">${im.preco||im.valor?_fmtMoney(parseFloat((im.preco||im.valor||'0').toString().replace(/\D/g,''))):'—'}</td>
+                                <td style="font-weight:700;">${im.diasSemVisita}d</td>
+                                <td><span class="rp-tag ${alerta[0]}">${alerta[1]}</span></td>
+                            </tr>`;
+                        }).join('')}</tbody>
+                    </table>
+                </div>`;
+            return { html, type: 'imoveis-sem-visita', data: resultado };
+        }
+
+        // ── Análise de Preços ─────────────────────────────────────────
+        function generateImoveisPrice() {
+            const imoveis = (UI.data.imoveis || []).filter(i => !i.vendido && i.status !== 'vendido');
+            const withPrice = imoveis.map(im => ({
+                ...im, _preco: parseFloat((im.preco||im.valor||'0').toString().replace(/[^0-9.,]/g,'').replace(',','.')) || 0
+            })).filter(im => im._preco > 0);
+
+            if (withPrice.length === 0) {
+                return { html: `<div class="empty-state"><i class="fas fa-tags"></i><p>Nenhum imóvel com preço cadastrado.</p></div>`, type: 'imoveis-price', data: [] };
+            }
+
+            // Por tipo
+            const porTipo = {};
+            withPrice.forEach(im => {
+                const t = im.tipo||im.tipoImovel||'Outros';
+                if (!porTipo[t]) porTipo[t] = [];
+                porTipo[t].push(im._preco);
+            });
+
+            // Por bairro
+            const porBairro = {};
+            withPrice.forEach(im => {
+                const b = im.bairro||'Não informado';
+                if (!porBairro[b]) porBairro[b] = [];
+                porBairro[b].push(im._preco);
+            });
+
+            function media(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
+            const tipoRows = Object.entries(porTipo).map(([k,v]) => ({ k, count: v.length, avg: media(v), min: Math.min(...v), max: Math.max(...v) })).sort((a,b)=>b.avg-a.avg);
+            const bairroRows = Object.entries(porBairro).map(([k,v]) => ({ k, count: v.length, avg: media(v) })).sort((a,b)=>b.avg-a.avg).slice(0,8);
+            const maxAvg = tipoRows[0]?.avg || 1;
+
+            const html = `
+                <div class="rp-highlight">
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--primary)">${withPrice.length}</div><div class="rp-hl-lbl">Com preço</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--accent);font-size:0.9rem;">${_fmtMoney(media(withPrice.map(i=>i._preco)))}</div><div class="rp-hl-lbl">Ticket Médio</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--warning);font-size:0.9rem;">${_fmtMoney(Math.max(...withPrice.map(i=>i._preco)))}</div><div class="rp-hl-lbl">Maior Preço</div></div>
+                </div>
+                <div class="rp-section-hd"><i class="fas fa-home"></i> Ticket Médio por Tipo</div>
+                <div class="rp-table-wrap">
+                    <table class="rp-table">
+                        <thead><tr><th>Tipo</th><th>Qtd.</th><th>Mínimo</th><th>Médio</th><th>Máximo</th></tr></thead>
+                        <tbody>${tipoRows.map(r => `<tr>
+                            <td style="font-weight:700;">${r.k}</td>
+                            <td>${r.count}</td>
+                            <td>${_fmtMoney(r.min)}</td>
+                            <td style="font-weight:700;color:var(--primary);">${_fmtMoney(r.avg)}</td>
+                            <td>${_fmtMoney(r.max)}</td>
+                        </tr>`).join('')}</tbody>
+                    </table>
+                </div>
+                <div class="rp-section-hd" style="margin-top:14px;"><i class="fas fa-map-marker-alt"></i> Ticket Médio por Bairro (Top 8)</div>
+                ${bairroRows.map(r => `<div class="rp-rank-row"><div class="rp-rank-info"><div class="rp-rank-name">${r.k} <span style="font-size:0.65rem;color:var(--text-muted);">(${r.count} imóv.)</span></div><div class="rp-progress"><div class="rp-progress-fill" style="width:${Math.round(r.avg/bairroRows[0].avg*100)}%;background:var(--teal);"></div></div></div><div class="rp-rank-val" style="color:var(--teal);font-size:0.72rem;">${_fmtMoney(r.avg)}</div></div>`).join('')}
+            `;
+            return { html, type: 'imoveis-price', data: tipoRows };
+        }
+
+        // ── Ranking de Imóveis ────────────────────────────────────────
+        function generateRankingImoveis(start, end) {
+            const visitas = (UI.data.visitas || []).filter(v => {
+                const d = new Date(v.data); return d >= start && d <= end && v.tipo === 'visita' && v.imovelId;
+            });
+            const imoveis = UI.data.imoveis || [];
+            const rank = {};
+            visitas.forEach(v => { rank[v.imovelId] = (rank[v.imovelId]||0)+1; });
+            const sorted = Object.entries(rank).sort((a,b)=>b[1]-a[1]).slice(0,10);
+            const imNomes = sorted.map(([id, cnt]) => {
+                const im = imoveis.find(i=>i.id===id);
+                return { id, cnt, titulo: im ? (im.titulo||im.endereco||`#${im.ref||id}`) : `ID ${id}`, bairro: im?.bairro||'—', preco: im ? _fmtMoney(parseFloat((im.preco||im.valor||'0').toString().replace(/[^0-9.,]/g,'').replace(',','.'))) : '—' };
+            });
+
+            if (imNomes.length === 0) {
+                return { html: `<div class="empty-state"><i class="fas fa-building"></i><p>Nenhuma visita registrada neste período.</p></div>`, type: 'ranking-imoveis', data: [] };
+            }
+
+            const maxCnt = imNomes[0].cnt;
+            const html = `
+                <div class="rp-section-hd"><i class="fas fa-trophy"></i> Imóveis Mais Visitados — ${_fmtDate(start.toISOString().split('T')[0])} a ${_fmtDate(end.toISOString().split('T')[0])}</div>
+                ${imNomes.map((im, idx) => `
+                    <div class="rp-rank-row">
+                        <div class="rp-rank-num">#${idx+1}</div>
+                        <div class="rp-rank-info">
+                            <div class="rp-rank-name">${im.titulo}</div>
+                            <div class="rp-rank-sub">${im.bairro} · ${im.preco}</div>
+                            <div class="rp-progress"><div class="rp-progress-fill" style="width:${Math.round(im.cnt/maxCnt*100)}%;background:var(--primary);"></div></div>
+                        </div>
+                        <div class="rp-rank-val">${im.cnt} visitas</div>
+                    </div>`).join('')}`;
+            return { html, type: 'ranking-imoveis', data: imNomes };
+        }
+
+        // ── DRE Simplificado ─────────────────────────────────────────
+        async function generateDRE(start, end) {
+            let lancs = [];
+            try { lancs = await DB.getAll('fin_lancamentos'); } catch(e) {}
+            const filtrados = lancs.filter(l => {
+                const d = new Date(l.data || l.dataCriacao || '');
+                return d >= start && d <= end;
+            });
+            const receitas  = filtrados.filter(l => l.tipo === 'receita' || l.tipo === 'entrada');
+            const despesas  = filtrados.filter(l => l.tipo === 'despesa' || l.tipo === 'saida');
+            const totalRec  = receitas.reduce((s,l) => s + (parseFloat(l.valor)||0), 0);
+            const totalDesp = despesas.reduce((s,l) => s + (parseFloat(l.valor)||0), 0);
+            const resultado = totalRec - totalDesp;
+
+            // Categorias
+            const catRec = {}, catDesp = {};
+            receitas.forEach(l => { const c = l.categoria||'Outros'; catRec[c] = (catRec[c]||0) + (parseFloat(l.valor)||0); });
+            despesas.forEach(l => { const c = l.categoria||'Outros'; catDesp[c] = (catDesp[c]||0) + (parseFloat(l.valor)||0); });
+            const sortedRec  = Object.entries(catRec).sort((a,b)=>b[1]-a[1]);
+            const sortedDesp = Object.entries(catDesp).sort((a,b)=>b[1]-a[1]);
+
+            const cor = resultado >= 0 ? 'var(--accent)' : 'var(--danger)';
+            const html = `
+                <div class="rp-highlight">
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--accent);font-size:0.9rem;">${_fmtMoney(totalRec)}</div><div class="rp-hl-lbl">Receitas</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--danger);font-size:0.9rem;">${_fmtMoney(totalDesp)}</div><div class="rp-hl-lbl">Despesas</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:${cor};font-size:0.9rem;">${_fmtMoney(resultado)}</div><div class="rp-hl-lbl">Resultado Líquido</div></div>
+                </div>
+                <div class="rp-kpi-bar" style="grid-template-columns:1fr 1fr 1fr;">
+                    <div class="rp-kpi-box"><div class="rp-kpi-val" style="color:var(--accent)">${receitas.length}</div><div class="rp-kpi-lbl">Lançamentos Receita</div></div>
+                    <div class="rp-kpi-box"><div class="rp-kpi-val" style="color:var(--danger)">${despesas.length}</div><div class="rp-kpi-lbl">Lançamentos Despesa</div></div>
+                    <div class="rp-kpi-box"><div class="rp-kpi-val" style="color:${cor}">${totalRec>0?_pct(resultado,totalRec):'—'}</div><div class="rp-kpi-lbl">Margem Líquida</div></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
+                    <div>
+                        <div class="rp-section-hd"><i class="fas fa-arrow-up" style="color:var(--accent)"></i> Receitas por Categoria</div>
+                        ${sortedRec.length ? sortedRec.map(([k,v]) => `<div class="rp-rank-row" style="padding:8px 10px;"><div class="rp-rank-info"><div class="rp-rank-name" style="font-size:0.75rem;">${k}</div><div class="rp-progress"><div class="rp-progress-fill" style="width:${Math.round(v/totalRec*100)}%;background:var(--accent);"></div></div></div><div class="rp-rank-val" style="color:var(--accent);font-size:0.7rem;">${_fmtMoney(v)}</div></div>`).join('') : '<div class="rp-result-card"><div class="rp-result-card-body">Nenhuma receita no período.</div></div>'}
+                    </div>
+                    <div>
+                        <div class="rp-section-hd"><i class="fas fa-arrow-down" style="color:var(--danger)"></i> Despesas por Categoria</div>
+                        ${sortedDesp.length ? sortedDesp.map(([k,v]) => `<div class="rp-rank-row" style="padding:8px 10px;"><div class="rp-rank-info"><div class="rp-rank-name" style="font-size:0.75rem;">${k}</div><div class="rp-progress"><div class="rp-progress-fill" style="width:${Math.round(v/totalDesp*100)}%;background:var(--danger);"></div></div></div><div class="rp-rank-val" style="color:var(--danger);font-size:0.7rem;">${_fmtMoney(v)}</div></div>`).join('') : '<div class="rp-result-card"><div class="rp-result-card-body">Nenhuma despesa no período.</div></div>'}
+                    </div>
+                </div>
+                <div class="rp-section-hd" style="margin-top:14px;"><i class="fas fa-list"></i> Lançamentos Detalhados (últimos 50)</div>
+                <div class="rp-table-wrap">
+                    <table class="rp-table">
+                        <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th>Valor</th></tr></thead>
+                        <tbody>${filtrados.sort((a,b)=>new Date(b.data||b.dataCriacao)-new Date(a.data||a.dataCriacao)).slice(0,50).map(l => {
+                            const isRec = l.tipo==='receita'||l.tipo==='entrada';
+                            return `<tr>
+                                <td>${_fmtDate((l.data||l.dataCriacao||'').split('T')[0])}</td>
+                                <td>${(l.descricao||l.titulo||'—').substring(0,30)}</td>
+                                <td>${l.categoria||'—'}</td>
+                                <td><span class="rp-tag ${isRec?'rp-tag-green':'rp-tag-red'}">${isRec?'Receita':'Despesa'}</span></td>
+                                <td style="font-weight:700;color:${isRec?'var(--accent)':'var(--danger)'};">${_fmtMoney(parseFloat(l.valor)||0)}</td>
+                            </tr>`;
+                        }).join('')}</tbody>
+                    </table>
+                </div>`;
+            return { html, type: 'dre', data: filtrados };
+        }
+
+        // ── Comissões ─────────────────────────────────────────────────
+        function generateComissoes(start, end) {
+            const clientes = UI.data.clientes || [];
+            const imoveis  = UI.data.imoveis || [];
+            const etapas   = UI.data.funilEtapas || [];
+
+            const vendas = clientes.filter(c => {
+                const e = etapas.find(et => et.id === c.etapaFunil);
+                if (!(e && (e.id==='venda'||(e.nome||'').toLowerCase().includes('venda')))) return false;
+                const d = new Date(c.dataAtualizacao || c.dataCriacao || '');
+                return d >= start && d <= end;
+            });
+
+            const rows = vendas.map(c => {
+                const im = c.imovelInteresseId ? imoveis.find(i=>i.id===c.imovelInteresseId) : null;
+                const precoRaw = im ? parseFloat((im.preco||im.valor||'0').toString().replace(/[^0-9.,]/g,'').replace(',','.')) : 0;
+                const pct = parseFloat(c.comissaoPct || (im && im.comissao) || 3) || 3;
+                const comissao = precoRaw * pct / 100;
+                return { nome: c.nome, telefone: c.telefone||'—', imovel: im ? (im.titulo||im.endereco||`Ref ${im.ref}`) : 'Não vinculado', valor: precoRaw, pct, comissao };
+            });
+
+            const totalVendas   = rows.reduce((s,r) => s+r.valor, 0);
+            const totalComissao = rows.reduce((s,r) => s+r.comissao, 0);
+
+            const html = `
+                <div class="rp-highlight">
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--primary)">${rows.length}</div><div class="rp-hl-lbl">Vendas</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--accent);font-size:0.85rem;">${_fmtMoney(totalVendas)}</div><div class="rp-hl-lbl">Volume de Vendas</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--warning);font-size:0.85rem;">${_fmtMoney(totalComissao)}</div><div class="rp-hl-lbl">Total Comissões</div></div>
+                </div>
+                ${rows.length === 0 ? `<div class="empty-state"><i class="fas fa-percent"></i><p>Nenhuma venda encontrada neste período.</p></div>` : `
+                <div class="rp-table-wrap">
+                    <table class="rp-table">
+                        <thead><tr><th>Cliente</th><th>Imóvel</th><th>Valor Venda</th><th>Comissão %</th><th>Comissão R$</th></tr></thead>
+                        <tbody>${rows.map(r => `<tr>
+                            <td style="font-weight:600;">${r.nome}</td>
+                            <td>${r.imovel.substring(0,25)}</td>
+                            <td>${_fmtMoney(r.valor)}</td>
+                            <td>${r.pct}%</td>
+                            <td style="font-weight:700;color:var(--warning);">${_fmtMoney(r.comissao)}</td>
+                        </tr>`).join('')}
+                        <tr style="background:var(--primary-ultra);font-weight:800;">
+                            <td colspan="2">TOTAL</td>
+                            <td>${_fmtMoney(totalVendas)}</td>
+                            <td>—</td>
+                            <td style="color:var(--warning);">${_fmtMoney(totalComissao)}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>`}`;
+            return { html, type: 'comissoes', data: rows };
+        }
+
+        // ── Fluxo de Caixa ────────────────────────────────────────────
+        async function generateFluxoCaixa(start, end) {
+            let lancs = [];
+            try { lancs = await DB.getAll('fin_lancamentos'); } catch(e) {}
+            const filtrados = lancs.filter(l => {
+                const d = new Date(l.data || l.dataCriacao || '');
+                return d >= start && d <= end;
+            }).sort((a,b) => new Date(a.data||a.dataCriacao) - new Date(b.data||b.dataCriacao));
+
+            // Agrupa por dia
+            const porDia = {};
+            filtrados.forEach(l => {
+                const dia = (l.data||l.dataCriacao||'').split('T')[0];
+                if (!porDia[dia]) porDia[dia] = { receita: 0, despesa: 0 };
+                if (l.tipo==='receita'||l.tipo==='entrada') porDia[dia].receita += parseFloat(l.valor)||0;
+                else porDia[dia].despesa += parseFloat(l.valor)||0;
+            });
+            const dias = Object.keys(porDia).sort();
+            let saldo = 0;
+            const linhas = dias.map(d => {
+                saldo += porDia[d].receita - porDia[d].despesa;
+                return { d, ...porDia[d], saldo };
+            });
+
+            const totalRec  = linhas.reduce((s,r)=>s+r.receita,0);
+            const totalDesp = linhas.reduce((s,r)=>s+r.despesa,0);
+            const resultado = totalRec - totalDesp;
+            const cor = resultado >= 0 ? 'var(--accent)' : 'var(--danger)';
+
+            const html = `
+                <div class="rp-highlight">
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--accent);font-size:0.85rem;">${_fmtMoney(totalRec)}</div><div class="rp-hl-lbl">Total Entradas</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--danger);font-size:0.85rem;">${_fmtMoney(totalDesp)}</div><div class="rp-hl-lbl">Total Saídas</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:${cor};font-size:0.85rem;">${_fmtMoney(resultado)}</div><div class="rp-hl-lbl">Saldo Período</div></div>
+                </div>
+                ${linhas.length === 0 ? `<div class="empty-state"><i class="fas fa-exchange-alt"></i><p>Nenhum lançamento neste período.</p></div>` : `
+                <div class="rp-table-wrap">
+                    <table class="rp-table">
+                        <thead><tr><th>Data</th><th>Entradas</th><th>Saídas</th><th>Saldo Dia</th><th>Saldo Acum.</th></tr></thead>
+                        <tbody>${linhas.map(r => {
+                            const saldoDia = r.receita - r.despesa;
+                            const corS = saldoDia >= 0 ? 'var(--accent)' : 'var(--danger)';
+                            const corAcum = r.saldo >= 0 ? 'var(--accent)' : 'var(--danger)';
+                            return `<tr>
+                                <td>${_fmtDate(r.d)}</td>
+                                <td style="color:var(--accent);">${r.receita>0?_fmtMoney(r.receita):'—'}</td>
+                                <td style="color:var(--danger);">${r.despesa>0?_fmtMoney(r.despesa):'—'}</td>
+                                <td style="font-weight:700;color:${corS};">${_fmtMoney(saldoDia)}</td>
+                                <td style="font-weight:800;color:${corAcum};">${_fmtMoney(r.saldo)}</td>
+                            </tr>`;
+                        }).join('')}</tbody>
+                    </table>
+                </div>`}`;
+            return { html, type: 'fluxo-caixa', data: linhas };
+        }
+
+        // ── Produtividade ─────────────────────────────────────────────
+        function generateProdutividade(start, end) {
+            const visitas = (UI.data.visitas || []).filter(v => {
+                const d = new Date(v.data);
+                return d >= start && d <= end;
+            });
+            const total = visitas.length;
+            const porTipo = {};
+            visitas.forEach(v => { const t = v.tipo||'outro'; porTipo[t]=(porTipo[t]||0)+1; });
+
+            // Por dia da semana
+            const diasSemana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+            const porDiaSem = [0,0,0,0,0,0,0];
+            visitas.forEach(v => { const d = new Date(v.data+'T12:00:00'); porDiaSem[d.getDay()]++; });
+
+            // Por semana
+            const porSemana = {};
+            visitas.forEach(v => {
+                const d = new Date(v.data+'T12:00:00');
+                const week = `${d.getFullYear()}-W${Math.ceil((d.getDate()-d.getDay()+1)/7).toString().padStart(2,'0')}`;
+                porSemana[week] = (porSemana[week]||0)+1;
+            });
+            const maxSem = Math.max(...Object.values(porSemana), 1);
+            const maxDia = Math.max(...porDiaSem, 1);
+
+            const tipoLabels = { visita:'Visitas', ligacao:'Ligações', whatsapp:'WhatsApp', 'reuniao-equipe':'Reunião Equipe', documentacao:'Documentação', outro:'Outros' };
+
+            const html = `
+                <div class="rp-highlight">
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--primary)">${total}</div><div class="rp-hl-lbl">Total Atividades</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--accent)">${total>0?(total/Math.max(1,Math.ceil((end-start)/86400000/7))).toFixed(1):0}</div><div class="rp-hl-lbl">Média/Semana</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--warning)">${total>0?(total/Math.max(1,Math.ceil((end-start)/86400000))).toFixed(1):0}</div><div class="rp-hl-lbl">Média/Dia</div></div>
+                </div>
+                <div class="rp-section-hd"><i class="fas fa-tasks"></i> Por Tipo de Atividade</div>
+                ${Object.entries(porTipo).sort((a,b)=>b[1]-a[1]).map(([k,v]) => `
+                    <div class="rp-rank-row">
+                        <div class="rp-rank-info">
+                            <div class="rp-rank-name">${tipoLabels[k]||k}</div>
+                            <div class="rp-progress"><div class="rp-progress-fill" style="width:${Math.round(v/total*100)}%;background:var(--primary);"></div></div>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+                            <div class="rp-rank-val">${v}</div>
+                            <div style="font-size:0.68rem;color:var(--text-muted);">${_pct(v,total)}</div>
+                        </div>
+                    </div>`).join('')}
+                <div class="rp-section-hd" style="margin-top:14px;"><i class="fas fa-calendar-week"></i> Distribuição por Dia da Semana</div>
+                <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid var(--border);">
+                    <div class="rp-bar-chart">
+                        ${diasSemana.map((d,i) => `<div class="rp-bar-row">
+                            <div class="rp-bar-month">${d}</div>
+                            <div class="rp-bar-track"><div class="rp-bar-fill" style="width:${Math.round(porDiaSem[i]/maxDia*100)}%;background:${i===0||i===6?'var(--accent)':'var(--primary)'};"></div></div>
+                            <div class="rp-bar-val">${porDiaSem[i]}</div>
+                        </div>`).join('')}
+                    </div>
+                </div>
+                <div class="rp-section-hd" style="margin-top:14px;"><i class="fas fa-list-alt"></i> Detalhes (últimos 30)</div>
+                <div class="rp-table-wrap">
+                    <table class="rp-table">
+                        <thead><tr><th>Data</th><th>Tipo</th><th>Cliente</th><th>Obs.</th></tr></thead>
+                        <tbody>${visitas.sort((a,b)=>new Date(b.data)-new Date(a.data)).slice(0,30).map(v => {
+                            const c = (UI.data.clientes||[]).find(x=>x.id===v.clienteId);
+                            return `<tr>
+                                <td>${_fmtDate(v.data)}</td>
+                                <td><span class="rp-tag rp-tag-blue">${tipoLabels[v.tipo]||v.tipo||'—'}</span></td>
+                                <td>${c?c.nome:v.clienteId?'ID '+v.clienteId:'—'}</td>
+                                <td style="color:var(--text-secondary);">${(v.observacoes||v.obs||'').substring(0,40)}</td>
+                            </tr>`;
+                        }).join('')}</tbody>
+                    </table>
+                </div>`;
+            return { html, type: 'produtividade', data: visitas };
+        }
+
+        // ── Captação por Status ───────────────────────────────────────
+        function generateCaptacaoStatus() {
+            let dados = [];
+            try {
+                const stored = localStorage.getItem('imobipro_captacoes');
+                dados = stored ? JSON.parse(stored) : [];
+            } catch(e) {}
+            if (dados.length === 0) {
+                return { html: `<div class="empty-state"><i class="fas fa-map-marker-alt"></i><p>Nenhuma captação registrada ainda.</p></div>`, type: 'captacao-status', data: [] };
+            }
+            const total   = dados.length;
+            const novo    = dados.filter(d=>d.status==='novo'||!d.status).length;
+            const cont    = dados.filter(d=>d.status==='contatado').length;
+            const aut     = dados.filter(d=>d.status==='autorizado').length;
+            const desc    = dados.filter(d=>d.status==='descartado').length;
+            const taxaAut = total > 0 ? ((aut/total)*100).toFixed(1) : 0;
+
+            const statusCfg = {
+                novo:       { label: 'Novo',        cor: '#64748B', tag: 'rp-tag-gray' },
+                contatado:  { label: 'Contatado',   cor: '#2980B9', tag: 'rp-tag-blue' },
+                autorizado: { label: 'Autorizado ✅',cor: '#27AE60', tag: 'rp-tag-green' },
+                descartado: { label: 'Descartado',  cor: '#E74C3C', tag: 'rp-tag-red' },
+            };
+
+            const html = `
+                <div class="rp-highlight">
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--primary)">${total}</div><div class="rp-hl-lbl">Total Captações</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--accent)">${aut}</div><div class="rp-hl-lbl">Autorizados</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--warning)">${taxaAut}%</div><div class="rp-hl-lbl">Taxa Autorização</div></div>
+                </div>
+                <div class="rp-kpi-bar">
+                    <div class="rp-kpi-box"><div class="rp-kpi-val" style="color:#64748B">${novo}</div><div class="rp-kpi-lbl">Novos</div></div>
+                    <div class="rp-kpi-box"><div class="rp-kpi-val" style="color:#2980B9">${cont}</div><div class="rp-kpi-lbl">Contatados</div></div>
+                    <div class="rp-kpi-box"><div class="rp-kpi-val" style="color:#27AE60">${aut}</div><div class="rp-kpi-lbl">Autorizados</div></div>
+                    <div class="rp-kpi-box"><div class="rp-kpi-val" style="color:#E74C3C">${desc}</div><div class="rp-kpi-lbl">Descartados</div></div>
+                </div>
+                <div class="rp-section-hd"><i class="fas fa-stream"></i> Funil de Captação</div>
+                <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid var(--border);">
+                    <div class="rp-funil-bar">
+                        ${[['novo',novo],['contatado',cont],['autorizado',aut],['descartado',desc]].map(([k,v]) => {
+                            const cfg = statusCfg[k];
+                            return `<div class="rp-funil-row">
+                                <div class="rp-funil-label">${cfg.label}</div>
+                                <div class="rp-funil-track"><div class="rp-funil-fill" style="width:${total>0?Math.round(v/total*100):0}%;background:${cfg.cor};"></div></div>
+                                <div class="rp-funil-count">${v}</div>
+                                <div style="font-size:0.62rem;color:var(--text-muted);min-width:38px;text-align:right;">${total>0?((v/total)*100).toFixed(0):'0'}%</div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>
+                <div class="rp-section-hd" style="margin-top:14px;"><i class="fas fa-list"></i> Listagem</div>
+                <div class="rp-table-wrap">
+                    <table class="rp-table">
+                        <thead><tr><th>Proprietário</th><th>Endereço</th><th>Tipo</th><th>Status</th><th>Contato</th></tr></thead>
+                        <tbody>${dados.map(d => {
+                            const s = d.status||'novo';
+                            const cfg = statusCfg[s]||statusCfg.novo;
+                            return `<tr>
+                                <td style="font-weight:600;">${d.proprietario||'—'}</td>
+                                <td>${(d.endereco||'—').substring(0,25)}</td>
+                                <td>${d.tipoImovel||d.tipo||'—'}</td>
+                                <td><span class="rp-tag ${cfg.tag}">${cfg.label}</span></td>
+                                <td>${d.telefone||'—'}</td>
+                            </tr>`;
+                        }).join('')}</tbody>
+                    </table>
+                </div>`;
+            return { html, type: 'captacao-status', data: dados };
+        }
+
+        // ── Captação por Bairro ───────────────────────────────────────
+        function generateCaptacaoBairro() {
+            let dados = [];
+            try {
+                const stored = localStorage.getItem('imobipro_captacoes');
+                dados = stored ? JSON.parse(stored) : [];
+            } catch(e) {}
+            if (dados.length === 0) {
+                return { html: `<div class="empty-state"><i class="fas fa-map"></i><p>Nenhuma captação registrada.</p></div>`, type: 'captacao-bairro', data: [] };
+            }
+            const porBairro = {};
+            dados.forEach(d => {
+                const b = d.bairro||'Não informado';
+                if (!porBairro[b]) porBairro[b] = { total:0, autorizado:0, contatado:0, novo:0, descartado:0 };
+                porBairro[b].total++;
+                porBairro[b][d.status||'novo'] = (porBairro[b][d.status||'novo']||0)+1;
+            });
+            const sorted = Object.entries(porBairro).sort((a,b)=>b[1].total-a[1].total);
+            const maxTotal = sorted[0]?.[1].total || 1;
+
+            const html = `
+                <div class="rp-highlight">
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--primary)">${dados.length}</div><div class="rp-hl-lbl">Total Captações</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--teal)">${sorted.length}</div><div class="rp-hl-lbl">Bairros Mapeados</div></div>
+                    <div class="rp-hl-box"><div class="rp-hl-num" style="color:var(--accent)">${sorted[0]?.[0]||'—'}</div><div class="rp-hl-lbl">Mais Captado</div></div>
+                </div>
+                <div class="rp-section-hd"><i class="fas fa-chart-bar"></i> Captações por Bairro</div>
+                ${sorted.map(([bairro, stat]) => `
+                    <div class="rp-rank-row">
+                        <div class="rp-rank-info">
+                            <div class="rp-rank-name">${bairro}</div>
+                            <div style="display:flex;gap:4px;margin:4px 0;">
+                                ${stat.autorizado?`<span class="rp-tag rp-tag-green" style="font-size:0.6rem;">${stat.autorizado} aut.</span>`:''}
+                                ${stat.contatado?`<span class="rp-tag rp-tag-blue" style="font-size:0.6rem;">${stat.contatado} cont.</span>`:''}
+                                ${stat.novo?`<span class="rp-tag rp-tag-gray" style="font-size:0.6rem;">${stat.novo} novo</span>`:''}
+                                ${stat.descartado?`<span class="rp-tag rp-tag-red" style="font-size:0.6rem;">${stat.descartado} desc.</span>`:''}
+                            </div>
+                            <div class="rp-progress"><div class="rp-progress-fill" style="width:${Math.round(stat.total/maxTotal*100)}%;background:var(--primary);"></div></div>
+                        </div>
+                        <div class="rp-rank-val">${stat.total}</div>
+                    </div>`).join('')}`;
+            return { html, type: 'captacao-bairro', data: sorted };
+        }
+
+        // ── Hook para gerar relatórios novos no switch do UI ──────────
+        function handleNewTypes(type, start, end) {
+            switch(type) {
+                case 'funil-saude':         return generateFunilSaude();
+                case 'perfil-compradores':  return generatePerfilCompradores();
+                case 'estoque':             return generateEstoque();
+                case 'imoveis-sem-visita':  return generateImoveisSemVisita();
+                case 'imoveis-price':       return generateImoveisPrice();
+                case 'ranking-imoveis':     return generateRankingImoveis(start, end);
+                case 'comissoes':           return generateComissoes(start, end);
+                case 'produtividade':       return generateProdutividade(start, end);
+                case 'captacao-status':     return generateCaptacaoStatus();
+                case 'captacao-bairro':     return generateCaptacaoBairro();
+                default: return null;
+            }
+        }
+
+        async function handleAsyncTypes(type, start, end) {
+            if (type === 'dre')           return await generateDRE(start, end);
+            if (type === 'fluxo-caixa')  return await generateFluxoCaixa(start, end);
+            return null;
+        }
+
+        return { init, filterCat, open, backToMenu, setPeriod, setThisMonth, setLastMonth, setThisYear, handleNewTypes, handleAsyncTypes };
+    })();
+
+    // ── Patch: interceptar UI.generateReport para suportar novos tipos ──
+    (function patchGenerateReport() {
+        const origGenerate = UI.generateReport;
+        UI.generateReport = async function() {
+            const type = (document.getElementById('report-type')||{}).value || '';
+            const newTypes = ['funil-saude','perfil-compradores','estoque','imoveis-sem-visita','imoveis-price','ranking-imoveis','comissoes','produtividade','captacao-status','captacao-bairro','dre','fluxo-caixa'];
+            if (!newTypes.includes(type)) { origGenerate.call(UI); return; }
+
+            const semData = ['funil-saude','perfil-compradores','estoque','imoveis-sem-visita','imoveis-price','captacao-status','captacao-bairro'];
+            let start = new Date(), end = new Date();
+            if (!semData.includes(type)) {
+                const sv = document.getElementById('report-date-start').value;
+                const ev = document.getElementById('report-date-end').value;
+                if (!sv) { Utils.toast('Selecione a data de início', 'error'); return; }
+                start = new Date(sv); end = ev ? new Date(ev) : new Date();
+                if (start > end) { Utils.toast('Data inicial maior que final', 'error'); return; }
+            }
+
+            // async types
+            let reportData = null;
+            if (type === 'dre' || type === 'fluxo-caixa') {
+                reportData = await ReportPanel.handleAsyncTypes(type, start, end);
+            } else {
+                reportData = ReportPanel.handleNewTypes(type, start, end);
+            }
+
+            if (reportData) {
+                UI.currentReport = reportData;
+                // Show PDF button for new reports
+                const container = document.getElementById('report-content');
+                const btnPdf = `<div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+                    <button class="btn-pdf-inline" onclick="UI.exportReport()">
+                        <i class="fas fa-file-pdf"></i> Baixar PDF
+                    </button></div>`;
+                container.innerHTML = btnPdf + reportData.html;
+                Utils.toast('Relatório gerado com sucesso!');
+            }
+        };
+    })();
+
+    // ── Patch: iniciar ReportPanel quando a view for ativada ──────────
+    (function patchSwitchTab() {
+        const orig = UI.switchTab;
+        UI.switchTab = function(el) {
+            orig.call(UI, el);
+            const target = el ? el.getAttribute('data-target') : '';
+            if (target === 'relatorios-view') {
+                setTimeout(() => ReportPanel.init(), 80);
+            }
+        };
+    })();
 
     // Patch: clicking agenda cards opens VerTarefa instead of edit form directly
     // Override createVisitaCard onclick to use VerTarefa
