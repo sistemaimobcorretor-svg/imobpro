@@ -11310,6 +11310,14 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </div>
                 <input type="file" id="cap-photo-input" accept="image/*" capture="environment" style="display:none" multiple onchange="CaptacaoModule.onPhotosSelected(this)">
                 <input type="file" id="cap-photo-input-gallery" accept="image/*" style="display:none" multiple onchange="CaptacaoModule.onPhotosSelected(this)">
+                <input type="file" id="cap-video-camera-input" accept="video/*" capture="environment" style="display:none" onchange="CaptacaoModule.onVideoSelected(this)">
+                <input type="file" id="cap-video-gallery-input" accept="video/*" style="display:none" multiple onchange="CaptacaoModule.onVideoSelected(this)">
+            </div>
+
+            <!-- ── Vídeos ── -->
+            <div class="form-group">
+                <label class="form-label" style="display:flex;align-items:center;gap:6px;"><i class="fas fa-video" style="color:#7C3AED;"></i> Vídeos <span style="font-size:0.7rem;color:var(--text-muted);font-weight:500;">(opcional · máx 3)</span></label>
+                <div id="cap-videos-grid" class="cap-photos-grid"></div>
             </div>
 
             <!-- ── Tipo de negócio ── -->
@@ -11438,6 +11446,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <!-- Galeria de fotos -->
             <div id="cap-detail-gallery-wrap" style="display:none;margin-bottom:14px;">
                 <div class="cap-detail-gallery" id="cap-detail-gallery"></div>
+            </div>
+
+            <!-- Vídeos -->
+            <div id="cap-detail-videos-wrap" style="display:none;margin-bottom:14px;">
+                <div class="cap-detail-label" style="margin-bottom:8px;"><i class="fas fa-video" style="margin-right:4px;color:#7C3AED;"></i>Vídeos</div>
+                <div id="cap-detail-videos-container"></div>
             </div>
 
             <div class="cap-detail-badges" id="cap-detail-badges"></div>
@@ -46227,6 +46241,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
         // ── Nova captura ─────────────────────────────────────────────────
         let _telefones = ['']; // array de strings de telefone
+        let _videos = []; // array de { name, data (base64 ou blob url), type }
 
         function _renderTelefonesList() {
             const list = document.getElementById('cap-telefones-list');
@@ -46245,9 +46260,77 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         function addTelefone() { _telefones.push(''); _renderTelefonesList(); setTimeout(()=>{ const inputs=document.querySelectorAll('.cap-tel-input'); if(inputs.length) inputs[inputs.length-1].focus(); },80); }
         function removeTelefone(idx) { _telefones.splice(idx,1); if(!_telefones.length) _telefones=[''];  _renderTelefonesList(); }
 
+        // ── Vídeos ───────────────────────────────────────────────────────
+        function _renderVideoGrid() {
+            const grid = document.getElementById('cap-videos-grid');
+            if (!grid) return;
+            grid.innerHTML = _videos.map((v, i) =>
+                `<div class="cap-photo-thumb-wrap" style="position:relative;">
+                    <div style="width:100%;height:100%;background:#1a1a2e;display:flex;align-items:center;justify-content:center;border-radius:10px;flex-direction:column;gap:4px;cursor:pointer;" onclick="CaptacaoModule._viewVideo(${i})" title="Ver vídeo">
+                        <i class="fas fa-play-circle" style="font-size:2rem;color:#fff;"></i>
+                        <span style="font-size:0.6rem;color:rgba(255,255,255,0.7);padding:0 4px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90%;">${v.name||'Vídeo '+(i+1)}</span>
+                    </div>
+                    <div class="cap-photo-thumb-del" onclick="CaptacaoModule.removeVideo(${i})"><i class="fas fa-times"></i></div>
+                </div>`
+            ).join('') +
+            (_videos.length < 3 ? `
+            <div class="cap-photo-add-btn" onclick="document.getElementById('cap-video-camera-input').click()" title="Gravar vídeo com a câmera" style="border-color:#7C3AED;color:#7C3AED;">
+                <i class="fas fa-video"></i><span>Câmera</span>
+            </div>
+            <div class="cap-photo-add-btn" onclick="document.getElementById('cap-video-gallery-input').click()" title="Importar vídeo da galeria" style="border-color:#E67E22;color:#E67E22;">
+                <i class="fas fa-film"></i><span>Galeria</span>
+            </div>` : '<div style="font-size:0.7rem;color:var(--text-muted);padding:8px 0;text-align:center;">Máximo 3 vídeos</div>');
+        }
+
+        function onVideoSelected(input) {
+            if (!input.files || !input.files.length) return;
+            const files = Array.from(input.files).slice(0, 3 - _videos.length);
+            if (!files.length) { Utils.toast('Máximo 3 vídeos permitidos', 'error'); return; }
+            let loaded = 0;
+            files.forEach(file => {
+                if (file.size > 100 * 1024 * 1024) { Utils.toast('Vídeo muito grande (máx 100MB)', 'error'); loaded++; return; }
+                const reader = new FileReader();
+                reader.onload = e => {
+                    _videos.push({ name: file.name, data: e.target.result, type: file.type });
+                    loaded++;
+                    if (loaded === files.length) _renderVideoGrid();
+                };
+                reader.readAsDataURL(file);
+            });
+            input.value = '';
+        }
+
+        function removeVideo(idx) {
+            _videos.splice(idx, 1);
+            _renderVideoGrid();
+        }
+
+        function _viewVideo(idx) {
+            const v = _videos[idx];
+            if (!v) return;
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;';
+            overlay.innerHTML = `<video src="${v.data}" controls autoplay playsinline style="max-width:95vw;max-height:80vh;border-radius:10px;"></video>
+                <button onclick="this.parentElement.remove()" style="background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:0.85rem;font-weight:700;cursor:pointer;"><i class='fas fa-times'></i> Fechar</button>`;
+            overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+            document.body.appendChild(overlay);
+        }
+
+        function _viewVideoDetalhe(videos, idx) {
+            const v = videos[idx];
+            if (!v) return;
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;';
+            overlay.innerHTML = `<video src="${v.data}" controls autoplay playsinline style="max-width:95vw;max-height:80vh;border-radius:10px;"></video>
+                <button onclick="this.parentElement.remove()" style="background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:0.85rem;font-weight:700;cursor:pointer;"><i class='fas fa-times'></i> Fechar</button>`;
+            overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+            document.body.appendChild(overlay);
+        }
+
         function novaCaptura() {
             _idAtual = null;
             _fotos = [];
+            _videos = [];
             _telefones = [''];
             document.getElementById('cap-edit-id').value = '';
             document.getElementById('cap-form-title').textContent = '📷 Novo Imóvel Captado';
@@ -46261,6 +46344,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             document.getElementById('cap-agend-hora').value = '09:00';
             document.getElementById('cap-agend-obs').value = '';
             _renderPhotoGrid();
+            _renderVideoGrid();
             _renderTelefonesList();
             UI.openModal('captacao-form');
             setTimeout(() => { const inp = document.querySelector('.cap-tel-input'); if(inp) inp.focus(); }, 350);
@@ -46336,6 +46420,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 valor: document.getElementById('cap-valor').value.trim(),
                 obs: document.getElementById('cap-obs').value.trim(),
                 fotos: _fotos.length > 0 ? _fotos : (existing.fotos || []),
+                videos: _videos.length > 0 ? _videos : (existing.videos || []),
                 data: isEdit ? (existing.data || new Date().toISOString()) : new Date().toISOString(),
                 status: isEdit ? (existing.status || 'novo') : 'novo',
                 agendamentos: existing.agendamentos || []
@@ -46436,6 +46521,25 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             }
             // Compat: manter hidden field
             document.getElementById('cap-detail-telefone') && (document.getElementById('cap-detail-telefone').textContent = tels[0] || 'Não informado');
+
+            // Render vídeos no detalhe
+            const videosSection = document.getElementById('cap-detail-videos-wrap');
+            const videosContainer = document.getElementById('cap-detail-videos-container');
+            if (videosContainer) {
+                const vids = d.videos || [];
+                if (vids.length > 0) {
+                    if (videosSection) videosSection.style.display = '';
+                    videosContainer.innerHTML = vids.map((v, i) =>
+                        `<div style="display:inline-flex;align-items:center;gap:8px;background:var(--bg-overlay);border:1px solid var(--border);border-radius:10px;padding:8px 12px;cursor:pointer;margin-bottom:6px;width:100%;box-sizing:border-box;" onclick="CaptacaoModule._viewVideoDetalhe(${JSON.stringify(d.videos).replace(/"/g,'&quot;')},${i})">
+                            <div style="width:36px;height:36px;background:#1a1a2e;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-play-circle" style="color:#fff;font-size:1.1rem;"></i></div>
+                            <div style="flex:1;min-width:0;"><div style="font-size:0.78rem;font-weight:700;color:var(--dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v.name||'Vídeo '+(i+1)}</div><div style="font-size:0.65rem;color:var(--text-muted);">Toque para reproduzir</div></div>
+                            <i class="fas fa-chevron-right" style="color:var(--text-muted);font-size:0.8rem;flex-shrink:0;"></i>
+                        </div>`
+                    ).join('');
+                } else {
+                    if (videosSection) videosSection.style.display = 'none';
+                }
+            }
 
             const show = (wrapId, valId, val) => {
                 const el = document.getElementById(wrapId);
@@ -46579,7 +46683,9 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 document.getElementById('cap-agend-ativo').checked = false;
                 document.getElementById('cap-agend-fields').style.display = 'none';
                 _fotos = [...(d.fotos||(d.foto?[d.foto]:[]))];
+                _videos = [...(d.videos||[])];
                 _renderPhotoGrid();
+                _renderVideoGrid();
                 _renderTelefonesList();
                 UI.openModal('captacao-form');
             }, 350);
@@ -46614,7 +46720,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             if (target) obs.observe(target, { attributes: true, attributeFilter: ['class','style'] });
         })();
 
-        return { open, filter, novaCaptura, toggleAgendForm, onPhotosSelected, removePhoto, salvar, verDetalhe, ligar, ligarDireto, whatsapp, whatsappDireto, setStatus, editarAtual, excluirAtual, novoAgendamento, _viewFullPhoto, _verAgendaItem };
+        return { open, filter, novaCaptura, toggleAgendForm, onPhotosSelected, removePhoto, onVideoSelected, removeVideo, salvar, verDetalhe, ligar, ligarDireto, whatsapp, whatsappDireto, setStatus, editarAtual, excluirAtual, novoAgendamento, _viewFullPhoto, _viewVideo, _viewVideoDetalhe, _verAgendaItem, addTelefone, removeTelefone, onTelChange };
     })();
 
     // ═══════════════ FIM MÓDULO CAPTAÇÃO ═══════════════
