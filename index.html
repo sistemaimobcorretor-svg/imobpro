@@ -5782,6 +5782,7 @@
         .dash-nav-card.c-fluxo    { background: linear-gradient(135deg, #4A0E8F 0%, #7C3AED 60%, #9D5CEA 100%); box-shadow: 0 4px 16px rgba(124,58,237,0.38); }
         .dash-nav-card.c-captacao { background: linear-gradient(135deg, #7B1200 0%, #C0392B 60%, #E74C3C 100%); box-shadow: 0 4px 16px rgba(192,57,43,0.38); }
         .dash-nav-card.c-construtoras { background: linear-gradient(135deg, #1A3A5C 0%, #1D6FA4 60%, #2E8BC0 100%); box-shadow: 0 4px 16px rgba(29,111,164,0.38); }
+        .dash-nav-icon {
             width: 42px; height: 42px;
             border-radius: 12px;
             background: rgba(255,255,255,0.20);
@@ -5795,11 +5796,13 @@
         .dash-nav-title {
             font-size: 0.88rem; font-weight: 800;
             color: #FFFFFF; letter-spacing: -0.2px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            white-space: normal;
+            word-wrap: break-word;
         }
         .dash-nav-sub {
-            font-size: 0.68rem; color: rgba(255,255,255,0.65);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            font-size: 0.68rem; color: rgba(255,255,255,0.85);
+            white-space: normal;
+            word-wrap: break-word;
         }
         .dash-nav-arrow {
             font-size: 0.7rem; color: rgba(255,255,255,0.50);
@@ -16647,6 +16650,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     'clientes-view':     () => { container.style.display='flex'; _fabIcon('user-plus','linear-gradient(135deg,var(--primary),var(--primary-dark))'); UI.setFabDirect(()=>UI.openNewCliente(false)); },
                     'agenda-view':       () => { container.style.display='flex'; _fabIcon('calendar-plus','linear-gradient(135deg,#E67E22,#D35400)'); UI.setFabDirect(UI.openNewVisita); },
                     'links-view':        () => { container.style.display='flex'; _fabIcon('link','linear-gradient(135deg,#0891B2,#0369A1)'); UI.setFabDirect(UI.openNewLink); },
+                    'construtoras-view': () => { container.style.display='flex'; _fabIcon('hard-hat','linear-gradient(135deg,var(--primary),var(--primary-dark))'); UI.setFabDirect(()=>ConstrutorasModule.openModal(null)); },
                     // FERRAMENTAS — sem FAB principal (cada um tem seu próprio botão ou não precisa)
                     'funil-view':        () => { container.style.display='none'; UI.renderFunil(); },
                     'relatorios-view':   () => { container.style.display='none'; },
