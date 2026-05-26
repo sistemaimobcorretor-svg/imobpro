@@ -5781,8 +5781,7 @@
         .dash-nav-card.c-perfis   { background: linear-gradient(135deg, #1A5C35 0%, #27AE60 60%, #2ECC71 100%); box-shadow: 0 4px 16px rgba(39,174,96,0.38); }
         .dash-nav-card.c-fluxo    { background: linear-gradient(135deg, #4A0E8F 0%, #7C3AED 60%, #9D5CEA 100%); box-shadow: 0 4px 16px rgba(124,58,237,0.38); }
         .dash-nav-card.c-captacao { background: linear-gradient(135deg, #7B1200 0%, #C0392B 60%, #E74C3C 100%); box-shadow: 0 4px 16px rgba(192,57,43,0.38); }
-
-        .dash-nav-icon {
+        .dash-nav-card.c-construtoras { background: linear-gradient(135deg, #1A3A5C 0%, #1D6FA4 60%, #2E8BC0 100%); box-shadow: 0 4px 16px rgba(29,111,164,0.38); }
             width: 42px; height: 42px;
             border-radius: 12px;
             background: rgba(255,255,255,0.20);
@@ -7969,6 +7968,15 @@ if(document.readyState==='loading'){
                         <div class="dash-nav-text">
                             <span class="dash-nav-title">Captação de Rua</span>
                             <span class="dash-nav-sub">Imóveis com placa encontrados</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
+                    <div class="dash-nav-card c-construtoras" onclick="UI.navigate('construtoras');ConstrutorasModule.init();">
+                        <div class="dash-nav-icon"><i class="fas fa-hard-hat"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Construtoras</span>
+                            <span class="dash-nav-sub">Gestão de construtoras e empreendimentos</span>
                         </div>
                         <i class="fas fa-chevron-right dash-nav-arrow"></i>
                     </div>
@@ -10751,6 +10759,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <button class="nav-panel-item" data-target="mercado-view" onclick="UI.switchTab(this);MarketPanel.load(false);UI.closeNavDrawer();return false;">
                     <i class="fas fa-chart-line"></i> Mercado
                 </button>
+                <button class="nav-panel-item" data-target="construtoras-view" onclick="UI.switchTab(this);ConstrutorasModule.init();UI.closeNavDrawer();return false;">
+                    <i class="fas fa-hard-hat"></i> Construtoras
+                </button>
             </div>
         </div>
 
@@ -10830,11 +10841,135 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <button class="nav-panel-item" data-target="mercado-view" onclick="UI.switchTab(this);MarketPanel.load(false);return false;">
                     <i class="fas fa-chart-line"></i> Mercado
                 </button>
+                <button class="nav-panel-item" data-target="construtoras-view" onclick="UI.switchTab(this);ConstrutorasModule.init();return false;">
+                    <i class="fas fa-hard-hat"></i> Construtoras
+                </button>
             </div>
         </nav>
 
         <!-- Modais (mantidos iguais ao original) -->
         <div class="modal-overlay" id="overlay-imovel-details"></div>
+
+        <!-- ========== CONSTRUTORAS VIEW ========== -->
+        <div id="construtoras-view" class="view">
+            <!-- Cabeçalho fixo -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:38px;height:38px;border-radius:12px;background:var(--primary-ultra);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-hard-hat" style="color:var(--primary);font-size:1.1rem;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:1.05rem;font-weight:800;color:var(--dark);line-height:1.2;">Construtoras</div>
+                        <div style="font-size:0.72rem;color:var(--text-muted);">Gestão de construtoras e empreendimentos</div>
+                    </div>
+                </div>
+                <button onclick="ConstrutorasModule.openModal(null)"
+                    style="display:inline-flex;align-items:center;gap:7px;
+                           background:var(--primary);color:#fff;border:none;border-radius:10px;
+                           padding:10px 18px;font-size:0.85rem;font-weight:700;cursor:pointer;
+                           font-family:'Inter',sans-serif;white-space:nowrap;
+                           box-shadow:0 4px 14px rgba(29,111,164,0.35);transition:all 0.2s;"
+                    onmouseover="this.style.background='var(--primary-dark)'"
+                    onmouseout="this.style.background='var(--primary)'">
+                    <i class="fas fa-plus"></i> Nova Construtora
+                </button>
+            </div>
+            <!-- Busca -->
+            <div style="position:relative;margin-bottom:12px;">
+                <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.82rem;pointer-events:none;"></i>
+                <input type="text" id="cs-search"
+                    placeholder="Buscar por nome..."
+                    oninput="ConstrutorasModule.render()"
+                    style="width:100%;padding:10px 12px 10px 36px;border:1.5px solid var(--border);border-radius:10px;
+                           font-size:0.88rem;font-family:'Inter',sans-serif;background:var(--bg-raised);
+                           color:var(--dark);outline:none;box-sizing:border-box;"
+                    onfocus="this.style.borderColor='var(--primary)'"
+                    onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div id="cs-counter" style="font-size:0.72rem;color:var(--text-muted);margin-bottom:12px;min-height:16px;"></div>
+            <div id="cs-list" style="display:flex;flex-direction:column;gap:10px;padding-bottom:80px;"></div>
+        </div>
+
+        <!-- ===== MODAL FORM CONSTRUTORA ===== -->
+        <div class="modal-overlay" id="overlay-cs-form" onclick="ConstrutorasModule.closeModal()"></div>
+        <div class="modal-sheet" id="sheet-cs-form" style="max-height:93vh;overflow-y:auto;">
+            <div class="sheet-handle"></div>
+            <div style="padding:6px 18px 32px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-top:4px;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:40px;height:40px;border-radius:12px;background:var(--primary-ultra);display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-hard-hat" style="color:var(--primary);font-size:1.1rem;"></i>
+                        </div>
+                        <div>
+                            <div id="cs-form-title" style="font-size:1rem;font-weight:800;color:var(--dark);">Nova Construtora</div>
+                            <div style="font-size:0.7rem;color:var(--text-muted);">Preencha os dados abaixo</div>
+                        </div>
+                    </div>
+                    <button onclick="ConstrutorasModule.closeModal()"
+                        style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);
+                               background:var(--bg-overlay);color:var(--text-secondary);cursor:pointer;
+                               display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <input type="hidden" id="cs-id">
+                <!-- Nome -->
+                <div class="form-group">
+                    <label class="form-label">Nome da Construtora *</label>
+                    <input type="text" id="cs-nome" class="form-control" placeholder="Ex: MRV, Cyrela, Tenda...">
+                </div>
+                <!-- Telefone + WhatsApp -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-phone" style="color:var(--primary);margin-right:5px;"></i>Telefone</label>
+                        <input type="tel" id="cs-telefone" class="form-control" placeholder="(00) 0000-0000" oninput="Utils.maskPhone(this)">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fab fa-whatsapp" style="color:#25D366;margin-right:5px;"></i>WhatsApp</label>
+                        <input type="tel" id="cs-whatsapp" class="form-control" placeholder="(00) 00000-0000" oninput="Utils.maskPhone(this)">
+                    </div>
+                </div>
+                <!-- Instagram -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fab fa-instagram" style="color:#E1306C;margin-right:5px;"></i>Instagram</label>
+                    <input type="text" id="cs-instagram" class="form-control" placeholder="@construtora">
+                </div>
+                <!-- Site -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-globe" style="color:var(--primary);margin-right:5px;"></i>Site</label>
+                    <input type="url" id="cs-site" class="form-control" placeholder="https://construtora.com.br">
+                </div>
+                <!-- Obs -->
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea id="cs-obs" class="form-control" rows="3" placeholder="Anotações sobre a construtora..." style="resize:vertical;"></textarea>
+                </div>
+                <!-- Botões -->
+                <div style="display:flex;gap:10px;margin-top:8px;">
+                    <button onclick="ConstrutorasModule.save()"
+                        style="flex:1;background:var(--primary);color:#fff;border:none;border-radius:12px;
+                               padding:14px;font-weight:700;font-size:0.95rem;cursor:pointer;
+                               font-family:'Inter',sans-serif;display:flex;align-items:center;
+                               justify-content:center;gap:8px;
+                               box-shadow:0 4px 14px rgba(29,111,164,0.30);">
+                        <i class="fas fa-save"></i> Salvar Construtora
+                    </button>
+                    <button onclick="ConstrutorasModule.closeModal()"
+                        style="padding:14px 18px;background:transparent;color:var(--text-secondary);
+                               border:1.5px solid var(--border);border-radius:12px;font-weight:600;
+                               cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== MODAL DETALHE CONSTRUTORA ===== -->
+        <div class="modal-overlay" id="overlay-cs-detalhe" onclick="ConstrutorasModule.closeDetalhe()"></div>
+        <div class="modal-sheet" id="sheet-cs-detalhe" style="max-height:93vh;overflow-y:auto;">
+            <div class="sheet-handle"></div>
+            <div id="cs-detalhe-content" style="padding:6px 18px 32px;"></div>
+        </div>
         <div class="modal-sheet" id="sheet-imovel-details">
             <div class="sheet-handle"></div>
             <div id="imovel-details-content">
@@ -11782,7 +11917,15 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                 <div class="form-group">
                     <label class="form-label">Construtora</label>
-                    <input type="text" id="i-construtora" class="form-control" placeholder="Nome da construtora">
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <select id="i-construtora-id" class="form-control" style="flex:1;" onchange="App.imovel.onConstrutoraSelect(this)">
+                            <option value="">Nenhuma / Digite manualmente</option>
+                        </select>
+                        <button type="button" class="btn-sm btn-primary-soft" onclick="ConstrutorasModule.openModal()" title="Nova construtora" style="white-space:nowrap;">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <input type="text" id="i-construtora" class="form-control" placeholder="Nome da construtora (ou selecione acima)" style="margin-top:6px;">
                 </div>
 
                 <div class="form-group">
@@ -13445,7 +13588,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
         // CÓDIGO JAVASCRIPT COMPLETO (com as melhorias: contador de contatos e alerta de cliente parado)
         const DB = {
             name: 'ImobiProDB',
-            version: 25, // v25: stores financeiro
+            version: 26, // v26: store construtoras
             db: null,
             
             init: function() {
@@ -13595,6 +13738,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     fl.createIndex('data', 'data', { unique: false });
                     fl.createIndex('tipo', 'tipo', { unique: false });
                     fl.createIndex('groupId', 'groupId', { unique: false });
+                }
+                // Construtoras (v26)
+                if (!db.objectStoreNames.contains('construtoras')) {
+                    const csStore = db.createObjectStore('construtoras', { keyPath: 'id' });
+                    csStore.createIndex('nome', 'nome', { unique: false });
                 }
             },
             
@@ -46135,18 +46283,58 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         let _filtroAtual = 'todos';
         let _idAtual = null;
         let _fotos = []; // array de base64
+        let _loaded = false; // evita recarregar localStorage e sobrescrever dados em memória
 
         function _load() {
             try { _dados = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { _dados = []; }
         }
+
+        // Salva dados. Se exceder quota do localStorage (fotos grandes),
+        // tenta salvar sem as fotos em base64 (mantém URLs externas) e avisa o usuário.
         function _save() {
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_dados)); } catch(e) {}
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(_dados));
+            } catch(e) {
+                // Provavelmente quota excedida por fotos base64
+                // Tenta salvar versão sem dados de fotos/videos base64
+                try {
+                    const compacto = _dados.map(d => ({
+                        ...d,
+                        fotos: (d.fotos || []).filter(f => !f.startsWith('data:')).slice(0, 3),
+                        videos: []
+                    }));
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(compacto));
+                    // Mantém fotos em memória (_dados continua completo)
+                } catch(e2) {
+                    // Se ainda falhar, salva só os metadados sem mídias
+                    try {
+                        const semMidia = _dados.map(d => ({
+                            id: d.id, tipo: d.tipo, proprietario: d.proprietario,
+                            telefone: d.telefone, telefones: d.telefones,
+                            endereco: d.endereco, bairro: d.bairro, tipoImovel: d.tipoImovel,
+                            referencias: d.referencias, caracteristicas: d.caracteristicas,
+                            valor: d.valor, obs: d.obs, data: d.data, status: d.status,
+                            agendamentos: d.agendamentos, fotos: [], videos: []
+                        }));
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(semMidia));
+                        Utils.toast('Atenção: fotos não salvas (espaço insuficiente)', 'error');
+                    } catch(e3) {
+                        Utils.toast('Erro ao salvar: armazenamento cheio', 'error');
+                    }
+                }
+            }
         }
         function _uid() { return 'cap_' + Date.now() + '_' + Math.random().toString(36).substr(2,6); }
 
         // ── Abrir painel ────────────────────────────────────────────────
         function open() {
-            _load();
+            // Só recarrega do localStorage se ainda não tiver dados em memória
+            // (evita sobrescrever dados recém-adicionados que podem não ter sido
+            // persistidos por quota do localStorage cheia)
+            if (!_loaded || _dados.length === 0) {
+                _load();
+                _loaded = true;
+            }
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             const v = document.getElementById('captacao-view');
             if (v) { v.style.display = ''; v.classList.add('active'); }
@@ -46473,7 +46661,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
         // ── Ver detalhe ──────────────────────────────────────────────────
         function verDetalhe(id) {
-            _load();
+            // NÃO recarrega do localStorage aqui — usa _dados em memória
+            // (recarregar sobrescreveria dados recém-salvos caso _save falhou por quota)
             const d = _dados.find(x => x.id === id);
             if (!d) return;
             _idAtual = id;
@@ -46630,7 +46819,6 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             if (tel) window.location.href = 'tel:'+tel.replace(/\D/g,'');
         }
         function ligarDireto(id) {
-            _load();
             const d = _dados.find(x=>x.id===id);
             const tel = d && ((d.telefones&&d.telefones[0]) || d.telefone);
             if (tel) window.location.href = 'tel:'+tel.replace(/\D/g,'');
@@ -46643,7 +46831,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             window.open('https://wa.me/55'+num+'?text='+msg, '_blank');
         }
         function whatsapp() { const d=_dados.find(x=>x.id===_idAtual); if(d&&d.telefone) _wppMsg(d); else Utils.toast('Telefone não informado','error'); }
-        function whatsappDireto(id) { _load(); const d=_dados.find(x=>x.id===id); if(d&&d.telefone) _wppMsg(d); else Utils.toast('Telefone não informado','error'); }
+        function whatsappDireto(id) { const d=_dados.find(x=>x.id===id); if(d&&d.telefone) _wppMsg(d); else Utils.toast('Telefone não informado','error'); }
 
         // ── Status ───────────────────────────────────────────────────────
         function setStatus(status) {
@@ -47845,14 +48033,21 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
     // ── Patch: iniciar ReportPanel quando a view for ativada ──────────
     (function patchSwitchTab() {
-        const orig = UI.switchTab;
-        UI.switchTab = function(el) {
-            orig.call(UI, el);
-            const target = el ? el.getAttribute('data-target') : '';
-            if (target === 'relatorios-view') {
-                setTimeout(() => ReportPanel.init(), 80);
-            }
-        };
+        // Usa o sistema de handlers do ConstrutorasModule (ou inicializa o array)
+        if (!window._switchTabHandlers) window._switchTabHandlers = [];
+        window._switchTabHandlers.push(function(target) {
+            if (target === 'relatorios-view') setTimeout(() => ReportPanel.init(), 80);
+        });
+        // Instala o interceptor central apenas uma vez
+        if (!UI.switchTab._multiPatch) {
+            const orig = UI.switchTab;
+            UI.switchTab = function(el) {
+                orig.call(UI, el);
+                const target = el ? el.getAttribute('data-target') : '';
+                (window._switchTabHandlers || []).forEach(h => h(target));
+            };
+            UI.switchTab._multiPatch = true;
+        }
     })();
 
     // Patch: clicking agenda cards opens VerTarefa instead of edit form directly
@@ -47866,6 +48061,568 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             html = html.replace(/onclick="App\.agenda\.edit\('([^']+)'\)"/g, (m, id) => `onclick="VerTarefa.open('${id}')"`);
             return html;
         };
+    })();
+
+    // ══════════════════════════════════════════════════════
+    //  MÓDULO CONSTRUTORAS — v2 (reescrita completa)
+    // ══════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════════════
+    //  MÓDULO CONSTRUTORAS v3 — reescrito completamente
+    // ══════════════════════════════════════════════════════════════════
+    const ConstrutorasModule = (function() {
+
+        // ── Persistência (IndexedDB com fallback localStorage) ──────────
+        let _cache = null;
+
+        async function _getAll() {
+            if (_cache) return _cache;
+            try {
+                _cache = await DB.getAll('construtoras');
+            } catch(e) {
+                try { _cache = JSON.parse(localStorage.getItem('_cs_data') || '[]'); }
+                catch(_) { _cache = []; }
+            }
+            return _cache;
+        }
+
+        async function _persist(obj) {
+            _cache = null; // invalida cache
+            try {
+                await DB.put('construtoras', obj);
+            } catch(e) {
+                // fallback localStorage
+                try {
+                    let arr = JSON.parse(localStorage.getItem('_cs_data') || '[]');
+                    const i = arr.findIndex(x => x.id === obj.id);
+                    if (i >= 0) arr[i] = obj; else arr.push(obj);
+                    localStorage.setItem('_cs_data', JSON.stringify(arr));
+                } catch(_) {}
+            }
+        }
+
+        async function _remove(id) {
+            _cache = null;
+            try {
+                await DB.delete('construtoras', id);
+            } catch(e) {
+                try {
+                    let arr = JSON.parse(localStorage.getItem('_cs_data') || '[]');
+                    localStorage.setItem('_cs_data', JSON.stringify(arr.filter(x => x.id !== id)));
+                } catch(_) {}
+            }
+        }
+
+        // ── Helpers de UI ───────────────────────────────────────────────
+        function _$(id) { return document.getElementById(id); }
+        function _val(id) { return (_$(id) ? _$(id).value : '') || ''; }
+        function _set(id, v) { if (_$(id)) _$(id).value = v || ''; }
+
+        // Abre o overlay + sheet
+        function _openSheet(name) {
+            const ov = _$('overlay-cs-' + name);
+            const sh = _$('sheet-cs-' + name);
+            if (ov) ov.classList.add('active');
+            if (sh) sh.classList.add('active');
+        }
+        function _closeSheet(name) {
+            const ov = _$('overlay-cs-' + name);
+            const sh = _$('sheet-cs-' + name);
+            if (ov) ov.classList.remove('active');
+            if (sh) sh.classList.remove('active');
+        }
+
+        // ── Init ────────────────────────────────────────────────────────
+        async function init() {
+            _cache = null;
+            await render();
+            await populateConstrutoraSelect();
+        }
+
+        // ── Render lista ────────────────────────────────────────────────
+        async function render() {
+            const all = await _getAll();
+            const q = (_$('cs-search') ? _$('cs-search').value : '').toLowerCase().trim();
+            const filtered = q ? all.filter(c => (c.nome||'').toLowerCase().includes(q)) : [...all];
+            filtered.sort((a, b) => (a.nome||'').localeCompare(b.nome||'', 'pt-BR'));
+
+            const counter = _$('cs-counter');
+            if (counter) {
+                counter.textContent = filtered.length === 0
+                    ? ''
+                    : filtered.length + ' construtora' + (filtered.length !== 1 ? 's' : '') + ' encontrada' + (filtered.length !== 1 ? 's' : '');
+            }
+
+            const list = _$('cs-list');
+            if (!list) return;
+
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                <div style="text-align:center;padding:56px 24px;color:var(--text-muted);">
+                    <div style="width:72px;height:72px;border-radius:50%;background:var(--primary-ultra);
+                                display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                        <i class="fas fa-hard-hat" style="font-size:1.8rem;color:var(--primary);opacity:0.5;"></i>
+                    </div>
+                    <div style="font-weight:700;font-size:0.95rem;color:var(--dark);margin-bottom:6px;">
+                        ${q ? 'Nenhuma construtora encontrada' : 'Nenhuma construtora cadastrada'}
+                    </div>
+                    <div style="font-size:0.82rem;margin-bottom:20px;">
+                        ${q ? 'Tente outro termo de busca' : 'Comece cadastrando sua primeira construtora'}
+                    </div>
+                    ${!q ? `<button onclick="ConstrutorasModule.openModal(null)"
+                        style="display:inline-flex;align-items:center;gap:7px;background:var(--primary);
+                               color:#fff;border:none;border-radius:10px;padding:10px 20px;
+                               font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+                        <i class="fas fa-plus"></i> Nova Construtora
+                    </button>` : ''}
+                </div>`;
+                return;
+            }
+
+            const imoveis = (typeof UI !== 'undefined' && UI.data && UI.data.imoveis) ? UI.data.imoveis : [];
+
+            list.innerHTML = filtered.map(c => {
+                const emps = imoveis.filter(i => i.construtoraId === c.id || (!i.construtoraId && i.construtora === c.nome));
+                const wpp = c.whatsapp ? c.whatsapp.replace(/\D/g,'') : '';
+                const insta = c.instagram ? (c.instagram.startsWith('@') ? c.instagram.slice(1) : c.instagram) : '';
+                const disp = emps.filter(i => i.status === 'disponivel').length;
+
+                const contactBadges = [
+                    c.telefone ? `<a href="tel:${c.telefone}" onclick="event.stopPropagation()"
+                        style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;
+                               background:var(--primary-ultra);color:var(--primary);font-size:0.7rem;
+                               font-weight:600;text-decoration:none;white-space:nowrap;">
+                        <i class="fas fa-phone" style="font-size:0.65rem;"></i>${c.telefone}
+                    </a>` : '',
+                    c.whatsapp ? `<a href="https://wa.me/55${wpp}" target="_blank" onclick="event.stopPropagation()"
+                        style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;
+                               background:#E8F9EE;color:#25D366;font-size:0.7rem;font-weight:600;
+                               text-decoration:none;white-space:nowrap;">
+                        <i class="fab fa-whatsapp" style="font-size:0.65rem;"></i>${c.whatsapp}
+                    </a>` : '',
+                    c.instagram ? `<a href="https://instagram.com/${insta}" target="_blank" onclick="event.stopPropagation()"
+                        style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;
+                               background:#FDF0F5;color:#E1306C;font-size:0.7rem;font-weight:600;
+                               text-decoration:none;white-space:nowrap;">
+                        <i class="fab fa-instagram" style="font-size:0.65rem;"></i>${c.instagram}
+                    </a>` : '',
+                    c.site ? `<a href="${c.site}" target="_blank" onclick="event.stopPropagation()"
+                        style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;
+                               background:var(--primary-ultra);color:var(--primary);font-size:0.7rem;font-weight:600;
+                               text-decoration:none;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis;">
+                        <i class="fas fa-globe" style="font-size:0.65rem;flex-shrink:0;"></i>
+                        <span style="overflow:hidden;text-overflow:ellipsis;">${c.site.replace(/^https?:\/\//,'').replace(/\/$/,'')}</span>
+                    </a>` : '',
+                ].filter(Boolean).join('');
+
+                return `
+                <div style="background:var(--bg-raised);border-radius:14px;border:1px solid var(--border);
+                            overflow:hidden;box-shadow:var(--shadow-sm);cursor:pointer;transition:box-shadow 0.2s;"
+                     onclick="ConstrutorasModule.openDetalhe('${c.id}')"
+                     onmouseover="this.style.boxShadow='var(--shadow-md)'"
+                     onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+                    <div style="padding:14px 16px;">
+                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;">
+                            <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                                <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--primary-ultra),rgba(29,111,164,0.15));
+                                            display:flex;align-items:center;justify-content:center;flex-shrink:0;
+                                            border:1.5px solid var(--border-accent);">
+                                    <i class="fas fa-hard-hat" style="color:var(--primary);font-size:1rem;"></i>
+                                </div>
+                                <div style="flex:1;min-width:0;">
+                                    <div style="font-weight:800;font-size:0.95rem;color:var(--dark);
+                                                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nome}</div>
+                                    <div style="font-size:0.7rem;color:var(--text-muted);margin-top:1px;">
+                                        Cadastrada em ${c.dataCriacao ? new Date(c.dataCriacao).toLocaleDateString('pt-BR') : '—'}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:6px;flex-shrink:0;" onclick="event.stopPropagation()">
+                                <button onclick="ConstrutorasModule.openModal('${c.id}')"
+                                    style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);
+                                           background:var(--primary-ultra);color:var(--primary);cursor:pointer;
+                                           display:flex;align-items:center;justify-content:center;" title="Editar">
+                                    <i class="fas fa-pen" style="font-size:0.75rem;"></i>
+                                </button>
+                                <button onclick="ConstrutorasModule.excluir('${c.id}')"
+                                    style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(231,76,60,0.25);
+                                           background:rgba(231,76,60,0.08);color:var(--danger);cursor:pointer;
+                                           display:flex;align-items:center;justify-content:center;" title="Excluir">
+                                    <i class="fas fa-trash" style="font-size:0.75rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+                        ${contactBadges ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">${contactBadges}</div>` : ''}
+                        ${c.obs ? `<div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:10px;
+                                               line-height:1.4;padding:8px 10px;background:var(--bg-overlay);
+                                               border-radius:8px;">${c.obs}</div>` : ''}
+                    </div>
+                    <!-- Footer com empreendimentos -->
+                    <div style="padding:10px 16px;background:var(--bg-overlay);border-top:1px solid var(--border);
+                                display:flex;align-items:center;justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <i class="fas fa-building" style="color:var(--primary);font-size:0.82rem;"></i>
+                            <span style="font-size:0.78rem;font-weight:700;color:var(--dark);">
+                                ${emps.length} empreendimento${emps.length !== 1 ? 's' : ''}
+                            </span>
+                            ${emps.length > 0 ? `<span style="font-size:0.7rem;color:var(--accent);font-weight:600;">· ${disp} disponív${disp !== 1 ? 'eis' : 'el'}</span>` : ''}
+                        </div>
+                        <span style="font-size:0.72rem;color:var(--primary);font-weight:600;display:flex;align-items:center;gap:4px;">
+                            Ver detalhes <i class="fas fa-chevron-right" style="font-size:0.6rem;"></i>
+                        </span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ── Modal formulário ────────────────────────────────────────────
+        async function openModal(id) {
+            // Limpa todos os campos
+            ['cs-id','cs-nome','cs-telefone','cs-whatsapp','cs-instagram','cs-site','cs-obs'].forEach(fid => {
+                _set(fid, '');
+            });
+            _set('cs-form-title', 'Nova Construtora');
+            if (_$('cs-form-title')) _$('cs-form-title').textContent = 'Nova Construtora';
+
+            if (id) {
+                const all = await _getAll();
+                const c = all.find(x => x.id === id);
+                if (c) {
+                    _set('cs-id', c.id);
+                    _set('cs-nome', c.nome);
+                    _set('cs-telefone', c.telefone);
+                    _set('cs-whatsapp', c.whatsapp);
+                    _set('cs-instagram', c.instagram);
+                    _set('cs-site', c.site);
+                    _set('cs-obs', c.obs);
+                    if (_$('cs-form-title')) _$('cs-form-title').textContent = 'Editar Construtora';
+                }
+            }
+
+            _openSheet('form');
+            setTimeout(() => { if (_$('cs-nome')) _$('cs-nome').focus(); }, 250);
+        }
+
+        function closeModal() { _closeSheet('form'); }
+
+        // ── Salvar ──────────────────────────────────────────────────────
+        async function save() {
+            const nome = _val('cs-nome').trim();
+            if (!nome) {
+                Utils.toast('Informe o nome da construtora', 'error');
+                if (_$('cs-nome')) _$('cs-nome').focus();
+                return;
+            }
+
+            const idExistente = _val('cs-id').trim();
+            const all = await _getAll();
+            const antigo = all.find(x => x.id === idExistente);
+
+            const obj = {
+                id:               idExistente || Utils.id(),
+                nome:             nome,
+                telefone:         _val('cs-telefone').trim(),
+                whatsapp:         _val('cs-whatsapp').trim(),
+                instagram:        _val('cs-instagram').trim(),
+                site:             _val('cs-site').trim(),
+                obs:              _val('cs-obs').trim(),
+                dataCriacao:      antigo ? antigo.dataCriacao : new Date().toISOString(),
+                dataAtualizacao:  new Date().toISOString()
+            };
+
+            await _persist(obj);
+            closeModal();
+            await render();
+            await populateConstrutoraSelect();
+            Utils.toast(idExistente ? 'Construtora atualizada! ✅' : 'Construtora cadastrada! 🏗️', 'success');
+        }
+
+        // ── Excluir ─────────────────────────────────────────────────────
+        async function excluir(id) {
+            const all = await _getAll();
+            const c = all.find(x => x.id === id);
+            if (!c) return;
+            if (!confirm('Excluir "' + c.nome + '"?\nOs imóveis vinculados não serão removidos.')) return;
+            await _remove(id);
+            await render();
+            await populateConstrutoraSelect();
+            Utils.toast('Construtora removida.', 'success');
+        }
+
+        // ── Modal detalhe ───────────────────────────────────────────────
+        async function openDetalhe(id) {
+            const all = await _getAll();
+            const c = all.find(x => x.id === id);
+            if (!c) return;
+
+            const imoveis = (typeof UI !== 'undefined' && UI.data && UI.data.imoveis) ? UI.data.imoveis : [];
+            const emps = imoveis.filter(i => i.construtoraId === id || (!i.construtoraId && i.construtora === c.nome));
+            emps.sort((a,b) => (b.dataCriacao||'').localeCompare(a.dataCriacao||''));
+
+            const wpp = c.whatsapp ? c.whatsapp.replace(/\D/g,'') : '';
+            const insta = c.instagram ? (c.instagram.startsWith('@') ? c.instagram.slice(1) : c.instagram) : '';
+
+            const stats = { disponivel:0, reservado:0, vendido:0, alugado:0 };
+            emps.forEach(i => { if (stats[i.status] !== undefined) stats[i.status]++; });
+
+            const statusLabel = { disponivel:'Disponível', reservado:'Reservado', vendido:'Vendido', alugado:'Alugado' };
+            const statusColor = { disponivel:'#27AE60', reservado:'#E67E22', vendido:'#94A3B8', alugado:'#2980B9' };
+
+            const empsHtml = emps.length === 0
+                ? `<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:0.85rem;">
+                    <i class="fas fa-building" style="font-size:1.8rem;display:block;margin-bottom:8px;opacity:0.2;"></i>
+                    Nenhum empreendimento vinculado
+                  </div>`
+                : emps.map(i => {
+                    const preco = i.precoVenda
+                        ? 'R$ ' + i.precoVenda.toLocaleString('pt-BR')
+                        : (i.precoAluguel ? 'R$ ' + i.precoAluguel.toLocaleString('pt-BR') + '/mês' : '—');
+                    const thumb = (i.imagens && i.imagens[0])
+                        ? `<img src="${i.imagens[0]}" style="width:50px;height:50px;object-fit:cover;border-radius:10px;flex-shrink:0;">`
+                        : `<div style="width:50px;height:50px;border-radius:10px;background:var(--bg-overlay);
+                                      display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                             <i class="fas fa-building" style="color:var(--text-muted);"></i>
+                           </div>`;
+                    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+                        ${thumb}
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:700;font-size:0.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.titulo||'—'}</div>
+                            <div style="font-size:0.72rem;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;">${i.endereco||''}</div>
+                            <div style="display:flex;gap:8px;margin-top:4px;align-items:center;">
+                                <span style="font-size:0.69rem;font-weight:700;color:${statusColor[i.status]||'#64748B'};">${statusLabel[i.status]||i.status||'—'}</span>
+                                <span style="font-size:0.69rem;color:var(--text-secondary);">${preco}</span>
+                                ${i.area ? `<span style="font-size:0.67rem;color:var(--text-muted);">${i.area}m²</span>` : ''}
+                            </div>
+                        </div>
+                        <button onclick="ConstrutorasModule.closeDetalhe();setTimeout(()=>App.imovel.edit('${i.id}'),200)"
+                            style="padding:6px 10px;background:var(--primary-ultra);border:none;border-radius:8px;
+                                   color:var(--primary);cursor:pointer;font-size:0.72rem;font-weight:600;white-space:nowrap;">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                    </div>`;
+                }).join('');
+
+            const content = `
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+                <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                    <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--primary-light));
+                                display:flex;align-items:center;justify-content:center;flex-shrink:0;
+                                box-shadow:0 4px 12px rgba(29,111,164,0.30);">
+                        <i class="fas fa-hard-hat" style="color:#fff;font-size:1.2rem;"></i>
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:800;font-size:1.05rem;color:var(--dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.nome}</div>
+                        <div style="font-size:0.7rem;color:var(--text-muted);">
+                            Cadastrada em ${c.dataCriacao ? new Date(c.dataCriacao).toLocaleDateString('pt-BR') : '—'}
+                        </div>
+                    </div>
+                </div>
+                <button onclick="ConstrutorasModule.closeDetalhe()"
+                    style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);
+                           background:var(--bg-overlay);cursor:pointer;display:flex;align-items:center;
+                           justify-content:center;color:var(--text-secondary);flex-shrink:0;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Contatos -->
+            <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;">
+                ${c.telefone ? `<a href="tel:${c.telefone}"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;
+                           background:var(--primary-ultra);color:var(--primary);font-size:0.78rem;
+                           font-weight:600;text-decoration:none;">
+                    <i class="fas fa-phone" style="font-size:0.7rem;"></i>${c.telefone}
+                </a>` : ''}
+                ${c.whatsapp ? `<a href="https://wa.me/55${wpp}" target="_blank"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;
+                           background:#E8F9EE;color:#25D366;font-size:0.78rem;font-weight:600;text-decoration:none;">
+                    <i class="fab fa-whatsapp" style="font-size:0.7rem;"></i>${c.whatsapp}
+                </a>` : ''}
+                ${c.instagram ? `<a href="https://instagram.com/${insta}" target="_blank"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;
+                           background:#FDF0F5;color:#E1306C;font-size:0.78rem;font-weight:600;text-decoration:none;">
+                    <i class="fab fa-instagram" style="font-size:0.7rem;"></i>${c.instagram}
+                </a>` : ''}
+                ${c.site ? `<a href="${c.site}" target="_blank"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;
+                           background:var(--primary-ultra);color:var(--primary);font-size:0.78rem;font-weight:600;
+                           text-decoration:none;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                    <i class="fas fa-globe" style="font-size:0.7rem;flex-shrink:0;"></i>
+                    ${c.site.replace(/^https?:\/\//,'').replace(/\/$/,'')}
+                </a>` : ''}
+            </div>
+
+            ${c.obs ? `<div style="font-size:0.82rem;color:var(--text-secondary);background:var(--bg-overlay);
+                                   border-radius:10px;padding:12px;margin-bottom:14px;line-height:1.5;">${c.obs}</div>` : ''}
+
+            <!-- Stats empreendimentos -->
+            ${emps.length > 0 ? `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;">
+                <div style="background:rgba(39,174,96,0.1);border-radius:10px;padding:10px 6px;text-align:center;">
+                    <div style="font-weight:800;font-size:1.1rem;color:#27AE60;">${stats.disponivel}</div>
+                    <div style="font-size:0.62rem;color:#27AE60;font-weight:600;">Disp.</div>
+                </div>
+                <div style="background:rgba(230,126,34,0.1);border-radius:10px;padding:10px 6px;text-align:center;">
+                    <div style="font-weight:800;font-size:1.1rem;color:#E67E22;">${stats.reservado}</div>
+                    <div style="font-size:0.62rem;color:#E67E22;font-weight:600;">Reserv.</div>
+                </div>
+                <div style="background:rgba(100,116,139,0.1);border-radius:10px;padding:10px 6px;text-align:center;">
+                    <div style="font-weight:800;font-size:1.1rem;color:#94A3B8;">${stats.vendido}</div>
+                    <div style="font-size:0.62rem;color:#94A3B8;font-weight:600;">Vendidos</div>
+                </div>
+                <div style="background:var(--primary-ultra);border-radius:10px;padding:10px 6px;text-align:center;">
+                    <div style="font-weight:800;font-size:1.1rem;color:var(--primary);">${emps.length}</div>
+                    <div style="font-size:0.62rem;color:var(--primary);font-weight:600;">Total</div>
+                </div>
+            </div>` : ''}
+
+            <!-- Lista empreendimentos -->
+            <div style="font-weight:800;font-size:0.9rem;color:var(--dark);margin-bottom:8px;
+                        display:flex;align-items:center;gap:6px;">
+                <i class="fas fa-building" style="color:var(--primary);font-size:0.85rem;"></i>
+                Empreendimentos (${emps.length})
+            </div>
+            <div style="max-height:300px;overflow-y:auto;margin-bottom:16px;">${empsHtml}</div>
+
+            <!-- Ações -->
+            <div style="display:flex;gap:10px;">
+                <button onclick="ConstrutorasModule.closeDetalhe();ConstrutorasModule.openModal('${c.id}')"
+                    style="flex:1;background:var(--primary);color:#fff;border:none;border-radius:12px;
+                           padding:13px;font-weight:700;font-size:0.88rem;cursor:pointer;
+                           font-family:'Inter',sans-serif;display:flex;align-items:center;
+                           justify-content:center;gap:7px;">
+                    <i class="fas fa-pen"></i> Editar Construtora
+                </button>
+                <button onclick="ConstrutorasModule.closeDetalhe()"
+                    style="padding:13px 18px;background:transparent;color:var(--text-secondary);
+                           border:1.5px solid var(--border);border-radius:12px;font-weight:600;
+                           cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;">
+                    Fechar
+                </button>
+            </div>`;
+
+            const el = document.getElementById('cs-detalhe-content');
+            if (el) el.innerHTML = content;
+            _openSheet('detalhe');
+        }
+
+        function closeDetalhe() { _closeSheet('detalhe'); }
+
+        // ── Select de construtora no form de imóvel ─────────────────────
+        async function populateConstrutoraSelect() {
+            const sel = document.getElementById('i-construtora-id');
+            if (!sel) return;
+            const cur = sel.value;
+            const all = await _getAll();
+            const sorted = [...all].sort((a,b) => (a.nome||'').localeCompare(b.nome||'', 'pt-BR'));
+            sel.innerHTML = '<option value="">— Selecionar construtora cadastrada —</option>' +
+                sorted.map(c => `<option value="${c.id}" data-nome="${c.nome}">${c.nome}</option>`).join('');
+            if (cur) sel.value = cur;
+        }
+
+        // ── Patches em App.imovel e UI ──────────────────────────────────
+        function applyPatches() {
+            if (!window.App || !App.imovel || !window.UI || !UI.openNewImovel) return false;
+
+            App.imovel.onConstrutoraSelect = function(sel) {
+                const opt = sel.options[sel.selectedIndex];
+                const el = document.getElementById('i-construtora');
+                if (el) el.value = (opt && opt.value) ? (opt.dataset.nome || opt.text) : '';
+            };
+
+            if (!UI.openNewImovel._cspatch) {
+                const orig = UI.openNewImovel;
+                UI.openNewImovel = async function() {
+                    orig.call(UI);
+                    await populateConstrutoraSelect();
+                    const sel = document.getElementById('i-construtora-id');
+                    if (sel) sel.value = '';
+                };
+                UI.openNewImovel._cspatch = true;
+            }
+
+            if (!App.imovel.save._cspatch) {
+                const orig = App.imovel.save;
+                App.imovel.save = async function(e) {
+                    const sel = document.getElementById('i-construtora-id');
+                    const cid = sel ? sel.value : '';
+                    const opt = sel ? sel.options[sel.selectedIndex] : null;
+                    const cnome = (opt && opt.value) ? (opt.dataset.nome || opt.text) : '';
+                    await orig.call(App.imovel, e);
+                    const iid = document.getElementById('i-id') ? document.getElementById('i-id').value : '';
+                    if (iid && typeof UI !== 'undefined' && UI.data) {
+                        const im = UI.data.imoveis.find(x => x.id === iid);
+                        if (im) {
+                            im.construtoraId = cid || '';
+                            if (cnome) im.construtora = cnome;
+                            try { await DB.put('imoveis', im); } catch(_) {}
+                        }
+                    }
+                };
+                App.imovel.save._cspatch = true;
+            }
+
+            if (!App.imovel.edit._cspatch) {
+                const orig = App.imovel.edit;
+                App.imovel.edit = async function(id) {
+                    await orig.call(App.imovel, id);
+                    await populateConstrutoraSelect();
+                    const im = UI.data.imoveis.find(x => x.id === id);
+                    const sel = document.getElementById('i-construtora-id');
+                    if (!sel) return;
+                    sel.value = '';
+                    if (!im) return;
+                    if (im.construtoraId) {
+                        sel.value = im.construtoraId;
+                    } else if (im.construtora) {
+                        for (const opt of sel.options) {
+                            if ((opt.dataset.nome || opt.text) === im.construtora) {
+                                sel.value = opt.value; break;
+                            }
+                        }
+                    }
+                };
+                App.imovel.edit._cspatch = true;
+            }
+
+            return true;
+        }
+
+        // Retry patch com backoff
+        (function retryPatches() {
+            if (!applyPatches()) {
+                let tries = 0;
+                const t = setInterval(() => {
+                    if (applyPatches() || ++tries > 40) clearInterval(t);
+                }, 250);
+            }
+        })();
+
+        // Popula select quando o form de imóvel aparecer
+        (function watchForImovelForm() {
+            const t = setInterval(async () => {
+                if (document.getElementById('i-construtora-id')) {
+                    clearInterval(t);
+                    await populateConstrutoraSelect();
+                }
+            }, 400);
+            setTimeout(() => clearInterval(t), 10000);
+        })();
+
+        // ── switchTab handler ───────────────────────────────────────────
+        if (!window._switchTabHandlers) window._switchTabHandlers = [];
+        window._switchTabHandlers.push(function(target) {
+            if (target === 'construtoras-view') setTimeout(() => ConstrutorasModule.init(), 80);
+        });
+        if (!UI.switchTab._multiPatch) {
+            const orig = UI.switchTab;
+            UI.switchTab = function(el) {
+                orig.call(UI, el);
+                const t = el ? el.getAttribute('data-target') : '';
+                (window._switchTabHandlers || []).forEach(h => h(t));
+            };
+            UI.switchTab._multiPatch = true;
+        }
+
+        return { init, render, openModal, closeModal, save, excluir, openDetalhe, closeDetalhe, populateConstrutoraSelect };
     })();
     </script>
 
