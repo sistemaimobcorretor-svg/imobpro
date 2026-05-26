@@ -249,11 +249,12 @@
         main {
             flex: 1;
             overflow-y: auto;
-            overflow-x: hidden;
+            overflow-x: clip;
             padding: calc(var(--header-height) + 12px) 14px 24px;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
             width: 100%;
+            min-width: 0;
             position: relative;
             z-index: 1;
         }
@@ -270,6 +271,26 @@
         @keyframes fadeIn { 
             from { opacity: 0; transform: translateY(10px); } 
             to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* ── Cabeçalho sticky do painel de Construtoras ── */
+        .cs-sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: var(--bg-base);
+            /* cancela o padding lateral do main (mobile: 14px) */
+            margin: -12px -14px 0;
+            padding: 14px 14px 12px;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        /* desktop: padding lateral do main aumenta para 24px direita */
+        @media (min-width: 900px) {
+            .cs-sticky-header {
+                margin: -12px -24px 0;
+                padding: 14px 24px 12px;
+            }
         }
 
         /* ── Dashboard grid — iPhone widget style ── */
@@ -10862,58 +10883,48 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
         <!-- ========== CONSTRUTORAS VIEW ========== -->
         <div id="construtoras-view" class="view">
-            <!-- Cabeçalho fixo -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-                <div style="display:flex;align-items:center;gap:10px;">
-                    <div style="width:38px;height:38px;border-radius:12px;background:var(--primary-ultra);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fas fa-hard-hat" style="color:var(--primary);font-size:1.1rem;"></i>
+            <!-- Cabeçalho sticky — fica sempre visível abaixo do header fixo -->
+            <div class="cs-sticky-header">
+                <!-- Linha 1: título + botões -->
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;min-width:0;margin-bottom:10px;">
+                    <div style="display:flex;align-items:center;gap:10px;min-width:0;flex-shrink:1;">
+                        <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-ultra);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-hard-hat" style="color:var(--primary);font-size:1rem;"></i>
+                        </div>
+                        <div style="min-width:0;">
+                            <div style="font-size:1rem;font-weight:800;color:var(--dark);line-height:1.2;">Construtoras</div>
+                            <div style="font-size:0.7rem;color:var(--text-muted);">Gestão de construtoras e empreendimentos</div>
+                        </div>
                     </div>
-                    <div>
-                        <div style="font-size:1.05rem;font-weight:800;color:var(--dark);line-height:1.2;">Construtoras</div>
-                        <div style="font-size:0.72rem;color:var(--text-muted);">Gestão de construtoras e empreendimentos</div>
+                    <div style="display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0;">
+                        <input type="file" id="cs-import-input" style="display:none;" accept=".csv" onchange="ConstrutorasModule.importCSV(this)">
+                        <button onclick="ConstrutorasModule.openModal(null)"
+                            style="display:inline-flex;align-items:center;gap:6px;
+                                   background:var(--primary);color:#fff;border:none;border-radius:9px;
+                                   padding:8px 16px;font-size:0.82rem;font-weight:700;cursor:pointer;
+                                   font-family:'Inter',sans-serif;white-space:nowrap;
+                                   box-shadow:0 3px 10px rgba(29,111,164,0.3);transition:all 0.2s;"
+                            onmouseover="this.style.background='var(--primary-dark)'"
+                            onmouseout="this.style.background='var(--primary)'">
+                            <i class="fas fa-plus"></i> Nova Construtora
+                        </button>
                     </div>
                 </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <button onclick="ConstrutorasModule.downloadTemplate()"
-                        style="display:inline-flex;align-items:center;gap:7px;
-                               background:var(--bg-raised);color:var(--text-secondary);border:1.5px solid var(--border);border-radius:10px;
-                               padding:10px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;
-                               font-family:'Inter',sans-serif;white-space:nowrap;transition:all 0.2s;">
-                        <i class="fas fa-download"></i> Modelo
-                    </button>
-                    <button onclick="document.getElementById('cs-import-input').click()"
-                        style="display:inline-flex;align-items:center;gap:7px;
-                               background:var(--accent-ultra);color:var(--accent);border:1.5px solid rgba(39,174,96,0.2);border-radius:10px;
-                               padding:10px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;
-                               font-family:'Inter',sans-serif;white-space:nowrap;transition:all 0.2s;">
-                        <i class="fas fa-file-import"></i> Importar
-                    </button>
-                    <input type="file" id="cs-import-input" style="display:none;" accept=".csv" onchange="ConstrutorasModule.importCSV(this)">
-                    <button onclick="ConstrutorasModule.openModal(null)"
-                        style="display:inline-flex;align-items:center;gap:7px;
-                               background:var(--primary);color:#fff;border:none;border-radius:10px;
-                               padding:10px 18px;font-size:0.85rem;font-weight:700;cursor:pointer;
-                               font-family:'Inter',sans-serif;white-space:nowrap;
-                               box-shadow:0 4px 14px rgba(29,111,164,0.35);transition:all 0.2s;"
-                        onmouseover="this.style.background='var(--primary-dark)'"
-                        onmouseout="this.style.background='var(--primary)'">
-                        <i class="fas fa-plus"></i> Nova
-                    </button>
+                <!-- Linha 2: busca -->
+                <div style="position:relative;">
+                    <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.82rem;pointer-events:none;"></i>
+                    <input type="text" id="cs-search"
+                        placeholder="Buscar por nome..."
+                        oninput="ConstrutorasModule.render()"
+                        style="width:100%;padding:9px 12px 9px 36px;border:1.5px solid var(--border);border-radius:9px;
+                               font-size:0.87rem;font-family:'Inter',sans-serif;background:var(--bg-raised);
+                               color:var(--dark);outline:none;box-sizing:border-box;"
+                        onfocus="this.style.borderColor='var(--primary)'"
+                        onblur="this.style.borderColor='var(--border)'">
                 </div>
             </div>
-            <!-- Busca -->
-            <div style="position:relative;margin-bottom:12px;">
-                <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.82rem;pointer-events:none;"></i>
-                <input type="text" id="cs-search"
-                    placeholder="Buscar por nome..."
-                    oninput="ConstrutorasModule.render()"
-                    style="width:100%;padding:10px 12px 10px 36px;border:1.5px solid var(--border);border-radius:10px;
-                           font-size:0.88rem;font-family:'Inter',sans-serif;background:var(--bg-raised);
-                           color:var(--dark);outline:none;box-sizing:border-box;"
-                    onfocus="this.style.borderColor='var(--primary)'"
-                    onblur="this.style.borderColor='var(--border)'">
-            </div>
-            <div id="cs-counter" style="font-size:0.72rem;color:var(--text-muted);margin-bottom:12px;min-height:16px;"></div>
+            <!-- contador + lista -->
+            <div id="cs-counter" style="font-size:0.72rem;color:var(--text-muted);margin:10px 0 8px;min-height:16px;"></div>
             <div id="cs-list" class="construtoras-grid" style="display:grid;grid-template-columns:repeat(1, 1fr);gap:12px;padding-bottom:80px;"></div>
         </div>
 
@@ -10922,14 +10933,16 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
         <div class="modal-sheet" id="sheet-cs-form" style="max-height:93vh;overflow-y:auto;">
             <div class="sheet-handle"></div>
             <div style="padding:6px 18px 32px;">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-top:4px;">
+
+                <!-- Cabeçalho do modal -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-top:4px;">
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:40px;height:40px;border-radius:12px;background:var(--primary-ultra);display:flex;align-items:center;justify-content:center;">
                             <i class="fas fa-hard-hat" style="color:var(--primary);font-size:1.1rem;"></i>
                         </div>
                         <div>
                             <div id="cs-form-title" style="font-size:1rem;font-weight:800;color:var(--dark);">Nova Construtora</div>
-                            <div style="font-size:0.7rem;color:var(--text-muted);">Preencha os dados abaixo</div>
+                            <div id="cs-form-subtitle" style="font-size:0.7rem;color:var(--text-muted);">Preencha os dados abaixo</div>
                         </div>
                     </div>
                     <button onclick="ConstrutorasModule.closeModal()"
@@ -10939,60 +10952,183 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <input type="hidden" id="cs-id">
-                <!-- Nome -->
-                <div class="form-group">
-                    <label class="form-label">Nome da Construtora *</label>
-                    <input type="text" id="cs-nome" class="form-control" placeholder="Ex: MRV, Cyrela, Tenda...">
-                </div>
-                <!-- Telefone + WhatsApp -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label"><i class="fas fa-phone" style="color:var(--primary);margin-right:5px;"></i>Telefone</label>
-                        <input type="tel" id="cs-telefone" class="form-control" placeholder="(00) 0000-0000" oninput="Utils.maskPhone(this)">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label"><i class="fab fa-whatsapp" style="color:#25D366;margin-right:5px;"></i>WhatsApp</label>
-                        <input type="tel" id="cs-whatsapp" class="form-control" placeholder="(00) 00000-0000" oninput="Utils.maskPhone(this)">
-                    </div>
-                </div>
-                <!-- Instagram -->
-                <div class="form-group">
-                    <label class="form-label"><i class="fab fa-instagram" style="color:#E1306C;margin-right:5px;"></i>Instagram</label>
-                    <input type="text" id="cs-instagram" class="form-control" placeholder="@construtora">
-                </div>
-                <!-- E-mail -->
-                <div class="form-group">
-                    <label class="form-label"><i class="fas fa-envelope" style="color:var(--primary);margin-right:5px;"></i>E-mail</label>
-                    <input type="email" id="cs-email" class="form-control" placeholder="contato@construtora.com.br">
-                </div>
-                <!-- Site -->
-                <div class="form-group">
-                    <label class="form-label"><i class="fas fa-globe" style="color:var(--primary);margin-right:5px;"></i>Site</label>
-                    <input type="url" id="cs-site" class="form-control" placeholder="https://construtora.com.br">
-                </div>
-                <!-- Obs -->
-                <div class="form-group">
-                    <label class="form-label">Observações</label>
-                    <textarea id="cs-obs" class="form-control" rows="3" placeholder="Anotações sobre a construtora..." style="resize:vertical;"></textarea>
-                </div>
-                <!-- Botões -->
-                <div style="display:flex;gap:10px;margin-top:8px;">
-                    <button onclick="ConstrutorasModule.save()"
-                        style="flex:1;background:var(--primary);color:#fff;border:none;border-radius:12px;
-                               padding:14px;font-weight:700;font-size:0.95rem;cursor:pointer;
-                               font-family:'Inter',sans-serif;display:flex;align-items:center;
-                               justify-content:center;gap:8px;
-                               box-shadow:0 4px 14px rgba(29,111,164,0.30);">
-                        <i class="fas fa-save"></i> Salvar Construtora
+
+                <!-- Abas — só visíveis em modo "Nova" (sem id) -->
+                <div id="cs-tabs-bar" style="display:flex;gap:0;margin-bottom:18px;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);background:var(--bg-overlay);">
+                    <button id="cs-tab-individual" onclick="ConstrutorasModule.switchTab('individual')"
+                        style="flex:1;padding:9px 6px;font-size:0.8rem;font-weight:700;cursor:pointer;border:none;
+                               font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;
+                               background:var(--primary);color:#fff;transition:all 0.18s;">
+                        <i class="fas fa-user-plus"></i> Individual
                     </button>
+                    <button id="cs-tab-lote" onclick="ConstrutorasModule.switchTab('lote')"
+                        style="flex:1;padding:9px 6px;font-size:0.8rem;font-weight:700;cursor:pointer;border:none;
+                               font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;
+                               background:transparent;color:var(--text-secondary);transition:all 0.18s;">
+                        <i class="fas fa-layer-group"></i> Importar em Lote
+                    </button>
+                </div>
+
+                <!-- ── ABA INDIVIDUAL ── -->
+                <div id="cs-panel-individual">
+                    <input type="hidden" id="cs-id">
+                    <div class="form-group">
+                        <label class="form-label">Nome da Construtora *</label>
+                        <input type="text" id="cs-nome" class="form-control" placeholder="Ex: MRV, Cyrela, Tenda...">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-phone" style="color:var(--primary);margin-right:5px;"></i>Telefone</label>
+                            <input type="tel" id="cs-telefone" class="form-control" placeholder="(00) 0000-0000" oninput="Utils.maskPhone(this)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fab fa-whatsapp" style="color:#25D366;margin-right:5px;"></i>WhatsApp</label>
+                            <input type="tel" id="cs-whatsapp" class="form-control" placeholder="(00) 00000-0000" oninput="Utils.maskPhone(this)">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fab fa-instagram" style="color:#E1306C;margin-right:5px;"></i>Instagram</label>
+                        <input type="text" id="cs-instagram" class="form-control" placeholder="@construtora">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-envelope" style="color:var(--primary);margin-right:5px;"></i>E-mail</label>
+                        <input type="email" id="cs-email" class="form-control" placeholder="contato@construtora.com.br">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-globe" style="color:var(--primary);margin-right:5px;"></i>Site</label>
+                        <input type="url" id="cs-site" class="form-control" placeholder="https://construtora.com.br">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Observações</label>
+                        <textarea id="cs-obs" class="form-control" rows="3" placeholder="Anotações sobre a construtora..." style="resize:vertical;"></textarea>
+                    </div>
+                    <div style="display:flex;gap:10px;margin-top:8px;">
+                        <button onclick="ConstrutorasModule.save()"
+                            style="flex:1;background:var(--primary);color:#fff;border:none;border-radius:12px;
+                                   padding:14px;font-weight:700;font-size:0.95rem;cursor:pointer;
+                                   font-family:'Inter',sans-serif;display:flex;align-items:center;
+                                   justify-content:center;gap:8px;
+                                   box-shadow:0 4px 14px rgba(29,111,164,0.30);">
+                            <i class="fas fa-save"></i> Salvar Construtora
+                        </button>
+                        <button onclick="ConstrutorasModule.closeModal()"
+                            style="padding:14px 18px;background:transparent;color:var(--text-secondary);
+                                   border:1.5px solid var(--border);border-radius:12px;font-weight:600;
+                                   cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── ABA IMPORTAR EM LOTE ── -->
+                <div id="cs-panel-lote" style="display:none;">
+
+                    <!-- Passo 1: Baixar modelo -->
+                    <div style="background:var(--primary-ultra);border:1.5px solid var(--border-accent);border-radius:12px;padding:14px 16px;margin-bottom:14px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:32px;height:32px;border-radius:8px;background:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <span style="color:#fff;font-size:0.75rem;font-weight:800;">1</span>
+                            </div>
+                            <div>
+                                <div style="font-size:0.85rem;font-weight:700;color:var(--dark);">Baixe o modelo CSV</div>
+                                <div style="font-size:0.72rem;color:var(--text-muted);">Preencha com os dados das construtoras</div>
+                            </div>
+                        </div>
+                        <button onclick="ConstrutorasModule.downloadTemplate()"
+                            style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+                                   background:var(--primary);color:#fff;border:none;border-radius:9px;
+                                   padding:11px;font-size:0.85rem;font-weight:700;cursor:pointer;
+                                   font-family:'Inter',sans-serif;box-shadow:0 3px 10px rgba(29,111,164,0.25);">
+                            <i class="fas fa-download"></i> Baixar Modelo CSV
+                        </button>
+                    </div>
+
+                    <!-- Passo 2: Colunas do modelo -->
+                    <div style="background:var(--bg-raised);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:32px;height:32px;border-radius:8px;background:var(--text-secondary);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <span style="color:#fff;font-size:0.75rem;font-weight:800;">2</span>
+                            </div>
+                            <div>
+                                <div style="font-size:0.85rem;font-weight:700;color:var(--dark);">Colunas do arquivo</div>
+                                <div style="font-size:0.72rem;color:var(--text-muted);">Separadas por ponto e vírgula ( ; )</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:5px;">
+                            <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;">
+                                <span style="background:var(--primary-ultra);color:var(--primary);border-radius:5px;padding:2px 8px;font-weight:700;font-family:monospace;flex-shrink:0;">A</span>
+                                <span style="color:var(--dark);font-weight:600;">Nome</span>
+                                <span style="color:var(--danger);font-size:0.7rem;">* obrigatório</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;">
+                                <span style="background:var(--bg-overlay);color:var(--text-secondary);border-radius:5px;padding:2px 8px;font-weight:700;font-family:monospace;flex-shrink:0;">B</span>
+                                <span style="color:var(--dark);">Telefone</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;">
+                                <span style="background:var(--bg-overlay);color:var(--text-secondary);border-radius:5px;padding:2px 8px;font-weight:700;font-family:monospace;flex-shrink:0;">C</span>
+                                <span style="color:var(--dark);">WhatsApp</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;">
+                                <span style="background:var(--bg-overlay);color:var(--text-secondary);border-radius:5px;padding:2px 8px;font-weight:700;font-family:monospace;flex-shrink:0;">D</span>
+                                <span style="color:var(--dark);">Instagram</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;">
+                                <span style="background:var(--bg-overlay);color:var(--text-secondary);border-radius:5px;padding:2px 8px;font-weight:700;font-family:monospace;flex-shrink:0;">E</span>
+                                <span style="color:var(--dark);">E-mail</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;">
+                                <span style="background:var(--bg-overlay);color:var(--text-secondary);border-radius:5px;padding:2px 8px;font-weight:700;font-family:monospace;flex-shrink:0;">F</span>
+                                <span style="color:var(--dark);">Site</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;">
+                                <span style="background:var(--bg-overlay);color:var(--text-secondary);border-radius:5px;padding:2px 8px;font-weight:700;font-family:monospace;flex-shrink:0;">G</span>
+                                <span style="color:var(--dark);">Observações</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Passo 3: Importar arquivo -->
+                    <div style="background:var(--accent-ultra);border:1.5px solid rgba(39,174,96,0.25);border-radius:12px;padding:14px 16px;margin-bottom:14px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:32px;height:32px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <span style="color:#fff;font-size:0.75rem;font-weight:800;">3</span>
+                            </div>
+                            <div>
+                                <div style="font-size:0.85rem;font-weight:700;color:var(--dark);">Importe o arquivo preenchido</div>
+                                <div style="font-size:0.72rem;color:var(--text-muted);">Selecione o CSV salvo no seu dispositivo</div>
+                            </div>
+                        </div>
+                        <!-- Zona de upload drag-and-drop visual -->
+                        <label for="cs-import-input-modal"
+                            style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+                                   border:2px dashed rgba(39,174,96,0.4);border-radius:10px;padding:22px 14px;
+                                   cursor:pointer;background:rgba(255,255,255,0.5);transition:all 0.2s;"
+                            onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(39,174,96,0.06)'"
+                            onmouseout="this.style.borderColor='rgba(39,174,96,0.4)';this.style.background='rgba(255,255,255,0.5)'">
+                            <div style="width:44px;height:44px;border-radius:12px;background:var(--accent);display:flex;align-items:center;justify-content:center;">
+                                <i class="fas fa-cloud-upload-alt" style="color:#fff;font-size:1.3rem;"></i>
+                            </div>
+                            <div style="text-align:center;">
+                                <div style="font-size:0.85rem;font-weight:700;color:var(--dark);">Clique para selecionar o CSV</div>
+                                <div style="font-size:0.72rem;color:var(--text-muted);">Somente arquivos .csv</div>
+                            </div>
+                        </label>
+                        <input type="file" id="cs-import-input-modal" accept=".csv"
+                            style="display:none;"
+                            onchange="ConstrutorasModule.importCSV(this);ConstrutorasModule.closeModal();">
+                    </div>
+
+                    <!-- Feedback de preview (preenchido via JS após seleção) -->
+                    <div id="cs-import-preview" style="display:none;background:var(--bg-raised);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:0.8rem;color:var(--text-secondary);"></div>
+
                     <button onclick="ConstrutorasModule.closeModal()"
-                        style="padding:14px 18px;background:transparent;color:var(--text-secondary);
+                        style="width:100%;padding:12px;background:transparent;color:var(--text-secondary);
                                border:1.5px solid var(--border);border-radius:12px;font-weight:600;
-                               cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;">
-                        Cancelar
+                               cursor:pointer;font-family:'Inter',sans-serif;">
+                        Fechar
                     </button>
                 </div>
+
             </div>
         </div>
 
@@ -48315,8 +48451,13 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             });
             _set('cs-form-title', 'Nova Construtora');
             if (_$('cs-form-title')) _$('cs-form-title').textContent = 'Nova Construtora';
+            if (_$('cs-form-subtitle')) _$('cs-form-subtitle').textContent = 'Preencha os dados abaixo';
 
+            // Mostra/oculta abas: edição não tem aba de lote
+            const tabsBar = _$('cs-tabs-bar');
             if (id) {
+                // modo edição — esconde abas e vai direto ao painel individual
+                if (tabsBar) tabsBar.style.display = 'none';
                 const all = await _getAll();
                 const c = all.find(x => x.id === id);
                 if (c) {
@@ -48329,11 +48470,43 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                     _set('cs-site', c.site);
                     _set('cs-obs', c.obs);
                     if (_$('cs-form-title')) _$('cs-form-title').textContent = 'Editar Construtora';
+                    if (_$('cs-form-subtitle')) _$('cs-form-subtitle').textContent = 'Atualize os dados da construtora';
                 }
+                // garante painel individual visível
+                if (_$('cs-panel-individual')) _$('cs-panel-individual').style.display = '';
+                if (_$('cs-panel-lote'))       _$('cs-panel-lote').style.display = 'none';
+            } else {
+                // modo novo — mostra abas e começa na aba individual
+                if (tabsBar) tabsBar.style.display = 'flex';
+                switchTab('individual');
             }
 
             _openSheet('form');
             setTimeout(() => { if (_$('cs-nome')) _$('cs-nome').focus(); }, 250);
+        }
+
+        function switchTab(tab) {
+            const isIndividual = tab === 'individual';
+            // painéis
+            if (_$('cs-panel-individual')) _$('cs-panel-individual').style.display = isIndividual ? '' : 'none';
+            if (_$('cs-panel-lote'))       _$('cs-panel-lote').style.display       = isIndividual ? 'none' : '';
+            // estilos das abas
+            const btnInd  = _$('cs-tab-individual');
+            const btnLote = _$('cs-tab-lote');
+            if (btnInd) {
+                btnInd.style.background = isIndividual ? 'var(--primary)' : 'transparent';
+                btnInd.style.color      = isIndividual ? '#fff' : 'var(--text-secondary)';
+            }
+            if (btnLote) {
+                btnLote.style.background = isIndividual ? 'transparent' : 'var(--primary)';
+                btnLote.style.color      = isIndividual ? 'var(--text-secondary)' : '#fff';
+            }
+            // subtítulo
+            if (_$('cs-form-subtitle')) {
+                _$('cs-form-subtitle').textContent = isIndividual
+                    ? 'Preencha os dados abaixo'
+                    : 'Baixe o modelo, preencha e importe';
+            }
         }
 
         function closeModal() { _closeSheet('form'); }
@@ -48733,7 +48906,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             UI.switchTab._multiPatch = true;
         }
 
-        return { init, render, openModal, closeModal, save, excluir, openDetalhe, closeDetalhe, populateConstrutoraSelect, downloadTemplate, importCSV };
+        return { init, render, openModal, closeModal, save, excluir, openDetalhe, closeDetalhe, populateConstrutoraSelect, downloadTemplate, importCSV, switchTab };
     })();
     </script>
 
