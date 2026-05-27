@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <style id="nuclear-hide">
+        /* Eliminação permanente do botão flutuante de licença */
+        #_lw_wall, #_lw_loading, #_act_modal,
+        #_lw_wall *, [class*="wabtn"], [id*="_lw_"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#1D6FA4">
@@ -268,6 +278,41 @@
             width: 100%;
         }
         .view.active { display: block; }
+
+        /* ── Scroll do painel de Construtoras ── */
+        #construtoras-view {
+            display: none;
+            flex-direction: column;
+            height: calc(100vh - var(--header-height) - 24px);
+            height: calc(100dvh - var(--header-height) - 24px);
+            overflow: hidden;
+        }
+        #construtoras-view.active {
+            display: flex;
+        }
+        /* FAB nunca aparece no painel de construtoras — regra CSS garantida */
+        body:has(#construtoras-view.active) #fab-container,
+        body:has(#construtoras-view.active) .cap-fab-captacao {
+            display: none !important;
+        }
+        #construtoras-view .cs-list-scroll {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            padding: 0 4px 90px 10px;
+        }
+        #construtoras-view .cs-list-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        #construtoras-view .cs-list-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #construtoras-view .cs-list-scroll::-webkit-scrollbar-thumb {
+            background: var(--border-strong);
+            border-radius: 4px;
+        }
         @keyframes fadeIn { 
             from { opacity: 0; transform: translateY(10px); } 
             to { opacity: 1; transform: translateY(0); } 
@@ -281,7 +326,7 @@
             background: var(--bg-base);
             /* cancela o padding lateral do main (mobile: 14px) */
             margin: -12px -14px 0;
-            padding: 14px 14px 12px;
+            padding: 14px 14px 12px 24px;
             border-bottom: 1px solid var(--border);
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
@@ -289,8 +334,12 @@
         @media (min-width: 900px) {
             .cs-sticky-header {
                 margin: -12px -24px 0;
-                padding: 14px 24px 12px;
+                padding: 14px 24px 12px 32px;
             }
+        }
+        /* Campo de busca — largura máxima para não ficar gigante */
+        #cs-search-wrap {
+            max-width: 420px;
         }
 
         /* ── Dashboard grid — iPhone widget style ── */
@@ -7220,396 +7269,6 @@
 
     </style>
 
-<style>
-/* ── Loading / Wall ── */
-#_lw_loading {
-    display:flex;position:fixed;inset:0;z-index:999998;
-    background:linear-gradient(160deg,#0D1F12 0%,#142218 100%);
-    align-items:center;justify-content:center;flex-direction:column;gap:16px;
-}
-#_lw_loading._hide{display:none;}
-#_lw_loading ._spin{
-    width:44px;height:44px;border:4px solid rgba(255,255,255,0.15);
-    border-top-color:#C4724A;border-radius:50%;
-    animation:_lwspin 0.8s linear infinite;
-}
-@keyframes _lwspin{to{transform:rotate(360deg);}}
-#_lw_loading p{color:rgba(255,255,255,0.6);font-family:'Inter',sans-serif;font-size:14px;margin:0;}
-#_lw_wall{
-    display:none;position:fixed;inset:0;z-index:999999;
-    background:linear-gradient(160deg,#0D1F12 0%,#142218 100%);
-    align-items:center;justify-content:center;flex-direction:column;
-    text-align:center;padding:32px;font-family:'Inter',sans-serif;
-}
-#_lw_wall._show{display:flex;}
-#_lw_wall .ico{font-size:48px;margin-bottom:18px;}
-#_lw_wall h1{color:#fff;font-size:22px;font-weight:700;margin-bottom:12px;line-height:1.3;}
-#_lw_wall p{color:rgba(255,255,255,0.70);font-size:15px;max-width:400px;line-height:1.7;margin-bottom:28px;}
-#_lw_wall .card{
-    background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
-    border-radius:16px;padding:18px 28px;margin-bottom:28px;max-width:400px;width:100%;
-}
-#_lw_wall .card small{display:block;color:rgba(255,255,255,0.45);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
-#_lw_wall .card span{color:#C4724A;font-size:13px;font-weight:600;word-break:break-all;}
-#_lw_wall .wabtn{
-    display:inline-flex;align-items:center;gap:10px;background:#25D366;color:#fff;
-    font-size:16px;font-weight:700;padding:14px 32px;border-radius:50px;
-    text-decoration:none;box-shadow:0 6px 24px rgba(37,211,102,0.35);
-    transition:transform .15s,box-shadow .15s;
-}
-#_lw_wall .wabtn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(37,211,102,0.45);}
-#_lw_wall .footer{margin-top:24px;color:rgba(255,255,255,0.3);font-size:12px;}
-
-/* ── Modal Cod de Ativação ── */
-#_act_modal{
-    display:none;position:fixed;inset:0;z-index:1000000;
-    background:linear-gradient(160deg,#0a1a28 0%,#0D2235 100%);
-    align-items:center;justify-content:center;flex-direction:column;
-    text-align:center;padding:24px;font-family:'Inter',sans-serif;
-}
-#_act_modal._show{display:flex;}
-#_act_modal .act-logo{font-size:46px;margin-bottom:10px;}
-#_act_modal h2{color:#fff;font-size:20px;font-weight:800;margin-bottom:6px;}
-#_act_modal .act-sub{color:rgba(255,255,255,0.55);font-size:13px;margin-bottom:28px;max-width:340px;line-height:1.6;}
-#_act_modal .act-box{
-    background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.13);
-    border-radius:18px;padding:26px 28px 22px;max-width:420px;width:100%;
-}
-#_act_modal .act-label{
-    display:block;color:rgba(255,255,255,0.55);font-size:11px;font-weight:700;
-    text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;text-align:left;
-}
-#_act_modal .act-input-wrap{position:relative;margin-bottom:10px;}
-#_act_modal .act-input{
-    width:100%;padding:13px 44px 13px 16px;
-    background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.18);
-    border-radius:11px;color:#fff;font-size:15px;font-family:'Inter',sans-serif;
-    outline:none;transition:border .2s;letter-spacing:0.5px;
-}
-#_act_modal .act-input:focus{border-color:#1D6FA4;background:rgba(29,111,164,0.10);}
-#_act_modal .act-input::placeholder{color:rgba(255,255,255,0.25);}
-#_act_modal .act-eye{
-    position:absolute;right:12px;top:50%;transform:translateY(-50%);
-    background:none;border:none;color:rgba(255,255,255,0.40);cursor:pointer;
-    font-size:15px;padding:4px;
-}
-#_act_modal .act-err{
-    display:none;color:#F87171;font-size:12.5px;margin-bottom:12px;
-    background:rgba(248,113,113,0.10);border-radius:8px;padding:8px 12px;text-align:left;
-}
-#_act_modal .act-err._show{display:block;}
-#_act_modal .act-btn{
-    width:100%;padding:13px;background:linear-gradient(135deg,#1D6FA4,#155A8A);
-    border:none;border-radius:11px;color:#fff;font-size:15px;font-weight:700;
-    cursor:pointer;letter-spacing:0.3px;transition:opacity .15s,transform .15s;
-    display:flex;align-items:center;justify-content:center;gap:8px;
-}
-#_act_modal .act-btn:hover{opacity:0.92;transform:translateY(-1px);}
-#_act_modal .act-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-#_act_modal .act-footer{margin-top:20px;color:rgba(255,255,255,0.25);font-size:11px;}
-#_act_modal .act-spin{
-    width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);
-    border-top-color:#fff;border-radius:50%;animation:_lwspin .7s linear infinite;display:none;
-}
-</style>
-
-<div id="_lw_loading">
-    <div class="_spin"></div>
-    <p>Verificando licença…</p>
-</div>
-
-<!-- Modal Cod de Ativação (aparece antes do login, apenas na 1ª vez) -->
-<div id="_act_modal">
-    <div class="act-logo">🏠</div>
-    <h2>ImobiPro</h2>
-    <p class="act-sub">Para ativar esta máquina, insira o <strong style="color:#A8D8FF;">Cod de Ativação</strong> fornecido pelo administrador do sistema.</p>
-    <div class="act-box">
-        <label class="act-label" for="_act_input">Cod de Ativação</label>
-        <div class="act-input-wrap">
-            <input id="_act_input" class="act-input" type="password" placeholder="Digite o Cod de Ativação…"
-                onkeydown="if(event.key==='Enter')_ActModal.confirmar()">
-            <button class="act-eye" type="button" onclick="_ActModal.toggleEye()"><i class="fas fa-eye"></i></button>
-        </div>
-        <div class="act-err" id="_act_err"></div>
-        <button class="act-btn" id="_act_btn" onclick="_ActModal.confirmar()">
-            <div class="act-spin" id="_act_spin"></div>
-            <span id="_act_btn_txt"><i class="fas fa-unlock-alt"></i>&nbsp; Ativar Máquina</span>
-        </button>
-    </div>
-    <div class="act-footer">ImobiPro · Gestão Imobiliária</div>
-</div>
-<div id="_lw_wall">
-    <div class="ico">🔒</div>
-    <h1>Acesso não autorizado</h1>
-    <p>Esta licença do <strong>ImobiPro</strong> já está vinculada a outro dispositivo.<br>Cada licença permite uso em apenas <strong>uma máquina</strong>.</p>
-    <div class="card">
-        <small>Dispositivo registrado</small>
-        <span id="_lw_dev">—</span>
-    </div>
-    <a class="wabtn" id="_lw_wa" href="#" target="_blank">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Solicitar nova licença
-    </a>
-    <div class="footer">ImobiPro · Sistema de Gestão Imobiliária</div>
-</div>
-
-<script>
-/* ── Modal de Cod de Ativação ──────────────────────────────────────────── */
-var _ActModal = (function(){
-    'use strict';
-
-    var STORE_KEY = '_imobipro_actcode';
-    var _AKEY = '$2a$10$xxIvXXIjG7A86QLIGEifv.jhyYGb3oxNTy37NWXJwY4/PDwozFjvK';
-
-    function _parseCode(raw){
-        // Apenas o BIN ID é inserido pelo usuário
-        var binId = (raw||'').trim();
-        if(!binId) return null;
-        return { binId: binId, apiKey: _AKEY };
-    }
-
-    function getSaved(){
-        try{ return JSON.parse(localStorage.getItem(STORE_KEY)||'null'); }catch(e){ return null; }
-    }
-
-    function save(obj){
-        try{ localStorage.setItem(STORE_KEY, JSON.stringify(obj)); }catch(e){}
-    }
-
-    function show(){
-        document.getElementById('_act_modal').classList.add('_show');
-        setTimeout(function(){ const _i = document.getElementById('_act_input'); if(_i) _i.focus(); }, 300);
-    }
-
-    function hide(){
-        document.getElementById('_act_modal').classList.remove('_show');
-    }
-
-    function setLoading(on){
-        document.getElementById('_act_btn').disabled = on;
-        document.getElementById('_act_spin').style.display = on ? 'block' : 'none';
-        document.getElementById('_act_btn_txt').style.display = on ? 'none' : 'inline';
-    }
-
-    function setErr(msg){
-        var el = document.getElementById('_act_err');
-        el.textContent = msg;
-        el.classList.toggle('_show', !!msg);
-    }
-
-    function toggleEye(){
-        var inp = document.getElementById('_act_input');
-        var ico = document.querySelector('#_act_modal .act-eye i');
-        if(inp.type==='password'){ inp.type='text'; ico.className='fas fa-eye-slash'; }
-        else { inp.type='password'; ico.className='fas fa-eye'; }
-    }
-
-    function confirmar(){
-        var raw = document.getElementById('_act_input').value;
-        var parsed = _parseCode(raw);
-        if(!parsed){
-            setErr('Código inválido. Verifique e tente novamente.');
-            return;
-        }
-        setLoading(true);
-        setErr('');
-        // Testa a conexão com o JSONBin antes de salvar
-        var base = 'https://api.jsonbin.io/v3/b/' + parsed.binId;
-        fetch(base+'/latest',{headers:{'X-Master-Key':parsed.apiKey,'X-Bin-Meta':false}})
-        .then(function(r){
-            if(!r.ok) throw new Error('HTTP '+r.status);
-            return r.json();
-        })
-        .then(function(){
-            save(parsed);
-            hide();
-            setLoading(false);
-            _LicenseCheck.run(parsed);
-        })
-        .catch(function(){
-            setLoading(false);
-            setErr('Código de ativação inválido ou sem conexão. Verifique e tente novamente.');
-        });
-    }
-
-    function init(){
-        var saved = getSaved();
-        if(saved && saved.binId && saved.apiKey){
-            // Já ativado — continua direto
-            _LicenseCheck.run(saved);
-        } else {
-            // 1ª vez — exibe modal de ativação
-            show();
-        }
-    }
-
-    return { init: init, confirmar: confirmar, toggleEye: toggleEye };
-})();
-
-/* ── Verificação de licença (fingerprint) ─────────────────────────────── */
-var _LicenseCheck = (function(){
-    'use strict';
-
-    var WA_NUM = '5582996622036';
-
-    // Detecta se é dispositivo móvel/tablet
-    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-                   || ('ontouchstart' in window)
-                   || (navigator.maxTouchPoints > 0);
-
-    function fp(){
-        var raw=[
-            navigator.userAgent,
-            navigator.language||'',
-            screen.width+'x'+screen.height,
-            screen.colorDepth||'',
-            new Date().getTimezoneOffset(),
-            navigator.hardwareConcurrency||'',
-            navigator.platform||''
-        ].join('|');
-        var h=5381;
-        for(var i=0;i<raw.length;i++){h=((h<<5)+h)+raw.charCodeAt(i);h=h&h;}
-        return 'FP_'+Math.abs(h).toString(36).toUpperCase();
-    }
-
-    function deviceLabel(){
-        var ua=navigator.userAgent;
-        var os='Desconhecido';
-        if(/Windows NT 10/.test(ua))os='Windows 10/11';
-        else if(/Windows/.test(ua))os='Windows';
-        else if(/Mac OS X/.test(ua))os='Mac';
-        else if(/Android/.test(ua))os='Android';
-        else if(/iPhone/.test(ua))os='iPhone';
-        else if(/iPad/.test(ua))os='iPad';
-        else if(/Linux/.test(ua))os='Linux';
-        var br='Navegador';
-        if(/Chrome\//.test(ua)&&!/Edg\//.test(ua))br='Chrome';
-        else if(/Firefox\//.test(ua))br='Firefox';
-        else if(/Edg\//.test(ua))br='Edge';
-        else if(/Safari\//.test(ua)&&!/Chrome/.test(ua))br='Safari';
-        return os+' · '+br+' · '+new Date().toLocaleDateString('pt-BR');
-    }
-
-    function showLoad(){document.getElementById('_lw_loading').classList.remove('_hide');}
-    function hideLoad(){document.getElementById('_lw_loading').classList.add('_hide');}
-    function allow(){hideLoad();}
-    function block(label){
-        hideLoad();
-        document.getElementById('_lw_dev').textContent=label||'Outro dispositivo';
-        var msg=encodeURIComponent('Olá! Gostaria de adquirir uma nova licença do ImobiPro para outro dispositivo.');
-        document.getElementById('_lw_wa').href='https://wa.me/'+WA_NUM+'?text='+msg;
-        document.getElementById('_lw_wall').classList.add('_show');
-    }
-
-    function fetchBin(creds, cb){
-        var base='https://api.jsonbin.io/v3/b/'+creds.binId;
-        fetch(base+'/latest',{headers:{'X-Master-Key':creds.apiKey,'X-Bin-Meta':false}})
-        .then(function(r){return r.json();})
-        .then(function(d){cb(null,d.record||d);})
-        .catch(function(e){cb(e,null);});
-    }
-
-    function saveBin(creds, record, cb){
-        var base='https://api.jsonbin.io/v3/b/'+creds.binId;
-        fetch(base,{
-            method:'PUT',
-            headers:{'Content-Type':'application/json','X-Master-Key':creds.apiKey},
-            body:JSON.stringify(record)
-        })
-        .then(function(r){return r.json();})
-        .then(function(d){cb(null,d);})
-        .catch(function(e){cb(e,null);});
-    }
-
-    function run(creds){
-        var licKey=(location.hostname||'local').replace(/\./g,'_');
-        var myFp=fp();
-        var myLabel=deviceLabel();
-
-        // Cache local — evita chamada de rede desnecessária
-        try{
-            var cached=localStorage.getItem('_imobipro_fp');
-            if(cached && cached===myFp){allow();return;}
-        }catch(e){}
-
-        showLoad();
-
-        fetchBin(creds, function(err,record){
-            if(err||!record){allow();return;}
-
-            var licenses=record.licenses||{};
-
-            if(!licenses[licKey]){
-                licenses[licKey]={
-                    fingerprint:myFp,
-                    label:myLabel,
-                    registeredAt:new Date().toISOString()
-                };
-                record.licenses=licenses;
-                saveBin(creds, record, function(){
-                    try{localStorage.setItem('_imobipro_fp',myFp);}catch(e){}
-                    allow();
-                });
-            } else {
-                var reg=licenses[licKey];
-                if(reg.fingerprint===myFp){
-                    try{localStorage.setItem('_imobipro_fp',myFp);}catch(e){}
-                    allow();
-                } else {
-                    var regDate='';
-                    try{regDate=new Date(reg.registeredAt).toLocaleDateString('pt-BR');}catch(e){}
-                    block(reg.label||('Registrado em '+regDate));
-                }
-            }
-        });
-    }
-
-    return { run: run };
-})();
-
-/* ── Inicialização ────────────────────────────────────────────────────── */
-if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', function(){ _ActModal.init(); });
-} else { _ActModal.init(); }
-
-// ── PROTEÇÃO DE CÓDIGO-FONTE (apenas desktop) ─────────────────────────
-    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-                   || ('ontouchstart' in window)
-                   || (navigator.maxTouchPoints > 0);
-
-    document.addEventListener('contextmenu',function(e){e.preventDefault();return false;},true);
-
-    document.addEventListener('keydown',function(e){
-        var k=e.key?e.key.toLowerCase():'';
-        var c=e.code?e.code.toLowerCase():'';
-        if(e.keyCode===123||k==='f12'){e.preventDefault();return false;}
-        if(e.ctrlKey&&e.shiftKey&&(k==='i'||k==='j'||k==='c'||c==='keyi'||c==='keyj'||c==='keyc')){e.preventDefault();return false;}
-        if(e.ctrlKey&&(k==='u'||c==='keyu')){e.preventDefault();return false;}
-        if(e.ctrlKey&&(k==='s'||c==='keys')){e.preventDefault();return false;}
-        if(e.ctrlKey&&(k==='p'||c==='keyp')){e.preventDefault();return false;}
-        if(e.metaKey&&e.altKey&&(k==='i'||c==='keyi')){e.preventDefault();return false;}
-    },true);
-
-    // Detecção de DevTools por tamanho — SOMENTE EM DESKTOP
-    // Em mobile a diferença de tamanho é normal (teclado virtual, barras do navegador)
-    if(!isMobile){
-        var _devOpen=false;
-        setInterval(function(){
-            var wDiff=window.outerWidth-window.innerWidth;
-            var hDiff=window.outerHeight-window.innerHeight;
-            if(wDiff>160||hDiff>160){
-                if(!_devOpen){
-                    _devOpen=true;
-                    document.documentElement.innerHTML='';
-                    setTimeout(function(){window.location.reload(true);},50);
-                }
-            } else {
-                _devOpen=false;
-            }
-        },1000);
-    }
-
-</script>
 </head>
 <body>
     
@@ -10885,47 +10544,47 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
         <div id="construtoras-view" class="view">
             <!-- Cabeçalho sticky — fica sempre visível abaixo do header fixo -->
             <div class="cs-sticky-header">
-                <!-- Linha 1: título + botões -->
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;min-width:0;margin-bottom:10px;">
-                    <div style="display:flex;align-items:center;gap:10px;min-width:0;flex-shrink:1;">
-                        <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-ultra);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="fas fa-hard-hat" style="color:var(--primary);font-size:1rem;"></i>
-                        </div>
-                        <div style="min-width:0;">
-                            <div style="font-size:1rem;font-weight:800;color:var(--dark);line-height:1.2;">Construtoras</div>
-                            <div style="font-size:0.7rem;color:var(--text-muted);">Gestão de construtoras e empreendimentos</div>
-                        </div>
+                <!-- Linha 1: título -->
+                <div style="display:flex;align-items:center;gap:10px;min-width:0;margin-bottom:10px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-ultra);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-hard-hat" style="color:var(--primary);font-size:1rem;"></i>
                     </div>
-                    <div style="display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0;">
-                        <input type="file" id="cs-import-input" style="display:none;" accept=".csv" onchange="ConstrutorasModule.importCSV(this)">
-                        <button onclick="ConstrutorasModule.openModal(null)"
-                            style="display:inline-flex;align-items:center;gap:6px;
-                                   background:var(--primary);color:#fff;border:none;border-radius:9px;
-                                   padding:8px 16px;font-size:0.82rem;font-weight:700;cursor:pointer;
-                                   font-family:'Inter',sans-serif;white-space:nowrap;
-                                   box-shadow:0 3px 10px rgba(29,111,164,0.3);transition:all 0.2s;"
-                            onmouseover="this.style.background='var(--primary-dark)'"
-                            onmouseout="this.style.background='var(--primary)'">
-                            <i class="fas fa-plus"></i> Nova Construtora
-                        </button>
+                    <div style="min-width:0;">
+                        <div style="font-size:1rem;font-weight:800;color:var(--dark);line-height:1.2;">Construtoras</div>
+                        <div style="font-size:0.7rem;color:var(--text-muted);">Gestão de construtoras e empreendimentos</div>
                     </div>
                 </div>
-                <!-- Linha 2: busca -->
-                <div style="position:relative;">
-                    <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.82rem;pointer-events:none;"></i>
-                    <input type="text" id="cs-search"
-                        placeholder="Buscar por nome..."
-                        oninput="ConstrutorasModule.render()"
-                        style="width:100%;padding:9px 12px 9px 36px;border:1.5px solid var(--border);border-radius:9px;
-                               font-size:0.87rem;font-family:'Inter',sans-serif;background:var(--bg-raised);
-                               color:var(--dark);outline:none;box-sizing:border-box;"
-                        onfocus="this.style.borderColor='var(--primary)'"
-                        onblur="this.style.borderColor='var(--border)'">
+                <!-- Linha 2: busca + botão lado a lado -->
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <input type="file" id="cs-import-input" style="display:none;" accept=".csv" onchange="ConstrutorasModule.importCSV(this)">
+                    <div id="cs-search-wrap" style="position:relative;flex:1;min-width:0;">
+                        <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.82rem;pointer-events:none;"></i>
+                        <input type="text" id="cs-search"
+                            placeholder="Buscar por nome..."
+                            oninput="ConstrutorasModule.render()"
+                            style="width:100%;padding:9px 12px 9px 36px;border:1.5px solid var(--border);border-radius:9px;
+                                   font-size:0.87rem;font-family:'Inter',sans-serif;background:var(--bg-raised);
+                                   color:var(--dark);outline:none;box-sizing:border-box;"
+                            onfocus="this.style.borderColor='var(--primary)'"
+                            onblur="this.style.borderColor='var(--border)'">
+                    </div>
+                    <button onclick="ConstrutorasModule.openModal(null)"
+                        style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;
+                               background:var(--primary);color:#fff;border:none;border-radius:9px;
+                               padding:9px 16px;font-size:0.82rem;font-weight:700;cursor:pointer;
+                               font-family:'Inter',sans-serif;white-space:nowrap;
+                               box-shadow:0 3px 10px rgba(29,111,164,0.3);transition:all 0.2s;"
+                        onmouseover="this.style.background='var(--primary-dark)'"
+                        onmouseout="this.style.background='var(--primary)'">
+                        <i class="fas fa-plus"></i> Nova Construtora
+                    </button>
                 </div>
             </div>
-            <!-- contador + lista -->
-            <div id="cs-counter" style="font-size:0.72rem;color:var(--text-muted);margin:10px 0 8px;min-height:16px;"></div>
-            <div id="cs-list" class="construtoras-grid" style="display:grid;grid-template-columns:repeat(1, 1fr);gap:12px;padding-bottom:80px;"></div>
+            <!-- contador + lista (scroll próprio) -->
+            <div class="cs-list-scroll">
+                <div id="cs-counter" style="font-size:0.72rem;color:var(--text-muted);margin:10px 0 8px;min-height:16px;padding-left:10px;"></div>
+                <div id="cs-list" class="construtoras-grid" style="display:grid;grid-template-columns:repeat(1, 1fr);gap:12px;padding-right:2px;"></div>
+            </div>
         </div>
 
         <!-- ===== MODAL FORM CONSTRUTORA ===== -->
@@ -16809,7 +16468,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     'clientes-view':     () => { container.style.display='flex'; _fabIcon('user-plus','linear-gradient(135deg,var(--primary),var(--primary-dark))'); UI.setFabDirect(()=>UI.openNewCliente(false)); },
                     'agenda-view':       () => { container.style.display='flex'; _fabIcon('calendar-plus','linear-gradient(135deg,#E67E22,#D35400)'); UI.setFabDirect(UI.openNewVisita); },
                     'links-view':        () => { container.style.display='flex'; _fabIcon('link','linear-gradient(135deg,#0891B2,#0369A1)'); UI.setFabDirect(UI.openNewLink); },
-                    'construtoras-view': () => { container.style.display='flex'; _fabIcon('hard-hat','linear-gradient(135deg,var(--primary),var(--primary-dark))'); UI.setFabDirect(()=>ConstrutorasModule.openModal(null)); },
+                    'construtoras-view': () => { container.style.display='none'; },
                     // FERRAMENTAS — sem FAB principal (cada um tem seu próprio botão ou não precisa)
                     'funil-view':        () => { container.style.display='none'; UI.renderFunil(); },
                     'relatorios-view':   () => { container.style.display='none'; },
@@ -48297,6 +47956,9 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         // ── Init ────────────────────────────────────────────────────────
         async function init() {
             _cache = null;
+            // Garante que o FAB nunca aparece neste painel
+            const _fabEl = document.getElementById('fab-container');
+            if (_fabEl) _fabEl.style.display = 'none';
             await render();
             await populateConstrutoraSelect();
         }
@@ -48362,12 +48024,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                                text-decoration:none;white-space:nowrap;">
                         <i class="fab fa-whatsapp" style="font-size:0.65rem;"></i>${c.whatsapp}
                     </a>` : '',
-                    c.instagram ? `<a href="https://instagram.com/${insta}" target="_blank" onclick="event.stopPropagation()"
-                        style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;
-                               background:#FDF0F5;color:#E1306C;font-size:0.7rem;font-weight:600;
-                               text-decoration:none;white-space:nowrap;">
-                        <i class="fab fa-instagram" style="font-size:0.65rem;"></i>${c.instagram}
-                    </a>` : '',
+                    /* instagram removido do card — disponível apenas no detalhe/cadastro */
                     c.email ? `<a href="mailto:${c.email}" onclick="event.stopPropagation()"
                         style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;
                                background:var(--primary-ultra);color:var(--primary);font-size:0.7rem;
@@ -48894,7 +48551,12 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         // ── switchTab handler ───────────────────────────────────────────
         if (!window._switchTabHandlers) window._switchTabHandlers = [];
         window._switchTabHandlers.push(function(target) {
-            if (target === 'construtoras-view') setTimeout(() => ConstrutorasModule.init(), 80);
+            if (target === 'construtoras-view') {
+                // Oculta imediatamente qualquer FAB de outro painel
+                const _fc = document.getElementById('fab-container');
+                if (_fc) _fc.style.display = 'none';
+                setTimeout(() => ConstrutorasModule.init(), 80);
+            }
         });
         if (!UI.switchTab._multiPatch) {
             const orig = UI.switchTab;
