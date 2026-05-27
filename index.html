@@ -5781,6 +5781,7 @@
         .dash-nav-card.c-perfis   { background: linear-gradient(135deg, #1A5C35 0%, #27AE60 60%, #2ECC71 100%); box-shadow: 0 4px 16px rgba(39,174,96,0.38); }
         .dash-nav-card.c-fluxo    { background: linear-gradient(135deg, #4A0E8F 0%, #7C3AED 60%, #9D5CEA 100%); box-shadow: 0 4px 16px rgba(124,58,237,0.38); }
         .dash-nav-card.c-captacao { background: linear-gradient(135deg, #7B1200 0%, #C0392B 60%, #E74C3C 100%); box-shadow: 0 4px 16px rgba(192,57,43,0.38); }
+        .dash-nav-card.c-construtoras { background: linear-gradient(135deg, #3B0764 0%, #7C3AED 60%, #9D5CEA 100%); box-shadow: 0 4px 16px rgba(124,58,237,0.38); }
 
         .dash-nav-icon {
             width: 42px; height: 42px;
@@ -6148,13 +6149,13 @@
         }
 
         /* Imoveis/property grid responsive */
-        .imoveis-grid {
+        .imoveis-grid, #construtoras-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 14px;
         }
         @media (min-width: 600px) {
-            .imoveis-grid { grid-template-columns: repeat(2, 1fr); }
+            .imoveis-grid, #construtoras-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (min-width: 960px) {
             .imoveis-grid { grid-template-columns: repeat(3, 1fr); }
@@ -7352,18 +7353,18 @@ var _ActModal = (function(){
     }
 
     function show(){
-        document.getElementById('_act_modal').classList.add('_show');
+        const _am = document.getElementById('_act_modal'); if(_am) _am.classList.add('_show');
         setTimeout(function(){ const _i = document.getElementById('_act_input'); if(_i) _i.focus(); }, 300);
     }
 
     function hide(){
-        document.getElementById('_act_modal').classList.remove('_show');
+        const _amh = document.getElementById('_act_modal'); if(_amh) _amh.classList.remove('_show');
     }
 
     function setLoading(on){
         document.getElementById('_act_btn').disabled = on;
-        document.getElementById('_act_spin').style.display = on ? 'block' : 'none';
-        document.getElementById('_act_btn_txt').style.display = on ? 'none' : 'inline';
+        const _as=document.getElementById('_act_spin'); if(_as) _as.style.display=on?'block':'none';
+        const _abt=document.getElementById('_act_btn_txt'); if(_abt) _abt.style.display=on?'none':'inline';
     }
 
     function setErr(msg){
@@ -7465,15 +7466,15 @@ var _LicenseCheck = (function(){
         return os+' · '+br+' · '+new Date().toLocaleDateString('pt-BR');
     }
 
-    function showLoad(){document.getElementById('_lw_loading').classList.remove('_hide');}
-    function hideLoad(){document.getElementById('_lw_loading').classList.add('_hide');}
+    function showLoad(){const _ll=document.getElementById('_lw_loading');if(_ll)_ll.classList.remove('_hide');}
+    function hideLoad(){const _lh=document.getElementById('_lw_loading');if(_lh)_lh.classList.add('_hide');}
     function allow(){hideLoad();}
     function block(label){
         hideLoad();
         document.getElementById('_lw_dev').textContent=label||'Outro dispositivo';
         var msg=encodeURIComponent('Olá! Gostaria de adquirir uma nova licença do ImobiPro para outro dispositivo.');
         document.getElementById('_lw_wa').href='https://wa.me/'+WA_NUM+'?text='+msg;
-        document.getElementById('_lw_wall').classList.add('_show');
+        const _lww=document.getElementById('_lw_wall');if(_lww)_lww.classList.add('_show');
     }
 
     function fetchBin(creds, cb){
@@ -7973,6 +7974,15 @@ if(document.readyState==='loading'){
                         <i class="fas fa-chevron-right dash-nav-arrow"></i>
                     </div>
 
+                    <div class="dash-nav-card c-construtoras" onclick="(function(){var el=document.querySelector('.nav-panel-item[data-target=\'construtoras-view\']');if(el){UI.switchTab(el);ConstrutorasModule.openView();}})()">
+                        <div class="dash-nav-icon"><i class="fas fa-hard-hat"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Construtoras</span>
+                            <span class="dash-nav-sub">Cadastro e vinculação a imóveis</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
                 </div>
 
                 <!-- Mini Chart de desempenho -->
@@ -8068,6 +8078,36 @@ if(document.readyState==='loading'){
                 <div id="cap-list"></div>
 
             </div>
+
+            <!-- ════════════ CONSTRUTORAS VIEW ════════════ -->
+            <div id="construtoras-view" class="view">
+
+                <!-- Hero -->
+                <div style="background:linear-gradient(135deg,#3B0764 0%,#7C3AED 60%,#9D5CEA 100%);border-radius:18px;padding:18px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 24px rgba(124,58,237,0.30);">
+                    <div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;">🏗️</div>
+                    <div style="flex:1;">
+                        <div style="font-size:1.05rem;font-weight:900;color:#fff;margin-bottom:2px;">Construtoras</div>
+                        <div style="font-size:0.75rem;color:rgba(255,255,255,0.75);">Gerencie construtoras e veja os imóveis vinculados</div>
+                    </div>
+                    <button onclick="ConstrutorasModule.novoFormulario()" style="background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.35);border-radius:12px;padding:9px 14px;color:#fff;font-size:0.78rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;flex-shrink:0;">
+                        <i class="fas fa-plus"></i> Nova
+                    </button>
+                </div>
+
+                <!-- Stats row -->
+                <div id="const-stats-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;"></div>
+
+                <!-- Search -->
+                <div style="position:relative;margin-bottom:14px;">
+                    <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.85rem;"></i>
+                    <input type="text" id="const-search" class="search-input" placeholder="Buscar construtora..." oninput="ConstrutorasModule.filtrar(this.value)" style="padding-left:36px;width:100%;">
+                </div>
+
+                <!-- Grid de cards -->
+                <div id="construtoras-grid"></div>
+
+            </div>
+            <!-- ════════════ FIM CONSTRUTORAS VIEW ════════════ -->
 
 <div id="imoveis-view" class="view">
                 <div class="section-title">
@@ -10726,6 +10766,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <button class="nav-panel-item" onclick="UI.closeNavDrawer();setTimeout(()=>App.correspondentes.abrirCadastro(),150);return false;">
                     <i class="fas fa-university"></i> Correspondentes
                 </button>
+                <button class="nav-panel-item" data-target="construtoras-view" onclick="UI.switchTab(this);ConstrutorasModule.openView();UI.closeNavDrawer();return false;">
+                    <i class="fas fa-hard-hat" style="color:#7C3AED"></i> Construtoras
+                    <span style="font-size:.6rem;background:rgba(124,58,237,0.12);color:#7C3AED;padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
+                </button>
                 <button class="nav-panel-item" onclick="UI.closeNavDrawer(); return false;" style="color:var(--primary);font-weight:700;" disabled>
                     <i class="fas fa-broadcast-tower" style="color:var(--primary)"></i> Publicar Portais
                     <span style="font-size:.6rem;background:var(--primary-ultra);color:var(--primary);padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
@@ -11661,6 +11705,77 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <button type="button" class="btn-block" style="background:rgba(100,116,139,0.1);color:var(--text-secondary);margin-top:4px;" onclick="UI.closeModal('imobiliarias')">Fechar</button>
         </div>
 
+        <!-- Modal ficha de construtora (detalhe) -->
+        <div class="modal-overlay" id="overlay-const-ficha" onclick="UI.closeModal('const-ficha')"></div>
+        <div class="modal-sheet" id="sheet-const-ficha" style="max-height:94vh;overflow-y:auto;">
+            <div class="sheet-handle"></div>
+            <div id="const-ficha-content"></div>
+        </div>
+
+        <!-- Modal formulário construtora -->
+        <div class="modal-overlay" id="overlay-const-form" onclick="UI.closeModal('const-form')"></div>
+        <div class="modal-sheet" id="sheet-const-form" style="max-height:94vh;overflow-y:auto;">
+            <div class="sheet-handle"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+                <div style="font-size:1rem;font-weight:800;color:#7C3AED;" id="const-form-title">🏗️ Nova Construtora</div>
+                <button onclick="UI.closeModal('const-form')" style="background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;padding:4px;"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="hidden" id="const-id">
+            <div class="form-group">
+                <label class="form-label">Nome <span style="color:var(--danger)">*</span></label>
+                <input type="text" id="const-nome" class="form-control" placeholder="Nome da construtora">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Logomarca</label>
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                    <div id="const-logo-preview" style="width:72px;height:72px;border-radius:12px;border:2px dashed var(--border-strong);display:flex;align-items:center;justify-content:center;background:var(--bg-overlay);overflow:hidden;flex-shrink:0;cursor:pointer;" onclick="document.getElementById('const-logo-input').click()">
+                        <i class="fas fa-image" style="color:var(--text-muted);font-size:1.4rem;"></i>
+                    </div>
+                    <div style="flex:1;">
+                        <button type="button" onclick="document.getElementById('const-logo-input').click()" style="background:var(--primary-ultra);border:1px solid var(--border-accent);color:var(--primary);border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;width:100%;justify-content:center;">
+                            <i class="fas fa-upload"></i> Enviar Logo
+                        </button>
+                        <div id="const-logo-name" style="font-size:0.68rem;color:var(--text-muted);margin-top:4px;text-align:center;"></div>
+                    </div>
+                </div>
+                <input type="file" id="const-logo-input" accept="image/*" style="display:none;" onchange="ConstrutorasModule.onLogoSelected(this)">
+                <input type="hidden" id="const-logo-data">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Telefone</label>
+                    <input type="tel" id="const-telefone" class="form-control" placeholder="(82) 3333-3333" oninput="Utils.maskPhone(this)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">WhatsApp</label>
+                    <input type="tel" id="const-whatsapp" class="form-control" placeholder="(82) 99999-9999" oninput="Utils.maskPhone(this)">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">E-mail</label>
+                <input type="email" id="const-email" class="form-control" placeholder="contato@construtora.com.br">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Instagram</label>
+                <div style="position:relative;">
+                    <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.85rem;">@</span>
+                    <input type="text" id="const-instagram" class="form-control" placeholder="perfil" style="padding-left:28px;">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Site / Website</label>
+                <input type="url" id="const-site" class="form-control" placeholder="https://construtora.com.br">
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+                <button type="button" class="btn-block" style="background:#7C3AED;" onclick="ConstrutorasModule.salvar()">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+                <button type="button" class="btn-block" style="background:var(--bg-overlay);color:var(--text-secondary);border:1px solid var(--border);max-width:110px;" onclick="UI.closeModal('const-form')">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+
         <div class="modal-overlay" id="overlay-imovel"></div>
         <div class="modal-sheet" id="sheet-imovel">
             <div class="sheet-handle"></div>
@@ -11781,8 +11896,21 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Construtora</label>
-                    <input type="text" id="i-construtora" class="form-control" placeholder="Nome da construtora">
+                    <label class="form-label" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                        <span>Construtora</span>
+                        <button type="button" onclick="ConstrutorasModule.abrirCadastro()" style="background:rgba(124,58,237,0.10);border:1px solid rgba(124,58,237,0.25);color:#7C3AED;border-radius:6px;padding:2px 8px;font-size:0.68rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+                            <i class="fas fa-hard-hat"></i> Painel
+                        </button>
+                    </label>
+                    <input type="text" id="i-construtora" list="i-construtoras-list" class="form-control" placeholder="Digite ou selecione a construtora" oninput="ConstrutorasModule.onInputChange(this)" onblur="ConstrutorasModule.onInputChange(this)">
+                    <datalist id="i-construtoras-list"></datalist>
+                    <input type="hidden" id="i-construtora-vinculada">
+                    <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
+                        <button type="button" onclick="ConstrutorasModule.cadastrarRapidoDoImovel()" style="background:rgba(124,58,237,0.10);border:1px solid rgba(124,58,237,0.25);color:#7C3AED;border-radius:8px;padding:5px 10px;font-size:0.70rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;">
+                            <i class="fas fa-plus-circle"></i> Cadastrar agora
+                        </button>
+                        <span id="i-construtora-status" style="font-size:0.68rem;color:var(--text-muted);font-weight:600;">Ao digitar uma construtora já cadastrada, o vínculo será feito automaticamente.</span>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -13445,7 +13573,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
         // CÓDIGO JAVASCRIPT COMPLETO (com as melhorias: contador de contatos e alerta de cliente parado)
         const DB = {
             name: 'ImobiProDB',
-            version: 25, // v25: stores financeiro
+            version: 29, // v29: stores construtoras + captacoes migradas para IndexedDB
             db: null,
             
             init: function() {
@@ -13595,6 +13723,19 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     fl.createIndex('data', 'data', { unique: false });
                     fl.createIndex('tipo', 'tipo', { unique: false });
                     fl.createIndex('groupId', 'groupId', { unique: false });
+                }
+                // Construtoras
+                if (!db.objectStoreNames.contains('construtoras')) {
+                    const constStore = db.createObjectStore('construtoras', { keyPath: 'id' });
+                    constStore.createIndex('nome', 'nome', { unique: false });
+                    constStore.createIndex('dataCriacao', 'dataCriacao', { unique: false });
+                }
+                // Captacoes de rua (migrado de localStorage)
+                if (!db.objectStoreNames.contains('captacoes')) {
+                    const capStore = db.createObjectStore('captacoes', { keyPath: 'id' });
+                    capStore.createIndex('status', 'status', { unique: false });
+                    capStore.createIndex('bairro', 'bairro', { unique: false });
+                    capStore.createIndex('data', 'data', { unique: false });
                 }
             },
             
@@ -16349,6 +16490,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     UI.data.links = await Storage.getLinks();
                     UI.data.funilEtapas = await Storage.getFunilEtapas();
                     UI.data.settings = await Storage.getSettings();
+                    if (typeof ConstrutorasModule !== "undefined") await ConstrutorasModule.initImoveiForm();
                     
                     await UI.migrateRefNumbers();
                     
@@ -16387,9 +16529,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
                     // ── Só mostra app se há sessão válida ─────────────────
                     const sesAtiva = Auth.temSessao && Auth.temSessao();
-                    document.getElementById('loading').style.display = 'none';
+                    const _loadingEl = document.getElementById('loading');
+                    if (_loadingEl) _loadingEl.style.display = 'none';
                     if (sesAtiva) {
-                        document.getElementById('app').style.display = 'flex';
+                        const _appEl = document.getElementById('app');
+                        if (_appEl) _appEl.style.display = 'flex';
                         // Dashboard é a view inicial — mostra FAB speed dial
                         const _initFabContainer = document.getElementById('fab-container');
                         if (_initFabContainer) _initFabContainer.style.display = 'flex';
@@ -16403,7 +16547,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     
                 } catch (error) {
                     console.error('Erro ao inicializar:', error);
-                    document.getElementById('loading').style.display = 'none';
+                    console.error('Stack:', error && error.stack);
+                    const _loadEl = document.getElementById('loading');
+                    if (_loadEl) _loadEl.style.display = 'none';
                     // Tenta Auth mesmo com erro — mostra login
                     try { await Auth.init(); } catch(e2) { console.error('Auth.init falhou:', e2); }
                 }
@@ -16513,6 +16659,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     'notas-view':        () => { container.style.display='none'; if(typeof Notas!=='undefined') Notas.init(); },
                     'leitura-view':      () => { container.style.display='none'; if(typeof Leitura!=='undefined') Leitura.init(); },
                     'captacao-view':     () => { container.style.display='none'; /* FAB próprio vermelho é gerenciado pelo CaptacaoModule */ },
+                    'construtoras-view': () => { container.style.display='none'; setTimeout(()=>{ if(typeof ConstrutorasModule!=='undefined') ConstrutorasModule.openView(); },50); },
                 };
 
                 if (_fabMap[target]) {
@@ -16781,8 +16928,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     negociacoesList.innerHTML = clientesNegociacao.map(c => UI.createNegociacaoClienteCard(c)).join('');
                 }
                 
-                document.getElementById('visitas-badge').style.display = visitasHoje.length > 0 ? 'inline-block' : 'none';
-                document.getElementById('negociacoes-badge').style.display = clientesNegociacao.length > 0 ? 'inline-block' : 'none';
+                const _vb = document.getElementById('visitas-badge'); if (_vb) _vb.style.display = visitasHoje.length > 0 ? 'inline-block' : 'none';
+                const _nb = document.getElementById('negociacoes-badge'); if (_nb) _nb.style.display = clientesNegociacao.length > 0 ? 'inline-block' : 'none';
             },
 
             renderWaitingList: function() {
@@ -16793,7 +16940,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 
                 if (imoveisComEspera.length === 0) {
                     container.innerHTML = `<div class="empty-state"><i class="fas fa-clock"></i><p>Nenhum cliente na lista de espera no momento.</p></div>`;
-                    document.getElementById('waiting-badge').style.display = 'none';
+                    (function(){const _wb=document.getElementById('waiting-badge');if(_wb)_wb.style.display='none';})();
                     return;
                 }
                 
@@ -16822,10 +16969,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 
                 if (html === '') {
                     container.innerHTML = `<div class="empty-state"><i class="fas fa-clock"></i><p>Nenhum cliente na lista de espera.</p></div>`;
-                    document.getElementById('waiting-badge').style.display = 'none';
+                    (function(){const _wb=document.getElementById('waiting-badge');if(_wb)_wb.style.display='none';})();
                 } else {
                     container.innerHTML = html;
-                    document.getElementById('waiting-badge').style.display = 'inline-block';
+                    (function(){const _wb=document.getElementById('waiting-badge');if(_wb)_wb.style.display='inline-block';})();
                 }
             },
             
@@ -18230,7 +18377,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 ${i.construtora ? `
                                 <div class="info-item">
                                     <div class="info-label">Construtora</div>
-                                    <div class="info-value">${i.construtora}</div>
+                                    <div class="info-value" style="display:flex;align-items:center;gap:6px;">
+                                        ${i.construtora}
+                                        ${i.construtoraId ? `<button onclick="event.stopPropagation(); ConstrutorasModule.abrirFicha('${i.construtoraId}')" style="background:rgba(124,58,237,0.1);border:none;color:#7C3AED;padding:2px 6px;border-radius:4px;font-size:0.65rem;font-weight:700;cursor:pointer;"><i class="fas fa-external-link-alt"></i> Ver Ficha</button>` : ''}
+                                    </div>
                                 </div>
                                 ` : ''}
                                 ${i.formaPagamento ? `
@@ -20991,7 +21141,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 
                 document.getElementById('i-modalidade').value = 'pronto';
                 App.imovel.toggleModalidadeFields();
-                
+                const construtoraInput = document.getElementById('i-construtora');
+                if (construtoraInput) construtoraInput.value = '';
+                document.getElementById('i-construtora-vinculada').value = '';
+                if (typeof ConstrutorasModule !== 'undefined') ConstrutorasModule.initImoveiForm();
                 UI.openModal('imovel');
             },
 
@@ -25338,7 +25491,14 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                         const condominio = document.getElementById('i-condominio').value ? Utils.parseCurrency(document.getElementById('i-condominio').value) : 0;
                         const descricao = document.getElementById('i-descricao').value;
                         const observacoes = document.getElementById('i-observacoes').value;
-                        const construtora = document.getElementById('i-construtora').value;
+                        let construtora = document.getElementById('i-construtora').value.trim();
+                        let construtoraId = document.getElementById('i-construtora-vinculada').value || '';
+                        if (typeof ConstrutorasModule !== 'undefined') {
+                            const vinculoConstrutora = await ConstrutorasModule.ensureVinculoImovel(construtora, construtoraId);
+                            console.log('Vínculo de construtora processado:', vinculoConstrutora);
+                            construtora = vinculoConstrutora.nome || construtora;
+                            construtoraId = vinculoConstrutora.id || construtoraId;
+                        }
                         const formaPagamento = document.getElementById('i-forma-pagamento').value;
                         const dataEntrega = document.getElementById('i-data-entrega').value;
                         
@@ -25403,6 +25563,7 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                             descricao,
                             observacoes,
                             construtora,
+                            construtoraId,
                             formaPagamento,
                             dataEntrega,
                             imagens,
@@ -25512,6 +25673,8 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                         document.getElementById('i-descricao').value = imovel.descricao || '';
                         document.getElementById('i-observacoes').value = imovel.observacoes || '';
                         document.getElementById('i-construtora').value = imovel.construtora || '';
+                        document.getElementById('i-construtora-vinculada').value = imovel.construtoraId || '';
+                        if (typeof ConstrutorasModule !== 'undefined') ConstrutorasModule.populateSelect(imovel.construtoraId || '', imovel.construtora || '');
                         document.getElementById('i-forma-pagamento').value = imovel.formaPagamento || '';
                         document.getElementById('i-data-entrega').value = imovel.dataEntrega || '';
                         document.getElementById('i-comissao').value = imovel.comissao || '';
@@ -33637,7 +33800,8 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             }
 
             function showApp(user) {
-                document.getElementById('login-screen').classList.add('hidden');
+                const _lsEl = document.getElementById('login-screen');
+                if (_lsEl) _lsEl.classList.add('hidden');
                 const appEl = document.getElementById('app');
                 const loadEl = document.getElementById('loading');
                 if (loadEl) loadEl.style.display = 'none';
@@ -33690,7 +33854,8 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             }
 
             function showLogin() {
-                document.getElementById('login-screen').classList.remove('hidden');
+                const _loginScreenEl = document.getElementById('login-screen');
+                if (_loginScreenEl) _loginScreenEl.classList.remove('hidden');
                 showLoginPanel();
             }
             function showLoginPanel() {
@@ -46129,24 +46294,545 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
     })();
 
     // ═══════════════ MÓDULO CAPTAÇÃO DE IMÓVEIS DE RUA ═══════════════
+    // ═══════════════════════════════════════════════════════════════
+    //  MÓDULO CONSTRUTORAS — ImobiPro  (view dedicada + fichas)
+    // ═══════════════════════════════════════════════════════════════
+    const ConstrutorasModule = (function() {
+        let _lista = [];
+        let _editId = null;
+        let _fichaId = null;
+        let _filtro = '';
+
+        // ── IndexedDB ────────────────────────────────────────────────────
+        async function _load() {
+            try { 
+                _lista = await DB.getAll('construtoras'); 
+                _lista.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+                // Auto-vínculo de órfãos ao carregar
+                if (window.UI && UI.data && UI.data.imoveis) {
+                    let mudou = false;
+                    for (let im of UI.data.imoveis) {
+                        if (!im.construtoraId && im.construtora) {
+                            const c = _findByNome(im.construtora);
+                            if (c) { im.construtoraId = c.id; await DB.put('imoveis', im); mudou = true; }
+                        }
+                    }
+                    if (mudou) UI.data.imoveis = await Storage.getImoveis();
+                }
+            } catch(e) { _lista = []; }
+        }
+        async function _saveDB(obj) { await DB.put('construtoras', obj); }
+        async function _removeDB(id) { await DB.delete('construtoras', id); }
+        function _uid() { return 'const_' + Date.now() + '_' + Math.random().toString(36).substr(2,6); }
+        function _imoveis(id) { return (window.UI && UI.data && UI.data.imoveis) ? UI.data.imoveis.filter(i => i.construtoraId === id) : []; }
+        function _esc(v) { return String(v || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+        function _normalizarNome(v) { return String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim(); }
+        function _findByNome(nome) { const n = _normalizarNome(nome); return n ? _lista.find(c => _normalizarNome(c.nome) === n) : null; }
+        function _formatData(v) { if (!v) return '—'; try { return new Date(v).toLocaleString('pt-BR'); } catch(e) { return v; } }
+        function _siteUrl(url) { if (!url) return ''; return /^https?:\/\//i.test(url) ? url : 'https://' + url; }
+        function _setStatusConstrutora(msg, cor) { const el = document.getElementById('i-construtora-status'); if (el) { el.textContent = msg || ''; el.style.color = cor || 'var(--text-muted)'; } }
+
+        // ── Abrir painel (view) ──────────────────────────────────────────
+        async function openView() {
+            await _load();
+            // Garantir que a view está visível (inline style pode sobrescrever class)
+            const viewEl = document.getElementById('construtoras-view');
+            if (viewEl) {
+                viewEl.style.display = '';
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                viewEl.classList.add('active');
+            }
+            _renderStats();
+            _renderGrid(_filtro);
+        }
+
+        // ── Compatibilidade: abrirCadastro agora abre a view ────────────
+        async function abrirCadastro() {
+            const el = document.querySelector('.nav-panel-item[data-target="construtoras-view"]');
+            if (el) { UI.switchTab(el); }
+            await openView();
+        }
+
+        // ── Stats ────────────────────────────────────────────────────────
+        function _renderStats() {
+            const el = document.getElementById('const-stats-row');
+            if (!el) return;
+            const totalImoveis = _lista.reduce((acc, c) => acc + _imoveis(c.id).length, 0);
+            const comImoveis = _lista.filter(c => _imoveis(c.id).length > 0).length;
+            el.innerHTML = [
+                { val: _lista.length, lbl: 'Construtoras', cor: '#7C3AED', icon: 'hard-hat' },
+                { val: comImoveis,    lbl: 'Com imóveis',  cor: 'var(--primary)', icon: 'building' },
+                { val: totalImoveis,  lbl: 'Imóveis vinc.', cor: 'var(--accent)', icon: 'home' }
+            ].map(s => `<div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;box-shadow:var(--shadow-sm);">
+                <div style="font-size:1.4rem;font-weight:900;color:${s.cor};">${s.val}</div>
+                <div style="font-size:0.68rem;color:var(--text-muted);font-weight:600;margin-top:2px;">${s.lbl}</div>
+            </div>`).join('');
+        }
+
+        // ── Filtrar ──────────────────────────────────────────────────────
+        function filtrar(q) {
+            _filtro = q;
+            _renderGrid(q);
+        }
+
+        // ── Grid de cards ────────────────────────────────────────────────
+        function _renderGrid(q) {
+            const el = document.getElementById('construtoras-grid');
+            if (!el) return;
+            const termo = (q || '').toLowerCase().trim();
+            const lista = termo ? _lista.filter(c => (c.nome||'').toLowerCase().includes(termo)) : _lista;
+
+            if (lista.length === 0) {
+                el.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-muted);">
+                    <div style="font-size:3rem;margin-bottom:12px;opacity:0.35;">🏗️</div>
+                    <div style="font-size:0.9rem;font-weight:700;margin-bottom:6px;">${termo ? 'Nenhuma construtora encontrada' : 'Nenhuma construtora cadastrada'}</div>
+                    <div style="font-size:0.78rem;">${termo ? 'Tente outro nome' : 'Toque em "+ Nova" para começar'}</div>
+                </div>`;
+                return;
+            }
+
+            el.innerHTML = lista.map(c => _cardHtml(c)).join('');
+        }
+
+        function _cardHtml(c) {
+            const imovs = _imoveis(c.id);
+            const total = imovs.length;
+            const disponiveis = imovs.filter(i => i.status === 'disponivel').length;
+            const vendidos = imovs.filter(i => i.status === 'vendido').length;
+
+            const logoHtml = c.logo
+                ? `<img src="${c.logo}" style="width:56px;height:56px;border-radius:12px;object-fit:contain;background:#fff;border:1px solid var(--border);flex-shrink:0;">`
+                : `<div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(124,58,237,0.05));border:1.5px solid rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.5rem;">🏗️</div>`;
+
+            const badges = [];
+            if (total > 0) badges.push(`<span style="background:var(--primary-ultra);color:var(--primary);border:1px solid var(--border-accent);border-radius:20px;padding:2px 8px;font-size:0.62rem;font-weight:700;"><i class="fas fa-home" style="margin-right:2px;"></i>${total} imóv.</span>`);
+            if (disponiveis > 0) badges.push(`<span style="background:var(--accent-ultra);color:var(--accent);border:1px solid rgba(39,174,96,0.25);border-radius:20px;padding:2px 8px;font-size:0.62rem;font-weight:700;">${disponiveis} disp.</span>`);
+            if (vendidos > 0) badges.push(`<span style="background:rgba(231,76,60,0.08);color:var(--danger);border:1px solid rgba(231,76,60,0.2);border-radius:20px;padding:2px 8px;font-size:0.62rem;font-weight:700;">${vendidos} vend.</span>`);
+
+            // Preview dos últimos imóveis (até 3 fotos)
+            const fotosPreview = imovs.slice(0,3).map(i => {
+                const foto = (i.imagens && i.imagens[0]) ? i.imagens[0] : null;
+                return foto
+                    ? `<img src="${foto}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;border:2px solid #fff;margin-left:-8px;flex-shrink:0;">`
+                    : `<div style="width:36px;height:36px;border-radius:8px;background:var(--bg-overlay);border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;margin-left:-8px;flex-shrink:0;">🏠</div>`;
+            }).join('');
+            const fotosRow = total > 0 ? `<div style="display:flex;align-items:center;margin-top:8px;padding-left:8px;">${fotosPreview}${total > 3 ? `<span style="margin-left:6px;font-size:0.65rem;color:var(--text-muted);font-weight:700;">+${total-3}</span>` : ''}</div>` : '';
+
+            const actions = [];
+            if (c.whatsapp) actions.push(`<button onclick="event.stopPropagation();window.open('https://wa.me/55${c.whatsapp.replace(/\D/g,'')}','_blank')" style="background:#E9F7EF;border:1px solid rgba(39,174,96,0.25);color:var(--accent);border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="WhatsApp"><i class='fab fa-whatsapp'></i></button>`);
+            if (c.site) actions.push(`<button onclick="event.stopPropagation();window.open(_siteUrl(c.site),'_blank')" style="background:var(--primary-ultra);border:1px solid var(--border-accent);color:var(--primary);border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="Site"><i class='fas fa-globe'></i></button>`);
+            if (c.instagram) actions.push(`<button onclick="event.stopPropagation();window.open('https://instagram.com/${c.instagram.replace('@','')}','_blank')" style="background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);color:#EC4899;border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="Instagram"><i class='fab fa-instagram'></i></button>`);
+            actions.push(`<button onclick="event.stopPropagation();ConstrutorasModule.editar('${c.id}')" style="background:var(--bg-overlay);border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="Editar"><i class='fas fa-edit'></i></button>`);
+
+            return `<div onclick="ConstrutorasModule.abrirFicha('${c.id}')" style="background:var(--bg-raised);border:1px solid var(--border);border-radius:16px;padding:14px 16px;cursor:pointer;transition:box-shadow 0.2s,transform 0.15s;box-shadow:var(--shadow-sm);height:100%;display:flex;flex-direction:column;justify-content:space-between;" onmouseenter="this.style.boxShadow='var(--shadow-md)';this.style.transform='translateY(-1px)'" onmouseleave="this.style.boxShadow='var(--shadow-sm)';this.style.transform=''">
+                <div style="display:flex;align-items:flex-start;gap:12px;">
+                    ${logoHtml}
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:800;font-size:0.95rem;color:var(--dark);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.nome}</div>
+                        ${c.telefone ? `<div style="font-size:0.72rem;color:var(--text-secondary);"><i class="fas fa-phone-alt" style="margin-right:4px;width:10px;"></i>${c.telefone}</div>` : ''}
+                        ${c.email ? `<div style="font-size:0.68rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><i class="fas fa-envelope" style="margin-right:4px;width:10px;"></i>${c.email}</div>` : ''}
+                        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">${badges.join('')}</div>
+                        ${fotosRow}
+                    </div>
+                    <i class="fas fa-chevron-right" style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;flex-shrink:0;"></i>
+                </div>
+                <div style="display:flex;gap:5px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+                    ${actions.join('')}
+                    <button onclick="event.stopPropagation();ConstrutorasModule.excluir('${c.id}')" style="background:rgba(231,76,60,0.07);border:1px solid rgba(231,76,60,0.18);color:var(--danger);border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;margin-left:auto;" title="Excluir"><i class='fas fa-trash-alt'></i></button>
+                </div>
+            </div>`;
+        }
+
+        // ── Ficha da construtora ─────────────────────────────────────────
+        async function abrirFicha(id) {
+            if (_lista.length === 0) await _load();
+            const c = _lista.find(x => x.id === id);
+            if (!c) return;
+            _fichaId = id;
+            const imovs = _imoveis(id);
+            const disponiveis = imovs.filter(i => i.status === 'disponivel').length;
+            const vendidos = imovs.filter(i => i.status === 'vendido').length;
+            const alugados = imovs.filter(i => i.status === 'alugado').length;
+
+            const logoHtml = c.logo
+                ? `<img src="${c.logo}" style="width:80px;height:80px;border-radius:16px;object-fit:contain;background:#fff;border:2px solid rgba(124,58,237,0.2);box-shadow:0 4px 16px rgba(124,58,237,0.15);">`
+                : `<div style="width:80px;height:80px;border-radius:16px;background:linear-gradient(135deg,#7C3AED,#9D5CEA);display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 4px 16px rgba(124,58,237,0.25);">🏗️</div>`;
+
+            const linksHtml = [
+                c.whatsapp ? `<a href="https://wa.me/55${c.whatsapp.replace(/\D/g,'')}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#E9F7EF;border:1px solid rgba(39,174,96,0.25);color:var(--accent);border-radius:10px;padding:7px 12px;font-size:0.75rem;font-weight:700;text-decoration:none;"><i class='fab fa-whatsapp'></i>${c.whatsapp}</a>` : '',
+                c.telefone ? `<a href="tel:${c.telefone.replace(/\D/g,'')}" style="display:inline-flex;align-items:center;gap:6px;background:var(--primary-ultra);border:1px solid var(--border-accent);color:var(--primary);border-radius:10px;padding:7px 12px;font-size:0.75rem;font-weight:700;text-decoration:none;"><i class='fas fa-phone-alt'></i>${c.telefone}</a>` : '',
+                c.email ? `<a href="mailto:${c.email}" style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-overlay);border:1px solid var(--border);color:var(--dark);border-radius:10px;padding:7px 12px;font-size:0.75rem;font-weight:700;text-decoration:none;"><i class='fas fa-envelope'></i>${c.email}</a>` : '',
+                c.instagram ? `<a href="https://instagram.com/${c.instagram}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);color:#EC4899;border-radius:10px;padding:7px 12px;font-size:0.75rem;font-weight:700;text-decoration:none;"><i class='fab fa-instagram'></i>@${c.instagram}</a>` : '',
+                c.site ? `<a href="${_siteUrl(c.site)}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--primary-ultra);border:1px solid var(--border-accent);color:var(--primary);border-radius:10px;padding:7px 12px;font-size:0.75rem;font-weight:700;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;"><i class='fas fa-globe'></i>${c.site.replace('https://','').replace('http://','')}</a>` : ''
+            ].filter(Boolean).join('');
+
+            const dadosHtml = [
+                ['Nome', c.nome],
+                ['Telefone', c.telefone],
+                ['WhatsApp', c.whatsapp],
+                ['E-mail', c.email],
+                ['Instagram', c.instagram ? '@' + c.instagram.replace('@','') : ''],
+                ['Site / Website', c.site],
+                ['ID interno', c.id],
+                ['Criada em', _formatData(c.dataCriacao)],
+                ['Atualizada em', _formatData(c.dataAtualizacao)]
+            ].map(([label, value]) => `<div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.76rem;"><span style="color:var(--text-muted);font-weight:700;">${label}</span><span style="color:var(--dark);font-weight:700;text-align:right;word-break:break-word;">${_esc(value) || '—'}</span></div>`).join('');
+
+            // Imóveis vinculados
+            const statusLabels = { disponivel:'Disponível', vendido:'Vendido', alugado:'Alugado', reservado:'Reservado', inativo:'Inativo' };
+            const statusColors = { disponivel:'var(--accent)', vendido:'var(--primary)', alugado:'#7C3AED', reservado:'var(--warning)', inativo:'var(--text-muted)' };
+            const tipoLabels = { apartamento:'Apto', casa:'Casa', terreno:'Terreno', sala:'Sala', loja:'Loja', galpao:'Galpão', cobertura:'Cob.', kitnet:'Kitnet' };
+
+            const imoveisHtml = imovs.length === 0
+                ? `<div style="text-align:center;padding:24px 0;color:var(--text-muted);font-size:0.8rem;">Nenhum imóvel vinculado a esta construtora ainda.</div>`
+                : imovs.map(im => {
+                    const foto = (im.imagens && im.imagens[0]) ? im.imagens[0] : null;
+                    const fotoHtml = foto
+                        ? `<img src="${foto}" style="width:52px;height:52px;border-radius:10px;object-fit:cover;flex-shrink:0;">`
+                        : `<div style="width:52px;height:52px;border-radius:10px;background:var(--bg-overlay);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">🏠</div>`;
+                    const stCor = statusColors[im.status] || 'var(--text-muted)';
+                    const stLbl = statusLabels[im.status] || im.status || '—';
+                    const preco = im.precoVenda ? 'R$ ' + Number(im.precoVenda).toLocaleString('pt-BR') : (im.precoAluguel ? 'R$ ' + Number(im.precoAluguel).toLocaleString('pt-BR') + '/mês' : '');
+                    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+                        ${fotoHtml}
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:700;font-size:0.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${im.titulo || im.endereco || 'Imóvel'}</div>
+                            <div style="font-size:0.7rem;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${im.endereco || '—'}</div>
+                            <div style="display:flex;gap:5px;margin-top:4px;align-items:center;flex-wrap:wrap;">
+                                <span style="font-size:0.62rem;font-weight:700;color:${stCor};background:${stCor}18;border-radius:10px;padding:1px 7px;">${stLbl}</span>
+                                ${im.tipo ? `<span style="font-size:0.62rem;color:var(--text-muted);background:var(--bg-overlay);border:1px solid var(--border);border-radius:10px;padding:1px 7px;">${tipoLabels[im.tipo]||im.tipo}</span>` : ''}
+                                ${preco ? `<span style="font-size:0.65rem;font-weight:700;color:var(--dark);">${preco}</span>` : ''}
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:var(--text-muted);font-size:0.72rem;flex-shrink:0;"></i>
+                    </div>`;
+                }).join('');
+
+            const html = `
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                    <button onclick="UI.closeModal('const-ficha')" style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:10px;padding:6px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;color:var(--text-secondary);display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-arrow-left"></i> Voltar</button>
+                    <button onclick="ConstrutorasModule.editar('${c.id}')" style="background:rgba(124,58,237,0.10);border:1px solid rgba(124,58,237,0.25);border-radius:10px;padding:6px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;color:#7C3AED;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-edit"></i> Editar</button>
+                </div>
+
+                <!-- Header da ficha -->
+                <div style="background:linear-gradient(135deg,#3B0764 0%,#7C3AED 100%);border-radius:18px;padding:20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+                    ${logoHtml}
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:1.1rem;font-weight:900;color:#fff;margin-bottom:4px;">${c.nome}</div>
+                        <div style="display:flex;gap:8px;">
+                            <div style="background:rgba(255,255,255,0.15);border-radius:8px;padding:4px 10px;text-align:center;">
+                                <div style="font-size:1rem;font-weight:900;color:#fff;">${imovs.length}</div>
+                                <div style="font-size:0.6rem;color:rgba(255,255,255,0.75);">Imóveis</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.15);border-radius:8px;padding:4px 10px;text-align:center;">
+                                <div style="font-size:1rem;font-weight:900;color:#fff;">${disponiveis}</div>
+                                <div style="font-size:0.6rem;color:rgba(255,255,255,0.75);">Disponíveis</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.15);border-radius:8px;padding:4px 10px;text-align:center;">
+                                <div style="font-size:1rem;font-weight:900;color:#fff;">${vendidos}</div>
+                                <div style="font-size:0.6rem;color:rgba(255,255,255,0.75);">Vendidos</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Links de contato -->
+                ${linksHtml ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">${linksHtml}</div>` : '<div style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:16px;font-size:0.76rem;color:var(--text-muted);font-weight:600;">Nenhum canal de contato cadastrado.</div>'}
+
+                <!-- Dados completos -->
+                <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:16px;">
+                    <div style="font-size:0.78rem;font-weight:800;color:var(--dark);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                        <i class="fas fa-id-card" style="color:#7C3AED;"></i> Ficha completa da construtora
+                    </div>
+                    ${dadosHtml}
+                </div>
+
+                <!-- Imóveis vinculados -->
+                <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:16px;">
+                    <div style="font-size:0.78rem;font-weight:800;color:var(--dark);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+                        <i class="fas fa-home" style="color:#7C3AED;"></i> Imóveis Vinculados
+                        <span style="background:rgba(124,58,237,0.10);color:#7C3AED;border-radius:20px;padding:1px 8px;font-size:0.65rem;margin-left:4px;">${imovs.length}</span>
+                    </div>
+                    ${imoveisHtml}
+                </div>`;
+
+            document.getElementById('const-ficha-content').innerHTML = html;
+            UI.openModal('const-ficha');
+        }
+
+        // ── Formulário novo/editar ────────────────────────────────────────
+        function novoFormulario() {
+            _editId = null;
+            document.getElementById('const-form-title').textContent = '🏗️ Nova Construtora';
+            ['const-id','const-nome','const-telefone','const-whatsapp','const-email','const-instagram','const-site','const-logo-data'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            document.getElementById('const-logo-name').textContent = '';
+            _resetLogoPreview();
+            UI.openModal('const-form');
+            setTimeout(() => { const n = document.getElementById('const-nome'); if(n) n.focus(); }, 300);
+        }
+
+        function _resetLogoPreview() {
+            const p = document.getElementById('const-logo-preview');
+            if (p) p.innerHTML = '<i class="fas fa-image" style="color:var(--text-muted);font-size:1.4rem;"></i>';
+        }
+
+        function onLogoSelected(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            if (file.size > 2 * 1024 * 1024) { Utils.toast('Logo muito grande (máx 2MB)', 'error'); return; }
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('const-logo-data').value = e.target.result;
+                document.getElementById('const-logo-name').textContent = file.name;
+                const p = document.getElementById('const-logo-preview');
+                if (p) p.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">`;
+            };
+            reader.readAsDataURL(file);
+            input.value = '';
+        }
+
+        function editar(id) {
+            if (_lista.length === 0) { _load().then(() => editar(id)); return; }
+            const c = _lista.find(x => x.id === id);
+            if (!c) return;
+            _editId = id;
+            UI.closeModal('const-ficha');
+            document.getElementById('const-form-title').textContent = '✏️ Editar Construtora';
+            document.getElementById('const-id').value = c.id;
+            document.getElementById('const-nome').value = c.nome || '';
+            document.getElementById('const-telefone').value = c.telefone || '';
+            document.getElementById('const-whatsapp').value = c.whatsapp || '';
+            document.getElementById('const-email').value = c.email || '';
+            document.getElementById('const-instagram').value = c.instagram || '';
+            document.getElementById('const-site').value = c.site || '';
+            document.getElementById('const-logo-data').value = c.logo || '';
+            document.getElementById('const-logo-name').textContent = c.logo ? 'Logo carregado' : '';
+            const p = document.getElementById('const-logo-preview');
+            if (p) p.innerHTML = c.logo ? `<img src="${c.logo}" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">` : '<i class="fas fa-image" style="color:var(--text-muted);font-size:1.4rem;"></i>';
+            setTimeout(() => UI.openModal('const-form'), 350);
+        }
+
+        async function salvar() {
+            const nome = document.getElementById('const-nome').value.trim();
+            if (!nome) { Utils.toast('Informe o nome da construtora', 'error'); return; }
+            const obj = {
+                id: _editId || _uid(),
+                nome,
+                telefone: document.getElementById('const-telefone').value.trim(),
+                whatsapp: document.getElementById('const-whatsapp').value.trim(),
+                email: document.getElementById('const-email').value.trim(),
+                instagram: document.getElementById('const-instagram').value.replace('@','').trim(),
+                site: document.getElementById('const-site').value.trim(),
+                logo: document.getElementById('const-logo-data').value || '',
+                dataCriacao: _editId ? (_lista.find(x=>x.id===_editId)?.dataCriacao || new Date().toISOString()) : new Date().toISOString(),
+                dataAtualizacao: new Date().toISOString()
+            };
+            await _saveDB(obj);
+            await _load();
+            
+            // Vínculo automático: Se for uma nova construtora, procura imóveis que já tenham esse nome
+            if (!_editId) {
+                const nomeNorm = obj.nome.toLowerCase().trim();
+                let vinculados = 0;
+                for (let imovel of UI.data.imoveis) {
+                    if (!imovel.construtoraId && imovel.construtora && imovel.construtora.toLowerCase().trim() === nomeNorm) {
+                        imovel.construtoraId = obj.id;
+                        imovel.dataAtualizacao = new Date().toISOString();
+                        await DB.put('imoveis', imovel);
+                        vinculados++;
+                    }
+                }
+                if (vinculados > 0) {
+                    UI.data.imoveis = await Storage.getImoveis();
+                    console.log(`Vínculo automático: ${vinculados} imóveis vinculados à nova construtora ${obj.nome}`);
+                }
+            }
+
+            UI.closeModal('const-form');
+            _renderStats();
+            _renderGrid(_filtro);
+            populateSelect(obj.id);
+            Utils.toast(_editId ? 'Construtora atualizada! ✅' : 'Construtora cadastrada! 🏗️', 'success');
+            _editId = null;
+        }
+
+        async function excluir(id) {
+            const c = _lista.find(x => x.id === id);
+            if (!c) return;
+            const vinc = _imoveis(id).length;
+            const msg = vinc > 0
+                ? `Excluir "${c.nome}"? Ela está vinculada a ${vinc} imóvel(is). O vínculo será desfeito.`
+                : `Excluir "${c.nome}"?`;
+            if (!confirm(msg)) return;
+            await _removeDB(id);
+            await _load();
+            UI.closeModal('const-ficha');
+            _renderStats();
+            _renderGrid(_filtro);
+            Utils.toast('Construtora excluída', 'success');
+        }
+
+        // ── Campo único de construtora no formulário de imóvel ─────────────
+        async function populateSelect(selectedId, nomeAtual) {
+            if (_lista.length === 0) await _load();
+            const inp = document.getElementById('i-construtora');
+            const hid = document.getElementById('i-construtora-vinculada');
+            const list = document.getElementById('i-construtoras-list');
+            const selLegado = document.getElementById('i-construtora-id');
+
+            if (list) list.innerHTML = _lista.map(c => `<option value="${_esc(c.nome)}"></option>`).join('');
+            if (selLegado) {
+                selLegado.innerHTML = '<option value="">— Selecione a construtora —</option>' +
+                    _lista.map(c => `<option value="${c.id}" ${c.id === selectedId ? 'selected' : ''}>${_esc(c.nome)}</option>`).join('');
+            }
+
+            let c = selectedId ? _lista.find(x => x.id === selectedId) : null;
+            if (!c && nomeAtual) c = _findByNome(nomeAtual);
+            if (!c && inp && inp.value) c = _findByNome(inp.value);
+
+            if (c) {
+                if (inp) inp.value = c.nome;
+                if (hid) hid.value = c.id;
+                _setStatusConstrutora(`Vinculado automaticamente a ${c.nome}.`, 'var(--accent)');
+            } else {
+                if (inp && typeof nomeAtual === 'string') inp.value = nomeAtual;
+                if (hid) hid.value = '';
+                _setStatusConstrutora('Ao digitar uma construtora já cadastrada, o vínculo será feito automaticamente.', 'var(--text-muted)');
+            }
+        }
+
+        async function onInputChange(input) {
+            if (_lista.length === 0) await _load();
+            const hid = document.getElementById('i-construtora-vinculada');
+            const nome = (input?.value || '').trim();
+            const match = _findByNome(nome);
+            if (match) {
+                if (hid) hid.value = match.id;
+                _setStatusConstrutora(`Vinculado automaticamente a ${match.nome}.`, 'var(--accent)');
+            } else {
+                if (hid) hid.value = '';
+                _setStatusConstrutora(nome ? 'Construtora ainda não cadastrada. Use “Cadastrar agora” para criar a ficha sem sair do imóvel.' : 'Ao digitar uma construtora já cadastrada, o vínculo será feito automaticamente.', nome ? '#E67E22' : 'var(--text-muted)');
+            }
+        }
+
+        function onSelectChange(sel) {
+            const id = sel.value;
+            const c = _lista.find(x => x.id === id);
+            const inp = document.getElementById('i-construtora');
+            const hid = document.getElementById('i-construtora-vinculada');
+            if (c) {
+                if (inp) inp.value = c.nome;
+                if (hid) hid.value = c.id;
+                _setStatusConstrutora(`Vinculado automaticamente a ${c.nome}.`, 'var(--accent)');
+            } else {
+                if (hid) hid.value = '';
+            }
+        }
+
+        function cadastrarRapidoDoImovel() {
+            const nome = document.getElementById('i-construtora')?.value.trim() || '';
+            const match = _findByNome(nome);
+            if (match) {
+                populateSelect(match.id, match.nome);
+                Utils.toast('Construtora já cadastrada e vinculada ao imóvel.', 'success');
+                return;
+            }
+            _editId = null;
+            document.getElementById('const-form-title').textContent = '🏗️ Nova Construtora';
+            ['const-id','const-telefone','const-whatsapp','const-email','const-instagram','const-site','const-logo-data'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            const nomeEl = document.getElementById('const-nome');
+            if (nomeEl) nomeEl.value = nome;
+            document.getElementById('const-logo-name').textContent = '';
+            _resetLogoPreview();
+            UI.openModal('const-form');
+            setTimeout(() => { const n = document.getElementById('const-nome'); if(n) n.focus(); }, 300);
+        }
+
+        async function ensureVinculoImovel(nomeInformado, idInformado) {
+            if (_lista.length === 0) await _load();
+            let nome = (nomeInformado || '').trim();
+            let c = idInformado ? _lista.find(x => x.id === idInformado) : null;
+            if (!c && nome) c = _findByNome(nome);
+            if (c) return { id: c.id, nome: c.nome };
+            if (!nome) return { id: '', nome: '' };
+
+            const confirmar = confirm(`A construtora "${nome}" ainda não está cadastrada. Deseja cadastrá-la agora e vincular este imóvel?`);
+            if (!confirmar) return { id: '', nome };
+
+            const nova = {
+                id: _uid(),
+                nome,
+                telefone: '',
+                whatsapp: '',
+                email: '',
+                instagram: '',
+                site: '',
+                logo: '',
+                dataCriacao: new Date().toISOString(),
+                dataAtualizacao: new Date().toISOString()
+            };
+            await _saveDB(nova);
+            await _load();
+            await populateSelect(nova.id, nova.nome);
+            Utils.toast('Construtora cadastrada e vinculada ao imóvel.', 'success');
+            return { id: nova.id, nome: nova.nome };
+        }
+
+        async function initImoveiForm() {
+            await _load();
+            await populateSelect('', '');
+        }
+
+        // ── Compatibilidade: fecharFormulario (ainda referenciado) ───────
+        function fecharFormulario() { UI.closeModal('const-form'); }
+
+        return { openView, abrirCadastro, novoFormulario, fecharFormulario, onLogoSelected, editar, salvar, excluir, abrirFicha, filtrar, populateSelect, onSelectChange, onInputChange, cadastrarRapidoDoImovel, ensureVinculoImovel, initImoveiForm };
+    })();
+
+    // ═══════════════ FIM MÓDULO CONSTRUTORAS ═══════════════
+
+
     const CaptacaoModule = (function() {
-        const STORAGE_KEY = 'imobipro_captacoes_v1';
         let _dados = [];
         let _filtroAtual = 'todos';
         let _idAtual = null;
         let _fotos = []; // array de base64
 
-        function _load() {
-            try { _dados = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { _dados = []; }
+        // ── IndexedDB helpers ─────────────────────────────────────────
+        async function _load() {
+            try { _dados = await DB.getAll('captacoes'); } catch(e) { _dados = []; }
+            // migrar dados antigos do localStorage se existirem
+            try {
+                const old = localStorage.getItem('imobipro_captacoes_v1') || localStorage.getItem('imobipro_captacoes');
+                if (old) {
+                    const arr = JSON.parse(old);
+                    if (arr && arr.length) {
+                        const ids = new Set(_dados.map(d => d.id));
+                        for (const item of arr) { if (!ids.has(item.id)) { await DB.put('captacoes', item); _dados.push(item); } }
+                        localStorage.removeItem('imobipro_captacoes_v1');
+                        localStorage.removeItem('imobipro_captacoes');
+                        console.log('Captações migradas do localStorage para IndexedDB:', arr.length);
+                    }
+                }
+            } catch(e) {}
         }
-        function _save() {
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_dados)); } catch(e) {}
+        async function _save(obj) {
+            try { await DB.put('captacoes', obj); } catch(e) { console.error('Erro ao salvar captação:', e); }
+        }
+        async function _delete(id) {
+            try { await DB.delete('captacoes', id); } catch(e) { console.error('Erro ao excluir captação:', e); }
         }
         function _uid() { return 'cap_' + Date.now() + '_' + Math.random().toString(36).substr(2,6); }
 
         // ── Abrir painel ────────────────────────────────────────────────
-        function open() {
-            _load();
+        async function open() {
+            await _load();
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             const v = document.getElementById('captacao-view');
             if (v) { v.style.display = ''; v.classList.add('active'); }
@@ -46394,7 +47080,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         }
 
         // ── Salvar ───────────────────────────────────────────────────────
-        function salvar() {
+        async function salvar() {
             // Sync _telefones from DOM inputs
             document.querySelectorAll('.cap-tel-input').forEach((inp,i) => { if(_telefones[i]!==undefined) _telefones[i]=inp.value; });
             const telefonesValidos = _telefones.map(t=>t.trim()).filter(Boolean);
@@ -46464,7 +47150,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             } else {
                 _dados.push(obj);
             }
-            _save();
+            await _save(obj);
             UI.closeModal('captacao-form');
             _renderStats();
             _renderList();
@@ -46472,8 +47158,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         }
 
         // ── Ver detalhe ──────────────────────────────────────────────────
-        function verDetalhe(id) {
-            _load();
+        async function verDetalhe(id) {
+            await _load();
             const d = _dados.find(x => x.id === id);
             if (!d) return;
             _idAtual = id;
@@ -46629,8 +47315,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             const tel = (d && ((d.telefones&&d.telefones[0]) || d.telefone)) || '';
             if (tel) window.location.href = 'tel:'+tel.replace(/\D/g,'');
         }
-        function ligarDireto(id) {
-            _load();
+        async function ligarDireto(id) {
+            await _load();
             const d = _dados.find(x=>x.id===id);
             const tel = d && ((d.telefones&&d.telefones[0]) || d.telefone);
             if (tel) window.location.href = 'tel:'+tel.replace(/\D/g,'');
@@ -46643,15 +47329,15 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             window.open('https://wa.me/55'+num+'?text='+msg, '_blank');
         }
         function whatsapp() { const d=_dados.find(x=>x.id===_idAtual); if(d&&d.telefone) _wppMsg(d); else Utils.toast('Telefone não informado','error'); }
-        function whatsappDireto(id) { _load(); const d=_dados.find(x=>x.id===id); if(d&&d.telefone) _wppMsg(d); else Utils.toast('Telefone não informado','error'); }
+        async function whatsappDireto(id) { await _load(); const d=_dados.find(x=>x.id===id); if(d&&d.telefone) _wppMsg(d); else Utils.toast('Telefone não informado','error'); }
 
         // ── Status ───────────────────────────────────────────────────────
-        function setStatus(status) {
+        async function setStatus(status) {
             if (!_idAtual) return;
             const idx = _dados.findIndex(d=>d.id===_idAtual);
             if (idx<0) return;
             _dados[idx].status = status;
-            _save();
+            await _save(_dados[idx]);
             verDetalhe(_idAtual);
             _renderStats();
             _renderList();
@@ -46692,11 +47378,11 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         }
 
         // ── Excluir ──────────────────────────────────────────────────────
-        function excluirAtual() {
+        async function excluirAtual() {
             if (!_idAtual) return;
             if (!confirm('Excluir este registro de captação?')) return;
+            await _delete(_idAtual);
             _dados = _dados.filter(d=>d.id!==_idAtual);
-            _save();
             _idAtual = null;
             UI.closeModal('captacao-detail');
             _renderStats();
@@ -47461,12 +48147,9 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         }
 
         // ── Captação por Status ───────────────────────────────────────
-        function generateCaptacaoStatus() {
+        async function generateCaptacaoStatus() {
             let dados = [];
-            try {
-                const stored = localStorage.getItem('imobipro_captacoes');
-                dados = stored ? JSON.parse(stored) : [];
-            } catch(e) {}
+            try { dados = await DB.getAll('captacoes'); } catch(e) {}
             if (dados.length === 0) {
                 return { html: `<div class="empty-state"><i class="fas fa-map-marker-alt"></i><p>Nenhuma captação registrada ainda.</p></div>`, type: 'captacao-status', data: [] };
             }
@@ -47531,12 +48214,9 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         }
 
         // ── Captação por Bairro ───────────────────────────────────────
-        function generateCaptacaoBairro() {
+        async function generateCaptacaoBairro() {
             let dados = [];
-            try {
-                const stored = localStorage.getItem('imobipro_captacoes');
-                dados = stored ? JSON.parse(stored) : [];
-            } catch(e) {}
+            try { dados = await DB.getAll('captacoes'); } catch(e) {}
             if (dados.length === 0) {
                 return { html: `<div class="empty-state"><i class="fas fa-map"></i><p>Nenhuma captação registrada.</p></div>`, type: 'captacao-bairro', data: [] };
             }
@@ -47774,7 +48454,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             return { html: html, type: 'follow-up', data: pendentes };
         }
 
-        function handleNewTypes(type, start, end) {
+        async function handleNewTypes(type, start, end) {
             switch(type) {
                 case 'funil-saude':             return generateFunilSaude();
                 case 'perfil-compradores':      return generatePerfilCompradores();
@@ -47784,8 +48464,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 case 'ranking-imoveis':         return generateRankingImoveis(start, end);
                 case 'comissoes':               return generateComissoes(start, end);
                 case 'produtividade':           return generateProdutividade(start, end);
-                case 'captacao-status':         return generateCaptacaoStatus();
-                case 'captacao-bairro':         return generateCaptacaoBairro();
+                case 'captacao-status':         return await generateCaptacaoStatus();
+                case 'captacao-bairro':         return await generateCaptacaoBairro();
                 case 'aniversariantes':         return generateAniversariantes();
                 case 'clientes-inativos':       return generateClientesInativos();
                 case 'imoveis-tempo-mercado':   return generateImoveisTempoMercado();
@@ -47826,7 +48506,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             if (type === 'dre' || type === 'fluxo-caixa') {
                 reportData = await ReportPanel.handleAsyncTypes(type, start, end);
             } else {
-                reportData = ReportPanel.handleNewTypes(type, start, end);
+                reportData = await ReportPanel.handleNewTypes(type, start, end);
             }
 
             if (reportData) {
