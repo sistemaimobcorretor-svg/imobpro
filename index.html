@@ -8089,6 +8089,9 @@ if(document.readyState==='loading'){
                         <div style="font-size:1.05rem;font-weight:900;color:#fff;margin-bottom:2px;">Construtoras</div>
                         <div style="font-size:0.75rem;color:rgba(255,255,255,0.75);">Gerencie construtoras e veja os imóveis vinculados</div>
                     </div>
+                    <button onclick="ConstrutorasModule.sincronizarVinculos()" style="background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.25);border-radius:12px;padding:9px 12px;color:rgba(255,255,255,0.85);font-size:0.72rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;flex-shrink:0;" title="Re-vincula todos os imóveis pelos nomes cadastrados">
+                        <i class="fas fa-sync-alt"></i> Sincronizar
+                    </button>
                     <button onclick="ConstrutorasModule.novoFormulario()" style="background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.35);border-radius:12px;padding:9px 14px;color:#fff;font-size:0.78rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;flex-shrink:0;">
                         <i class="fas fa-plus"></i> Nova
                     </button>
@@ -11902,7 +11905,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             <i class="fas fa-hard-hat"></i> Painel
                         </button>
                     </label>
-                    <input type="text" id="i-construtora" list="i-construtoras-list" class="form-control" placeholder="Digite ou selecione a construtora" oninput="ConstrutorasModule.onInputChange(this)" onblur="ConstrutorasModule.onInputChange(this)">
+                    <input type="text" id="i-construtora" list="i-construtoras-list" class="form-control" placeholder="Digite ou selecione a construtora" oninput="ConstrutorasModule.onInputChange(this)" onchange="ConstrutorasModule.onInputChange(this)" onblur="ConstrutorasModule.onInputChange(this)">
                     <datalist id="i-construtoras-list"></datalist>
                     <input type="hidden" id="i-construtora-vinculada">
                     <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
@@ -16492,6 +16495,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     UI.data.settings = await Storage.getSettings();
                     if (typeof ConstrutorasModule !== "undefined") await ConstrutorasModule.initImoveiForm();
                     
+                    // ── Sincroniza vínculos construtora×imóvel logo após carregar os dados ──
+                    // Corrige: imóveis com nome mas sem construtoraId (digitado sem aguardar debounce),
+                    // IDs apontando para construtoras excluídas, e nomes desatualizados após renomeação.
+                    if (typeof ConstrutorasModule !== "undefined" && UI.data.imoveis && UI.data.imoveis.length > 0) {
+                        try { await ConstrutorasModule.sincronizarVinculos(true); } catch(e) {}
+                    }
+                    
                     await UI.migrateRefNumbers();
                     
                     console.log('Dados carregados:', {
@@ -18101,6 +18111,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 ${featuresHTML}
                             </div>
                             ${dataEntregaInfo}
+                            ${i.construtora ? `<div style="font-size:0.68rem;color:#7C3AED;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:4px;"><i class='fas fa-hard-hat' style='font-size:0.65rem;'></i> ${i.construtora}</div>` : ''}
                             <div class="property-price">${preco}</div>
                             ${i.comissao && i.precoVenda && i.status === 'disponivel' ? `<div style="margin-bottom:8px;"><span class="commission-badge"><i class="fas fa-coins"></i> Comissão: ${Utils.formatCurrency(i.precoVenda * (parseFloat(i.comissao)/100))} (${i.comissao}%)</span></div>` : ''}
                             ${Publicador.getBadgesHTML(i.id)}
@@ -21092,7 +21103,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 UI.openModal('cliente');
             },
 
-            openNewImovel: () => {
+            openNewImovel: async () => {
                 const form = document.getElementById('form-imovel');
                 if (!form) return;
                 
@@ -21144,7 +21155,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 const construtoraInput = document.getElementById('i-construtora');
                 if (construtoraInput) construtoraInput.value = '';
                 document.getElementById('i-construtora-vinculada').value = '';
-                if (typeof ConstrutorasModule !== 'undefined') ConstrutorasModule.initImoveiForm();
+                // ── CORREÇÃO: await garante que o datalist e o status sejam preenchidos antes de abrir o modal ──
+                if (typeof ConstrutorasModule !== 'undefined') await ConstrutorasModule.initImoveiForm();
                 UI.openModal('imovel');
             },
 
@@ -25494,10 +25506,14 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                         let construtora = document.getElementById('i-construtora').value.trim();
                         let construtoraId = document.getElementById('i-construtora-vinculada').value || '';
                         if (typeof ConstrutorasModule !== 'undefined') {
+                            // Garante resolução do vínculo mesmo se o debounce não completou
+                            // (usuário digitou nome e clicou em Salvar rapidamente)
                             const vinculoConstrutora = await ConstrutorasModule.ensureVinculoImovel(construtora, construtoraId);
-                            console.log('Vínculo de construtora processado:', vinculoConstrutora);
                             construtora = vinculoConstrutora.nome || construtora;
                             construtoraId = vinculoConstrutora.id || construtoraId;
+                            // Atualiza o campo hidden para consistência visual
+                            const hidEl = document.getElementById('i-construtora-vinculada');
+                            if (hidEl && construtoraId) hidEl.value = construtoraId;
                         }
                         const formaPagamento = document.getElementById('i-forma-pagamento').value;
                         const dataEntrega = document.getElementById('i-data-entrega').value;
@@ -25635,15 +25651,16 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                             }
                             UI.data.clientes = await Storage.getClientes();
                         }
-                        
                         UI.data.imoveis = await Storage.getImoveis();
-                        
                         Utils.toast('Imóvel salvo com sucesso!');
-                        
                         UI.closeModals();
                         UI.renderImoveis();
                         UI.renderDashboard();
                         UI.verificarLancamentos();
+                        // ── CORREÇÃO: Atualizar painel de construtoras após salvar imóvel ──
+                        if (typeof ConstrutorasModule !== 'undefined') {
+                            try { await ConstrutorasModule.refreshStats(); } catch(e) {}
+                        }
                         
                     } catch (error) {
                         console.error('Erro ao salvar imóvel:', error);
@@ -25674,7 +25691,8 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                         document.getElementById('i-observacoes').value = imovel.observacoes || '';
                         document.getElementById('i-construtora').value = imovel.construtora || '';
                         document.getElementById('i-construtora-vinculada').value = imovel.construtoraId || '';
-                        if (typeof ConstrutorasModule !== 'undefined') ConstrutorasModule.populateSelect(imovel.construtoraId || '', imovel.construtora || '');
+                        // ── CORREÇÃO: await garante que o datalist e status sejam preenchidos antes de abrir o modal ──
+                        if (typeof ConstrutorasModule !== 'undefined') await ConstrutorasModule.populateSelect(imovel.construtoraId || '', imovel.construtora || '');
                         document.getElementById('i-forma-pagamento').value = imovel.formaPagamento || '';
                         document.getElementById('i-data-entrega').value = imovel.dataEntrega || '';
                         document.getElementById('i-comissao').value = imovel.comissao || '';
@@ -25966,13 +25984,15 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                 
                 delete: async (id) => {
                     if(!confirm('Tem certeza que deseja excluir este imóvel? Esta ação não pode ser desfeita.')) return;
-                    
                     UI.data.imoveis = UI.data.imoveis.filter(x => x.id !== id);
                     await DB.delete('imoveis', id);
-                    
                     Utils.toast('Imóvel excluído');
                     UI.renderImoveis();
                     UI.renderDashboard();
+                    // ── CORREÇÃO: Atualizar painel de construtoras após excluir imóvel ──
+                    if (typeof ConstrutorasModule !== 'undefined') {
+                        try { await ConstrutorasModule.refreshStats(); } catch(e) {}
+                    }
                 }
             },
             
@@ -46308,13 +46328,40 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             try { 
                 _lista = await DB.getAll('construtoras'); 
                 _lista.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
-                // Auto-vínculo de órfãos ao carregar
+                // Sincronização automática de vínculos ao carregar:
+                // 1. Imóveis com nome mas sem construtoraId → vincula pelo nome (órfãos)
+                // 2. Imóveis com construtoraId inválido (construtora excluída) → limpa o id
+                // 3. Imóveis com construtoraId válido mas nome desatualizado → atualiza nome
                 if (window.UI && UI.data && UI.data.imoveis) {
                     let mudou = false;
                     for (let im of UI.data.imoveis) {
+                        let alterado = false;
                         if (!im.construtoraId && im.construtora) {
+                            // Caso 1: órfão — tenta vincular pelo nome
                             const c = _findByNome(im.construtora);
-                            if (c) { im.construtoraId = c.id; await DB.put('imoveis', im); mudou = true; }
+                            if (c) {
+                                im.construtoraId = c.id;
+                                im.construtora = c.nome;
+                                alterado = true;
+                            }
+                        } else if (im.construtoraId) {
+                            const c = _lista.find(x => x.id === im.construtoraId);
+                            if (!c) {
+                                // Caso 2: construtora foi excluída — tenta re-vincular pelo nome
+                                const cPorNome = _findByNome(im.construtora);
+                                if (cPorNome) { im.construtoraId = cPorNome.id; im.construtora = cPorNome.nome; }
+                                else { im.construtoraId = ''; }
+                                alterado = true;
+                            } else if (im.construtora !== c.nome) {
+                                // Caso 3: nome desatualizado
+                                im.construtora = c.nome;
+                                alterado = true;
+                            }
+                        }
+                        if (alterado) {
+                            im.dataAtualizacao = new Date().toISOString();
+                            await DB.put('imoveis', im);
+                            mudou = true;
                         }
                     }
                     if (mudou) UI.data.imoveis = await Storage.getImoveis();
@@ -46324,17 +46371,29 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         async function _saveDB(obj) { await DB.put('construtoras', obj); }
         async function _removeDB(id) { await DB.delete('construtoras', id); }
         function _uid() { return 'const_' + Date.now() + '_' + Math.random().toString(36).substr(2,6); }
-        function _imoveis(id) { return (window.UI && UI.data && UI.data.imoveis) ? UI.data.imoveis.filter(i => i.construtoraId === id) : []; }
+        function _imoveis(id) {
+            if (!window.UI || !UI.data || !UI.data.imoveis) return [];
+            const c = _lista.find(x => x.id === id);
+            const nomeNorm = c ? _normalizarNome(c.nome) : null;
+            return UI.data.imoveis.filter(i =>
+                i.construtoraId === id ||
+                // Fallback: imóvel com nome mas sem construtoraId (legacy)
+                (!i.construtoraId && nomeNorm && _normalizarNome(i.construtora) === nomeNorm)
+            );
+        }
         function _esc(v) { return String(v || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
         function _normalizarNome(v) { return String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim(); }
         function _findByNome(nome) { const n = _normalizarNome(nome); return n ? _lista.find(c => _normalizarNome(c.nome) === n) : null; }
         function _formatData(v) { if (!v) return '—'; try { return new Date(v).toLocaleString('pt-BR'); } catch(e) { return v; } }
         function _siteUrl(url) { if (!url) return ''; return /^https?:\/\//i.test(url) ? url : 'https://' + url; }
-        function _setStatusConstrutora(msg, cor) { const el = document.getElementById('i-construtora-status'); if (el) { el.textContent = msg || ''; el.style.color = cor || 'var(--text-muted)'; } }
+        function _setStatusConstrutora(msg, cor) {
+            const el = document.getElementById('i-construtora-status');
+            if (el) { el.textContent = msg || ''; el.style.color = cor || 'var(--text-muted)'; }
+        }
 
         // ── Abrir painel (view) ──────────────────────────────────────────
         async function openView() {
-            await _load();
+            await _load(); // sincroniza vínculos automaticamente (3 casos: órfão, ID inválido, nome desatualizado)
             // Garantir que a view está visível (inline style pode sobrescrever class)
             const viewEl = document.getElementById('construtoras-view');
             if (viewEl) {
@@ -46420,7 +46479,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
             const actions = [];
             if (c.whatsapp) actions.push(`<button onclick="event.stopPropagation();window.open('https://wa.me/55${c.whatsapp.replace(/\D/g,'')}','_blank')" style="background:#E9F7EF;border:1px solid rgba(39,174,96,0.25);color:var(--accent);border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="WhatsApp"><i class='fab fa-whatsapp'></i></button>`);
-            if (c.site) actions.push(`<button onclick="event.stopPropagation();window.open(_siteUrl(c.site),'_blank')" style="background:var(--primary-ultra);border:1px solid var(--border-accent);color:var(--primary);border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="Site"><i class='fas fa-globe'></i></button>`);
+            // ── CORREÇÃO: Resolve a URL do site em tempo de geração do HTML (não em tempo de click) ──
+            if (c.site) actions.push(`<button onclick="event.stopPropagation();window.open('${_siteUrl(c.site)}','_blank')" style="background:var(--primary-ultra);border:1px solid var(--border-accent);color:var(--primary);border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="Site"><i class='fas fa-globe'></i></button>`);
             if (c.instagram) actions.push(`<button onclick="event.stopPropagation();window.open('https://instagram.com/${c.instagram.replace('@','')}','_blank')" style="background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);color:#EC4899;border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="Instagram"><i class='fab fa-instagram'></i></button>`);
             actions.push(`<button onclick="event.stopPropagation();ConstrutorasModule.editar('${c.id}')" style="background:var(--bg-overlay);border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="Editar"><i class='fas fa-edit'></i></button>`);
 
@@ -46445,7 +46505,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
         // ── Ficha da construtora ─────────────────────────────────────────
         async function abrirFicha(id) {
-            if (_lista.length === 0) await _load();
+            // Sempre recarrega para garantir vínculos atualizados antes de exibir
+            await _load();
             const c = _lista.find(x => x.id === id);
             if (!c) return;
             _fichaId = id;
@@ -46493,7 +46554,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                     const stCor = statusColors[im.status] || 'var(--text-muted)';
                     const stLbl = statusLabels[im.status] || im.status || '—';
                     const preco = im.precoVenda ? 'R$ ' + Number(im.precoVenda).toLocaleString('pt-BR') : (im.precoAluguel ? 'R$ ' + Number(im.precoAluguel).toLocaleString('pt-BR') + '/mês' : '');
-                    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+                    // ── CORREÇÃO: Card de imóvel na ficha da construtora agora navega para o detalhe do imóvel ──
+                    return `<div onclick="UI.closeModal('const-ficha'); setTimeout(()=>UI.showImovelDetails('${im.id}'), 200);" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;border-radius:8px;" onmouseenter="this.style.background='var(--bg-overlay)'" onmouseleave="this.style.background=''">
                         ${fotoHtml}
                         <div style="flex:1;min-width:0;">
                             <div style="font-weight:700;font-size:0.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${im.titulo || im.endereco || 'Imóvel'}</div>
@@ -46618,6 +46680,19 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         async function salvar() {
             const nome = document.getElementById('const-nome').value.trim();
             if (!nome) { Utils.toast('Informe o nome da construtora', 'error'); return; }
+            // ── CORREÇÃO: Captura se o formulário de imóvel está aberto para re-vincular após salvar ──
+            // Detecta se o formulário de imóvel está aberto (sheet ativo OU overlay visível)
+            const _sheetImovel = document.getElementById('sheet-imovel');
+            const _overlayImovel = document.getElementById('overlay-imovel');
+            const _imovelFormAberto = !!(
+                document.getElementById('i-construtora') &&
+                _sheetImovel && (
+                    _sheetImovel.classList.contains('active') ||
+                    (_overlayImovel && _overlayImovel.classList.contains('active')) ||
+                    _sheetImovel.style.display === 'block' ||
+                    getComputedStyle(_sheetImovel).display !== 'none'
+                )
+            );
             const obj = {
                 id: _editId || _uid(),
                 nome,
@@ -46633,13 +46708,23 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             await _saveDB(obj);
             await _load();
             
-            // Vínculo automático: Se for uma nova construtora, procura imóveis que já tenham esse nome
-            if (!_editId) {
-                const nomeNorm = obj.nome.toLowerCase().trim();
+            // Vínculo automático após salvar construtora:
+            // Vincula TODOS os imóveis cujo campo construtora (texto) bate com este nome,
+            // independente de já terem ou não um construtoraId (inclusive os que foram 
+            // cadastrados com o nome mas sem aguardar o debounce do campo de vínculo).
+            if (window.UI && UI.data && UI.data.imoveis) {
+                const nomeNorm = _normalizarNome(obj.nome);
                 let vinculados = 0;
                 for (let imovel of UI.data.imoveis) {
-                    if (!imovel.construtoraId && imovel.construtora && imovel.construtora.toLowerCase().trim() === nomeNorm) {
+                    const nomeImovelNorm = _normalizarNome(imovel.construtora);
+                    // Vincula se: nome bate E (sem id OU id errado/diferente)
+                    const nomeCompativel = nomeImovelNorm === nomeNorm;
+                    const idErrado = imovel.construtoraId && imovel.construtoraId !== obj.id;
+                    const semId = !imovel.construtoraId;
+                    const jaCorreto = imovel.construtoraId === obj.id && imovel.construtora === obj.nome;
+                    if (nomeCompativel && !jaCorreto) {
                         imovel.construtoraId = obj.id;
+                        imovel.construtora = obj.nome; // normaliza nome para o cadastrado
                         imovel.dataAtualizacao = new Date().toISOString();
                         await DB.put('imoveis', imovel);
                         vinculados++;
@@ -46647,16 +46732,25 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 }
                 if (vinculados > 0) {
                     UI.data.imoveis = await Storage.getImoveis();
-                    console.log(`Vínculo automático: ${vinculados} imóveis vinculados à nova construtora ${obj.nome}`);
+                    // Atualiza cards de imóveis se a view estiver aberta
+                    try { if (document.getElementById('imoveis-list')) UI.renderImoveis(); } catch(e) {}
+                    console.log(`[ConstrutorasModule] salvar(): ${vinculados} imóvel(is) vinculado(s) à construtora "${obj.nome}"`);
                 }
             }
 
             UI.closeModal('const-form');
             _renderStats();
             _renderGrid(_filtro);
-            populateSelect(obj.id);
+            // Re-vincula campo de construtora no formulário de imóvel se estiver aberto
+            if (_imovelFormAberto) {
+                await populateSelect(obj.id, obj.nome);
+            } else {
+                populateSelect(obj.id, obj.nome);
+            }
             Utils.toast(_editId ? 'Construtora atualizada! ✅' : 'Construtora cadastrada! 🏗️', 'success');
             _editId = null;
+            // Re-sincroniza para atualizar ficha aberta e stats com os imóveis recém-vinculados
+            await sincronizarVinculos(true);
         }
 
         async function excluir(id) {
@@ -46667,6 +46761,20 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 ? `Excluir "${c.nome}"? Ela está vinculada a ${vinc} imóvel(is). O vínculo será desfeito.`
                 : `Excluir "${c.nome}"?`;
             if (!confirm(msg)) return;
+            // Desfaz vínculo em todos os imóveis antes de excluir (limpa id E mantém nome como texto livre)
+            if (window.UI && UI.data && UI.data.imoveis) {
+                let mudou = false;
+                for (let im of UI.data.imoveis) {
+                    if (im.construtoraId === id) {
+                        im.construtoraId = '';
+                        // Mantém o nome como string livre para não perder a informação
+                        im.dataAtualizacao = new Date().toISOString();
+                        await DB.put('imoveis', im);
+                        mudou = true;
+                    }
+                }
+                if (mudou) UI.data.imoveis = await Storage.getImoveis();
+            }
             await _removeDB(id);
             await _load();
             UI.closeModal('const-ficha');
@@ -46683,7 +46791,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             const list = document.getElementById('i-construtoras-list');
             const selLegado = document.getElementById('i-construtora-id');
 
-            if (list) list.innerHTML = _lista.map(c => `<option value="${_esc(c.nome)}"></option>`).join('');
+            // Sempre sincroniza datalist com todas as construtoras cadastradas
+            if (list) list.innerHTML = _lista.map(c => `<option value="${_esc(c.nome)}" data-id="${c.id}"></option>`).join('');
             if (selLegado) {
                 selLegado.innerHTML = '<option value="">— Selecione a construtora —</option>' +
                     _lista.map(c => `<option value="${c.id}" ${c.id === selectedId ? 'selected' : ''}>${_esc(c.nome)}</option>`).join('');
@@ -46691,31 +46800,69 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
             let c = selectedId ? _lista.find(x => x.id === selectedId) : null;
             if (!c && nomeAtual) c = _findByNome(nomeAtual);
-            if (!c && inp && inp.value) c = _findByNome(inp.value);
+            // Tenta vincular pelo que já está no campo (ex: ao reabrir form de edição)
+            if (!c && inp && inp.value.trim()) c = _findByNome(inp.value.trim());
 
             if (c) {
                 if (inp) inp.value = c.nome;
                 if (hid) hid.value = c.id;
-                _setStatusConstrutora(`Vinculado automaticamente a ${c.nome}.`, 'var(--accent)');
+                _setStatusConstrutora(`✅ Vinculado a ${c.nome}.`, 'var(--accent)');
             } else {
-                if (inp && typeof nomeAtual === 'string') inp.value = nomeAtual;
+                // Só sobrescreve o campo texto se nomeAtual for uma string não-vazia e diferente do atual
+                if (inp && nomeAtual && typeof nomeAtual === 'string' && nomeAtual !== inp.value) {
+                    inp.value = nomeAtual;
+                }
                 if (hid) hid.value = '';
-                _setStatusConstrutora('Ao digitar uma construtora já cadastrada, o vínculo será feito automaticamente.', 'var(--text-muted)');
+                const textoAtual = inp ? inp.value.trim() : '';
+                _setStatusConstrutora(
+                    textoAtual
+                        ? '⚠️ Construtora não cadastrada. Use "Cadastrar agora" para criar a ficha.'
+                        : 'Ao digitar uma construtora já cadastrada, o vínculo é feito automaticamente.',
+                    textoAtual ? '#E67E22' : 'var(--text-muted)'
+                );
             }
         }
 
+        // ── onInputChange: debounce robusto sem race condition entre oninput/onchange/onblur ──
+        // Estratégia: usamos um único timer de 120ms. Se o nome bater exatamente com
+        // um item do datalist, vinculamos imediatamente (seleção via mouse/teclado).
+        let _inputDebounceTimer = null;
         async function onInputChange(input) {
-            if (_lista.length === 0) await _load();
-            const hid = document.getElementById('i-construtora-vinculada');
-            const nome = (input?.value || '').trim();
-            const match = _findByNome(nome);
-            if (match) {
-                if (hid) hid.value = match.id;
-                _setStatusConstrutora(`Vinculado automaticamente a ${match.nome}.`, 'var(--accent)');
-            } else {
-                if (hid) hid.value = '';
-                _setStatusConstrutora(nome ? 'Construtora ainda não cadastrada. Use “Cadastrar agora” para criar a ficha sem sair do imóvel.' : 'Ao digitar uma construtora já cadastrada, o vínculo será feito automaticamente.', nome ? '#E67E22' : 'var(--text-muted)');
+            clearTimeout(_inputDebounceTimer);
+            // Garante lista carregada de forma síncrona antes de disparar o timer
+            if (_lista.length === 0) {
+                await _load();
             }
+            const nome = (input?.value || '').trim();
+            // Vinculação imediata se houver match exato (seleção via datalist)
+            const matchImediato = _findByNome(nome);
+            if (matchImediato) {
+                const hid = document.getElementById('i-construtora-vinculada');
+                if (hid) hid.value = matchImediato.id;
+                if (input && input.value !== matchImediato.nome) input.value = matchImediato.nome;
+                _setStatusConstrutora(`✅ Vinculado a ${matchImediato.nome}.`, 'var(--accent)');
+                clearTimeout(_inputDebounceTimer);
+                return;
+            }
+            // Para digitação livre, aguarda pausa antes de avaliar
+            _inputDebounceTimer = setTimeout(async () => {
+                const hid = document.getElementById('i-construtora-vinculada');
+                const nomeAtual = (input?.value || '').trim();
+                const match = _findByNome(nomeAtual);
+                if (match) {
+                    if (hid) hid.value = match.id;
+                    if (input && input.value !== match.nome) input.value = match.nome;
+                    _setStatusConstrutora(`✅ Vinculado a ${match.nome}.`, 'var(--accent)');
+                } else {
+                    if (hid) hid.value = '';
+                    _setStatusConstrutora(
+                        nomeAtual
+                            ? '⚠️ Construtora não cadastrada. Use "Cadastrar agora" para criar a ficha.'
+                            : 'Ao digitar uma construtora já cadastrada, o vínculo é feito automaticamente.',
+                        nomeAtual ? '#E67E22' : 'var(--text-muted)'
+                    );
+                }
+            }, 200);
         }
 
         function onSelectChange(sel) {
@@ -46733,11 +46880,12 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         }
 
         function cadastrarRapidoDoImovel() {
+            if (_lista.length === 0) { _load().then(() => cadastrarRapidoDoImovel()); return; }
             const nome = document.getElementById('i-construtora')?.value.trim() || '';
             const match = _findByNome(nome);
             if (match) {
                 populateSelect(match.id, match.nome);
-                Utils.toast('Construtora já cadastrada e vinculada ao imóvel.', 'success');
+                Utils.toast('Construtora já cadastrada e vinculada! ✅', 'success');
                 return;
             }
             _editId = null;
@@ -46758,8 +46906,18 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             if (_lista.length === 0) await _load();
             let nome = (nomeInformado || '').trim();
             let c = idInformado ? _lista.find(x => x.id === idInformado) : null;
+            // Fallback: se o id fornecido não existe mais, tenta pelo nome
+            if (!c && idInformado) c = _findByNome(nome);
             if (!c && nome) c = _findByNome(nome);
-            if (c) return { id: c.id, nome: c.nome };
+            if (c) {
+                // Garante que o campo hidden no form está sincronizado
+                const hidEl = document.getElementById('i-construtora-vinculada');
+                if (hidEl && hidEl.value !== c.id) hidEl.value = c.id;
+                const inpEl = document.getElementById('i-construtora');
+                if (inpEl && inpEl.value !== c.nome) inpEl.value = c.nome;
+                _setStatusConstrutora(`✅ Vinculado a ${c.nome}.`, 'var(--accent)');
+                return { id: c.id, nome: c.nome };
+            }
             if (!nome) return { id: '', nome: '' };
 
             const confirmar = confirm(`A construtora "${nome}" ainda não está cadastrada. Deseja cadastrá-la agora e vincular este imóvel?`);
@@ -46779,6 +46937,22 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             };
             await _saveDB(nova);
             await _load();
+            // Vínculo automático em outros imóveis com o mesmo nome (caso cadastro rápido)
+            if (window.UI && UI.data && UI.data.imoveis) {
+                const nomeNorm = _normalizarNome(nova.nome);
+                let vinculados = 0;
+                for (let im of UI.data.imoveis) {
+                    const imovelNomeNorm = _normalizarNome(im.construtora);
+                    if (imovelNomeNorm === nomeNorm && !im.construtoraId) {
+                        im.construtoraId = nova.id;
+                        im.construtora = nova.nome; // normaliza nome
+                        im.dataAtualizacao = new Date().toISOString();
+                        await DB.put('imoveis', im);
+                        vinculados++;
+                    }
+                }
+                if (vinculados > 0) UI.data.imoveis = await Storage.getImoveis();
+            }
             await populateSelect(nova.id, nova.nome);
             Utils.toast('Construtora cadastrada e vinculada ao imóvel.', 'success');
             return { id: nova.id, nome: nova.nome };
@@ -46789,10 +46963,74 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             await populateSelect('', '');
         }
 
+        // refreshStats — recarrega lista do IndexedDB e atualiza stats + grid
+        async function refreshStats() {
+            await _load(); // sempre recarrega para garantir dados frescos
+            _renderStats();
+            _renderGrid(_filtro);
+        }
+
         // ── Compatibilidade: fecharFormulario (ainda referenciado) ───────
         function fecharFormulario() { UI.closeModal('const-form'); }
 
-        return { openView, abrirCadastro, novoFormulario, fecharFormulario, onLogoSelected, editar, salvar, excluir, abrirFicha, filtrar, populateSelect, onSelectChange, onInputChange, cadastrarRapidoDoImovel, ensureVinculoImovel, initImoveiForm };
+        // Sincroniza todos os imóveis: vincula órfãos pelo nome, atualiza nomes desatualizados,
+        // limpa IDs de construtoras excluídas e re-vincula pelo nome quando possível.
+        // Parâmetro silencioso=false: quando true, não exibe toast (chamadas automáticas de boot).
+        async function sincronizarVinculos(silencioso = false) {
+            await _load();
+            if (!window.UI || !UI.data || !UI.data.imoveis) {
+                if (!silencioso) Utils.toast('Nenhum imóvel para sincronizar.', 'info');
+                return;
+            }
+            let total = 0;
+            for (let imovel of UI.data.imoveis) {
+                let mudou = false;
+                if (!imovel.construtoraId && imovel.construtora) {
+                    // Caso 1: órfão — vincula pelo nome
+                    const c = _findByNome(imovel.construtora);
+                    if (c) { imovel.construtoraId = c.id; imovel.construtora = c.nome; mudou = true; }
+                } else if (imovel.construtoraId) {
+                    const c = _lista.find(x => x.id === imovel.construtoraId);
+                    if (!c) {
+                        // Caso 2: construtora excluída — tenta re-vincular pelo nome
+                        const cPorNome = _findByNome(imovel.construtora);
+                        if (cPorNome) { imovel.construtoraId = cPorNome.id; imovel.construtora = cPorNome.nome; }
+                        else { imovel.construtoraId = ''; }
+                        mudou = true;
+                    } else if (imovel.construtora !== c.nome) {
+                        // Caso 3: nome desatualizado após renomeação
+                        imovel.construtora = c.nome;
+                        mudou = true;
+                    }
+                }
+                if (mudou) {
+                    imovel.dataAtualizacao = new Date().toISOString();
+                    await DB.put('imoveis', imovel);
+                    total++;
+                }
+            }
+            if (total > 0) {
+                UI.data.imoveis = await Storage.getImoveis();
+                // Atualiza cards de imóveis se a view estiver aberta
+                try { if (document.getElementById('imoveis-list')) UI.renderImoveis(); } catch(e) {}
+            }
+            _renderStats();
+            _renderGrid(_filtro);
+            // Se a ficha de uma construtora estiver visivelmente aberta, re-abre com dados atualizados
+            if (_fichaId && document.getElementById('sheet-const-ficha')?.classList.contains('active')) {
+                try { await abrirFicha(_fichaId); } catch(e) {}
+            }
+            if (!silencioso) {
+                Utils.toast(total > 0
+                    ? `${total} imóvel(is) sincronizado(s) com sucesso! ✅`
+                    : 'Todos os vínculos já estão atualizados. ✅',
+                    'success');
+            } else if (total > 0) {
+                console.log(`[ConstrutorasModule] Auto-sync: ${total} imóvel(is) vinculado(s).`);
+            }
+        }
+
+        return { openView, abrirCadastro, novoFormulario, fecharFormulario, onLogoSelected, editar, salvar, excluir, abrirFicha, filtrar, populateSelect, onSelectChange, onInputChange, cadastrarRapidoDoImovel, ensureVinculoImovel, initImoveiForm, refreshStats, sincronizarVinculos };
     })();
 
     // ═══════════════ FIM MÓDULO CONSTRUTORAS ═══════════════
