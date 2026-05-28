@@ -7234,9 +7234,91 @@
     transition:transform .15s,box-shadow .15s;
 }
 #_lw_wall .wabtn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(37,211,102,0.45);}
-#_lw_wall .footer{margin-top:24px;color:rgba(255,255,255,0.3);font-size:12px;}
+    #_lw_wall .footer{margin-top:24px;color:rgba(255,255,255,0.3);font-size:12px;}
 
-/* ── Modal Cod de Ativação ── */
+    /* Estilos para o campo de licença na tela de bloqueio */
+    #_lw_wall .act-box {
+        margin-top: 20px;
+        width: 100%;
+        max-width: 400px;
+        background: rgba(255,255,255,0.05);
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    #_lw_wall .act-label {
+        display: block;
+        color: rgba(255,255,255,0.6);
+        font-size: 12px;
+        text-align: left;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    #_lw_wall .act-input-wrap {
+        position: relative;
+        margin-bottom: 12px;
+    }
+    #_lw_wall .act-input {
+        width: 100%;
+        background: rgba(0,0,0,0.2);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 10px;
+        padding: 12px 45px 12px 15px;
+        color: #fff;
+        font-size: 15px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    #_lw_wall .act-input:focus { border-color: var(--primary); }
+    #_lw_wall .act-eye {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.4);
+        cursor: pointer;
+        padding: 5px;
+    }
+    #_lw_wall .act-btn {
+        width: 100%;
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 14px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: background 0.2s;
+    }
+    #_lw_wall .act-btn:hover { background: var(--primary-dark); }
+    #_lw_wall .act-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    #_lw_wall .act-err {
+        color: #ff6b6b;
+        font-size: 13px;
+        margin-bottom: 12px;
+        display: none;
+        text-align: left;
+    }
+    #_lw_wall .act-err._show { display: block; }
+    #_lw_wall .act-spin {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: _lwspin 0.8s linear infinite;
+        display: none;
+    }
+
+	/* ── Modal Cod de Ativação ── */
 #_act_modal{
     display:none;position:fixed;inset:0;z-index:1000000;
     background:linear-gradient(160deg,#0a1a28 0%,#0D2235 100%);
@@ -7322,7 +7404,23 @@
         <small>Dispositivo registrado</small>
         <span id="_lw_dev">—</span>
     </div>
-    <a class="wabtn" id="_lw_wa" href="#" target="_blank">
+    <div class="act-box">
+        <label class="act-label" for="_lw_act_input">Inserir nova licença</label>
+        <div class="act-input-wrap">
+            <input id="_lw_act_input" class="act-input" type="password" placeholder="Digite o Cod de Ativação…"
+                onkeydown="if(event.key==='Enter')_LicenseCheck.confirmarNovaLicenca()">
+            <button class="act-eye" type="button" onclick="_LicenseCheck.toggleEyeLock()"><i class="fas fa-eye"></i></button>
+        </div>
+        <div class="act-err" id="_lw_act_err"></div>
+        <button class="act-btn" id="_lw_act_btn" onclick="_LicenseCheck.confirmarNovaLicenca()">
+            <div class="act-spin" id="_lw_act_spin"></div>
+            <span id="_lw_act_btn_txt"><i class="fas fa-unlock-alt"></i>&nbsp; Ativar neste Dispositivo</span>
+        </button>
+    </div>
+
+    <div style="margin-top: 20px; color: rgba(255,255,255,0.4); font-size: 13px;">— OU —</div>
+
+    <a class="wabtn" id="_lw_wa" href="#" target="_blank" style="margin-top: 20px;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         Solicitar nova licença
     </a>
@@ -7419,7 +7517,13 @@ var _ActModal = (function(){
         }
     }
 
-    return { init: init, confirmar: confirmar, toggleEye: toggleEye };
+    return { 
+        init: init, 
+        confirmar: confirmar, 
+        toggleEye: toggleEye, 
+        _parseCode: _parseCode, 
+        save: save 
+    };
 })();
 
 /* ── Verificação de licença (fingerprint) ─────────────────────────────── */
@@ -7497,6 +7601,53 @@ var _LicenseCheck = (function(){
         .catch(function(e){cb(e,null);});
     }
 
+    function setLockLoading(on){
+        document.getElementById('_lw_act_btn').disabled = on;
+        const _as=document.getElementById('_lw_act_spin'); if(_as) _as.style.display=on?'block':'none';
+        const _abt=document.getElementById('_lw_act_btn_txt'); if(_abt) _abt.style.display=on?'none':'inline';
+    }
+
+    function setLockErr(msg){
+        var el = document.getElementById('_lw_act_err');
+        el.textContent = msg;
+        el.classList.toggle('_show', !!msg);
+    }
+
+    function toggleEyeLock(){
+        var inp = document.getElementById('_lw_act_input');
+        var ico = document.querySelector('#_lw_wall .act-eye i');
+        if(inp.type==='password'){ inp.type='text'; ico.className='fas fa-eye-slash'; }
+        else { inp.type='password'; ico.className='fas fa-eye'; }
+    }
+
+    function confirmarNovaLicenca(){
+        var raw = document.getElementById('_lw_act_input').value;
+        var parsed = _ActModal._parseCode(raw);
+        if(!parsed){
+            setLockErr('Código inválido. Verifique e tente novamente.');
+            return;
+        }
+        setLockLoading(true);
+        setLockErr('');
+        
+        var base = 'https://api.jsonbin.io/v3/b/' + parsed.binId;
+        fetch(base+'/latest',{headers:{'X-Master-Key':parsed.apiKey,'X-Bin-Meta':false}})
+        .then(function(r){
+            if(!r.ok) throw new Error('HTTP '+r.status);
+            return r.json();
+        })
+        .then(function(){
+            setLockLoading(false);
+            _ActModal.save(parsed);
+            // Após salvar o novo código, recarrega a página ou tenta rodar a verificação novamente
+            location.reload();
+        })
+        .catch(function(){
+            setLockLoading(false);
+            setLockErr('Código de ativação inválido ou sem conexão.');
+        });
+    }
+
     function run(creds){
         var licKey=(location.hostname||'local').replace(/\./g,'_');
         var myFp=fp();
@@ -7540,7 +7691,11 @@ var _LicenseCheck = (function(){
         });
     }
 
-    return { run: run };
+    return { 
+        run: run, 
+        confirmarNovaLicenca: confirmarNovaLicenca, 
+        toggleEyeLock: toggleEyeLock 
+    };
 })();
 
 /* ── Inicialização ────────────────────────────────────────────────────── */
