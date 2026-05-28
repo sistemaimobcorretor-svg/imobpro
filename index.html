@@ -8237,19 +8237,28 @@ if(document.readyState==='loading'){
             <!-- ════════════ CONSTRUTORAS VIEW ════════════ -->
             <div id="construtoras-view" class="view">
 
-                <!-- Hero -->
-                <div style="background:linear-gradient(135deg,#3B0764 0%,#7C3AED 60%,#9D5CEA 100%);border-radius:18px;padding:18px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 24px rgba(124,58,237,0.30);">
-                    <div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;">🏗️</div>
-                    <div style="flex:1;">
-                        <div style="font-size:1.05rem;font-weight:900;color:#fff;margin-bottom:2px;">Construtoras</div>
-                        <div style="font-size:0.75rem;color:rgba(255,255,255,0.75);">Gerencie construtoras e veja os imóveis vinculados</div>
+                <!-- Hero Reformulado -->
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 24px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden; box-shadow: var(--shadow-lg);">
+                    <div style="position: absolute; top: -20px; right: -20px; font-size: 8rem; opacity: 0.1; color: #fff; transform: rotate(-15deg);">🏗️</div>
+                    <div style="position: relative; z-index: 1;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                            <div style="width: 40px; height: 40px; background: rgba(124,58,237,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #a78bfa;">
+                                <i class="fas fa-hard-hat"></i>
+                            </div>
+                            <h2 style="color: #fff; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px;">Ecossistema de Construtoras</h2>
+                        </div>
+                        <p style="color: #94a3b8; font-size: 0.85rem; max-width: 80%; line-height: 1.5; margin-bottom: 20px;">
+                            Central de inteligência para gestão de parcerias, acompanhamento de obras e portfólio de lançamentos vinculados.
+                        </p>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="ConstrutorasModule.novoFormulario()" style="background: #7C3AED; color: #fff; border: none; border-radius: 12px; padding: 10px 18px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                                <i class="fas fa-plus-circle"></i> Cadastrar Parceira
+                            </button>
+                            <button onclick="ConstrutorasModule.sincronizarVinculos()" style="background: rgba(255,255,255,0.05); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                                <i class="fas fa-sync-alt"></i> Sincronizar Portfólio
+                            </button>
+                        </div>
                     </div>
-                    <button onclick="ConstrutorasModule.sincronizarVinculos()" style="background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.25);border-radius:12px;padding:9px 12px;color:rgba(255,255,255,0.85);font-size:0.72rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;flex-shrink:0;" title="Re-vincula todos os imóveis pelos nomes cadastrados">
-                        <i class="fas fa-sync-alt"></i> Sincronizar
-                    </button>
-                    <button onclick="ConstrutorasModule.novoFormulario()" style="background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.35);border-radius:12px;padding:9px 14px;color:#fff;font-size:0.78rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;flex-shrink:0;">
-                        <i class="fas fa-plus"></i> Nova
-                    </button>
                 </div>
 
                 <!-- Stats row -->
@@ -46612,50 +46621,55 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             const imovs = _imoveis(c.id);
             const total = imovs.length;
             const disponiveis = imovs.filter(i => i.status === 'disponivel').length;
-            const vendidos = imovs.filter(i => i.status === 'vendido').length;
 
             const logoHtml = c.logo
-                ? `<img src="${c.logo}" style="width:56px;height:56px;border-radius:12px;object-fit:contain;background:#fff;border:1px solid var(--border);flex-shrink:0;">`
-                : `<div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(124,58,237,0.05));border:1.5px solid rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.5rem;">🏗️</div>`;
+                ? `<img src="${c.logo}" style="width:64px;height:64px;border-radius:16px;object-fit:contain;background:#fff;border:1px solid var(--border);box-shadow: var(--shadow-sm);">`
+                : `<div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#f1f5f9,#e2e8f0);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🏗️</div>`;
 
-            const badges = [];
-            if (total > 0) badges.push(`<span style="background:var(--primary-ultra);color:var(--primary);border:1px solid var(--border-accent);border-radius:20px;padding:2px 8px;font-size:0.62rem;font-weight:700;"><i class="fas fa-home" style="margin-right:2px;"></i>${total} imóv.</span>`);
-            if (disponiveis > 0) badges.push(`<span style="background:var(--accent-ultra);color:var(--accent);border:1px solid rgba(39,174,96,0.25);border-radius:20px;padding:2px 8px;font-size:0.62rem;font-weight:700;">${disponiveis} disp.</span>`);
-            if (vendidos > 0) badges.push(`<span style="background:rgba(231,76,60,0.08);color:var(--danger);border:1px solid rgba(231,76,60,0.2);border-radius:20px;padding:2px 8px;font-size:0.62rem;font-weight:700;">${vendidos} vend.</span>`);
-
-            // Preview dos últimos imóveis (até 3 fotos)
-            const fotosPreview = imovs.slice(0,3).map(i => {
+            // Fotos dos imóveis em grid miniatura
+            const fotosHtml = imovs.slice(0, 4).map(i => {
                 const foto = (i.imagens && i.imagens[0]) ? i.imagens[0] : null;
-                return foto
-                    ? `<img src="${foto}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;border:2px solid #fff;margin-left:-8px;flex-shrink:0;">`
-                    : `<div style="width:36px;height:36px;border-radius:8px;background:var(--bg-overlay);border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;margin-left:-8px;flex-shrink:0;">🏠</div>`;
+                return foto 
+                    ? `<div style="width:100%; aspect-ratio:1; border-radius:6px; background:url('${foto}') center/cover no-repeat; border:1px solid rgba(0,0,0,0.05);"></div>`
+                    : `<div style="width:100%; aspect-ratio:1; border-radius:6px; background:#f8fafc; border:1px solid rgba(0,0,0,0.05); display:flex; align-items:center; justify-content:center; font-size:0.8rem;">🏠</div>`;
             }).join('');
-            const fotosRow = total > 0 ? `<div style="display:flex;align-items:center;margin-top:8px;padding-left:8px;">${fotosPreview}${total > 3 ? `<span style="margin-left:6px;font-size:0.65rem;color:var(--text-muted);font-weight:700;">+${total-3}</span>` : ''}</div>` : '';
 
-            const actions = [];
-            if (c.whatsapp) actions.push(`<button onclick="event.stopPropagation();window.open('https://wa.me/55${c.whatsapp.replace(/\D/g,'')}','_blank')" style="background:#E9F7EF;border:1px solid rgba(39,174,96,0.25);color:var(--accent);border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="WhatsApp"><i class='fab fa-whatsapp'></i></button>`);
-            // ── CORREÇÃO: Resolve a URL do site em tempo de geração do HTML (não em tempo de click) ──
-            if (c.site) actions.push(`<button onclick="event.stopPropagation();window.open('${_siteUrl(c.site)}','_blank')" style="background:var(--primary-ultra);border:1px solid var(--border-accent);color:var(--primary);border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="Site"><i class='fas fa-globe'></i></button>`);
-            if (c.instagram) actions.push(`<button onclick="event.stopPropagation();window.open('https://instagram.com/${c.instagram.replace('@','')}','_blank')" style="background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);color:#EC4899;border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="Instagram"><i class='fab fa-instagram'></i></button>`);
-            actions.push(`<button onclick="event.stopPropagation();ConstrutorasModule.editar('${c.id}')" style="background:var(--bg-overlay);border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="Editar"><i class='fas fa-edit'></i></button>`);
-
-            return `<div onclick="ConstrutorasModule.abrirFicha('${c.id}')" style="background:var(--bg-raised);border:1px solid var(--border);border-radius:16px;padding:14px 16px;cursor:pointer;transition:box-shadow 0.2s,transform 0.15s;box-shadow:var(--shadow-sm);height:100%;display:flex;flex-direction:column;justify-content:space-between;" onmouseenter="this.style.boxShadow='var(--shadow-md)';this.style.transform='translateY(-1px)'" onmouseleave="this.style.boxShadow='var(--shadow-sm)';this.style.transform=''">
-                <div style="display:flex;align-items:flex-start;gap:12px;">
+            return `
+            <div onclick="ConstrutorasModule.abrirFicha('${c.id}')" class="const-card-new" style="background:var(--bg-raised); border:1px solid var(--border); border-radius:24px; padding:20px; cursor:pointer; transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position:relative; overflow:hidden; display:flex; flex-direction:column; gap:16px;">
+                <div style="display:flex; align-items:center; gap:16px;">
                     ${logoHtml}
-                    <div style="flex:1;min-width:0;">
-                        <div style="font-weight:800;font-size:0.95rem;color:var(--dark);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.nome}</div>
-                        ${c.telefone ? `<div style="font-size:0.72rem;color:var(--text-secondary);"><i class="fas fa-phone-alt" style="margin-right:4px;width:10px;"></i>${c.telefone}</div>` : ''}
-                        ${c.email ? `<div style="font-size:0.68rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><i class="fas fa-envelope" style="margin-right:4px;width:10px;"></i>${c.email}</div>` : ''}
-                        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">${badges.join('')}</div>
-                        ${fotosRow}
+                    <div style="flex:1; min-width:0;">
+                        <h3 style="font-size:1.1rem; font-weight:800; color:var(--dark); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.nome}</h3>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="background:var(--primary-ultra); color:var(--primary); padding:2px 10px; border-radius:100px; font-size:0.65rem; font-weight:700;">${total} Imóveis</span>
+                            ${disponiveis > 0 ? `<span style="background:var(--accent-ultra); color:var(--accent); padding:2px 10px; border-radius:100px; font-size:0.65rem; font-weight:700;">${disponiveis} à venda</span>` : ''}
+                        </div>
                     </div>
-                    <i class="fas fa-chevron-right" style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;flex-shrink:0;"></i>
                 </div>
-                <div style="display:flex;gap:5px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
-                    ${actions.join('')}
-                    <button onclick="event.stopPropagation();ConstrutorasModule.excluir('${c.id}')" style="background:rgba(231,76,60,0.07);border:1px solid rgba(231,76,60,0.18);color:var(--danger);border-radius:8px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;margin-left:auto;" title="Excluir"><i class='fas fa-trash-alt'></i></button>
+
+                ${total > 0 ? `
+                <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; background:var(--bg-base); padding:8px; border-radius:12px;">
+                    ${fotosHtml}
+                    ${total > 4 ? `<div style="grid-column:span 4; text-align:center; font-size:0.65rem; font-weight:700; color:var(--text-secondary); margin-top:4px;">+ ${total-4} outros imóveis no portfólio</div>` : ''}
                 </div>
-            </div>`;
+                ` : `
+                <div style="height:60px; border:2px dashed var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:0.75rem; font-weight:600;">
+                    Nenhum imóvel vinculado
+                </div>
+                `}
+
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-top:auto;">
+                    <div style="display:flex; gap:6px;">
+                        ${c.whatsapp ? `<button onclick="event.stopPropagation(); window.open('https://wa.me/55${c.whatsapp.replace(/\D/g,'')}')" style="width:32px; height:32px; border-radius:8px; border:none; background:#25D36615; color:#25D366; cursor:pointer;"><i class="fab fa-whatsapp"></i></button>` : ''}
+                        ${c.site ? `<button onclick="event.stopPropagation(); window.open('${_siteUrl(c.site)}')" style="width:32px; height:32px; border-radius:8px; border:none; background:var(--primary-ultra); color:var(--primary); cursor:pointer;"><i class="fas fa-globe"></i></button>` : ''}
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="event.stopPropagation(); ConstrutorasModule.editar('${c.id}')" style="padding:6px 12px; border-radius:8px; border:1px solid var(--border); background:none; color:var(--text-secondary); font-size:0.75rem; font-weight:700; cursor:pointer;">Editar</button>
+                        <button onclick="event.stopPropagation(); ConstrutorasModule.abrirFicha('${c.id}')" style="padding:6px 12px; border-radius:8px; border:none; background:var(--dark); color:#fff; font-size:0.75rem; font-weight:700; cursor:pointer;">Ver Portfólio</button>
+                    </div>
+                </div>
+            </div>
+            `;
         }
 
         // ── Ficha da construtora ─────────────────────────────────────────
@@ -46726,51 +46740,81 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 }).join('');
 
             const html = `
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-                    <button onclick="UI.closeModal('const-ficha')" style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:10px;padding:6px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;color:var(--text-secondary);display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-arrow-left"></i> Voltar</button>
-                    <button onclick="ConstrutorasModule.editar('${c.id}')" style="background:rgba(124,58,237,0.10);border:1px solid rgba(124,58,237,0.25);border-radius:10px;padding:6px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;color:#7C3AED;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-edit"></i> Editar</button>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+                    <button onclick="UI.closeModal('const-ficha')" style="background:none; border:none; color:var(--text-secondary); font-size:1.1rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="ConstrutorasModule.editar('${c.id}')" style="background:var(--bg-overlay); border:1px solid var(--border); border-radius:12px; padding:8px 16px; font-size:0.8rem; font-weight:700; cursor:pointer; color:var(--text-secondary); display:flex; align-items:center; gap:8px;"><i class="fas fa-edit"></i> Editar</button>
+                        <button onclick="event.stopPropagation(); window.open('https://wa.me/55${c.whatsapp?.replace(/\D/g,'')}')" style="background:#25D366; border:none; border-radius:12px; padding:8px 16px; font-size:0.8rem; font-weight:700; cursor:pointer; color:#fff; display:flex; align-items:center; gap:8px;"><i class="fab fa-whatsapp"></i> Contato</button>
+                    </div>
                 </div>
 
-                <!-- Header da ficha -->
-                <div style="background:linear-gradient(135deg,#3B0764 0%,#7C3AED 100%);border-radius:18px;padding:20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
-                    ${logoHtml}
-                    <div style="flex:1;min-width:0;">
-                        <div style="font-size:1.1rem;font-weight:900;color:#fff;margin-bottom:4px;">${c.nome}</div>
-                        <div style="display:flex;gap:8px;">
-                            <div style="background:rgba(255,255,255,0.15);border-radius:8px;padding:4px 10px;text-align:center;">
-                                <div style="font-size:1rem;font-weight:900;color:#fff;">${imovs.length}</div>
-                                <div style="font-size:0.6rem;color:rgba(255,255,255,0.75);">Imóveis</div>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.15);border-radius:8px;padding:4px 10px;text-align:center;">
-                                <div style="font-size:1rem;font-weight:900;color:#fff;">${disponiveis}</div>
-                                <div style="font-size:0.6rem;color:rgba(255,255,255,0.75);">Disponíveis</div>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.15);border-radius:8px;padding:4px 10px;text-align:center;">
-                                <div style="font-size:1rem;font-weight:900;color:#fff;">${vendidos}</div>
-                                <div style="font-size:0.6rem;color:rgba(255,255,255,0.75);">Vendidos</div>
-                            </div>
+                <!-- Header Moderno -->
+                <div style="text-align:center; margin-bottom:32px;">
+                    <div style="margin-bottom:16px; display:inline-block; position:relative;">
+                        ${logoHtml}
+                        <div style="position:absolute; bottom:-4px; right:-4px; width:28px; height:28px; background:#7C3AED; border:3px solid #fff; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.7rem;">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <h2 style="font-size:1.6rem; font-weight:900; color:var(--dark); margin-bottom:8px; letter-spacing:-0.5px;">${c.nome}</h2>
+                    <div style="display:flex; align-items:center; justify-content:center; gap:12px;">
+                        <div style="display:flex; align-items:center; gap:6px; color:var(--text-secondary); font-size:0.85rem; font-weight:600;">
+                            <i class="fas fa-building" style="color:var(--primary);"></i> ${imovs.length} Empreendimentos
+                        </div>
+                        <div style="width:4px; height:4px; background:var(--border-strong); border-radius:50%;"></div>
+                        <div style="display:flex; align-items:center; gap:6px; color:var(--text-secondary); font-size:0.85rem; font-weight:600;">
+                            <i class="fas fa-check-circle" style="color:var(--accent);"></i> ${disponiveis} Disponíveis
                         </div>
                     </div>
                 </div>
 
-                <!-- Links de contato -->
-                ${linksHtml ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">${linksHtml}</div>` : '<div style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:16px;font-size:0.76rem;color:var(--text-muted);font-weight:600;">Nenhum canal de contato cadastrado.</div>'}
-
-                <!-- Dados completos -->
-                <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:16px;">
-                    <div style="font-size:0.78rem;font-weight:800;color:var(--dark);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                        <i class="fas fa-id-card" style="color:#7C3AED;"></i> Ficha completa da construtora
+                <!-- Grid de Métricas Rápidas -->
+                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:32px;">
+                    <div style="background:var(--bg-base); border-radius:16px; padding:16px; text-align:center;">
+                        <div style="font-size:1.2rem; font-weight:800; color:var(--primary);">${imovs.length}</div>
+                        <div style="font-size:0.65rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Total</div>
                     </div>
-                    ${dadosHtml}
+                    <div style="background:var(--bg-base); border-radius:16px; padding:16px; text-align:center;">
+                        <div style="font-size:1.2rem; font-weight:800; color:var(--accent);">${disponiveis}</div>
+                        <div style="font-size:0.65rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Venda</div>
+                    </div>
+                    <div style="background:var(--bg-base); border-radius:16px; padding:16px; text-align:center;">
+                        <div style="font-size:1.2rem; font-weight:800; color:#7C3AED;">${vendidos}</div>
+                        <div style="font-size:0.65rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Vendidos</div>
+                    </div>
                 </div>
 
-                <!-- Imóveis vinculados -->
-                <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:16px;">
-                    <div style="font-size:0.78rem;font-weight:800;color:var(--dark);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
-                        <i class="fas fa-home" style="color:#7C3AED;"></i> Imóveis Vinculados
-                        <span style="background:rgba(124,58,237,0.10);color:#7C3AED;border-radius:20px;padding:1px 8px;font-size:0.65rem;margin-left:4px;">${imovs.length}</span>
-                    </div>
+                                <!-- Seções em Abas (Visual) -->
+                <div style="display:flex; border-bottom:1px solid var(--border); margin-bottom:24px; gap:24px;">
+                    <div style="padding-bottom:12px; border-bottom:2px solid #7C3AED; color:var(--dark); font-size:0.9rem; font-weight:800; cursor:pointer;">Portfólio de Imóveis</div>
+                    <div style="padding-bottom:12px; color:var(--text-muted); font-size:0.9rem; font-weight:600; cursor:pointer;">Informações da Empresa</div>
+                </div>
+
+                <!-- Portfólio de Imóveis -->
+                <div style="margin-bottom:32px;">
                     ${imoveisHtml}
+                    ${imovs.length === 0 ? `
+                    <div style="text-align:center; padding:40px 20px; background:var(--bg-base); border-radius:20px; border:2px dashed var(--border);">
+                        <div style="font-size:2rem; margin-bottom:12px; opacity:0.5;">🏠</div>
+                        <p style="font-size:0.85rem; color:var(--text-secondary); font-weight:600;">Nenhum imóvel vinculado a esta construtora.</p>
+                        <button onclick="UI.closeModal('const-ficha'); setTimeout(()=>UI.openModal('imovel'), 200);" style="margin-top:16px; background:none; border:1px solid var(--primary); color:var(--primary); border-radius:10px; padding:8px 16px; font-size:0.75rem; font-weight:700; cursor:pointer;">Cadastrar Novo Imóvel</button>
+                    </div>
+                    ` : ''}
+                </div>
+
+                <!-- Informações de Contato e Dados -->
+                <div style="background:var(--bg-raised); border:1px solid var(--border); border-radius:24px; padding:24px;">
+                    <h4 style="font-size:0.9rem; font-weight:800; color:var(--dark); margin-bottom:20px; display:flex; align-items:center; gap:10px;">
+                        <i class="fas fa-info-circle" style="color:#7C3AED;"></i> Detalhes Corporativos
+                    </h4>
+                    
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px;">
+                        ${linksHtml || '<span style="color:var(--text-muted); font-size:0.8rem;">Sem canais de contato.</span>'}
+                    </div>
+
+                    <div style="display:grid; gap:16px;">
+                        ${dadosHtml}
+                    </div>
                 </div>`;
 
             document.getElementById('const-ficha-content').innerHTML = html;
