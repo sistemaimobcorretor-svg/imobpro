@@ -16711,8 +16711,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const today = new Date();
                     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
                     
-                    document.getElementById('report-date-start').value = firstDay.toISOString().split('T')[0];
-                    document.getElementById('report-date-end').value = today.toISOString().split('T')[0];
+                    const rptStart = document.getElementById('report-date-start');
+                    const rptEnd   = document.getElementById('report-date-end');
+                    if (rptStart) rptStart.value = firstDay.toISOString().split('T')[0];
+                    if (rptEnd)   rptEnd.value   = today.toISOString().split('T')[0];
                     
                     UI.applyBackground();
                     
@@ -19821,11 +19823,15 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             },
             
             generateSalesReport: (start, end) => {
-                // Encontra etapas de venda — suporta etapas customizadas
+                // Encontra etapas de venda — apenas etapas cujo id é 'venda' ou
+                // cujo nome é EXATAMENTE "Venda Concluída" / "Venda" (evita falsos positivos)
                 const etapasVenda = new Set(['venda']);
                 if (UI.data.funilEtapas) {
                     UI.data.funilEtapas.forEach(e => {
-                        if ((e.nome||'').toLowerCase().includes('venda') || (e.nome||'').toLowerCase().includes('fechad') || (e.nome||'').toLowerCase().includes('conclu')) {
+                        if (e.id === 'venda') return; // já incluído
+                        const n = (e.nome||'').toLowerCase().trim();
+                        // Só inclui se o nome for especificamente de conclusão de venda
+                        if (n === 'venda concluída' || n === 'venda concluida' || n === 'venda' || n === 'fechado' || n === 'concluído' || n === 'concluido') {
                             etapasVenda.add(e.id);
                         }
                     });
@@ -19988,7 +19994,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 
                 const clientesVendaSemImovel = UI.data.clientes.filter(c => 
                     c.etapaFunil === 'venda' && 
-                    (!c.imovelInteresseId || !vendas.some(v => v.clienteId === c.id))
+                    (!c.imovelInteresseId || !UI.data.imoveis.some(i => i.id === c.imovelInteresseId))
                 );
                 
                 if (clientesVendaSemImovel.length > 0) {
@@ -20049,19 +20055,25 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             },
             
             generateSalesFunnelReport: (start, end) => {
-                // Suporta etapas de venda customizadas
+                // Suporta etapas de venda customizadas — apenas nomes exatos para evitar falsos positivos
                 const etapasVendaIds = new Set(['venda']);
                 if (UI.data.funilEtapas) {
                     UI.data.funilEtapas.forEach(e => {
-                        const n = (e.nome||'').toLowerCase();
-                        if (n.includes('venda') || n.includes('fechad') || n.includes('conclu')) etapasVendaIds.add(e.id);
+                        if (e.id === 'venda') return; // já incluído
+                        const n = (e.nome||'').toLowerCase().trim();
+                        if (n === 'venda concluída' || n === 'venda concluida' || n === 'venda' || n === 'fechado' || n === 'concluído' || n === 'concluido') {
+                            etapasVendaIds.add(e.id);
+                        }
                     });
                 }
                 const clientesVendaConcluida = UI.data.clientes.filter(cliente => 
                     etapasVendaIds.has(cliente.etapaFunil)
                 );
                 
-                const imoveisVendidos = UI.data.imoveis.filter(imovel => {
+                // Busca imóveis vendidos/alugados no período — mas para verificar vínculo
+                // usa todos os imóveis do cliente (sem restringir por dataVenda), evitando
+                // falsos "sem imóvel" quando o imóvel não tem dataVenda preenchida.
+                const imoveisVendidosPeriodo = UI.data.imoveis.filter(imovel => {
                     if (!imovel.dataVenda) return false;
                     const dataVenda = new Date(imovel.dataVenda);
                     return dataVenda >= start && dataVenda <= end && (imovel.status === 'vendido' || imovel.status === 'alugado');
@@ -20071,7 +20083,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 
                 clientesVendaConcluida.forEach(cliente => {
                     if (cliente.imovelInteresseId) {
-                        const imovelVendido = imoveisVendidos.find(i => i.id === cliente.imovelInteresseId);
+                        // Primeiro tenta encontrar o imóvel dentro do período
+                        let imovelVendido = imoveisVendidosPeriodo.find(i => i.id === cliente.imovelInteresseId);
+                        // Se não encontrou no período, busca em todos os imóveis (imóvel existe mas sem dataVenda ou fora do período)
+                        if (!imovelVendido) {
+                            imovelVendido = UI.data.imoveis.find(i => i.id === cliente.imovelInteresseId);
+                        }
                         if (imovelVendido) {
                             vendasDetalhadas.push({
                                 clienteId: cliente.id,
@@ -20081,7 +20098,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 imovelTitulo: imovelVendido.titulo,
                                 imovelTipo: imovelVendido.tipo,
                                 valor: imovelVendido.precoVenda || imovelVendido.precoAluguel || 0,
-                                dataVenda: imovelVendido.dataVenda,
+                                dataVenda: imovelVendido.dataVenda || cliente.dataEntradaFunil,
                                 status: imovelVendido.status,
                                 transacao: imovelVendido.transacao
                             });
@@ -20136,7 +20153,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     `;
                 }
                 
-                const clientesSemImovel = clientesVendaConcluida.filter(c => !c.imovelInteresseId || !imoveisVendidos.some(i => i.id === c.imovelInteresseId));
+                // Um cliente só é "sem imóvel" se não tiver imovelInteresseId OU se o id não existir em nenhum imóvel cadastrado
+                const clientesSemImovel = clientesVendaConcluida.filter(c => !c.imovelInteresseId || !UI.data.imoveis.some(i => i.id === c.imovelInteresseId));
                 
                 if (clientesSemImovel.length > 0) {
                     html += `
@@ -20202,7 +20220,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 }).length;
                 
                 const _pvIdsP = new Set(['venda']);
-                if (UI.data.funilEtapas) UI.data.funilEtapas.forEach(e => { const n=(e.nome||'').toLowerCase(); if(n.includes('venda')||n.includes('fechad')||n.includes('conclu')) _pvIdsP.add(e.id); });
+                if (UI.data.funilEtapas) UI.data.funilEtapas.forEach(e => { if (e.id === 'venda') return; const n=(e.nome||'').toLowerCase().trim(); if(n==='venda concluída'||n==='venda concluida'||n==='venda'||n==='fechado'||n==='concluído'||n==='concluido') _pvIdsP.add(e.id); });
                 const clientesVendaConcluidaPeriodo = UI.data.clientes.filter(cliente => {
                     if (!_pvIdsP.has(cliente.etapaFunil) || !cliente.dataEntradaFunil) return false;
                     const dataVenda = new Date(cliente.dataEntradaFunil);
@@ -21578,10 +21596,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
             toggleReportInputs: (type) => {
                 const endInput = document.getElementById('report-date-end');
+                const startInput = document.getElementById('report-date-start');
+                if (!endInput || !startInput) return;
                 if(type === 'plantao') {
                     endInput.style.display = 'none';
-                    if(!document.getElementById('report-date-start').value) {
-                        document.getElementById('report-date-start').value = Utils.getToday();
+                    if(!startInput.value) {
+                        startInput.value = Utils.getToday();
                     }
                 } else {
                     endInput.style.display = 'block';
