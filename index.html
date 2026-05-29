@@ -12076,7 +12076,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         <button type="button" onclick="ConstrutorasModule.cadastrarRapidoDoImovel()" style="background:rgba(124,58,237,0.10);border:1px solid rgba(124,58,237,0.25);color:#7C3AED;border-radius:8px;padding:5px 10px;font-size:0.70rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;">
                             <i class="fas fa-plus-circle"></i> Cadastrar agora
                         </button>
-                        <span id="i-construtora-status" style="font-size:0.68rem;color:var(--text-muted);font-weight:600;">Ao digitar uma construtora já cadastrada, o vínculo será feito automaticamente.</span>
+                        <span id="i-construtora-status" style="font-size:0.68rem;color:var(--text-muted);font-weight:600;">O vínculo é automático: construtoras já cadastradas são reconhecidas ao digitar; nomes novos são criados e vinculados ao salvar.</span>
                     </div>
                 </div>
 
@@ -46488,49 +46488,71 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         let _filtro = '';
 
         // ── IndexedDB ────────────────────────────────────────────────────
+        // _load(): APENAS carrega a lista de construtoras (operação leve, sem
+        // gravações). A sincronização de vínculos é feita SEPARADAMENTE por
+        // _syncVinculos(), chamada nos pontos certos (abertura de painel/ficha,
+        // boot, após salvar/excluir e no botão "Sincronizar"). Isso evita que a
+        // digitação no formulário de imóvel dispare reescritas em massa no banco.
         async function _load() {
-            try { 
-                _lista = await DB.getAll('construtoras'); 
+            try {
+                _lista = await DB.getAll('construtoras');
                 _lista.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
-                // Sincronização automática de vínculos ao carregar:
-                // 1. Imóveis com nome mas sem construtoraId → vincula pelo nome (órfãos)
-                // 2. Imóveis com construtoraId inválido (construtora excluída) → limpa o id
-                // 3. Imóveis com construtoraId válido mas nome desatualizado → atualiza nome
-                if (window.UI && UI.data && UI.data.imoveis) {
-                    let mudou = false;
-                    for (let im of UI.data.imoveis) {
-                        let alterado = false;
-                        if (!im.construtoraId && im.construtora) {
-                            // Caso 1: órfão — tenta vincular pelo nome
-                            const c = _findByNome(im.construtora);
-                            if (c) {
-                                im.construtoraId = c.id;
-                                im.construtora = c.nome;
-                                alterado = true;
-                            }
-                        } else if (im.construtoraId) {
-                            const c = _lista.find(x => x.id === im.construtoraId);
-                            if (!c) {
-                                // Caso 2: construtora foi excluída — tenta re-vincular pelo nome
-                                const cPorNome = _findByNome(im.construtora);
-                                if (cPorNome) { im.construtoraId = cPorNome.id; im.construtora = cPorNome.nome; }
-                                else { im.construtoraId = ''; }
-                                alterado = true;
-                            } else if (im.construtora !== c.nome) {
-                                // Caso 3: nome desatualizado
-                                im.construtora = c.nome;
-                                alterado = true;
-                            }
-                        }
-                        if (alterado) {
-                            im.dataAtualizacao = new Date().toISOString();
-                            await DB.put('imoveis', im);
-                            mudou = true;
-                        }
-                    }
-                    if (mudou) UI.data.imoveis = await Storage.getImoveis();
-                }
             } catch(e) { _lista = []; }
+        }
+
+        // ── Motor ÚNICO de sincronização imóvel × construtora ──────────────
+        // Percorre todos os imóveis e garante a consistência dos vínculos:
+        //   Caso 1 (órfão):       imóvel tem nome de construtora mas não tem
+        //                         construtoraId → vincula ao id da construtora
+        //                         cujo nome normalizado coincide.
+        //   Caso 2 (id inválido): construtoraId aponta para uma construtora que
+        //                         não existe mais → tenta revincular pelo nome;
+        //                         se não houver, limpa o id (mantém o nome como
+        //                         texto livre, sem perder a informação).
+        //   Caso 3 (renomeada):   id válido porém nome divergente → atualiza o
+        //                         texto do imóvel para o nome cadastrado.
+        // Grava no banco apenas os imóveis que realmente mudaram e devolve a
+        // contagem de alterações. opts: { persist, render, silencioso }.
+        async function _syncVinculos(opts = {}) {
+            const { persist = true, render = false, silencioso = true } = opts;
+            if (!window.UI || !UI.data || !Array.isArray(UI.data.imoveis)) return 0;
+            let total = 0;
+            for (const im of UI.data.imoveis) {
+                let mudou = false;
+                if (!im.construtoraId && im.construtora) {
+                    const c = _findByNome(im.construtora);
+                    if (c) { im.construtoraId = c.id; im.construtora = c.nome; mudou = true; }
+                } else if (im.construtoraId) {
+                    const c = _lista.find(x => x.id === im.construtoraId);
+                    if (!c) {
+                        const cPorNome = _findByNome(im.construtora);
+                        if (cPorNome) { im.construtoraId = cPorNome.id; im.construtora = cPorNome.nome; }
+                        else { im.construtoraId = ''; }
+                        mudou = true;
+                    } else if (im.construtora !== c.nome) {
+                        im.construtora = c.nome;
+                        mudou = true;
+                    }
+                }
+                if (mudou) {
+                    im.dataAtualizacao = new Date().toISOString();
+                    if (persist) await DB.put('imoveis', im);
+                    total++;
+                }
+            }
+            if (total > 0 && persist) {
+                UI.data.imoveis = await Storage.getImoveis();
+                try { if (document.getElementById('imoveis-list')) UI.renderImoveis(); } catch(e) {}
+            }
+            if (render) { _renderStats(); _renderGrid(_filtro); }
+            if (!silencioso) {
+                Utils.toast(total > 0
+                    ? `${total} imóvel(is) sincronizado(s) com sucesso! ✅`
+                    : 'Todos os vínculos já estão atualizados. ✅', 'success');
+            } else if (total > 0) {
+                console.log(`[ConstrutorasModule] Sync: ${total} imóvel(is) vinculado(s).`);
+            }
+            return total;
         }
         async function _saveDB(obj) { await DB.put('construtoras', obj); }
         async function _removeDB(id) { await DB.delete('construtoras', id); }
@@ -46557,7 +46579,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
         // ── Abrir painel (view) ──────────────────────────────────────────
         async function openView() {
-            await _load(); // sincroniza vínculos automaticamente (3 casos: órfão, ID inválido, nome desatualizado)
+            await _load();
+            await _syncVinculos(); // sincroniza vínculos (3 casos: órfão, ID inválido, nome desatualizado)
             // Garantir que a view está visível (inline style pode sobrescrever class)
             const viewEl = document.getElementById('construtoras-view');
             if (viewEl) {
@@ -46674,8 +46697,9 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
         // ── Ficha da construtora ─────────────────────────────────────────
         async function abrirFicha(id) {
-            // Sempre recarrega para garantir vínculos atualizados antes de exibir
+            // Sempre recarrega e sincroniza para garantir vínculos atualizados antes de exibir
             await _load();
+            await _syncVinculos();
             const c = _lista.find(x => x.id === id);
             if (!c) return;
             _fichaId = id;
@@ -46879,6 +46903,16 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         async function salvar() {
             const nome = document.getElementById('const-nome').value.trim();
             if (!nome) { Utils.toast('Informe o nome da construtora', 'error'); return; }
+            // ── Proteção contra duplicidade ──
+            // Impede criar/renomear para um nome já usado por OUTRA construtora,
+            // o que quebraria a vinculação automática (dois registros para o mesmo nome).
+            if (_lista.length === 0) await _load();
+            const nomeNormCheck = _normalizarNome(nome);
+            const dupe = _lista.find(c => c.id !== (_editId || '') && _normalizarNome(c.nome) === nomeNormCheck);
+            if (dupe) {
+                Utils.toast(`Já existe uma construtora chamada "${dupe.nome}".`, 'error');
+                return;
+            }
             // ── CORREÇÃO: Captura se o formulário de imóvel está aberto para re-vincular após salvar ──
             // Detecta se o formulário de imóvel está aberto (sheet ativo OU overlay visível)
             const _sheetImovel = document.getElementById('sheet-imovel');
@@ -46906,35 +46940,14 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             };
             await _saveDB(obj);
             await _load();
-            
-            // Vínculo automático após salvar construtora:
-            // Vincula TODOS os imóveis cujo campo construtora (texto) bate com este nome,
-            // independente de já terem ou não um construtoraId (inclusive os que foram 
-            // cadastrados com o nome mas sem aguardar o debounce do campo de vínculo).
-            if (window.UI && UI.data && UI.data.imoveis) {
-                const nomeNorm = _normalizarNome(obj.nome);
-                let vinculados = 0;
-                for (let imovel of UI.data.imoveis) {
-                    const nomeImovelNorm = _normalizarNome(imovel.construtora);
-                    // Vincula se: nome bate E (sem id OU id errado/diferente)
-                    const nomeCompativel = nomeImovelNorm === nomeNorm;
-                    const idErrado = imovel.construtoraId && imovel.construtoraId !== obj.id;
-                    const semId = !imovel.construtoraId;
-                    const jaCorreto = imovel.construtoraId === obj.id && imovel.construtora === obj.nome;
-                    if (nomeCompativel && !jaCorreto) {
-                        imovel.construtoraId = obj.id;
-                        imovel.construtora = obj.nome; // normaliza nome para o cadastrado
-                        imovel.dataAtualizacao = new Date().toISOString();
-                        await DB.put('imoveis', imovel);
-                        vinculados++;
-                    }
-                }
-                if (vinculados > 0) {
-                    UI.data.imoveis = await Storage.getImoveis();
-                    // Atualiza cards de imóveis se a view estiver aberta
-                    try { if (document.getElementById('imoveis-list')) UI.renderImoveis(); } catch(e) {}
-                    console.log(`[ConstrutorasModule] salvar(): ${vinculados} imóvel(is) vinculado(s) à construtora "${obj.nome}"`);
-                }
+
+            // Vinculação automática após salvar a construtora, via motor único:
+            // todos os imóveis órfãos cujo nome (texto) bate com este passam a
+            // apontar para o id; imóveis já ligados a esta construtora têm o
+            // nome normalizado caso ela tenha sido renomeada.
+            const vinculados = await _syncVinculos({ silencioso: true });
+            if (vinculados > 0) {
+                console.log(`[ConstrutorasModule] salvar(): ${vinculados} imóvel(is) sincronizado(s) com "${obj.nome}"`);
             }
 
             UI.closeModal('const-form');
@@ -46948,8 +46961,6 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             }
             Utils.toast(_editId ? 'Construtora atualizada! ✅' : 'Construtora cadastrada! 🏗️', 'success');
             _editId = null;
-            // Re-sincroniza para atualizar ficha aberta e stats com os imóveis recém-vinculados
-            await sincronizarVinculos(true);
         }
 
         async function excluir(id) {
@@ -47015,8 +47026,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                 const textoAtual = inp ? inp.value.trim() : '';
                 _setStatusConstrutora(
                     textoAtual
-                        ? '⚠️ Construtora não cadastrada. Use "Cadastrar agora" para criar a ficha.'
-                        : 'Ao digitar uma construtora já cadastrada, o vínculo é feito automaticamente.',
+                        ? '🆕 Construtora ainda não cadastrada — será criada e vinculada automaticamente ao salvar (ou use "Cadastrar agora" para preencher os detalhes).'
+                        : 'O vínculo é automático: digite o nome da construtora.',
                     textoAtual ? '#E67E22' : 'var(--text-muted)'
                 );
             }
@@ -47056,8 +47067,8 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                     if (hid) hid.value = '';
                     _setStatusConstrutora(
                         nomeAtual
-                            ? '⚠️ Construtora não cadastrada. Use "Cadastrar agora" para criar a ficha.'
-                            : 'Ao digitar uma construtora já cadastrada, o vínculo é feito automaticamente.',
+                            ? '🆕 Construtora ainda não cadastrada — será criada e vinculada automaticamente ao salvar (ou use "Cadastrar agora" para preencher os detalhes).'
+                            : 'O vínculo é automático: digite o nome da construtora.',
                         nomeAtual ? '#E67E22' : 'var(--text-muted)'
                     );
                 }
@@ -47103,13 +47114,12 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
 
         async function ensureVinculoImovel(nomeInformado, idInformado) {
             if (_lista.length === 0) await _load();
-            let nome = (nomeInformado || '').trim();
+            const nome = (nomeInformado || '').trim();
             let c = idInformado ? _lista.find(x => x.id === idInformado) : null;
             // Fallback: se o id fornecido não existe mais, tenta pelo nome
-            if (!c && idInformado) c = _findByNome(nome);
             if (!c && nome) c = _findByNome(nome);
             if (c) {
-                // Garante que o campo hidden no form está sincronizado
+                // Garante que os campos do form de imóvel ficam sincronizados
                 const hidEl = document.getElementById('i-construtora-vinculada');
                 if (hidEl && hidEl.value !== c.id) hidEl.value = c.id;
                 const inpEl = document.getElementById('i-construtora');
@@ -47119,41 +47129,32 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             }
             if (!nome) return { id: '', nome: '' };
 
-            const confirmar = confirm(`A construtora "${nome}" ainda não está cadastrada. Deseja cadastrá-la agora e vincular este imóvel?`);
-            if (!confirmar) return { id: '', nome };
-
+            // ── VINCULAÇÃO AUTOMÁTICA ──
+            // O nome digitado não corresponde a nenhuma construtora cadastrada.
+            // Em vez de bloquear o salvamento com um confirm(), criamos a ficha da
+            // construtora automaticamente e já a vinculamos. Assim, todo imóvel com
+            // um nome de construtora SEMPRE fica ligado a um registro real, mantendo
+            // o painel sempre completo e sincronizado. Os detalhes (logo, contatos)
+            // podem ser preenchidos depois pela tela de Construtoras.
             const nova = {
                 id: _uid(),
                 nome,
-                telefone: '',
-                whatsapp: '',
-                email: '',
-                instagram: '',
-                site: '',
-                logo: '',
+                telefone: '', whatsapp: '', email: '', instagram: '', site: '', logo: '',
                 dataCriacao: new Date().toISOString(),
                 dataAtualizacao: new Date().toISOString()
             };
             await _saveDB(nova);
             await _load();
-            // Vínculo automático em outros imóveis com o mesmo nome (caso cadastro rápido)
-            if (window.UI && UI.data && UI.data.imoveis) {
-                const nomeNorm = _normalizarNome(nova.nome);
-                let vinculados = 0;
-                for (let im of UI.data.imoveis) {
-                    const imovelNomeNorm = _normalizarNome(im.construtora);
-                    if (imovelNomeNorm === nomeNorm && !im.construtoraId) {
-                        im.construtoraId = nova.id;
-                        im.construtora = nova.nome; // normaliza nome
-                        im.dataAtualizacao = new Date().toISOString();
-                        await DB.put('imoveis', im);
-                        vinculados++;
-                    }
-                }
-                if (vinculados > 0) UI.data.imoveis = await Storage.getImoveis();
-            }
-            await populateSelect(nova.id, nova.nome);
-            Utils.toast('Construtora cadastrada e vinculada ao imóvel.', 'success');
+            const hidEl = document.getElementById('i-construtora-vinculada');
+            if (hidEl) hidEl.value = nova.id;
+            const inpEl = document.getElementById('i-construtora');
+            if (inpEl) inpEl.value = nova.nome;
+            // Vincula também outros imóveis já existentes com o mesmo nome (órfãos)
+            await _syncVinculos({ silencioso: true });
+            _renderStats();
+            _renderGrid(_filtro);
+            _setStatusConstrutora(`🏗️ Construtora "${nova.nome}" criada e vinculada automaticamente.`, 'var(--accent)');
+            Utils.toast(`Construtora "${nova.nome}" criada e vinculada automaticamente. 🏗️`, 'success');
             return { id: nova.id, nome: nova.nome };
         }
 
@@ -47172,61 +47173,24 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         // ── Compatibilidade: fecharFormulario (ainda referenciado) ───────
         function fecharFormulario() { UI.closeModal('const-form'); }
 
-        // Sincroniza todos os imóveis: vincula órfãos pelo nome, atualiza nomes desatualizados,
-        // limpa IDs de construtoras excluídas e re-vincula pelo nome quando possível.
-        // Parâmetro silencioso=false: quando true, não exibe toast (chamadas automáticas de boot).
+        // Sincroniza todos os imóveis usando o motor único (_syncVinculos):
+        // vincula órfãos pelo nome, atualiza nomes desatualizados, limpa IDs de
+        // construtoras excluídas e re-vincula pelo nome quando possível.
+        // silencioso=true em chamadas automáticas (boot/após salvar) — sem toast.
         async function sincronizarVinculos(silencioso = false) {
             await _load();
             if (!window.UI || !UI.data || !UI.data.imoveis) {
                 if (!silencioso) Utils.toast('Nenhum imóvel para sincronizar.', 'info');
-                return;
+                return 0;
             }
-            let total = 0;
-            for (let imovel of UI.data.imoveis) {
-                let mudou = false;
-                if (!imovel.construtoraId && imovel.construtora) {
-                    // Caso 1: órfão — vincula pelo nome
-                    const c = _findByNome(imovel.construtora);
-                    if (c) { imovel.construtoraId = c.id; imovel.construtora = c.nome; mudou = true; }
-                } else if (imovel.construtoraId) {
-                    const c = _lista.find(x => x.id === imovel.construtoraId);
-                    if (!c) {
-                        // Caso 2: construtora excluída — tenta re-vincular pelo nome
-                        const cPorNome = _findByNome(imovel.construtora);
-                        if (cPorNome) { imovel.construtoraId = cPorNome.id; imovel.construtora = cPorNome.nome; }
-                        else { imovel.construtoraId = ''; }
-                        mudou = true;
-                    } else if (imovel.construtora !== c.nome) {
-                        // Caso 3: nome desatualizado após renomeação
-                        imovel.construtora = c.nome;
-                        mudou = true;
-                    }
-                }
-                if (mudou) {
-                    imovel.dataAtualizacao = new Date().toISOString();
-                    await DB.put('imoveis', imovel);
-                    total++;
-                }
-            }
-            if (total > 0) {
-                UI.data.imoveis = await Storage.getImoveis();
-                // Atualiza cards de imóveis se a view estiver aberta
-                try { if (document.getElementById('imoveis-list')) UI.renderImoveis(); } catch(e) {}
-            }
+            const total = await _syncVinculos({ silencioso });
             _renderStats();
             _renderGrid(_filtro);
             // Se a ficha de uma construtora estiver visivelmente aberta, re-abre com dados atualizados
             if (_fichaId && document.getElementById('sheet-const-ficha')?.classList.contains('active')) {
                 try { await abrirFicha(_fichaId); } catch(e) {}
             }
-            if (!silencioso) {
-                Utils.toast(total > 0
-                    ? `${total} imóvel(is) sincronizado(s) com sucesso! ✅`
-                    : 'Todos os vínculos já estão atualizados. ✅',
-                    'success');
-            } else if (total > 0) {
-                console.log(`[ConstrutorasModule] Auto-sync: ${total} imóvel(is) vinculado(s).`);
-            }
+            return total;
         }
 
         return { openView, abrirCadastro, novoFormulario, fecharFormulario, onLogoSelected, editar, salvar, excluir, abrirFicha, filtrar, populateSelect, onSelectChange, onInputChange, cadastrarRapidoDoImovel, ensureVinculoImovel, initImoveiForm, refreshStats, sincronizarVinculos };
@@ -48983,6 +48947,285 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
             html = html.replace(/onclick="App\.agenda\.edit\('([^']+)'\)"/g, (m, id) => `onclick="VerTarefa.open('${id}')"`);
             return html;
         };
+    })();
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // PATCH v2 — ConstrutorasModule: corrige vinculação imóveis × construtoras
+    // Substitui completamente o módulo original com versão corrigida.
+    // Problemas resolvidos:
+    //   1. _lista vazia no boot → _load() sempre aguardado antes de usar _lista
+    //   2. Race condition entre oninput/onchange/onblur → timer único + flag
+    //   3. initImoveiForm apagava o campo ao abrir o form → preserva valor atual
+    //   4. sincronizarVinculos no boot sem _lista carregada → _load() garantido
+    //   5. populateSelect sobrescrevia valor do input sem motivo → só altera se vazio
+    // ═══════════════════════════════════════════════════════════════════════
+    (function patchConstrutorasModule() {
+
+        // Cópia de segurança das funções que NÃO mudam
+        const _orig = Object.assign({}, ConstrutorasModule);
+
+        // ── Helpers internos expostos como closure ────────────────────────
+        function _normNome(v) {
+            return String(v || '').toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, ' ').trim();
+        }
+        function _esc(v) {
+            return String(v || '').replace(/[&<>"']/g, ch =>
+                ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        }
+        function _setStatus(msg, cor) {
+            const el = document.getElementById('i-construtora-status');
+            if (el) { el.textContent = msg || ''; el.style.color = cor || 'var(--text-muted)'; }
+        }
+
+        // ── Carrega lista garantindo dados frescos ────────────────────────
+        async function _getLista() {
+            try { return await DB.getAll('construtoras'); } catch(e) { return []; }
+        }
+        function _findNome(lista, nome) {
+            const n = _normNome(nome);
+            return n ? lista.find(c => _normNome(c.nome) === n) : null;
+        }
+
+        // ── populateSelect corrigido ──────────────────────────────────────
+        // Só sobrescreve o campo de texto se ele estiver VAZIO ou se houver
+        // match confirmado — nunca apaga digitação do usuário.
+        async function populateSelect(selectedId, nomeAtual) {
+            const lista = await _getLista();
+            const inp = document.getElementById('i-construtora');
+            const hid = document.getElementById('i-construtora-vinculada');
+            const list = document.getElementById('i-construtoras-list');
+            const selLegado = document.getElementById('i-construtora-id');
+
+            // Sempre atualiza datalist com todas as construtoras
+            if (list) {
+                list.innerHTML = lista.map(c =>
+                    `<option value="${_esc(c.nome)}" data-id="${c.id}"></option>`
+                ).join('');
+            }
+            if (selLegado) {
+                selLegado.innerHTML = '<option value="">— Selecione a construtora —</option>' +
+                    lista.map(c =>
+                        `<option value="${c.id}" ${c.id === selectedId ? 'selected' : ''}>${_esc(c.nome)}</option>`
+                    ).join('');
+            }
+
+            // Tenta resolver: por ID → por nome informado → pelo que já está no campo
+            let c = selectedId ? lista.find(x => x.id === selectedId) : null;
+            if (!c && nomeAtual && typeof nomeAtual === 'string') c = _findNome(lista, nomeAtual);
+            if (!c && inp && inp.value.trim()) c = _findNome(lista, inp.value.trim());
+
+            if (c) {
+                if (inp) inp.value = c.nome;
+                if (hid) hid.value = c.id;
+                _setStatus(`✅ Vinculado a ${c.nome}.`, 'var(--accent)');
+            } else {
+                // Só limpa ID; preserva texto se já houver algo digitado
+                if (hid) hid.value = '';
+                if (inp && !inp.value.trim() && nomeAtual && typeof nomeAtual === 'string') {
+                    inp.value = nomeAtual;
+                }
+                const textoAtual = inp ? inp.value.trim() : '';
+                _setStatus(
+                    textoAtual
+                        ? '🆕 Construtora ainda não cadastrada — será criada e vinculada automaticamente ao salvar.'
+                        : 'O vínculo é automático: digite o nome da construtora.',
+                    textoAtual ? '#E67E22' : 'var(--text-muted)'
+                );
+            }
+        }
+
+        // ── initImoveiForm corrigido ──────────────────────────────────────
+        // Carrega datalist mas NÃO apaga o campo se já houver valor.
+        async function initImoveiForm() {
+            const lista = await _getLista();
+            const list = document.getElementById('i-construtoras-list');
+            const selLegado = document.getElementById('i-construtora-id');
+            if (list) {
+                list.innerHTML = lista.map(c =>
+                    `<option value="${_esc(c.nome)}" data-id="${c.id}"></option>`
+                ).join('');
+            }
+            if (selLegado) {
+                const cur = selLegado.value;
+                selLegado.innerHTML = '<option value="">— Selecione a construtora —</option>' +
+                    lista.map(c =>
+                        `<option value="${c.id}" ${c.id === cur ? 'selected' : ''}>${_esc(c.nome)}</option>`
+                    ).join('');
+            }
+            // Só resolve vínculo se já houver um valor nos campos
+            const inp = document.getElementById('i-construtora');
+            const hid = document.getElementById('i-construtora-vinculada');
+            const nomeAtual = inp ? inp.value.trim() : '';
+            const idAtual = hid ? hid.value : '';
+            if (nomeAtual || idAtual) {
+                await populateSelect(idAtual, nomeAtual);
+            }
+        }
+
+        // ── onInputChange corrigido ───────────────────────────────────────
+        // Timer único de 250ms. Flag _onInputRunning evita chamadas concorrentes.
+        let _debounceTimer = null;
+        let _onInputRunning = false;
+        async function onInputChange(input) {
+            clearTimeout(_debounceTimer);
+            const nome = (input && input.value ? input.value : '').trim();
+
+            // Vinculação imediata se houver match exato (seleção via datalist)
+            const lista = await _getLista();
+            const matchImediato = _findNome(lista, nome);
+            if (matchImediato) {
+                const hid = document.getElementById('i-construtora-vinculada');
+                if (hid) hid.value = matchImediato.id;
+                if (input && input.value !== matchImediato.nome) input.value = matchImediato.nome;
+                _setStatus(`✅ Vinculado a ${matchImediato.nome}.`, 'var(--accent)');
+                return;
+            }
+
+            // Digitação livre: aguarda pausa de 250ms
+            _debounceTimer = setTimeout(async () => {
+                if (_onInputRunning) return;
+                _onInputRunning = true;
+                try {
+                    const lista2 = await _getLista();
+                    const nomeAgora = (document.getElementById('i-construtora')?.value || '').trim();
+                    const match = _findNome(lista2, nomeAgora);
+                    const hid = document.getElementById('i-construtora-vinculada');
+                    if (match) {
+                        if (hid) hid.value = match.id;
+                        const inp2 = document.getElementById('i-construtora');
+                        if (inp2 && inp2.value !== match.nome) inp2.value = match.nome;
+                        _setStatus(`✅ Vinculado a ${match.nome}.`, 'var(--accent)');
+                    } else {
+                        if (hid) hid.value = '';
+                        _setStatus(
+                            nomeAgora
+                                ? '🆕 Construtora ainda não cadastrada — será criada e vinculada automaticamente ao salvar.'
+                                : 'O vínculo é automático: digite o nome da construtora.',
+                            nomeAgora ? '#E67E22' : 'var(--text-muted)'
+                        );
+                    }
+                } finally {
+                    _onInputRunning = false;
+                }
+            }, 250);
+        }
+
+        // ── ensureVinculoImovel corrigido ─────────────────────────────────
+        // Garante que _lista está carregada antes de qualquer operação.
+        async function ensureVinculoImovel(nomeInformado, idInformado) {
+            const lista = await _getLista();
+            const nome = (nomeInformado || '').trim();
+            let c = idInformado ? lista.find(x => x.id === idInformado) : null;
+            if (!c && nome) c = _findNome(lista, nome);
+            if (c) {
+                const hidEl = document.getElementById('i-construtora-vinculada');
+                if (hidEl && hidEl.value !== c.id) hidEl.value = c.id;
+                const inpEl = document.getElementById('i-construtora');
+                if (inpEl && inpEl.value !== c.nome) inpEl.value = c.nome;
+                _setStatus(`✅ Vinculado a ${c.nome}.`, 'var(--accent)');
+                return { id: c.id, nome: c.nome };
+            }
+            if (!nome) return { id: '', nome: '' };
+
+            // Cria construtora automaticamente
+            const nova = {
+                id: 'const_' + Date.now() + '_' + Math.random().toString(36).substr(2,6),
+                nome,
+                telefone: '', whatsapp: '', email: '', instagram: '', site: '', logo: '',
+                dataCriacao: new Date().toISOString(),
+                dataAtualizacao: new Date().toISOString()
+            };
+            await DB.put('construtoras', nova);
+
+            // Vincula imóveis órfãos com o mesmo nome
+            if (window.UI && UI.data && Array.isArray(UI.data.imoveis)) {
+                const listaAtualizada = await _getLista();
+                let mudou = false;
+                for (const im of UI.data.imoveis) {
+                    if (!im.construtoraId && im.construtora && _normNome(im.construtora) === _normNome(nome)) {
+                        im.construtoraId = nova.id;
+                        im.construtora = nova.nome;
+                        im.dataAtualizacao = new Date().toISOString();
+                        await DB.put('imoveis', im);
+                        mudou = true;
+                    }
+                }
+                if (mudou) UI.data.imoveis = await Storage.getImoveis();
+            }
+
+            const hidEl = document.getElementById('i-construtora-vinculada');
+            if (hidEl) hidEl.value = nova.id;
+            const inpEl = document.getElementById('i-construtora');
+            if (inpEl) inpEl.value = nova.nome;
+            _setStatus(`🏗️ Construtora "${nova.nome}" criada e vinculada automaticamente.`, 'var(--accent)');
+            Utils.toast(`Construtora "${nova.nome}" criada e vinculada automaticamente. 🏗️`, 'success');
+            return { id: nova.id, nome: nova.nome };
+        }
+
+        // ── sincronizarVinculos corrigido ─────────────────────────────────
+        // Garante _load() antes de sincronizar, evitando _lista vazia no boot.
+        async function sincronizarVinculos(silencioso = false) {
+            const lista = await _getLista();
+            if (!window.UI || !UI.data || !Array.isArray(UI.data.imoveis)) {
+                if (!silencioso) Utils.toast('Nenhum imóvel para sincronizar.', 'info');
+                return 0;
+            }
+            let total = 0;
+            for (const im of UI.data.imoveis) {
+                let mudou = false;
+                if (!im.construtoraId && im.construtora) {
+                    const c = _findNome(lista, im.construtora);
+                    if (c) { im.construtoraId = c.id; im.construtora = c.nome; mudou = true; }
+                } else if (im.construtoraId) {
+                    const c = lista.find(x => x.id === im.construtoraId);
+                    if (!c) {
+                        const cPorNome = _findNome(lista, im.construtora);
+                        if (cPorNome) { im.construtoraId = cPorNome.id; im.construtora = cPorNome.nome; }
+                        else { im.construtoraId = ''; }
+                        mudou = true;
+                    } else if (im.construtora !== c.nome) {
+                        im.construtora = c.nome;
+                        mudou = true;
+                    }
+                }
+                if (mudou) {
+                    im.dataAtualizacao = new Date().toISOString();
+                    await DB.put('imoveis', im);
+                    total++;
+                }
+            }
+            if (total > 0) {
+                UI.data.imoveis = await Storage.getImoveis();
+                try { if (document.getElementById('imoveis-list')) UI.renderImoveis(); } catch(e) {}
+            }
+            if (!silencioso) {
+                Utils.toast(total > 0
+                    ? `${total} imóvel(is) sincronizado(s) com sucesso! ✅`
+                    : 'Todos os vínculos já estão atualizados. ✅', 'success');
+            } else if (total > 0) {
+                console.log(`[ConstrutorasModule PATCH] Sync: ${total} imóvel(is) vinculado(s).`);
+            }
+            return total;
+        }
+
+        // ── refreshStats corrigido ────────────────────────────────────────
+        async function refreshStats() {
+            // Delega para o original (ele já chama _load interno)
+            // mas garantimos que sincronizarVinculos seja chamado depois
+            try { await _orig.refreshStats(); } catch(e) {}
+        }
+
+        // Substitui as funções problemáticas no objeto público
+        ConstrutorasModule.populateSelect       = populateSelect;
+        ConstrutorasModule.initImoveiForm       = initImoveiForm;
+        ConstrutorasModule.onInputChange        = onInputChange;
+        ConstrutorasModule.ensureVinculoImovel  = ensureVinculoImovel;
+        ConstrutorasModule.sincronizarVinculos  = sincronizarVinculos;
+        ConstrutorasModule.refreshStats         = refreshStats;
+
+        console.log('[ConstrutorasModule PATCH v2] Vinculação imóveis×construtoras corrigida.');
     })();
     </script>
 
