@@ -27346,110 +27346,98 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                 importData: async function(input) {
                     const file = input.files[0];
                     if (!file) return;
-                    
+
                     try {
                         const text = await file.text();
                         const data = JSON.parse(text);
-                        
-                        if (data.clientes && Array.isArray(data.clientes)) {
-                            await DB.clear('clientes');
-                            for (const cliente of data.clientes) {
-                                if (!cliente.documentos) cliente.documentos = [];
-                                if (!cliente.taxaJuros) cliente.taxaJuros = Utils.getInterestRateByIncome(cliente.rendaMensal || 0);
-                                if (cliente.cpf === undefined) cliente.cpf = '';
-                                if (cliente.contatos === undefined) cliente.contatos = 0;
-                                await DB.put('clientes', cliente);
+
+                        // Lista de stores que realmente existem no banco atual.
+                        const existentes = (DB.db && DB.db.objectStoreNames)
+                            ? Array.from(DB.db.objectStoreNames) : [];
+
+                        // Backfills de compatibilidade para registros antigos.
+                        const _backfill = (store, rec) => {
+                            if (store === 'clientes') {
+                                if (!rec.documentos) rec.documentos = [];
+                                if (!rec.taxaJuros) rec.taxaJuros = Utils.getInterestRateByIncome(rec.rendaMensal || 0);
+                                if (rec.cpf === undefined) rec.cpf = '';
+                                if (rec.contatos === undefined) rec.contatos = 0;
+                            } else if (store === 'imoveis') {
+                                if (!rec.waitingList) rec.waitingList = [];
+                                if (rec.valorAvaliacao === undefined) rec.valorAvaliacao = 0;
+                                if (rec.tabelaPDF === undefined) rec.tabelaPDF = '';
+                                if (rec.tabelaPDFNome === undefined) rec.tabelaPDFNome = '';
+                                if (rec.modalidade === undefined) rec.modalidade = 'pronto';
+                                if (rec.proprietarioNome === undefined) rec.proprietarioNome = '';
+                                if (rec.proprietarioTelefone === undefined) rec.proprietarioTelefone = '';
+                                if (rec.proprietarioEmail === undefined) rec.proprietarioEmail = '';
+                                if (rec.documentosImovel === undefined) rec.documentosImovel = [];
+                                if (rec.documentosProprietario === undefined) rec.documentosProprietario = [];
+                                if (rec.proprietarioCpf === undefined) rec.proprietarioCpf = '';
+                                // Preserva o vínculo de construtora (id + nome)
+                                if (rec.construtora === undefined) rec.construtora = '';
+                                if (rec.construtoraId === undefined) rec.construtoraId = '';
                             }
-                        }
-                        
-                        if (data.imoveis && Array.isArray(data.imoveis)) {
-                            await DB.clear('imoveis');
-                            for (const imovel of data.imoveis) {
-                                if (!imovel.waitingList) imovel.waitingList = [];
-                                if (imovel.valorAvaliacao === undefined) imovel.valorAvaliacao = 0;
-                                if (imovel.tabelaPDF === undefined) imovel.tabelaPDF = '';
-                                if (imovel.tabelaPDFNome === undefined) imovel.tabelaPDFNome = '';
-                                if (imovel.modalidade === undefined) imovel.modalidade = 'pronto';
-                                if (imovel.proprietarioNome === undefined) imovel.proprietarioNome = '';
-                                if (imovel.proprietarioTelefone === undefined) imovel.proprietarioTelefone = '';
-                                if (imovel.proprietarioEmail === undefined) imovel.proprietarioEmail = '';
-                                if (imovel.documentosImovel === undefined) imovel.documentosImovel = [];
-                                if (imovel.documentosProprietario === undefined) imovel.documentosProprietario = [];
-                                if (imovel.proprietarioCpf === undefined) imovel.proprietarioCpf = '';
-                                await DB.put('imoveis', imovel);
+                            return rec;
+                        };
+
+                        let importados = 0;
+                        // Importa TODA chave presente no backup, de forma global.
+                        for (const store of Object.keys(data)) {
+                            // settings é um registro único (chave 'main'), não um array.
+                            if (store === 'settings') {
+                                if (data.settings) {
+                                    if (Array.isArray(data.settings)) {
+                                        for (const s of data.settings) await DB.put('settings', s);
+                                    } else {
+                                        await DB.put('settings', data.settings);
+                                    }
+                                    importados++;
+                                }
+                                continue;
                             }
-                        }
-                        
-                        if (data.visitas && Array.isArray(data.visitas)) {
-                            await DB.clear('visitas');
-                            for (const visita of data.visitas) {
-                                await DB.put('visitas', visita);
+                            // Ignora chaves que não correspondem a um store do banco.
+                            if (!existentes.includes(store)) continue;
+                            const arr = data[store];
+                            if (!Array.isArray(arr)) continue;
+                            await DB.clear(store);
+                            for (const rec of arr) {
+                                await DB.put(store, _backfill(store, rec));
                             }
-                        }
-                        
-                        if (data.links && Array.isArray(data.links)) {
-                            await DB.clear('links');
-                            for (const link of data.links) {
-                                await DB.put('links', link);
-                            }
-                        }
-                        
-                        if (data.settings) {
-                            await DB.put('settings', data.settings);
-                        }
-                        
-                        if (data.funilEtapas && Array.isArray(data.funilEtapas)) {
-                            await DB.clear('funilEtapas');
-                            for (const etapa of data.funilEtapas) {
-                                await DB.put('funilEtapas', etapa);
-                            }
+                            importados++;
                         }
 
-                        if (data.correspondentes && Array.isArray(data.correspondentes)) {
-                            await DB.clear('correspondentes');
-                            for (const corr of data.correspondentes) {
-                                await DB.put('correspondentes', corr);
-                            }
-                        }
+                        Utils.toast(importados > 0 ? 'Dados importados com sucesso!' : 'Nenhum dado reconhecido no arquivo.', importados > 0 ? 'success' : 'error');
+                        if (importados > 0) location.reload();
 
-                        if (data.gerentes && Array.isArray(data.gerentes)) {
-                            await DB.clear('gerentes');
-                            for (const g of data.gerentes) {
-                                await DB.put('gerentes', g);
-                            }
-                        }
-
-                        if (data.imobiliarias && Array.isArray(data.imobiliarias)) {
-                            await DB.clear('imobiliarias');
-                            for (const im of data.imobiliarias) {
-                                await DB.put('imobiliarias', im);
-                            }
-                        }
-                        
-                        Utils.toast('Dados importados com sucesso!');
-                        location.reload();
-                        
                     } catch (error) {
                         console.error('Erro ao importar:', error);
                         Utils.toast('Erro ao importar dados', 'error');
                     }
-                    
+
                     input.value = '';
                 },
                 
                 exportData: async function() {
-                    const data = {
-                        clientes: await DB.getAll('clientes'),
-                        imoveis: await DB.getAll('imoveis'),
-                        visitas: await DB.getAll('visitas'),
-                        links: await DB.getAll('links'),
-                        settings: await DB.get('settings', 'main'),
-                        funilEtapas: await DB.getAll('funilEtapas'),
-                        correspondentes: await DB.getAll('correspondentes'),
-                        gerentes: await DB.getAll('gerentes'),
-                        imobiliarias: await DB.getAll('imobiliarias')
-                    };
-                    
+                    // Backup GLOBAL: percorre todos os object stores existentes no
+                    // banco, garantindo que nada fique de fora (construtoras, captações,
+                    // notas, leitura, usuários, etc.) — inclusive stores futuros.
+                    const data = {};
+                    const stores = (DB.db && DB.db.objectStoreNames)
+                        ? Array.from(DB.db.objectStoreNames) : [];
+                    for (const store of stores) {
+                        try {
+                            if (store === 'settings') {
+                                data.settings = await DB.get('settings', 'main');
+                            } else {
+                                data[store] = await DB.getAll(store);
+                            }
+                        } catch (e) {
+                            console.warn('Falha ao exportar store', store, e);
+                        }
+                    }
+                    data._meta = { exportadoEm: new Date().toISOString(), stores };
+
                     const json = JSON.stringify(data, null, 2);
                     const blob = new Blob([json], { type: 'application/json' });
                     const url = URL.createObjectURL(blob);
@@ -27458,8 +27446,8 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                     a.download = `imobipro_backup_${new Date().toISOString().split('T')[0]}.json`;
                     a.click();
                     URL.revokeObjectURL(url);
-                    
-                    Utils.toast('Backup exportado com sucesso!');
+
+                    Utils.toast('Backup completo exportado com sucesso!');
                 },
                 
                 importImoveisTrigger: function() {
@@ -27533,16 +27521,18 @@ Se quiser, é só responder ✅ SIM ou ❌ NÃO. Sem compromisso nenhum!`;
                 
                 clearData: async function() {
                     if(!confirm('TEM CERTEZA QUE DESEJA RESETAR TODOS OS DADOS? Esta ação é irreversível!')) return;
-                    
-                    await DB.clear('clientes');
-                    await DB.clear('imoveis');
-                    await DB.clear('visitas');
-                    await DB.clear('links');
-                    await DB.delete('settings', 'main');
-                    await DB.clear('funilEtapas');
-                    
+
+                    // Reset GLOBAL: limpa todos os object stores existentes.
+                    // Preserva 'usuarios' para não desconectar/perder a licença do app.
+                    const stores = (DB.db && DB.db.objectStoreNames)
+                        ? Array.from(DB.db.objectStoreNames) : [];
+                    for (const store of stores) {
+                        if (store === 'usuarios') continue;
+                        try { await DB.clear(store); } catch (e) { console.warn('Falha ao limpar store', store, e); }
+                    }
+
                     localStorage.clear();
-                    
+
                     Utils.toast('Todos os dados foram resetados!');
                     location.reload();
                 }
@@ -47940,9 +47930,44 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         }
         function _wppMsg(d) {
             const num = ((d.telefones&&d.telefones[0]) || d.telefone||'').replace(/\D/g,'');
-            const end = d.endereco || 'imóvel que vi na rua';
-            const prop = d.proprietario ? `, ${d.proprietario}` : '';
-            const msg = encodeURIComponent(`Olá${prop}! Vi a placa do seu imóvel (${end}) e gostaria de conversar sobre a possibilidade de comercializá-lo pela nossa imobiliária. Podemos conversar?`);
+
+            // Dados do corretor (para credibilidade e segurança)
+            const s = (window.UI && UI.data && UI.data.settings) || {};
+            const nome   = (s.nome || '').trim();
+            const creci  = (s.creci || '').trim();
+            const imob   = (s.imobiliaria || '').trim();
+
+            const saudacao = d.proprietario ? `Olá, ${d.proprietario}! Tudo bem? 😊` : 'Olá! Tudo bem? 😊';
+            const assina   = nome
+                ? `Meu nome é ${nome}${creci ? ` (CRECI ${creci})` : ''}, corretor(a)${imob ? ` da ${imob}` : ''}.`
+                : `Sou corretor(a)${imob ? ` da ${imob}` : ' de imóveis'}${creci ? ` (CRECI ${creci})` : ''}.`;
+            const refLocal = d.endereco ? ` em ${d.endereco}` : '';
+
+            let corpo;
+            if (d.tipo === 'aluguel') {
+                corpo =
+`Vi a placa do seu imóvel${refLocal} disponível para locação e gostaria de ajudá-lo(a) a alugá-lo com tranquilidade e segurança.
+
+Cuidamos de todo o processo para proteger o seu patrimônio: análise de crédito e cadastro dos interessados, garantias locatícias (seguro-fiança, fiador ou caução), elaboração do contrato, vistoria detalhada e acompanhamento durante toda a locação — reduzindo o risco de inadimplência e dor de cabeça para você.
+
+E o melhor: você não tem nenhum custo antecipado. Posso te explicar como funciona, sem compromisso? Qual o melhor horário para conversarmos?`;
+            } else if (d.tipo === 'ambos') {
+                corpo =
+`Vi a placa do seu imóvel${refLocal} e gostaria de ajudá-lo(a) a vendê-lo ou alugá-lo — o que for mais vantajoso para você.
+
+Trabalhamos com total segurança e transparência: avaliação justa de mercado, divulgação profissional nos principais portais e redes sociais, filtragem e análise dos interessados, garantias e todo o suporte com a documentação e a parte jurídica até a conclusão do negócio.
+
+Você não tem custo antecipado — só há comissão quando o negócio é concretizado. Posso te apresentar as opções sem compromisso? Quando podemos conversar?`;
+            } else {
+                corpo =
+`Vi a placa do seu imóvel${refLocal} e gostaria de ajudá-lo(a) a vendê-lo com a maior segurança e o melhor valor possível.
+
+Trabalhamos com transparência em cada etapa: avaliação justa de mercado, divulgação profissional nos principais portais e redes sociais, filtragem dos interessados, visitas acompanhadas e todo o suporte com a documentação e a parte jurídica até a escritura.
+
+E você não tem nenhum custo antecipado — a comissão só é devida quando a venda é concretizada. Posso te apresentar uma proposta de divulgação, sem compromisso? Quando seria um bom horário para conversarmos?`;
+            }
+
+            const msg = encodeURIComponent(`${saudacao}\n${assina}\n\n${corpo}`);
             window.open('https://wa.me/55'+num+'?text='+msg, '_blank');
         }
         function whatsapp() { const d=_dados.find(x=>x.id===_idAtual); if(d&&d.telefone) _wppMsg(d); else Utils.toast('Telefone não informado','error'); }
