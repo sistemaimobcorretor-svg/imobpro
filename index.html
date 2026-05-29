@@ -11933,7 +11933,23 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <label class="form-label">Site / Website</label>
                 <input type="url" id="const-site" class="form-control" placeholder="https://construtora.com.br">
             </div>
-            <div style="display:flex;gap:8px;margin-top:8px;">
+            <!-- ── Vincular Imóveis ──────────────────────────────── -->
+            <div id="const-form-imoveis-section" style="margin-top:20px;border-top:1px solid var(--border);padding-top:18px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                    <label class="form-label" style="margin:0;font-size:0.82rem;font-weight:800;color:#7C3AED;display:flex;align-items:center;gap:6px;">
+                        <i class="fas fa-home" style="font-size:0.75rem;"></i> Imóveis Vinculados
+                    </label>
+                    <span id="const-form-imoveis-count" style="font-size:0.68rem;font-weight:700;color:var(--text-muted);background:var(--bg-overlay);border:1px solid var(--border);border-radius:20px;padding:2px 8px;">0 imóveis</span>
+                </div>
+                <div style="position:relative;margin-bottom:8px;">
+                    <i class="fas fa-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.75rem;pointer-events:none;"></i>
+                    <input type="text" id="const-form-imoveis-busca" class="form-control" placeholder="Buscar imóvel por título, endereço ou tipo..." style="padding-left:32px;font-size:0.82rem;" oninput="ConstrutorasModule.filtrarImoveisForm(this.value)">
+                </div>
+                <div id="const-form-imoveis-lista" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:12px;background:var(--bg-base);"></div>
+                <div id="const-form-imoveis-vinculados" style="margin-top:10px;display:flex;flex-direction:column;gap:6px;"></div>
+            </div>
+            <!-- ────────────────────────────────────────────────── -->
+            <div style="display:flex;gap:8px;margin-top:16px;">
                 <button type="button" class="btn-block" style="background:#7C3AED;" onclick="ConstrutorasModule.salvar()">
                     <i class="fas fa-save"></i> Salvar
                 </button>
@@ -49226,6 +49242,234 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
         ConstrutorasModule.refreshStats         = refreshStats;
 
         console.log('[ConstrutorasModule PATCH v2] Vinculação imóveis×construtoras corrigida.');
+    })();
+
+    // ═══════════════ PATCH v3 — Vincular Imóveis no Form Construtora ═══════════════
+    (function patchConstrutorasFormImoveis() {
+        // Aguarda ConstrutorasModule estar disponível
+        if (typeof ConstrutorasModule === 'undefined') return;
+
+        // Estado interno do painel de vinculação
+        let _imoveisParaVincular = []; // ids de imóveis marcados para vincular
+        let _imoveisParaDesvincular = []; // ids de imóveis marcados para desvincular
+        let _buscarTermo = '';
+        let _editIdAtual = null;
+
+        // ─── Normaliza texto para busca ──────────────────────────────────────
+        function _norm(v) {
+            return String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+        }
+
+        // ─── Pega lista de imóveis do UI ─────────────────────────────────────
+        function _getTodosImoveis() {
+            if (!window.UI || !UI.data || !Array.isArray(UI.data.imoveis)) return [];
+            return UI.data.imoveis;
+        }
+
+        // ─── Verifica se imóvel está vinculado à construtora em edição ───────
+        function _estaVinculado(imovel) {
+            if (!_editIdAtual) return false;
+            if (_imoveisParaDesvincular.includes(imovel.id)) return false;
+            if (_imoveisParaVincular.includes(imovel.id)) return true;
+            return imovel.construtoraId === _editIdAtual;
+        }
+
+        // ─── Renderiza a lista de imóveis disponíveis para vincular ──────────
+        function _renderImoveisForm() {
+            const listaEl = document.getElementById('const-form-imoveis-lista');
+            const vinculadosEl = document.getElementById('const-form-imoveis-vinculados');
+            const countEl = document.getElementById('const-form-imoveis-count');
+            if (!listaEl || !vinculadosEl) return;
+
+            const todos = _getTodosImoveis();
+            const termo = _norm(_buscarTermo);
+
+            // Imóveis vinculados (em cima) — os que já pertencem OU foram selecionados
+            const vinculados = todos.filter(i => _estaVinculado(i));
+
+            // Imóveis disponíveis (para vincular) — sem vínculo com ESTA construtora,
+            // ou vinculados a outra, exibidos na busca
+            const disponiveis = todos.filter(i => {
+                if (_estaVinculado(i)) return false;
+                if (!termo) return false; // só mostra na busca ativa
+                const txt = _norm((i.titulo || '') + ' ' + (i.endereco || '') + ' ' + (i.tipo || '') + ' ' + (i.construtora || ''));
+                return txt.includes(termo);
+            });
+
+            // Atualiza contador
+            if (countEl) countEl.textContent = `${vinculados.length} imóvel(is)`;
+
+            // Renderiza vinculados
+            if (vinculados.length === 0) {
+                vinculadosEl.innerHTML = `<div style="font-size:0.74rem;color:var(--text-muted);text-align:center;padding:6px 0;">Nenhum imóvel vinculado ainda.</div>`;
+            } else {
+                vinculadosEl.innerHTML = vinculados.map(i => _cardVinculado(i)).join('');
+            }
+
+            // Renderiza lista de busca
+            if (!termo) {
+                listaEl.innerHTML = `<div style="text-align:center;padding:18px 10px;color:var(--text-muted);font-size:0.78rem;"><i class="fas fa-search" style="margin-right:6px;opacity:0.5;"></i>Digite para buscar imóveis disponíveis</div>`;
+            } else if (disponiveis.length === 0) {
+                listaEl.innerHTML = `<div style="text-align:center;padding:18px 10px;color:var(--text-muted);font-size:0.78rem;">Nenhum imóvel encontrado para "<strong>${_buscarTermo}</strong>"</div>`;
+            } else {
+                listaEl.innerHTML = disponiveis.map(i => _cardDisponivel(i)).join('');
+            }
+        }
+
+        // ─── Card de imóvel JÁ vinculado ─────────────────────────────────────
+        function _cardVinculado(i) {
+            const foto = (i.imagens && i.imagens[0]) ? i.imagens[0] : null;
+            const fotoHtml = foto
+                ? `<img src="${foto}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0;">`
+                : `<div style="width:36px;height:36px;border-radius:8px;background:var(--primary-ultra);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;">🏠</div>`;
+            const eraDoOutro = i.construtoraId && i.construtoraId !== _editIdAtual && !_imoveisParaVincular.includes(i.id);
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.18);border-radius:10px;margin-bottom:4px;">
+                ${fotoHtml}
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:0.78rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dark);">${i.titulo || i.endereco || 'Imóvel'}</div>
+                    <div style="font-size:0.65rem;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.endereco || '—'}${eraDoOutro ? ' <span style="color:var(--warning);font-weight:700;">(era de outra construtora)</span>' : ''}</div>
+                </div>
+                <button onclick="ConstrutorasModule.desvincularImovelForm('${i.id}')" title="Desvincular" style="background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);color:#E74C3C;border-radius:7px;padding:4px 8px;font-size:0.68rem;font-weight:700;cursor:pointer;flex-shrink:0;"><i class="fas fa-unlink"></i></button>
+            </div>`;
+        }
+
+        // ─── Card de imóvel DISPONÍVEL (resultado de busca) ───────────────────
+        function _cardDisponivel(i) {
+            const foto = (i.imagens && i.imagens[0]) ? i.imagens[0] : null;
+            const fotoHtml = foto
+                ? `<img src="${foto}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0;">`
+                : `<div style="width:36px;height:36px;border-radius:8px;background:var(--bg-overlay);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;">🏠</div>`;
+            const jaTemOutra = i.construtoraId && i.construtoraId !== _editIdAtual;
+            const outraLabel = jaTemOutra ? `<span style="font-size:0.6rem;color:var(--warning);font-weight:700;background:rgba(230,126,34,0.1);border-radius:6px;padding:1px 6px;">${i.construtora || 'outra construtora'}</span>` : '';
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;" onmouseenter="this.style.background='var(--bg-overlay)'" onmouseleave="this.style.background=''">
+                ${fotoHtml}
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:0.78rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dark);">${i.titulo || i.endereco || 'Imóvel'}</div>
+                    <div style="font-size:0.65rem;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:4px;">${i.endereco || '—'} ${outraLabel}</div>
+                </div>
+                <button onclick="ConstrutorasModule.vincularImovelForm('${i.id}')" title="Vincular" style="background:rgba(124,58,237,0.09);border:1px solid rgba(124,58,237,0.25);color:#7C3AED;border-radius:7px;padding:4px 9px;font-size:0.68rem;font-weight:800;cursor:pointer;flex-shrink:0;white-space:nowrap;"><i class="fas fa-link"></i> Vincular</button>
+            </div>`;
+        }
+
+        // ─── Expõe função para filtrar na busca ───────────────────────────────
+        ConstrutorasModule.filtrarImoveisForm = function(q) {
+            _buscarTermo = q || '';
+            _renderImoveisForm();
+        };
+
+        // ─── Vincular imóvel selecionado na busca ─────────────────────────────
+        ConstrutorasModule.vincularImovelForm = function(imovelId) {
+            if (!_imoveisParaVincular.includes(imovelId)) _imoveisParaVincular.push(imovelId);
+            _imoveisParaDesvincular = _imoveisParaDesvincular.filter(id => id !== imovelId);
+            // Limpa busca para dar feedback visual
+            const busca = document.getElementById('const-form-imoveis-busca');
+            if (busca) busca.value = '';
+            _buscarTermo = '';
+            _renderImoveisForm();
+        };
+
+        // ─── Desvincular imóvel da lista de vinculados ────────────────────────
+        ConstrutorasModule.desvincularImovelForm = function(imovelId) {
+            _imoveisParaVincular = _imoveisParaVincular.filter(id => id !== imovelId);
+            if (!_imoveisParaDesvincular.includes(imovelId)) _imoveisParaDesvincular.push(imovelId);
+            _renderImoveisForm();
+        };
+
+        // ─── Hook no novoFormulario para inicializar painel ──────────────────
+        const _origNovo = ConstrutorasModule.novoFormulario.bind(ConstrutorasModule);
+        ConstrutorasModule.novoFormulario = function() {
+            _editIdAtual = null;
+            _imoveisParaVincular = [];
+            _imoveisParaDesvincular = [];
+            _buscarTermo = '';
+            _origNovo();
+            setTimeout(_renderImoveisForm, 350);
+        };
+
+        // ─── Hook no editar para pré-carregar imóveis vinculados ─────────────
+        const _origEditar = ConstrutorasModule.editar.bind(ConstrutorasModule);
+        ConstrutorasModule.editar = function(id) {
+            _editIdAtual = id;
+            _imoveisParaVincular = [];
+            _imoveisParaDesvincular = [];
+            _buscarTermo = '';
+            const busca = document.getElementById('const-form-imoveis-busca');
+            if (busca) busca.value = '';
+            _origEditar(id);
+            setTimeout(_renderImoveisForm, 400);
+        };
+
+        // ─── Hook no salvar para aplicar vínculos/desvinculações ─────────────
+        const _origSalvar = ConstrutorasModule.salvar.bind(ConstrutorasModule);
+        ConstrutorasModule.salvar = async function() {
+            // Captura o id antes de chamar o salvar original
+            // (o original pode criar novo id via _uid(), então obtemos pelo nome)
+            const nomeEl = document.getElementById('const-nome');
+            const idEl = document.getElementById('const-id');
+            const nomeDigitado = nomeEl ? nomeEl.value.trim() : '';
+            const idEditando = idEl ? idEl.value.trim() : '';
+
+            // Chama o salvar original
+            await _origSalvar();
+
+            // Depois que o original rodou, acha o id da construtora salva
+            // (se era novo, busca pelo nome; se era edição, usa o id)
+            if (typeof window.UI === 'undefined' || !UI.data) return;
+
+            let construtoraId = idEditando;
+            if (!construtoraId && nomeDigitado) {
+                // Nova construtora: acha pelo nome na lista de construtoras
+                const todas = await window.DB ? DB.getAll('construtoras') : [];
+                const norm = v => String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+                const found = todas.find(c => norm(c.nome) === norm(nomeDigitado));
+                if (found) construtoraId = found.id;
+            }
+
+            if (!construtoraId) { _imoveisParaVincular = []; _imoveisParaDesvincular = []; return; }
+
+            const todos = _getTodosImoveis();
+            let mudou = false;
+
+            // Aplicar novas vinculações
+            for (const imovelId of _imoveisParaVincular) {
+                const im = todos.find(x => x.id === imovelId);
+                if (!im) continue;
+                // Busca nome atualizado da construtora
+                let nomeConst = nomeDigitado;
+                try {
+                    const todas2 = await DB.getAll('construtoras');
+                    const c = todas2.find(x => x.id === construtoraId);
+                    if (c) nomeConst = c.nome;
+                } catch(e) {}
+                im.construtoraId = construtoraId;
+                im.construtora = nomeConst;
+                im.dataAtualizacao = new Date().toISOString();
+                try { await DB.put('imoveis', im); mudou = true; } catch(e) {}
+            }
+
+            // Aplicar desvinculações
+            for (const imovelId of _imoveisParaDesvincular) {
+                const im = todos.find(x => x.id === imovelId);
+                if (!im || im.construtoraId !== construtoraId) continue;
+                im.construtoraId = '';
+                // Mantém nome como texto livre para não perder info
+                im.dataAtualizacao = new Date().toISOString();
+                try { await DB.put('imoveis', im); mudou = true; } catch(e) {}
+            }
+
+            if (mudou) {
+                try { UI.data.imoveis = await Storage.getImoveis(); } catch(e) {}
+                try { if (document.getElementById('imoveis-list')) UI.renderImoveis(); } catch(e) {}
+                const total = _imoveisParaVincular.length + _imoveisParaDesvincular.length;
+                if (total > 0) Utils.toast(`${_imoveisParaVincular.length} imóvel(is) vinculado(s)${_imoveisParaDesvincular.length > 0 ? ', ' + _imoveisParaDesvincular.length + ' desvinculado(s)' : ''}. ✅`, 'success');
+            }
+
+            _imoveisParaVincular = [];
+            _imoveisParaDesvincular = [];
+            _editIdAtual = null;
+        };
+
+        console.log('[ConstrutorasModule PATCH v3] Vinculação de imóveis no formulário de construtora ativada.');
     })();
     </script>
 
