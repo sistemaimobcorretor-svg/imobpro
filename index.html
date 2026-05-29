@@ -46731,6 +46731,7 @@ ${_sec('❓','Perguntas Frequentes','#155A8A',`
                     <div style="display:flex; gap:6px;">
                         ${c.whatsapp ? `<button onclick="event.stopPropagation(); window.open('https://wa.me/55${c.whatsapp.replace(/\D/g,'')}')" style="width:32px; height:32px; border-radius:8px; border:none; background:#25D36615; color:#25D366; cursor:pointer;"><i class="fab fa-whatsapp"></i></button>` : ''}
                         ${c.site ? `<button onclick="event.stopPropagation(); window.open('${_siteUrl(c.site)}')" style="width:32px; height:32px; border-radius:8px; border:none; background:var(--primary-ultra); color:var(--primary); cursor:pointer;"><i class="fas fa-globe"></i></button>` : ''}
+                        <button onclick="event.stopPropagation(); ConstrutorasModule.excluir('${c.id}')" title="Excluir construtora" style="width:32px; height:32px; border-radius:8px; border:none; background:rgba(231,76,60,0.10); color:var(--danger); cursor:pointer;"><i class="fas fa-trash"></i></button>
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button onclick="event.stopPropagation(); ConstrutorasModule.editar('${c.id}')" style="padding:6px 12px; border-radius:8px; border:1px solid var(--border); background:none; color:var(--text-secondary); font-size:0.75rem; font-weight:700; cursor:pointer;">Editar</button>
