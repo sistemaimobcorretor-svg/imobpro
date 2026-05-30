@@ -10924,11 +10924,20 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <i class="fas fa-camera" style="color:#E74C3C"></i> Captação de Rua
                     <span style="font-size:.6rem;background:rgba(192,57,43,0.12);color:#C0392B;padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
                 </button>
+                <button class="nav-panel-item" onclick="AutorizacoesPainel.open();UI.closeNavDrawer();return false;">
+                    <i class="fas fa-file-contract" style="color:#C4724A"></i> Autorizações
+                </button>
                 <button class="nav-panel-item" data-target="coach-view" onclick="UI.switchTab(this);Coach.init();UI.closeNavDrawer();return false;">
                     <i class="fas fa-trophy"></i> Coach
                 </button>
                 <button class="nav-panel-item" data-target="simulador-view" onclick="UI.switchTab(this);Simulador.init();UI.closeNavDrawer();return false;">
                     <i class="fas fa-calculator"></i> Simulador
+                </button>
+                <button class="nav-panel-item" onclick="UI.closeNavDrawer();setTimeout(()=>App.gerentes.abrirCadastro(),150);return false;">
+                    <i class="fas fa-user-tie" style="width:18px;text-align:center;"></i> Gerentes
+                </button>
+                <button class="nav-panel-item" onclick="UI.closeNavDrawer();setTimeout(()=>App.imobiliarias.abrirCadastro(),150);return false;">
+                    <i class="fas fa-building" style="width:18px;text-align:center;"></i> Imobiliárias
                 </button>
                 <button class="nav-panel-item" onclick="UI.closeNavDrawer();setTimeout(()=>App.correspondentes.abrirCadastro(),150);return false;">
                     <i class="fas fa-university"></i> Correspondentes
@@ -10955,6 +10964,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </button>
                 <button class="nav-panel-item" data-target="leitura-view" onclick="UI.switchTab(this);Leitura.init();UI.closeNavDrawer();return false;">
                     <i class="fas fa-book-open"></i> Leitura
+                </button>
+                <button class="nav-panel-item" onclick="GuiaFinanciamento.open();UI.closeNavDrawer();return false;">
+                    <i class="fas fa-book"></i> Guia Financiamento
+                </button>
+                <button class="nav-panel-item" onclick="TermoCiencia.open();UI.closeNavDrawer();return false;">
+                    <i class="fas fa-file-signature"></i> Termo de Ciência
                 </button>
                 <button class="nav-panel-item" data-target="financeiro-view" onclick="UI.switchTab(this);Financeiro.init();UI.closeNavDrawer();return false;">
                     <i class="fas fa-wallet"></i> Financeiro
@@ -11024,6 +11039,13 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     <i class="fas fa-hard-hat" style="color:#7C3AED"></i> Construtoras
                     <span style="font-size:.6rem;background:rgba(124,58,237,0.12);color:#7C3AED;padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
                 </button>
+                <button class="nav-panel-item" onclick="CaptacaoModule.open();return false;">
+                    <i class="fas fa-camera" style="color:#E74C3C"></i> Captação de Rua
+                    <span style="font-size:.6rem;background:rgba(192,57,43,0.12);color:#C0392B;padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
+                </button>
+                <button class="nav-panel-item" onclick="AutorizacoesPainel.open();return false;">
+                    <i class="fas fa-file-contract" style="color:#C4724A"></i> Autorizações
+                </button>
             </div>
 
             <div class="nav-panel-divider"></div>
@@ -11038,6 +11060,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </button>
                 <button class="nav-panel-item" data-target="leitura-view" onclick="UI.switchTab(this);Leitura.init();return false;">
                     <i class="fas fa-book-open"></i> Leitura
+                </button>
+                <button class="nav-panel-item" onclick="GuiaFinanciamento.open();return false;">
+                    <i class="fas fa-book"></i> Guia Financiamento
+                </button>
+                <button class="nav-panel-item" onclick="TermoCiencia.open();return false;">
+                    <i class="fas fa-file-signature"></i> Termo de Ciência
                 </button>
                 <button class="nav-panel-item" data-target="financeiro-view" onclick="UI.switchTab(this);Financeiro.init();return false;">
                     <i class="fas fa-wallet"></i> Financeiro
@@ -16711,10 +16739,8 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     const today = new Date();
                     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
                     
-                    const rptStart = document.getElementById('report-date-start');
-                    const rptEnd   = document.getElementById('report-date-end');
-                    if (rptStart) rptStart.value = firstDay.toISOString().split('T')[0];
-                    if (rptEnd)   rptEnd.value   = today.toISOString().split('T')[0];
+                    document.getElementById('report-date-start').value = firstDay.toISOString().split('T')[0];
+                    document.getElementById('report-date-end').value = today.toISOString().split('T')[0];
                     
                     UI.applyBackground();
                     
@@ -19823,15 +19849,11 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             },
             
             generateSalesReport: (start, end) => {
-                // Encontra etapas de venda — apenas etapas cujo id é 'venda' ou
-                // cujo nome é EXATAMENTE "Venda Concluída" / "Venda" (evita falsos positivos)
+                // Encontra etapas de venda — suporta etapas customizadas
                 const etapasVenda = new Set(['venda']);
                 if (UI.data.funilEtapas) {
                     UI.data.funilEtapas.forEach(e => {
-                        if (e.id === 'venda') return; // já incluído
-                        const n = (e.nome||'').toLowerCase().trim();
-                        // Só inclui se o nome for especificamente de conclusão de venda
-                        if (n === 'venda concluída' || n === 'venda concluida' || n === 'venda' || n === 'fechado' || n === 'concluído' || n === 'concluido') {
+                        if ((e.nome||'').toLowerCase().includes('venda') || (e.nome||'').toLowerCase().includes('fechad') || (e.nome||'').toLowerCase().includes('conclu')) {
                             etapasVenda.add(e.id);
                         }
                     });
@@ -19994,7 +20016,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 
                 const clientesVendaSemImovel = UI.data.clientes.filter(c => 
                     c.etapaFunil === 'venda' && 
-                    (!c.imovelInteresseId || !UI.data.imoveis.some(i => i.id === c.imovelInteresseId))
+                    (!c.imovelInteresseId || !vendas.some(v => v.clienteId === c.id))
                 );
                 
                 if (clientesVendaSemImovel.length > 0) {
@@ -20055,25 +20077,19 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             },
             
             generateSalesFunnelReport: (start, end) => {
-                // Suporta etapas de venda customizadas — apenas nomes exatos para evitar falsos positivos
+                // Suporta etapas de venda customizadas
                 const etapasVendaIds = new Set(['venda']);
                 if (UI.data.funilEtapas) {
                     UI.data.funilEtapas.forEach(e => {
-                        if (e.id === 'venda') return; // já incluído
-                        const n = (e.nome||'').toLowerCase().trim();
-                        if (n === 'venda concluída' || n === 'venda concluida' || n === 'venda' || n === 'fechado' || n === 'concluído' || n === 'concluido') {
-                            etapasVendaIds.add(e.id);
-                        }
+                        const n = (e.nome||'').toLowerCase();
+                        if (n.includes('venda') || n.includes('fechad') || n.includes('conclu')) etapasVendaIds.add(e.id);
                     });
                 }
                 const clientesVendaConcluida = UI.data.clientes.filter(cliente => 
                     etapasVendaIds.has(cliente.etapaFunil)
                 );
                 
-                // Busca imóveis vendidos/alugados no período — mas para verificar vínculo
-                // usa todos os imóveis do cliente (sem restringir por dataVenda), evitando
-                // falsos "sem imóvel" quando o imóvel não tem dataVenda preenchida.
-                const imoveisVendidosPeriodo = UI.data.imoveis.filter(imovel => {
+                const imoveisVendidos = UI.data.imoveis.filter(imovel => {
                     if (!imovel.dataVenda) return false;
                     const dataVenda = new Date(imovel.dataVenda);
                     return dataVenda >= start && dataVenda <= end && (imovel.status === 'vendido' || imovel.status === 'alugado');
@@ -20083,12 +20099,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 
                 clientesVendaConcluida.forEach(cliente => {
                     if (cliente.imovelInteresseId) {
-                        // Primeiro tenta encontrar o imóvel dentro do período
-                        let imovelVendido = imoveisVendidosPeriodo.find(i => i.id === cliente.imovelInteresseId);
-                        // Se não encontrou no período, busca em todos os imóveis (imóvel existe mas sem dataVenda ou fora do período)
-                        if (!imovelVendido) {
-                            imovelVendido = UI.data.imoveis.find(i => i.id === cliente.imovelInteresseId);
-                        }
+                        const imovelVendido = imoveisVendidos.find(i => i.id === cliente.imovelInteresseId);
                         if (imovelVendido) {
                             vendasDetalhadas.push({
                                 clienteId: cliente.id,
@@ -20098,7 +20109,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                                 imovelTitulo: imovelVendido.titulo,
                                 imovelTipo: imovelVendido.tipo,
                                 valor: imovelVendido.precoVenda || imovelVendido.precoAluguel || 0,
-                                dataVenda: imovelVendido.dataVenda || cliente.dataEntradaFunil,
+                                dataVenda: imovelVendido.dataVenda,
                                 status: imovelVendido.status,
                                 transacao: imovelVendido.transacao
                             });
@@ -20153,8 +20164,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     `;
                 }
                 
-                // Um cliente só é "sem imóvel" se não tiver imovelInteresseId OU se o id não existir em nenhum imóvel cadastrado
-                const clientesSemImovel = clientesVendaConcluida.filter(c => !c.imovelInteresseId || !UI.data.imoveis.some(i => i.id === c.imovelInteresseId));
+                const clientesSemImovel = clientesVendaConcluida.filter(c => !c.imovelInteresseId || !imoveisVendidos.some(i => i.id === c.imovelInteresseId));
                 
                 if (clientesSemImovel.length > 0) {
                     html += `
@@ -20220,7 +20230,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 }).length;
                 
                 const _pvIdsP = new Set(['venda']);
-                if (UI.data.funilEtapas) UI.data.funilEtapas.forEach(e => { if (e.id === 'venda') return; const n=(e.nome||'').toLowerCase().trim(); if(n==='venda concluída'||n==='venda concluida'||n==='venda'||n==='fechado'||n==='concluído'||n==='concluido') _pvIdsP.add(e.id); });
+                if (UI.data.funilEtapas) UI.data.funilEtapas.forEach(e => { const n=(e.nome||'').toLowerCase(); if(n.includes('venda')||n.includes('fechad')||n.includes('conclu')) _pvIdsP.add(e.id); });
                 const clientesVendaConcluidaPeriodo = UI.data.clientes.filter(cliente => {
                     if (!_pvIdsP.has(cliente.etapaFunil) || !cliente.dataEntradaFunil) return false;
                     const dataVenda = new Date(cliente.dataEntradaFunil);
@@ -21596,12 +21606,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
 
             toggleReportInputs: (type) => {
                 const endInput = document.getElementById('report-date-end');
-                const startInput = document.getElementById('report-date-start');
-                if (!endInput || !startInput) return;
                 if(type === 'plantao') {
                     endInput.style.display = 'none';
-                    if(!startInput.value) {
-                        startInput.value = Utils.getToday();
+                    if(!document.getElementById('report-date-start').value) {
+                        document.getElementById('report-date-start').value = Utils.getToday();
                     }
                 } else {
                     endInput.style.display = 'block';
