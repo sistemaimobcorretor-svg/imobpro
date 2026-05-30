@@ -48013,16 +48013,39 @@ E você não tem nenhum custo antecipado — a comissão só é devida quando a 
             const imoveis  = UI.data.imoveis || [];
             const etapas   = UI.data.funilEtapas || [];
 
+            // Considera SOMENTE vendas concluídas. A etapa canônica de venda
+            // concluída tem id 'venda' (nome "Venda Concluída"). Etapas
+            // personalizadas como "Venda Perdida"/"Cancelada" NÃO entram no
+            // cálculo de comissões, mesmo contendo a palavra "venda".
+            const _NEGATIVAS = ['perdid','cancel','desist','inativ','adiad','encerr','recus','reprov','negad'];
+            const _ehVendaConcluida = (etapaObj, etapaId) => {
+                const id   = (etapaId || '').toLowerCase();
+                const nome = ((etapaObj && etapaObj.nome) || '').toLowerCase();
+                // Exclui qualquer etapa marcada como perdida/cancelada/etc.
+                if (_NEGATIVAS.some(p => id.includes(p) || nome.includes(p))) return false;
+                // Aceita a etapa canônica 'venda' ou nomes que indiquem conclusão.
+                return id === 'venda' || nome.includes('venda') || nome.includes('conclu');
+            };
+
             const vendas = clientes.filter(c => {
                 const e = etapas.find(et => et.id === c.etapaFunil);
-                if (!(e && (e.id==='venda'||(e.nome||'').toLowerCase().includes('venda')))) return false;
+                if (!_ehVendaConcluida(e, c.etapaFunil)) return false;
                 const d = new Date(c.dataAtualizacao || c.dataCriacao || '');
                 return d >= start && d <= end;
             });
 
             const rows = vendas.map(c => {
                 const im = c.imovelInteresseId ? imoveis.find(i=>i.id===c.imovelInteresseId) : null;
-                const precoRaw = im ? parseFloat((im.preco||im.valor||'0').toString().replace(/[^0-9.,]/g,'').replace(',','.')) : 0;
+                // Os imóveis guardam o preço como número em precoVenda/precoAluguel
+                // (campos reais do sistema). As versões antigas liam im.preco/im.valor,
+                // que não existem — por isso o valor e a comissão saíam zerados.
+                const _num = (v) => {
+                    if (v === undefined || v === null || v === '') return 0;
+                    if (typeof v === 'number') return v;
+                    const n = parseFloat(String(v).replace(/[^0-9.,-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'));
+                    return isNaN(n) ? 0 : n;
+                };
+                const precoRaw = im ? (_num(im.precoVenda) || _num(im.precoAluguel) || _num(im.valor) || _num(im.preco)) : 0;
                 const pct = parseFloat(c.comissaoPct || (im && im.comissao) || 3) || 3;
                 const comissao = precoRaw * pct / 100;
                 return { nome: c.nome, telefone: c.telefone||'—', imovel: im ? (im.titulo||im.endereco||`Ref ${im.ref}`) : 'Não vinculado', valor: precoRaw, pct, comissao };
