@@ -5774,6 +5774,7 @@
         .dash-nav-card.c-mercado  { background: linear-gradient(135deg, #155A8A 0%, #1D6FA4 100%); box-shadow: 0 4px 16px rgba(29,111,164,0.30); }
         .dash-nav-card.c-leitura  { background: linear-gradient(135deg, #92400E 0%, #D97706 100%); box-shadow: 0 4px 16px rgba(217,119,6,0.28); }
         .dash-nav-card.c-notas    { background: linear-gradient(135deg, #831843 0%, #DB2777 100%); box-shadow: 0 4px 16px rgba(219,39,119,0.28); }
+        .dash-nav-card.c-alugueis { background: linear-gradient(135deg, #0E7490 0%, #0891B2 100%); box-shadow: 0 4px 16px rgba(8,145,178,0.28); }
         .dash-nav-card.c-guia     { background: linear-gradient(135deg, #0C4A6E 0%, #1D6FA4 55%, #2E8BC0 100%); box-shadow: 0 4px 16px rgba(29,111,164,0.35); }
         .dash-nav-card.c-termo    { background: linear-gradient(135deg, #1E8449 0%, #27AE60 100%); box-shadow: 0 4px 16px rgba(39,174,96,0.32); }
         .dash-nav-card.c-autorizacoes { background: linear-gradient(135deg, #7B3F00 0%, #C4724A 60%, #D98A62 100%); box-shadow: 0 4px 16px rgba(196,114,74,0.35); }
@@ -8094,6 +8095,15 @@ if(document.readyState==='loading'){
                         <i class="fas fa-chevron-right dash-nav-arrow"></i>
                     </div>
 
+                    <div class="dash-nav-card c-alugueis" onclick="(function(){var el=document.querySelector('.nav-panel-item[data-target=\'alugueis-view\']');if(el){UI.switchTab(el);Alugueis.init();}})()">
+                        <div class="dash-nav-icon"><i class="fas fa-key"></i></div>
+                        <div class="dash-nav-text">
+                            <span class="dash-nav-title">Aluguéis</span>
+                            <span class="dash-nav-sub">Contratos, cobranças e recibos</span>
+                        </div>
+                        <i class="fas fa-chevron-right dash-nav-arrow"></i>
+                    </div>
+
                     <div class="dash-nav-card c-match" onclick="(function(){var el=document.querySelector('.nav-panel-item[data-target=\'match-view\']');if(el){UI.switchTab(el);MatchModule.init();}})()">
                         <div class="dash-nav-icon"><i class="fas fa-bullseye"></i></div>
                         <div class="dash-nav-text">
@@ -10340,6 +10350,72 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
             <!-- END FINANCEIRO VIEW -->
 
             <!-- ===== MATCH IMÓVEL × CLIENTE VIEW ===== -->
+            <div id="alugueis-view" class="view">
+
+                <!-- HERO + KPIs -->
+                <div class="alug-hero">
+                    <div class="alug-hero-top">
+                        <div class="alug-hero-ico">🔑</div>
+                        <div style="flex:1;min-width:0;">
+                            <div class="alug-hero-title">Gestão de Aluguéis</div>
+                            <div class="alug-hero-sub">Contratos · Inquilinos · Cobranças · Recibos · Repasses</div>
+                        </div>
+                    </div>
+                    <div class="alug-kpi-grid">
+                        <div class="alug-kpi"><div class="alug-kpi-val" id="alug-kpi-ativos">0</div><div class="alug-kpi-lbl">Contratos ativos</div></div>
+                        <div class="alug-kpi"><div class="alug-kpi-val pos" id="alug-kpi-recebido">R$ 0,00</div><div class="alug-kpi-lbl">Recebido (mês)</div></div>
+                        <div class="alug-kpi"><div class="alug-kpi-val warn" id="alug-kpi-receber">R$ 0,00</div><div class="alug-kpi-lbl">A receber (mês)</div></div>
+                        <div class="alug-kpi"><div class="alug-kpi-val neg" id="alug-kpi-atrasado">R$ 0,00</div><div class="alug-kpi-lbl">Em atraso</div></div>
+                    </div>
+                </div>
+
+                <!-- TABS -->
+                <div class="alug-tabs">
+                    <button class="alug-tab active" onclick="Alugueis.switchTab('painel',this)"><i class="fas fa-gauge-high"></i> Painel</button>
+                    <button class="alug-tab" onclick="Alugueis.switchTab('contratos',this)"><i class="fas fa-file-signature"></i> Contratos</button>
+                    <button class="alug-tab" onclick="Alugueis.switchTab('cobrancas',this)"><i class="fas fa-receipt"></i> Cobranças</button>
+                    <button class="alug-tab" onclick="Alugueis.switchTab('repasses',this)"><i class="fas fa-hand-holding-dollar"></i> Repasses</button>
+                </div>
+
+                <!-- PAINEL -->
+                <div class="alug-panel active" id="alug-panel-painel">
+                    <div id="alug-alertas"></div>
+                    <button class="alug-add" onclick="Alugueis.abrirModalContrato()"><i class="fas fa-plus"></i> Novo contrato de locação</button>
+                    <div class="alug-sec">Cobranças a vencer & em atraso</div>
+                    <div id="alug-painel-list"></div>
+                </div>
+
+                <!-- CONTRATOS -->
+                <div class="alug-panel" id="alug-panel-contratos">
+                    <button class="alug-add" onclick="Alugueis.abrirModalContrato()"><i class="fas fa-plus"></i> Novo contrato de locação</button>
+                    <div id="alug-contratos-list"></div>
+                </div>
+
+                <!-- COBRANÇAS -->
+                <div class="alug-panel" id="alug-panel-cobrancas">
+                    <button class="alug-add" onclick="Alugueis.abrirModalCobranca()"><i class="fas fa-plus"></i> Nova cobrança avulsa</button>
+                    <div class="alug-filtros" id="alug-chips-status">
+                        <button class="alug-chip active" onclick="Alugueis.setFiltroStatus('',this)">Todas</button>
+                        <button class="alug-chip" onclick="Alugueis.setFiltroStatus('pendente',this)">Pendentes</button>
+                        <button class="alug-chip" onclick="Alugueis.setFiltroStatus('atrasado',this)">Atrasadas</button>
+                        <button class="alug-chip" onclick="Alugueis.setFiltroStatus('pago',this)">Pagas</button>
+                    </div>
+                    <div class="form-group" style="margin-bottom:10px;">
+                        <select id="alug-filtro-mes" class="form-control" style="font-size:0.85rem;" onchange="Alugueis.setFiltroMes(this.value)">
+                            <option value="">Todos os meses</option>
+                        </select>
+                    </div>
+                    <div id="alug-cobrancas-list"></div>
+                </div>
+
+                <!-- REPASSES -->
+                <div class="alug-panel" id="alug-panel-repasses">
+                    <div class="alug-sec" style="margin-top:4px;">Repasses ao proprietário</div>
+                    <div id="alug-repasses-list"></div>
+                </div>
+
+            </div>
+
             <div id="match-view" class="view">
                 <div style="background:linear-gradient(135deg,#1D6FA4 0%,#155A8A 100%);border-radius:18px;padding:20px;margin-bottom:16px;color:white;position:relative;overflow:hidden;">
                     <div style="position:absolute;top:-30px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.08);pointer-events:none;"></div>
@@ -10984,6 +11060,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 <button class="nav-panel-item" data-target="financeiro-view" onclick="UI.switchTab(this);Financeiro.init();UI.closeNavDrawer();return false;">
                     <i class="fas fa-wallet"></i> Financeiro
                 </button>
+                <button class="nav-panel-item" data-target="alugueis-view" onclick="UI.switchTab(this);Alugueis.init();UI.closeNavDrawer();return false;">
+                    <i class="fas fa-key" style="color:#0891B2"></i> Aluguéis
+                    <span style="font-size:.6rem;background:rgba(8,145,178,0.12);color:#0891B2;padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
+                </button>
                 <button class="nav-panel-item" data-target="mercado-view" onclick="UI.switchTab(this);MarketPanel.load(false);UI.closeNavDrawer();return false;">
                     <i class="fas fa-chart-line"></i> Mercado
                 </button>
@@ -11079,6 +11159,10 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </button>
                 <button class="nav-panel-item" data-target="financeiro-view" onclick="UI.switchTab(this);Financeiro.init();return false;">
                     <i class="fas fa-wallet"></i> Financeiro
+                </button>
+                <button class="nav-panel-item" data-target="alugueis-view" onclick="UI.switchTab(this);Alugueis.init();return false;">
+                    <i class="fas fa-key" style="color:#0891B2"></i> Aluguéis
+                    <span style="font-size:.6rem;background:rgba(8,145,178,0.12);color:#0891B2;padding:1px 6px;border-radius:10px;margin-left:auto;">NOVO</span>
                 </button>
                 <button class="nav-panel-item" data-target="mercado-view" onclick="UI.switchTab(this);MarketPanel.load(false);return false;">
                     <i class="fas fa-chart-line"></i> Mercado
@@ -13810,7 +13894,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
         // CÓDIGO JAVASCRIPT COMPLETO (com as melhorias: contador de contatos e alerta de cliente parado)
         const DB = {
             name: 'ImobiProDB',
-            version: 29, // v29: stores construtoras + captacoes migradas para IndexedDB
+            version: 30, // v30: stores de aluguéis (contratos + cobranças)
             db: null,
             
             init: function() {
@@ -13973,6 +14057,21 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     capStore.createIndex('status', 'status', { unique: false });
                     capStore.createIndex('bairro', 'bairro', { unique: false });
                     capStore.createIndex('data', 'data', { unique: false });
+                }
+                // Aluguéis — Contratos de locação
+                if (!db.objectStoreNames.contains('alugueis_contratos')) {
+                    const acStore = db.createObjectStore('alugueis_contratos', { keyPath: 'id' });
+                    acStore.createIndex('status', 'status', { unique: false });
+                    acStore.createIndex('inquilinoNome', 'inquilinoNome', { unique: false });
+                    acStore.createIndex('dataInicio', 'dataInicio', { unique: false });
+                }
+                // Aluguéis — Cobranças mensais
+                if (!db.objectStoreNames.contains('alugueis_cobrancas')) {
+                    const abStore = db.createObjectStore('alugueis_cobrancas', { keyPath: 'id' });
+                    abStore.createIndex('contratoId', 'contratoId', { unique: false });
+                    abStore.createIndex('competencia', 'competencia', { unique: false });
+                    abStore.createIndex('vencimento', 'vencimento', { unique: false });
+                    abStore.createIndex('status', 'status', { unique: false });
                 }
             },
             
@@ -16894,6 +16993,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                     'relatorios-view':   () => { container.style.display='none'; },
                     'coach-view':        () => { container.style.display='none'; },
                     'financeiro-view':   () => { container.style.display='none'; },
+                    'alugueis-view':     () => { container.style.display='none'; if(typeof Alugueis!=='undefined') Alugueis.init(); },
                     'venda-certa-view':  () => { container.style.display='none'; VendaCerta.init(); },
                     'simulador-view':    () => { container.style.display='none'; Simulador.init(); },
                     'mercado-view':      () => { container.style.display='none'; MarketPanel.load(false); },
@@ -16921,6 +17021,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 if(target === 'relatorios-view') UI.renderReport();
                 if(target === 'links-view') UI.renderLinks();
                 if(target === 'financeiro-view') { Financeiro.init(); Financeiro.popularSelectsContas(); }
+                if(target === 'alugueis-view') { if(typeof Alugueis!=='undefined') Alugueis.init(); }
                 
                 document.querySelector('main').scrollTop = 0;
             },
@@ -36501,6 +36602,915 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
         // integrações de outros módulos (ex.: registro automático de comissão
         // ao concluir venda no funil) consigam acessá-lo via window.Financeiro.
         try { window.Financeiro = Financeiro; } catch (e) { console.error('Falha ao expor Financeiro no window:', e); }
+
+        /* ===================================================================
+           MÓDULO ALUGUÉIS — Gestão de Locações / Administração de Imóveis
+           Contratos · Inquilinos · Cobranças · Recibos · Repasses · Financeiro
+           =================================================================== */
+        const Alugueis = (() => {
+
+            // ── Estado interno ────────────────────────────────────────────
+            let _tab = 'painel';
+            let _delAlvo = null;          // { tipo:'contrato'|'cobranca', id }
+            let _fStatus = '';            // filtro de status nas cobranças
+            let _fMes = '';               // filtro 'YYYY-MM' nas cobranças
+            let _stylesOk = false, _modalsOk = false;
+
+            // ── Helpers ───────────────────────────────────────────────────
+            const br      = v => Utils.formatCurrency(v || 0);
+            const parseV  = s => Utils.parseCurrency(s || '0');
+            const today   = () => Utils.getToday();
+            const uid     = () => Utils.id();
+            const esc     = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+            const MESES   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+            const getContratos = () => DB.getAll('alugueis_contratos');
+            const getCobrancas = () => DB.getAll('alugueis_cobrancas');
+
+            function fmtData(d){ return d ? Utils.formatDate(d) : '—'; }
+            function ymHoje(){ return new Date().toISOString().slice(0,7); }
+            function competenciaLabel(ym){
+                if(!ym) return '—';
+                const [y,m] = ym.split('-');
+                return (MESES[parseInt(m,10)-1] || m) + '/' + y;
+            }
+            // Soma n meses a uma competência 'YYYY-MM' → 'YYYY-MM'
+            function addMesesYM(ym, n){
+                let [y,m] = ym.split('-').map(x=>parseInt(x,10));
+                const total = (y*12 + (m-1)) + n;
+                const ny = Math.floor(total/12);
+                const nm = (total%12)+1;
+                return ny + '-' + String(nm).padStart(2,'0');
+            }
+            // Vencimento de uma competência conforme dia (clampa p/ último dia do mês)
+            function vencimentoDe(ym, dia){
+                const [y,m] = ym.split('-').map(x=>parseInt(x,10));
+                const ultimo = new Date(y, m, 0).getDate();
+                const d = Math.min(Math.max(parseInt(dia,10)||5,1), ultimo);
+                return y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+            }
+            // Status efetivo de uma cobrança (atrasado é computado)
+            function statusCob(cb){
+                if(cb.status === 'pago') return 'pago';
+                if(cb.vencimento && cb.vencimento < today()) return 'atrasado';
+                return 'pendente';
+            }
+            function totalCob(cb){
+                return (cb.valorAluguel||0)+(cb.valorCondominio||0)+(cb.valorIptu||0)+(cb.encargos||0)-(cb.desconto||0);
+            }
+
+            // ── Estilos (injetados uma única vez) ─────────────────────────
+            function ensureStyles(){
+                if(_stylesOk) return; _stylesOk = true;
+                const css = `
+                .alug-hero{background:linear-gradient(135deg,#0E7490 0%,#0891B2 60%,#1D6FA4 100%);border-radius:0 0 22px 22px;padding:18px 18px 0;color:#fff;position:relative;overflow:hidden;margin:-16px -16px 14px;}
+                .alug-hero-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+                .alug-hero-ico{width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,0.16);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+                .alug-hero-title{font-size:1.12rem;font-weight:800;line-height:1.1;}
+                .alug-hero-sub{font-size:0.72rem;opacity:0.85;margin-top:2px;}
+                .alug-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.12);border-radius:14px 14px 0 0;overflow:hidden;}
+                .alug-kpi{background:rgba(255,255,255,0.06);padding:11px 8px 13px;text-align:center;}
+                .alug-kpi-val{font-size:0.96rem;font-weight:800;font-family:'DM Mono',monospace;line-height:1.1;}
+                .alug-kpi-lbl{font-size:0.6rem;opacity:0.82;margin-top:3px;text-transform:uppercase;letter-spacing:.04em;}
+                .alug-kpi-val.pos{color:#86EFAC;} .alug-kpi-val.neg{color:#FCA5A5;} .alug-kpi-val.warn{color:#FCD34D;}
+                @media(max-width:430px){.alug-kpi-val{font-size:0.82rem;} .alug-kpi-lbl{font-size:0.54rem;}}
+                .alug-tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+                .alug-tabs::-webkit-scrollbar{display:none;}
+                .alug-tab{flex-shrink:0;padding:8px 15px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-raised);color:var(--text-secondary);font-size:0.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+                .alug-tab.active{background:var(--info);border-color:var(--info);color:#fff;}
+                .alug-panel{display:none;} .alug-panel.active{display:block;}
+                .alug-card{background:var(--bg-raised);border:1px solid var(--border);border-radius:14px;padding:13px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+                .alug-card-top{display:flex;align-items:flex-start;gap:10px;}
+                .alug-card-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0;color:#fff;}
+                .alug-card-title{font-size:0.92rem;font-weight:800;color:var(--dark);line-height:1.15;}
+                .alug-card-sub{font-size:0.72rem;color:var(--text-secondary);margin-top:2px;}
+                .alug-badge{font-size:0.62rem;font-weight:800;padding:3px 9px;border-radius:20px;white-space:nowrap;text-transform:uppercase;letter-spacing:.03em;}
+                .alug-b-ativo{background:var(--accent-ultra);color:var(--accent-dark);}
+                .alug-b-encerrado{background:rgba(100,116,139,0.14);color:var(--text-secondary);}
+                .alug-b-pago{background:var(--accent-ultra);color:var(--accent-dark);}
+                .alug-b-pendente{background:rgba(230,126,34,0.14);color:#C76A1F;}
+                .alug-b-atrasado{background:rgba(231,76,60,0.14);color:#C0392B;}
+                .alug-meta{display:flex;flex-wrap:wrap;gap:5px 14px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--border);}
+                .alug-meta-item{font-size:0.72rem;color:var(--text-secondary);display:flex;align-items:center;gap:5px;}
+                .alug-meta-item b{color:var(--dark);font-weight:700;}
+                .alug-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
+                .alug-btn{flex:1;min-width:fit-content;border:none;border-radius:9px;padding:8px 10px;font-size:0.74rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;}
+                .alug-btn.p{background:var(--primary);color:#fff;} .alug-btn.g{background:var(--accent);color:#fff;}
+                .alug-btn.w{background:#25D366;color:#fff;} .alug-btn.o{background:var(--bg-overlay);color:var(--text-secondary);border:1px solid var(--border);}
+                .alug-btn.d{background:rgba(231,76,60,0.1);color:var(--danger);}
+                .alug-add{width:100%;border:none;border-radius:12px;padding:13px;font-size:0.92rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--info);color:#fff;margin-bottom:12px;}
+                .alug-empty{text-align:center;padding:34px 20px;color:var(--text-secondary);}
+                .alug-empty-ico{font-size:2.4rem;margin-bottom:8px;opacity:0.55;}
+                .alug-empty-t{font-size:0.95rem;font-weight:800;color:var(--dark);margin-bottom:4px;}
+                .alug-empty-s{font-size:0.78rem;line-height:1.4;max-width:320px;margin:0 auto;}
+                .alug-sec{display:flex;align-items:center;gap:8px;margin:18px 0 9px;font-size:0.82rem;font-weight:800;color:var(--dark);}
+                .alug-sec::before{content:'';width:3px;height:14px;background:var(--info);border-radius:2px;}
+                .alug-filtros{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;}
+                .alug-chip{padding:6px 13px;border-radius:18px;border:1.5px solid var(--border);background:var(--bg-raised);color:var(--text-secondary);font-size:0.74rem;font-weight:700;cursor:pointer;}
+                .alug-chip.active{background:var(--info);border-color:var(--info);color:#fff;}
+                .alug-alert{background:rgba(230,126,34,0.1);border:1px solid rgba(230,126,34,0.3);border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:0.78rem;color:#9A5418;display:flex;gap:9px;align-items:flex-start;}
+                body.dark-mode .alug-card{background:#1B2433;}
+                `;
+                const st = document.createElement('style');
+                st.id = 'alug-styles'; st.textContent = css;
+                document.head.appendChild(st);
+            }
+
+            // ── Modais (injetados uma única vez) ──────────────────────────
+            function ensureModals(){
+                if(_modalsOk) return; _modalsOk = true;
+                const wrap = document.createElement('div');
+                wrap.id = 'alug-modais';
+                wrap.innerHTML = `
+                <!-- CONTRATO -->
+                <div class="modal-overlay" id="overlay-alug-contrato" onclick="UI.closeModals()"></div>
+                <div class="modal-sheet" id="sheet-alug-contrato" style="max-height:92vh;overflow-y:auto;">
+                    <div class="sheet-handle"></div>
+                    <h3 class="section-title"><span id="alug-contrato-titulo">Novo Contrato de Locação</span></h3>
+                    <form onsubmit="Alugueis.salvarContrato(event)">
+                        <input type="hidden" id="alug-c-id">
+                        <div class="alug-sec" style="margin-top:0;">Imóvel</div>
+                        <div class="form-group">
+                            <label class="form-label">Imóvel cadastrado (opcional)</label>
+                            <select id="alug-c-imovel" class="form-control" onchange="Alugueis.vincularImovel()">
+                                <option value="">— Não vincular / digitar manualmente —</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Endereço / identificação do imóvel *</label>
+                            <input type="text" id="alug-c-imovel-desc" class="form-control" placeholder="Ex: Rua das Flores, 120 — Apto 302, Centro" required>
+                        </div>
+                        <div class="alug-sec">Inquilino</div>
+                        <div class="form-group"><label class="form-label">Nome completo *</label>
+                            <input type="text" id="alug-c-inq-nome" class="form-control" required></div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;"><label class="form-label">Telefone</label>
+                                <input type="tel" id="alug-c-inq-tel" class="form-control" oninput="Utils.maskPhone(this)" placeholder="(00) 00000-0000"></div>
+                            <div class="form-group" style="flex:1;"><label class="form-label">CPF</label>
+                                <input type="text" id="alug-c-inq-cpf" class="form-control" oninput="Utils.maskCPF(this)" placeholder="000.000.000-00"></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">E-mail</label>
+                            <input type="email" id="alug-c-inq-email" class="form-control"></div>
+                        <div class="alug-sec">Proprietário (locador)</div>
+                        <div class="form-group"><label class="form-label">Nome</label>
+                            <input type="text" id="alug-c-prop-nome" class="form-control"></div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;"><label class="form-label">Telefone</label>
+                                <input type="tel" id="alug-c-prop-tel" class="form-control" oninput="Utils.maskPhone(this)" placeholder="(00) 00000-0000"></div>
+                            <div class="form-group" style="flex:1;"><label class="form-label">CPF/CNPJ</label>
+                                <input type="text" id="alug-c-prop-cpf" class="form-control" placeholder="000.000.000-00"></div>
+                        </div>
+                        <div class="alug-sec">Valores & condições</div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;"><label class="form-label">Aluguel mensal (R$) *</label>
+                                <input type="text" id="alug-c-valor" class="form-control" placeholder="0,00" inputmode="decimal" oninput="Utils.maskMoney(this)" required></div>
+                            <div class="form-group" style="flex:1;"><label class="form-label">Taxa de admin. (%)</label>
+                                <input type="number" id="alug-c-taxa" class="form-control" placeholder="10" step="0.5" min="0" max="100" value="10"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;"><label class="form-label">Condomínio (R$)</label>
+                                <input type="text" id="alug-c-condominio" class="form-control" placeholder="0,00" inputmode="decimal" oninput="Utils.maskMoney(this)"></div>
+                            <div class="form-group" style="flex:1;"><label class="form-label">IPTU mensal (R$)</label>
+                                <input type="text" id="alug-c-iptu" class="form-control" placeholder="0,00" inputmode="decimal" oninput="Utils.maskMoney(this)"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;"><label class="form-label">Dia de vencimento *</label>
+                                <input type="number" id="alug-c-dia" class="form-control" min="1" max="31" value="5" required></div>
+                            <div class="form-group" style="flex:1;"><label class="form-label">Início do contrato *</label>
+                                <input type="date" id="alug-c-inicio" class="form-control" required></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;"><label class="form-label">Duração (meses)</label>
+                                <input type="number" id="alug-c-duracao" class="form-control" min="1" max="120" value="12"></div>
+                            <div class="form-group" style="flex:1;"><label class="form-label">Índice de reajuste</label>
+                                <select id="alug-c-indice" class="form-control">
+                                    <option value="igpm">IGP-M</option>
+                                    <option value="ipca">IPCA</option>
+                                    <option value="incc">INCC</option>
+                                    <option value="nenhum">Sem reajuste</option>
+                                </select></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;"><label class="form-label">Garantia</label>
+                                <select id="alug-c-garantia" class="form-control">
+                                    <option value="nenhum">Nenhuma</option>
+                                    <option value="caucao">Caução</option>
+                                    <option value="fiador">Fiador</option>
+                                    <option value="seguro">Seguro-fiança</option>
+                                    <option value="titulo">Título de capitalização</option>
+                                </select></div>
+                            <div class="form-group" style="flex:1;"><label class="form-label">Detalhe da garantia</label>
+                                <input type="text" id="alug-c-garantia-det" class="form-control" placeholder="Ex: fiador João / 3 aluguéis"></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">Status</label>
+                            <select id="alug-c-status" class="form-control">
+                                <option value="ativo">🟢 Ativo</option>
+                                <option value="encerrado">⚪ Encerrado</option>
+                            </select></div>
+                        <div class="form-group"><label class="form-label">Observações</label>
+                            <textarea id="alug-c-obs" class="form-control" rows="2" style="min-height:60px;"></textarea></div>
+                        <label style="display:flex;align-items:center;gap:9px;font-size:0.82rem;color:var(--dark);font-weight:600;margin-bottom:14px;cursor:pointer;">
+                            <input type="checkbox" id="alug-c-gerar" checked style="width:18px;height:18px;">
+                            Gerar cobranças mensais automaticamente
+                        </label>
+                        <button type="submit" class="btn-block" style="background:var(--info);color:#fff;border:none;border-radius:12px;padding:14px;font-weight:800;font-size:0.95rem;cursor:pointer;">Salvar Contrato</button>
+                        <button type="button" class="btn-block" style="background:transparent;border:1px solid var(--border);border-radius:12px;padding:12px;font-weight:600;font-size:0.9rem;cursor:pointer;margin-top:8px;color:var(--text-secondary);" onclick="UI.closeModals()">Cancelar</button>
+                    </form>
+                </div>
+
+                <!-- COBRANÇA -->
+                <div class="modal-overlay" id="overlay-alug-cobranca" onclick="UI.closeModals()"></div>
+                <div class="modal-sheet" id="sheet-alug-cobranca" style="max-height:90vh;overflow-y:auto;">
+                    <div class="sheet-handle"></div>
+                    <h3 class="section-title"><span id="alug-cob-titulo">Nova Cobrança</span></h3>
+                    <form onsubmit="Alugueis.salvarCobranca(event)">
+                        <input type="hidden" id="alug-cob-id">
+                        <div class="form-group"><label class="form-label">Contrato *</label>
+                            <select id="alug-cob-contrato" class="form-control" required></select></div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;"><label class="form-label">Competência (mês) *</label>
+                                <input type="month" id="alug-cob-competencia" class="form-control" required></div>
+                            <div class="form-group" style="flex:1;"><label class="form-label">Vencimento *</label>
+                                <input type="date" id="alug-cob-vencimento" class="form-control" required></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;"><label class="form-label">Aluguel (R$) *</label>
+                                <input type="text" id="alug-cob-aluguel" class="form-control" placeholder="0,00" inputmode="decimal" oninput="Utils.maskMoney(this)" required></div>
+                            <div class="form-group" style="flex:1;"><label class="form-label">Condomínio (R$)</label>
+                                <input type="text" id="alug-cob-condominio" class="form-control" placeholder="0,00" inputmode="decimal" oninput="Utils.maskMoney(this)"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;"><label class="form-label">IPTU (R$)</label>
+                                <input type="text" id="alug-cob-iptu" class="form-control" placeholder="0,00" inputmode="decimal" oninput="Utils.maskMoney(this)"></div>
+                            <div class="form-group" style="flex:1;"><label class="form-label">Encargos/multa (R$)</label>
+                                <input type="text" id="alug-cob-encargos" class="form-control" placeholder="0,00" inputmode="decimal" oninput="Utils.maskMoney(this)"></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">Desconto (R$)</label>
+                            <input type="text" id="alug-cob-desconto" class="form-control" placeholder="0,00" inputmode="decimal" oninput="Utils.maskMoney(this)"></div>
+                        <button type="submit" class="btn-block" style="background:var(--info);color:#fff;border:none;border-radius:12px;padding:14px;font-weight:800;font-size:0.95rem;cursor:pointer;">Salvar Cobrança</button>
+                        <button type="button" class="btn-block" style="background:transparent;border:1px solid var(--border);border-radius:12px;padding:12px;font-weight:600;font-size:0.9rem;cursor:pointer;margin-top:8px;color:var(--text-secondary);" onclick="UI.closeModals()">Cancelar</button>
+                    </form>
+                </div>
+
+                <!-- PAGAMENTO -->
+                <div class="modal-overlay" id="overlay-alug-pagamento" onclick="UI.closeModals()"></div>
+                <div class="modal-sheet" id="sheet-alug-pagamento">
+                    <div class="sheet-handle"></div>
+                    <h3 class="section-title">Registrar Pagamento</h3>
+                    <form onsubmit="Alugueis.confirmarPagamento(event)">
+                        <input type="hidden" id="alug-pag-id">
+                        <div id="alug-pag-resumo" style="background:var(--bg-overlay);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:0.82rem;color:var(--dark);"></div>
+                        <div class="form-group"><label class="form-label">Data do pagamento *</label>
+                            <input type="date" id="alug-pag-data" class="form-control" required></div>
+                        <div class="form-group"><label class="form-label">Forma de pagamento</label>
+                            <select id="alug-pag-forma" class="form-control">
+                                <option value="pix">PIX</option>
+                                <option value="transferencia">Transferência</option>
+                                <option value="boleto">Boleto</option>
+                                <option value="dinheiro">Dinheiro</option>
+                                <option value="cartao">Cartão</option>
+                                <option value="outro">Outro</option>
+                            </select></div>
+                        <button type="submit" class="btn-block" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-weight:800;font-size:0.95rem;cursor:pointer;">Confirmar Recebimento</button>
+                        <button type="button" class="btn-block" style="background:transparent;border:1px solid var(--border);border-radius:12px;padding:12px;font-weight:600;font-size:0.9rem;cursor:pointer;margin-top:8px;color:var(--text-secondary);" onclick="UI.closeModals()">Cancelar</button>
+                    </form>
+                </div>
+
+                <!-- EXCLUSÃO -->
+                <div class="modal-overlay" id="overlay-alug-del" onclick="UI.closeModals()"></div>
+                <div class="modal-sheet" id="sheet-alug-del">
+                    <div class="sheet-handle"></div>
+                    <h3 class="section-title">Confirmar exclusão</h3>
+                    <p id="alug-del-msg" style="font-size:0.88rem;color:var(--text-secondary);line-height:1.5;margin-bottom:18px;"></p>
+                    <button class="btn-block" style="background:var(--danger);color:#fff;border:none;border-radius:12px;padding:14px;font-weight:800;font-size:0.95rem;cursor:pointer;" onclick="Alugueis.confirmarExclusao()">Excluir</button>
+                    <button class="btn-block" style="background:transparent;border:1px solid var(--border);border-radius:12px;padding:12px;font-weight:600;font-size:0.9rem;cursor:pointer;margin-top:8px;color:var(--text-secondary);" onclick="UI.closeModals()">Cancelar</button>
+                </div>`;
+                document.body.appendChild(wrap);
+            }
+
+            // ── INIT / RENDER MESTRE ──────────────────────────────────────
+            async function init(){
+                ensureStyles();
+                ensureModals();
+                await renderTudo();
+            }
+            async function renderTudo(){
+                const [contratos, cobrancas] = await Promise.all([getContratos(), getCobrancas()]);
+                renderKPIs(contratos, cobrancas);
+                renderAlertas(contratos);
+                renderPainel(contratos, cobrancas);
+                renderContratos(contratos, cobrancas);
+                renderCobrancas(contratos, cobrancas);
+                renderRepasses(contratos, cobrancas);
+            }
+
+            function switchTab(tab, btn){
+                _tab = tab;
+                document.querySelectorAll('.alug-tab').forEach(b=>b.classList.remove('active'));
+                if(btn) btn.classList.add('active');
+                document.querySelectorAll('.alug-panel').forEach(p=>p.classList.remove('active'));
+                const p = document.getElementById('alug-panel-'+tab);
+                if(p) p.classList.add('active');
+            }
+
+            // ── KPIs ──────────────────────────────────────────────────────
+            function renderKPIs(contratos, cobrancas){
+                const mes = ymHoje();
+                const ativos = contratos.filter(c=>c.status==='ativo').length;
+                let recebidoMes=0, aReceber=0, atrasado=0, taxaMes=0;
+                cobrancas.forEach(cb=>{
+                    const st = statusCob(cb);
+                    const tot = totalCob(cb);
+                    if(st==='pago' && (cb.dataPagamento||'').slice(0,7)===mes){ recebidoMes += tot; taxaMes += (cb.taxaAdminValor||0); }
+                    if(st==='pendente' && (cb.competencia===mes)) aReceber += tot;
+                    if(st==='atrasado') atrasado += tot;
+                });
+                const set = (id,v,cls)=>{ const el=document.getElementById(id); if(el){ el.textContent=v; if(cls){el.className='alug-kpi-val '+cls;} } };
+                set('alug-kpi-ativos', String(ativos));
+                set('alug-kpi-recebido', br(recebidoMes), 'pos');
+                set('alug-kpi-receber', br(aReceber), 'warn');
+                set('alug-kpi-atrasado', br(atrasado), 'neg');
+                const tx = document.getElementById('alug-kpi-taxa'); if(tx) tx.textContent = br(taxaMes);
+            }
+
+            // ── Alertas de reajuste (12 meses do início) ──────────────────
+            function renderAlertas(contratos){
+                const box = document.getElementById('alug-alertas'); if(!box) return;
+                const hoje = new Date(); const avisos=[];
+                contratos.filter(c=>c.status==='ativo' && c.dataInicio && c.indiceReajuste && c.indiceReajuste!=='nenhum').forEach(c=>{
+                    const ini = new Date(c.dataInicio+'T00:00');
+                    let prox = new Date(ini); 
+                    while(prox <= hoje){ prox.setFullYear(prox.getFullYear()+1); }
+                    const diff = Math.ceil((prox - hoje)/(1000*60*60*24));
+                    if(diff <= 60){
+                        avisos.push(`<b>${esc(c.inquilinoNome||'Contrato')}</b> — reajuste ${(c.indiceReajuste||'').toUpperCase()} previsto p/ ${prox.toLocaleDateString('pt-BR')} (${diff} dias)`);
+                    }
+                });
+                box.innerHTML = avisos.length
+                    ? `<div class="alug-alert"><i class="fas fa-arrow-trend-up" style="margin-top:2px;"></i><div>${avisos.join('<br>')}</div></div>`
+                    : '';
+            }
+
+            // ── PAINEL: cobranças a vencer / atrasadas ────────────────────
+            function renderPainel(contratos, cobrancas){
+                const cont = document.getElementById('alug-painel-list'); if(!cont) return;
+                const cMap = {}; contratos.forEach(c=>cMap[c.id]=c);
+                const pend = cobrancas
+                    .filter(cb=>statusCob(cb)!=='pago')
+                    .sort((a,b)=>(a.vencimento||'').localeCompare(b.vencimento||''));
+                if(!pend.length){
+                    cont.innerHTML = `<div class="alug-empty"><div class="alug-empty-ico">✅</div><div class="alug-empty-t">Tudo em dia</div><div class="alug-empty-s">Nenhuma cobrança pendente ou atrasada no momento.</div></div>`;
+                    return;
+                }
+                cont.innerHTML = pend.slice(0,40).map(cb=>cardCobranca(cb, cMap[cb.contratoId])).join('');
+            }
+
+            // ── CONTRATOS ─────────────────────────────────────────────────
+            function renderContratos(contratos, cobrancas){
+                const cont = document.getElementById('alug-contratos-list'); if(!cont) return;
+                if(!contratos.length){
+                    cont.innerHTML = `<div class="alug-empty"><div class="alug-empty-ico">📄</div><div class="alug-empty-t">Nenhum contrato cadastrado</div><div class="alug-empty-s">Cadastre o primeiro contrato de locação para começar a administrar.</div></div>`;
+                    return;
+                }
+                const ord = [...contratos].sort((a,b)=> (a.status==='ativo'?0:1)-(b.status==='ativo'?0:1) || (b.dataCriacao||'').localeCompare(a.dataCriacao||''));
+                cont.innerHTML = ord.map(c=>{
+                    const cobC = cobrancas.filter(x=>x.contratoId===c.id);
+                    const pagas = cobC.filter(x=>x.status==='pago').length;
+                    const atr = cobC.filter(x=>statusCob(x)==='atrasado').length;
+                    const cor = c.status==='ativo' ? 'linear-gradient(135deg,#0891B2,#1D6FA4)' : '#94A3B8';
+                    return `<div class="alug-card">
+                        <div class="alug-card-top">
+                            <div class="alug-card-ico" style="background:${cor};"><i class="fas fa-file-signature"></i></div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="alug-card-title">${esc(c.inquilinoNome||'Inquilino')}</div>
+                                <div class="alug-card-sub"><i class="fas fa-map-marker-alt"></i> ${esc(c.imovelDesc||'—')}</div>
+                            </div>
+                            <span class="alug-badge alug-b-${c.status}">${c.status==='ativo'?'Ativo':'Encerrado'}</span>
+                        </div>
+                        <div class="alug-meta">
+                            <span class="alug-meta-item"><i class="fas fa-dollar-sign"></i> <b>${br(c.valorAluguel)}</b>/mês</span>
+                            <span class="alug-meta-item"><i class="fas fa-percent"></i> Taxa <b>${c.taxaAdmin||0}%</b></span>
+                            <span class="alug-meta-item"><i class="fas fa-calendar-day"></i> Vence dia <b>${c.diaVencimento||'—'}</b></span>
+                            <span class="alug-meta-item"><i class="fas fa-clock"></i> ${fmtData(c.dataInicio)} · <b>${c.duracaoMeses||'—'}m</b></span>
+                            ${atr?`<span class="alug-meta-item" style="color:var(--danger);"><i class="fas fa-triangle-exclamation"></i> <b>${atr}</b> atrasada(s)</span>`:''}
+                            <span class="alug-meta-item"><i class="fas fa-receipt"></i> ${pagas}/${cobC.length} pagas</span>
+                        </div>
+                        <div class="alug-acts">
+                            <button class="alug-btn p" onclick="Alugueis.abrirModalCobranca(null,'${c.id}')"><i class="fas fa-plus"></i> Cobrança</button>
+                            <button class="alug-btn o" onclick="Alugueis.abrirModalContrato('${c.id}')"><i class="fas fa-pen"></i> Editar</button>
+                            <button class="alug-btn d" onclick="Alugueis.pedirExclusao('contrato','${c.id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            // ── COBRANÇAS ─────────────────────────────────────────────────
+            function cardCobranca(cb, contrato){
+                const st = statusCob(cb);
+                const tot = totalCob(cb);
+                const icoCor = st==='pago' ? 'var(--accent)' : (st==='atrasado' ? 'var(--danger)' : 'var(--warning)');
+                const ico = st==='pago' ? 'check' : (st==='atrasado' ? 'triangle-exclamation' : 'hourglass-half');
+                const nome = contrato ? contrato.inquilinoNome : 'Inquilino';
+                const end = contrato ? contrato.imovelDesc : '';
+                return `<div class="alug-card">
+                    <div class="alug-card-top">
+                        <div class="alug-card-ico" style="background:${icoCor};"><i class="fas fa-${ico}"></i></div>
+                        <div style="flex:1;min-width:0;">
+                            <div class="alug-card-title">${esc(nome)} · ${competenciaLabel(cb.competencia)}</div>
+                            <div class="alug-card-sub">${esc(end||'')}${end?' · ':''}Venc. ${fmtData(cb.vencimento)}</div>
+                        </div>
+                        <div style="text-align:right;flex-shrink:0;">
+                            <div style="font-size:1rem;font-weight:800;color:var(--dark);font-family:'DM Mono',monospace;">${br(tot)}</div>
+                            <span class="alug-badge alug-b-${st}">${st==='pago'?'Pago':st==='atrasado'?'Atrasado':'Pendente'}</span>
+                        </div>
+                    </div>
+                    ${st==='pago'?`<div class="alug-meta"><span class="alug-meta-item"><i class="fas fa-circle-check" style="color:var(--accent);"></i> Pago em <b>${fmtData(cb.dataPagamento)}</b> · ${esc(cb.formaPagamento||'')}</span><span class="alug-meta-item"><i class="fas fa-hand-holding-dollar"></i> Repasse <b>${br(cb.repasseProprietario||0)}</b></span></div>`:''}
+                    <div class="alug-acts">
+                        ${st!=='pago'?`<button class="alug-btn g" onclick="Alugueis.marcarPaga('${cb.id}')"><i class="fas fa-check"></i> Pago</button>`:`<button class="alug-btn o" onclick="Alugueis.reabrirCobranca('${cb.id}')"><i class="fas fa-rotate-left"></i> Reabrir</button>`}
+                        <button class="alug-btn w" onclick="Alugueis.enviarCobrancaWhatsApp('${cb.id}')"><i class="fab fa-whatsapp"></i> Cobrar</button>
+                        ${st==='pago'?`<button class="alug-btn p" onclick="Alugueis.gerarRecibo('${cb.id}')"><i class="fas fa-file-pdf"></i> Recibo</button>`:''}
+                        <button class="alug-btn o" onclick="Alugueis.abrirModalCobranca('${cb.id}')"><i class="fas fa-pen"></i></button>
+                        <button class="alug-btn d" onclick="Alugueis.pedirExclusao('cobranca','${cb.id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }
+            function renderCobrancas(contratos, cobrancas){
+                const cont = document.getElementById('alug-cobrancas-list'); if(!cont) return;
+                const cMap={}; contratos.forEach(c=>cMap[c.id]=c);
+                // filtros de mês
+                const sel = document.getElementById('alug-filtro-mes');
+                if(sel && sel.options.length<=1){
+                    const meses = [...new Set(cobrancas.map(c=>c.competencia).filter(Boolean))].sort().reverse();
+                    sel.innerHTML = '<option value="">Todos os meses</option>' + meses.map(m=>`<option value="${m}">${competenciaLabel(m)}</option>`).join('');
+                    if(_fMes) sel.value=_fMes;
+                }
+                let lista = [...cobrancas];
+                if(_fStatus) lista = lista.filter(c=>statusCob(c)===_fStatus);
+                if(_fMes) lista = lista.filter(c=>c.competencia===_fMes);
+                lista.sort((a,b)=>(b.vencimento||'').localeCompare(a.vencimento||''));
+                if(!lista.length){
+                    cont.innerHTML = `<div class="alug-empty"><div class="alug-empty-ico">🧾</div><div class="alug-empty-t">Nenhuma cobrança</div><div class="alug-empty-s">As cobranças aparecem aqui. Crie um contrato com geração automática ou adicione manualmente.</div></div>`;
+                    return;
+                }
+                cont.innerHTML = lista.map(cb=>cardCobranca(cb, cMap[cb.contratoId])).join('');
+            }
+            function setFiltroStatus(s, btn){
+                _fStatus = s;
+                document.querySelectorAll('#alug-chips-status .alug-chip').forEach(b=>b.classList.remove('active'));
+                if(btn) btn.classList.add('active');
+                renderTudo();
+            }
+            function setFiltroMes(v){ _fMes = v; renderTudo(); }
+
+            // ── REPASSES AO PROPRIETÁRIO ──────────────────────────────────
+            function renderRepasses(contratos, cobrancas){
+                const cont = document.getElementById('alug-repasses-list'); if(!cont) return;
+                const cMap={}; contratos.forEach(c=>cMap[c.id]=c);
+                const pagas = cobrancas.filter(c=>c.status==='pago').sort((a,b)=>(b.dataPagamento||'').localeCompare(a.dataPagamento||''));
+                if(!pagas.length){
+                    cont.innerHTML = `<div class="alug-empty"><div class="alug-empty-ico">💸</div><div class="alug-empty-t">Sem repasses</div><div class="alug-empty-s">Quando uma cobrança é marcada como paga, o repasse ao proprietário é calculado automaticamente (aluguel − taxa de administração).</div></div>`;
+                    return;
+                }
+                let totalRepasse=0, totalTaxa=0;
+                pagas.forEach(c=>{ totalRepasse += (c.repasseProprietario||0); totalTaxa += (c.taxaAdminValor||0); });
+                const resumo = `<div class="alug-card" style="background:linear-gradient(135deg,#0E7490,#1D6FA4);color:#fff;border:none;">
+                    <div style="display:flex;justify-content:space-between;gap:10px;">
+                        <div><div style="font-size:0.66rem;opacity:0.85;text-transform:uppercase;letter-spacing:.04em;">Total a repassar</div><div style="font-size:1.15rem;font-weight:800;font-family:'DM Mono',monospace;">${br(totalRepasse)}</div></div>
+                        <div style="text-align:right;"><div style="font-size:0.66rem;opacity:0.85;text-transform:uppercase;letter-spacing:.04em;">Sua taxa acumulada</div><div style="font-size:1.15rem;font-weight:800;font-family:'DM Mono',monospace;color:#86EFAC;">${br(totalTaxa)}</div></div>
+                    </div></div>`;
+                cont.innerHTML = resumo + pagas.map(c=>{
+                    const ct = cMap[c.contratoId];
+                    const feito = c.repasseFeito;
+                    return `<div class="alug-card">
+                        <div class="alug-card-top">
+                            <div class="alug-card-ico" style="background:${feito?'var(--accent)':'#94A3B8'};"><i class="fas fa-hand-holding-dollar"></i></div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="alug-card-title">${esc(ct?ct.proprietarioNome||ct.inquilinoNome:'Proprietário')}</div>
+                                <div class="alug-card-sub">${competenciaLabel(c.competencia)} · ${esc(ct?ct.imovelDesc:'')}</div>
+                            </div>
+                            <div style="text-align:right;"><div style="font-size:1rem;font-weight:800;color:var(--dark);font-family:'DM Mono',monospace;">${br(c.repasseProprietario||0)}</div>
+                            <span class="alug-badge ${feito?'alug-b-pago':'alug-b-pendente'}">${feito?'Repassado':'A repassar'}</span></div>
+                        </div>
+                        <div class="alug-meta">
+                            <span class="alug-meta-item"><i class="fas fa-dollar-sign"></i> Aluguel <b>${br(c.valorAluguel)}</b></span>
+                            <span class="alug-meta-item"><i class="fas fa-percent"></i> Taxa <b>${br(c.taxaAdminValor||0)}</b></span>
+                        </div>
+                        <div class="alug-acts">
+                            <button class="alug-btn ${feito?'o':'g'}" onclick="Alugueis.marcarRepasse('${c.id}')"><i class="fas fa-${feito?'rotate-left':'check'}"></i> ${feito?'Desfazer':'Marcar repassado'}</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+            async function marcarRepasse(id){
+                const cb = await DB.get('alugueis_cobrancas', id); if(!cb) return;
+                cb.repasseFeito = !cb.repasseFeito;
+                await DB.put('alugueis_cobrancas', cb);
+                Utils.toast(cb.repasseFeito?'Repasse marcado como concluído.':'Repasse reaberto.');
+                renderTudo();
+            }
+
+            // ── CONTRATO: abrir/salvar/excluir ────────────────────────────
+            async function popularSelectImoveis(){
+                const sel = document.getElementById('alug-c-imovel'); if(!sel) return;
+                const imoveis = (UI.data && UI.data.imoveis) ? UI.data.imoveis : await Storage.getImoveis();
+                sel.innerHTML = '<option value="">— Não vincular / digitar manualmente —</option>' +
+                    imoveis.map(i=>`<option value="${i.id}">${esc((i.titulo||'Imóvel').substring(0,50))}</option>`).join('');
+            }
+            function vincularImovel(){
+                const sel = document.getElementById('alug-c-imovel');
+                const id = sel.value; if(!id) return;
+                const imovel = (UI.data.imoveis||[]).find(i=>i.id===id);
+                if(!imovel) return;
+                const desc = document.getElementById('alug-c-imovel-desc');
+                if(desc && !desc.value.trim()) desc.value = imovel.endereco || imovel.titulo || '';
+                const val = document.getElementById('alug-c-valor');
+                if(val && !val.value && imovel.precoAluguel) val.value = Utils.formatMoneyField(imovel.precoAluguel);
+                const cond = document.getElementById('alug-c-condominio');
+                if(cond && !cond.value && imovel.condominio) cond.value = Utils.formatMoneyField(imovel.condominio);
+                const prop = document.getElementById('alug-c-prop-nome');
+                if(prop && !prop.value && imovel.proprietarioNome) prop.value = imovel.proprietarioNome;
+                const propTel = document.getElementById('alug-c-prop-tel');
+                if(propTel && !propTel.value && imovel.proprietarioTelefone) propTel.value = imovel.proprietarioTelefone;
+                const propCpf = document.getElementById('alug-c-prop-cpf');
+                if(propCpf && !propCpf.value && imovel.proprietarioCpf) propCpf.value = imovel.proprietarioCpf;
+            }
+            async function abrirModalContrato(id){
+                ensureModals();
+                await popularSelectImoveis();
+                const set=(k,v)=>{ const el=document.getElementById(k); if(el) el.value=v; };
+                set('alug-c-id', id||'');
+                document.getElementById('alug-contrato-titulo').textContent = id ? 'Editar Contrato' : 'Novo Contrato de Locação';
+                const gerar = document.getElementById('alug-c-gerar');
+                if(id){
+                    const c = await DB.get('alugueis_contratos', id); if(!c){ Utils.toast('Contrato não encontrado','error'); return; }
+                    set('alug-c-imovel', c.imovelId||'');
+                    set('alug-c-imovel-desc', c.imovelDesc||'');
+                    set('alug-c-inq-nome', c.inquilinoNome||''); set('alug-c-inq-tel', c.inquilinoTel||'');
+                    set('alug-c-inq-cpf', c.inquilinoCpf||''); set('alug-c-inq-email', c.inquilinoEmail||'');
+                    set('alug-c-prop-nome', c.proprietarioNome||''); set('alug-c-prop-tel', c.proprietarioTel||'');
+                    set('alug-c-prop-cpf', c.proprietarioCpf||'');
+                    set('alug-c-valor', c.valorAluguel?Utils.formatMoneyField(c.valorAluguel):'');
+                    set('alug-c-taxa', c.taxaAdmin!=null?c.taxaAdmin:10);
+                    set('alug-c-condominio', c.valorCondominio?Utils.formatMoneyField(c.valorCondominio):'');
+                    set('alug-c-iptu', c.valorIptu?Utils.formatMoneyField(c.valorIptu):'');
+                    set('alug-c-dia', c.diaVencimento||5); set('alug-c-inicio', c.dataInicio||'');
+                    set('alug-c-duracao', c.duracaoMeses||12); set('alug-c-indice', c.indiceReajuste||'igpm');
+                    set('alug-c-garantia', c.tipoGarantia||'nenhum'); set('alug-c-garantia-det', c.garantiaDetalhe||'');
+                    set('alug-c-status', c.status||'ativo'); set('alug-c-obs', c.observacoes||'');
+                    if(gerar){ gerar.checked=false; gerar.parentElement.style.display='none'; }
+                } else {
+                    ['alug-c-imovel-desc','alug-c-inq-nome','alug-c-inq-tel','alug-c-inq-cpf','alug-c-inq-email','alug-c-prop-nome','alug-c-prop-tel','alug-c-prop-cpf','alug-c-valor','alug-c-condominio','alug-c-iptu','alug-c-garantia-det','alug-c-obs'].forEach(k=>set(k,''));
+                    set('alug-c-imovel',''); set('alug-c-taxa',10); set('alug-c-dia',5);
+                    set('alug-c-inicio', today()); set('alug-c-duracao',12); set('alug-c-indice','igpm');
+                    set('alug-c-garantia','nenhum'); set('alug-c-status','ativo');
+                    if(gerar){ gerar.checked=true; gerar.parentElement.style.display='flex'; }
+                }
+                UI.openModal('alug-contrato');
+            }
+            async function salvarContrato(e){
+                e.preventDefault();
+                const g=k=>document.getElementById(k);
+                const id = g('alug-c-id').value || uid();
+                const existente = g('alug-c-id').value ? await DB.get('alugueis_contratos', id) : null;
+                const contrato = {
+                    id,
+                    imovelId: g('alug-c-imovel').value || '',
+                    imovelDesc: g('alug-c-imovel-desc').value.trim(),
+                    inquilinoNome: g('alug-c-inq-nome').value.trim(),
+                    inquilinoTel: g('alug-c-inq-tel').value.trim(),
+                    inquilinoCpf: g('alug-c-inq-cpf').value.trim(),
+                    inquilinoEmail: g('alug-c-inq-email').value.trim(),
+                    proprietarioNome: g('alug-c-prop-nome').value.trim(),
+                    proprietarioTel: g('alug-c-prop-tel').value.trim(),
+                    proprietarioCpf: g('alug-c-prop-cpf').value.trim(),
+                    valorAluguel: parseV(g('alug-c-valor').value),
+                    taxaAdmin: parseFloat(g('alug-c-taxa').value)||0,
+                    valorCondominio: parseV(g('alug-c-condominio').value),
+                    valorIptu: parseV(g('alug-c-iptu').value),
+                    diaVencimento: parseInt(g('alug-c-dia').value)||5,
+                    dataInicio: g('alug-c-inicio').value,
+                    duracaoMeses: parseInt(g('alug-c-duracao').value)||12,
+                    indiceReajuste: g('alug-c-indice').value,
+                    tipoGarantia: g('alug-c-garantia').value,
+                    garantiaDetalhe: g('alug-c-garantia-det').value.trim(),
+                    status: g('alug-c-status').value,
+                    observacoes: g('alug-c-obs').value.trim(),
+                    dataCriacao: existente ? existente.dataCriacao : new Date().toISOString()
+                };
+                try{
+                    await DB.put('alugueis_contratos', contrato);
+                    const gerar = g('alug-c-gerar');
+                    if(!existente && gerar && gerar.checked){
+                        const n = await gerarCobrancasContrato(contrato);
+                        Utils.toast('Contrato salvo · '+n+' cobrança(s) gerada(s).');
+                    } else {
+                        Utils.toast('Contrato salvo com sucesso.');
+                    }
+                    UI.closeModals();
+                    await renderTudo();
+                }catch(err){
+                    console.error(err);
+                    Utils.toast('Erro ao salvar contrato.','error');
+                }
+            }
+            async function gerarCobrancasContrato(contrato){
+                if(!contrato.dataInicio) return 0;
+                const existentes = (await getCobrancas()).filter(c=>c.contratoId===contrato.id);
+                const jaTem = new Set(existentes.map(c=>c.competencia));
+                const inicioYM = contrato.dataInicio.slice(0,7);
+                const n = Math.min(Math.max(contrato.duracaoMeses||12,1), 60);
+                let criadas=0;
+                for(let i=0;i<n;i++){
+                    const comp = addMesesYM(inicioYM, i);
+                    if(jaTem.has(comp)) continue;
+                    const taxaVal = +( (contrato.valorAluguel||0) * (contrato.taxaAdmin||0)/100 ).toFixed(2);
+                    const cob = {
+                        id: uid(),
+                        contratoId: contrato.id,
+                        competencia: comp,
+                        vencimento: vencimentoDe(comp, contrato.diaVencimento),
+                        valorAluguel: contrato.valorAluguel||0,
+                        valorCondominio: contrato.valorCondominio||0,
+                        valorIptu: contrato.valorIptu||0,
+                        encargos: 0, desconto: 0,
+                        status: 'pendente', dataPagamento: null, formaPagamento: '',
+                        taxaAdminValor: taxaVal,
+                        repasseProprietario: +((contrato.valorAluguel||0) - taxaVal).toFixed(2),
+                        repasseFeito: false,
+                        dataCriacao: new Date().toISOString()
+                    };
+                    await DB.put('alugueis_cobrancas', cob);
+                    criadas++;
+                }
+                return criadas;
+            }
+
+            // ── COBRANÇA: abrir/salvar ────────────────────────────────────
+            async function popularSelectContratos(selId, valorSel){
+                const sel = document.getElementById(selId); if(!sel) return;
+                const contratos = await getContratos();
+                sel.innerHTML = contratos.map(c=>`<option value="${c.id}">${esc(c.inquilinoNome||'Inquilino')} — ${esc((c.imovelDesc||'').substring(0,30))}</option>`).join('');
+                if(valorSel) sel.value = valorSel;
+            }
+            async function abrirModalCobranca(id, contratoId){
+                ensureModals();
+                const g=k=>document.getElementById(k);
+                const set=(k,v)=>{ const el=g(k); if(el) el.value=v; };
+                set('alug-cob-id', id||'');
+                document.getElementById('alug-cob-titulo').textContent = id ? 'Editar Cobrança' : 'Nova Cobrança';
+                if(id){
+                    const cb = await DB.get('alugueis_cobrancas', id); if(!cb){ Utils.toast('Cobrança não encontrada','error'); return; }
+                    await popularSelectContratos('alug-cob-contrato', cb.contratoId);
+                    set('alug-cob-competencia', cb.competencia||'');
+                    set('alug-cob-vencimento', cb.vencimento||'');
+                    set('alug-cob-aluguel', cb.valorAluguel?Utils.formatMoneyField(cb.valorAluguel):'');
+                    set('alug-cob-condominio', cb.valorCondominio?Utils.formatMoneyField(cb.valorCondominio):'');
+                    set('alug-cob-iptu', cb.valorIptu?Utils.formatMoneyField(cb.valorIptu):'');
+                    set('alug-cob-encargos', cb.encargos?Utils.formatMoneyField(cb.encargos):'');
+                    set('alug-cob-desconto', cb.desconto?Utils.formatMoneyField(cb.desconto):'');
+                } else {
+                    await popularSelectContratos('alug-cob-contrato', contratoId);
+                    const ct = contratoId ? await DB.get('alugueis_contratos', contratoId) : null;
+                    const comp = ymHoje();
+                    set('alug-cob-competencia', comp);
+                    set('alug-cob-vencimento', vencimentoDe(comp, ct?ct.diaVencimento:5));
+                    set('alug-cob-aluguel', ct&&ct.valorAluguel?Utils.formatMoneyField(ct.valorAluguel):'');
+                    set('alug-cob-condominio', ct&&ct.valorCondominio?Utils.formatMoneyField(ct.valorCondominio):'');
+                    set('alug-cob-iptu', ct&&ct.valorIptu?Utils.formatMoneyField(ct.valorIptu):'');
+                    set('alug-cob-encargos',''); set('alug-cob-desconto','');
+                }
+                UI.openModal('alug-cobranca');
+            }
+            async function salvarCobranca(e){
+                e.preventDefault();
+                const g=k=>document.getElementById(k);
+                const id = g('alug-cob-id').value || uid();
+                const existente = g('alug-cob-id').value ? await DB.get('alugueis_cobrancas', id) : null;
+                const contratoId = g('alug-cob-contrato').value;
+                const contrato = await DB.get('alugueis_contratos', contratoId);
+                const valorAluguel = parseV(g('alug-cob-aluguel').value);
+                const taxaPct = contrato ? (contrato.taxaAdmin||0) : 0;
+                const taxaVal = +(valorAluguel * taxaPct/100).toFixed(2);
+                const cob = Object.assign({}, existente||{}, {
+                    id, contratoId,
+                    competencia: g('alug-cob-competencia').value,
+                    vencimento: g('alug-cob-vencimento').value,
+                    valorAluguel,
+                    valorCondominio: parseV(g('alug-cob-condominio').value),
+                    valorIptu: parseV(g('alug-cob-iptu').value),
+                    encargos: parseV(g('alug-cob-encargos').value),
+                    desconto: parseV(g('alug-cob-desconto').value),
+                    taxaAdminValor: taxaVal,
+                    repasseProprietario: +(valorAluguel - taxaVal).toFixed(2),
+                    status: existente ? existente.status : 'pendente',
+                    dataPagamento: existente ? existente.dataPagamento : null,
+                    formaPagamento: existente ? existente.formaPagamento : '',
+                    repasseFeito: existente ? !!existente.repasseFeito : false,
+                    dataCriacao: existente ? existente.dataCriacao : new Date().toISOString()
+                });
+                try{
+                    await DB.put('alugueis_cobrancas', cob);
+                    Utils.toast('Cobrança salva.');
+                    UI.closeModals();
+                    await renderTudo();
+                }catch(err){ console.error(err); Utils.toast('Erro ao salvar cobrança.','error'); }
+            }
+            async function marcarPaga(id){
+                ensureModals();
+                const cb = await DB.get('alugueis_cobrancas', id); if(!cb) return;
+                const ct = await DB.get('alugueis_contratos', cb.contratoId);
+                document.getElementById('alug-pag-id').value = id;
+                document.getElementById('alug-pag-data').value = today();
+                document.getElementById('alug-pag-resumo').innerHTML =
+                    `<b>${esc(ct?ct.inquilinoNome:'Inquilino')}</b> · ${competenciaLabel(cb.competencia)}<br>`+
+                    `Valor: <b style="color:var(--dark);">${br(totalCob(cb))}</b> · Venc. ${fmtData(cb.vencimento)}`;
+                UI.openModal('alug-pagamento');
+            }
+            async function confirmarPagamento(e){
+                e.preventDefault();
+                const id = document.getElementById('alug-pag-id').value;
+                const cb = await DB.get('alugueis_cobrancas', id); if(!cb) return;
+                cb.status = 'pago';
+                cb.dataPagamento = document.getElementById('alug-pag-data').value || today();
+                cb.formaPagamento = document.getElementById('alug-pag-forma').value;
+                await DB.put('alugueis_cobrancas', cb);
+                Utils.toast('Pagamento registrado! Recibo disponível.');
+                UI.closeModals();
+                await renderTudo();
+            }
+            async function reabrirCobranca(id){
+                const cb = await DB.get('alugueis_cobrancas', id); if(!cb) return;
+                cb.status='pendente'; cb.dataPagamento=null; cb.formaPagamento=''; cb.repasseFeito=false;
+                await DB.put('alugueis_cobrancas', cb);
+                Utils.toast('Cobrança reaberta.');
+                await renderTudo();
+            }
+
+            // ── WhatsApp cobrança ─────────────────────────────────────────
+            async function enviarCobrancaWhatsApp(id){
+                const cb = await DB.get('alugueis_cobrancas', id); if(!cb) return;
+                const ct = await DB.get('alugueis_contratos', cb.contratoId);
+                if(!ct || !ct.inquilinoTel){ Utils.toast('Inquilino sem telefone cadastrado.','error'); return; }
+                const tot = totalCob(cb);
+                const st = statusCob(cb);
+                let msg = `Olá, ${ct.inquilinoNome||''}! `;
+                if(st==='atrasado') msg += `Identificamos que o aluguel referente a *${competenciaLabel(cb.competencia)}* está em aberto.\n\n`;
+                else msg += `Segue a cobrança do aluguel referente a *${competenciaLabel(cb.competencia)}*.\n\n`;
+                msg += `🏠 *Imóvel:* ${ct.imovelDesc||'—'}\n`;
+                msg += `💰 *Aluguel:* ${br(cb.valorAluguel)}\n`;
+                if(cb.valorCondominio) msg += `🏢 *Condomínio:* ${br(cb.valorCondominio)}\n`;
+                if(cb.valorIptu) msg += `📄 *IPTU:* ${br(cb.valorIptu)}\n`;
+                if(cb.encargos) msg += `⚠️ *Encargos:* ${br(cb.encargos)}\n`;
+                if(cb.desconto) msg += `🏷️ *Desconto:* -${br(cb.desconto)}\n`;
+                msg += `\n📌 *Total: ${br(tot)}*\n`;
+                msg += `📅 *Vencimento:* ${fmtData(cb.vencimento)}\n\n`;
+                msg += `Qualquer dúvida, estou à disposição. Obrigado!`;
+                const fone = (ct.inquilinoTel||'').replace(/\D/g,'');
+                const num = fone.length>=12 ? fone : '55'+fone;
+                Utils.openWhatsApp(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`);
+            }
+
+            // ── Recibo em PDF ─────────────────────────────────────────────
+            function valorExtenso(valor){
+                valor = Math.round((valor||0)*100)/100;
+                const inteiro = Math.floor(valor);
+                const cent = Math.round((valor-inteiro)*100);
+                const u=['','um','dois','três','quatro','cinco','seis','sete','oito','nove'];
+                const especiais=['dez','onze','doze','treze','quatorze','quinze','dezesseis','dezessete','dezoito','dezenove'];
+                const dez=['','','vinte','trinta','quarenta','cinquenta','sessenta','setenta','oitenta','noventa'];
+                const cem=['','cento','duzentos','trezentos','quatrocentos','quinhentos','seiscentos','setecentos','oitocentos','novecentos'];
+                function ate999(n){
+                    if(n===0) return '';
+                    if(n===100) return 'cem';
+                    let s='';
+                    const c=Math.floor(n/100), resto=n%100;
+                    if(c) s+=cem[c];
+                    if(resto){
+                        if(s) s+=' e ';
+                        if(resto<10) s+=u[resto];
+                        else if(resto<20) s+=especiais[resto-10];
+                        else { const d=Math.floor(resto/10), un=resto%10; s+=dez[d]; if(un) s+=' e '+u[un]; }
+                    }
+                    return s;
+                }
+                function grupos(n){
+                    if(n===0) return 'zero';
+                    const milhao=Math.floor(n/1000000);
+                    const milhar=Math.floor((n%1000000)/1000);
+                    const resto=n%1000;
+                    let p=[];
+                    if(milhao) p.push(ate999(milhao)+(milhao===1?' milhão':' milhões'));
+                    if(milhar) p.push((milhar===1?'mil':ate999(milhar)+' mil'));
+                    if(resto) p.push(ate999(resto));
+                    return p.join(' e ');
+                }
+                let txt = grupos(inteiro)+(inteiro===1?' real':' reais');
+                if(cent) txt += ' e '+ate999(cent)+(cent===1?' centavo':' centavos');
+                return txt.charAt(0).toUpperCase()+txt.slice(1);
+            }
+            async function gerarRecibo(id){
+                try{
+                    const cb = await DB.get('alugueis_cobrancas', id); if(!cb){ Utils.toast('Cobrança não encontrada','error'); return; }
+                    const ct = await DB.get('alugueis_contratos', cb.contratoId);
+                    const settings = await Storage.getSettings();
+                    const tot = totalCob(cb);
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF('p','mm','a4');
+                    const W = doc.internal.pageSize.getWidth();
+                    const M = 16;
+                    // Cabeçalho
+                    doc.setFillColor(14,116,144); doc.rect(0,0,W,34,'F');
+                    doc.setFillColor(39,174,96); doc.rect(0,32,W,2.2,'F');
+                    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(17);
+                    doc.text('RECIBO DE ALUGUEL', W/2, 15, {align:'center'});
+                    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(200,230,245);
+                    doc.text(`${settings.nome||''}${settings.creci?'  ·  CRECI '+settings.creci:''}`, W/2, 23, {align:'center'});
+                    if(settings.telefone) doc.text(settings.telefone, W/2, 28.5, {align:'center'});
+                    // Número e competência
+                    let y=46;
+                    doc.setTextColor(30,40,55); doc.setFont('helvetica','bold'); doc.setFontSize(11);
+                    doc.text('Recibo nº '+ id.slice(-6).toUpperCase(), M, y);
+                    doc.text('Competência: '+competenciaLabel(cb.competencia), W-M, y, {align:'right'});
+                    // Valor destaque
+                    y+=10;
+                    doc.setFillColor(235,244,251); doc.roundedRect(M, y, W-2*M, 18, 3,3,'F');
+                    doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(14,116,144);
+                    doc.text(Utils.formatCurrency(tot), M+6, y+12);
+                    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(100,116,139);
+                    doc.text('VALOR TOTAL RECEBIDO', W-M-6, y+8, {align:'right'});
+                    y+=28;
+                    // Corpo declaratório
+                    doc.setFontSize(10.5); doc.setTextColor(40,40,40); doc.setFont('helvetica','normal');
+                    const linhas = doc.splitTextToSize(
+                        `Recebi de ${ct?ct.inquilinoNome:'—'}${ct&&ct.inquilinoCpf?', CPF '+ct.inquilinoCpf:''}, a importância de ${Utils.formatCurrency(tot)} (${valorExtenso(tot)}), referente ao aluguel do imóvel situado em ${ct?ct.imovelDesc:'—'}, competência ${competenciaLabel(cb.competencia)}.`,
+                        W-2*M);
+                    doc.text(linhas, M, y); y += linhas.length*6 + 4;
+                    // Discriminação
+                    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.text('Discriminação dos valores', M, y); y+=6;
+                    doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+                    const item=(lbl,val)=>{ doc.setTextColor(80,90,105); doc.text(lbl, M, y); doc.setTextColor(30,40,55); doc.text(Utils.formatCurrency(val), W-M, y, {align:'right'}); y+=5.6; };
+                    item('Aluguel', cb.valorAluguel||0);
+                    if(cb.valorCondominio) item('Condomínio', cb.valorCondominio);
+                    if(cb.valorIptu) item('IPTU', cb.valorIptu);
+                    if(cb.encargos) item('Encargos/multa', cb.encargos);
+                    if(cb.desconto) item('Desconto', -cb.desconto);
+                    doc.setDrawColor(210,220,230); doc.line(M,y,W-M,y); y+=6;
+                    doc.setFont('helvetica','bold'); doc.text('Total', M, y); doc.text(Utils.formatCurrency(tot), W-M, y, {align:'right'}); y+=12;
+                    // Pagamento
+                    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(80,90,105);
+                    doc.text('Forma de pagamento: '+(cb.formaPagamento||'—'), M, y);
+                    doc.text('Pago em: '+fmtData(cb.dataPagamento), W-M, y, {align:'right'}); y+=18;
+                    // Assinatura
+                    const cidadeData = new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'});
+                    doc.setTextColor(40,40,40); doc.text(`${settings.imobiliaria||''}, ${cidadeData}.`, M, y); y+=20;
+                    doc.setDrawColor(120,130,145); doc.line(W/2-35, y, W/2+35, y); y+=5;
+                    doc.setFontSize(9); doc.setTextColor(60,70,85);
+                    doc.text(settings.nome||'Responsável', W/2, y, {align:'center'});
+                    if(settings.creci){ y+=4.5; doc.setFontSize(8); doc.setTextColor(120,130,145); doc.text('CRECI '+settings.creci, W/2, y, {align:'center'}); }
+                    doc.save(`Recibo_${(ct?ct.inquilinoNome:'aluguel').replace(/\s+/g,'_')}_${cb.competencia}.pdf`);
+                    Utils.toast('Recibo gerado com sucesso!');
+                }catch(err){ console.error(err); Utils.toast('Erro ao gerar recibo.','error'); }
+            }
+
+            // ── Exclusão ──────────────────────────────────────────────────
+            function pedirExclusao(tipo, id){
+                ensureModals();
+                _delAlvo = { tipo, id };
+                const msg = document.getElementById('alug-del-msg');
+                if(msg) msg.innerHTML = tipo==='contrato'
+                    ? 'Tem certeza? Isso excluirá o contrato <b>e todas as cobranças vinculadas</b>. Esta ação não pode ser desfeita.'
+                    : 'Tem certeza que deseja excluir esta cobrança? Esta ação não pode ser desfeita.';
+                UI.openModal('alug-del');
+            }
+            async function confirmarExclusao(){
+                if(!_delAlvo) return;
+                try{
+                    if(_delAlvo.tipo==='contrato'){
+                        const cobs = (await getCobrancas()).filter(c=>c.contratoId===_delAlvo.id);
+                        for(const c of cobs) await DB.delete('alugueis_cobrancas', c.id);
+                        await DB.delete('alugueis_contratos', _delAlvo.id);
+                        Utils.toast('Contrato excluído.');
+                    } else {
+                        await DB.delete('alugueis_cobrancas', _delAlvo.id);
+                        Utils.toast('Cobrança excluída.');
+                    }
+                }catch(err){ console.error(err); Utils.toast('Erro ao excluir.','error'); }
+                _delAlvo=null; UI.closeModals(); await renderTudo();
+            }
+
+            return {
+                init, switchTab,
+                abrirModalContrato, salvarContrato, vincularImovel,
+                abrirModalCobranca, salvarCobranca,
+                marcarPaga, confirmarPagamento, reabrirCobranca,
+                enviarCobrancaWhatsApp, gerarRecibo,
+                marcarRepasse, setFiltroStatus, setFiltroMes,
+                pedirExclusao, confirmarExclusao
+            };
+        })();
+        try { window.Alugueis = Alugueis; } catch(e) { console.error('Falha ao expor Alugueis:', e); }
+
+
 
         // ── wppOpen: abre WhatsApp com compatibilidade total mobile/PWA ──
         // Usado nos onclick inline dos templates. Delega para Utils.openWhatsApp
