@@ -740,8 +740,19 @@
         .client-header {
             display: flex; justify-content: space-between; align-items: flex-start;
             margin-bottom: 12px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .client-name { font-weight: 700; font-size: 0.95rem; color: var(--dark); line-height: 1.3; }
+        .client-name { 
+            font-weight: 700; 
+            font-size: 0.95rem; 
+            color: var(--dark); 
+            line-height: 1.3;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            flex: 1;
+            min-width: 0;
+        }
         .client-type {
             font-size: 0.7rem; padding: 3px 8px; border-radius: 99px;
             font-weight: 600;
@@ -753,6 +764,9 @@
         .client-row {
             display: flex; align-items: center; gap: 8px;
             font-size: 0.85rem; color: var(--text-secondary);
+            word-break: break-word;
+            overflow-wrap: break-word;
+            min-width: 0;
         }
 
         .client-actions {
@@ -6081,6 +6095,8 @@
             grid-template-columns: 1fr;
             gap: 10px;
             width: 100%;
+            max-width: 100%;
+            overflow: hidden;
         }
         @media (min-width: 600px) {
             .client-cards-grid { grid-template-columns: repeat(2, 1fr); }
@@ -17579,7 +17595,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         <div class="client-card" onclick="App.cliente.showDetails('${cliente.id}')">
                             <div class="client-header">
                                 <div class="client-name">${cliente.nome} <span class="badge badge-primary contact-count">${cliente.contatos || 0}</span></div>
-                                <span style="display:inline-flex;align-items:center;gap:5px;background:${etapa?.cor || '#707070'};color:white;padding:3px 9px;border-radius:20px;font-size:0.7rem;font-weight:700;white-space:nowrap;letter-spacing:0.02em;">
+                                <span style="display:inline-flex;align-items:center;gap:5px;background:${etapa?.cor || '#707070'};color:white;padding:3px 9px;border-radius:20px;font-size:0.7rem;font-weight:700;letter-spacing:0.02em;">
                                     <i class="fas ${etapaInfo.icon}" style="font-size:0.65rem;"></i>${etapaInfo.abrev}${dias > 0 ? `<span style="opacity:0.8;font-weight:500;">· ${dias}d</span>` : ''}${isParado ? `<span style="background:rgba(255,255,255,0.25);border-radius:10px;padding:1px 5px;font-size:0.62rem;">⚠️</span>` : ''}
                                 </span>
                             </div>
@@ -18078,7 +18094,7 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                             ${rank !== null ? `<div style="position:absolute;top:10px;left:12px;font-size:0.7rem;font-weight:800;color:var(--text-secondary);opacity:0.6;">#${rank+1}</div>` : ''}
                             <div class="client-header" style="${rank !== null ? 'padding-left:28px;' : ''}">
                                 <div class="client-name">${c.nome} ${idade ? `(${idade} anos)` : ''} <span class="badge badge-primary contact-count">${c.contatos || 0}</span>${prioIcon}${c.receberNovidades ? `<span title="Recebe novidades" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:white;font-size:0.6rem;padding:2px 6px;border-radius:10px;margin-left:4px;font-weight:700;">📬</span>` : ''}</div>
-                                <span style="display:inline-flex;align-items:center;gap:5px;background:${etapa.cor};color:white;padding:3px 9px;border-radius:20px;font-size:0.7rem;font-weight:700;white-space:nowrap;letter-spacing:0.02em;">
+                                <span style="display:inline-flex;align-items:center;gap:5px;background:${etapa.cor};color:white;padding:3px 9px;border-radius:20px;font-size:0.7rem;font-weight:700;letter-spacing:0.02em;">
                                     <i class="fas ${etapaInfo.icon}" style="font-size:0.65rem;"></i>${etapaInfo.abrev}${diasNaEtapa > 0 ? `<span style="opacity:0.8;font-weight:500;">· ${diasNaEtapa}d</span>` : ''}${isParado ? `<span style="background:rgba(255,255,255,0.25);border-radius:10px;padding:1px 5px;font-size:0.62rem;">⚠️</span>` : ''}
                                 </span>
                             </div>
