@@ -36710,6 +36710,58 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 .alug-chip.active{background:var(--info);border-color:var(--info);color:#fff;}
                 .alug-alert{background:rgba(230,126,34,0.1);border:1px solid rgba(230,126,34,0.3);border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:0.78rem;color:#9A5418;display:flex;gap:9px;align-items:flex-start;}
                 body.dark-mode .alug-card{background:#1B2433;}
+
+                /* ── Visão mês a mês (cobranças) ───────────────────────── */
+                .alug-mes-bloco{margin-bottom:20px;}
+                .alug-mes-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px;padding-bottom:7px;border-bottom:2px solid var(--border);}
+                .alug-mes-titulo{font-size:0.95rem;font-weight:800;color:var(--dark);display:flex;align-items:center;gap:7px;text-transform:capitalize;}
+                .alug-mes-titulo i{color:var(--info);}
+                .alug-mes-resumo{display:flex;gap:6px 10px;font-size:0.68rem;font-weight:700;color:var(--text-secondary);align-items:center;flex-wrap:wrap;}
+                .alug-mes-resumo b{color:var(--dark);}
+                .alug-mes-total{color:var(--info);font-family:'DM Mono',monospace;font-weight:800;}
+                .alug-mes-atr{color:var(--danger);}
+                .alug-mes-pagas{color:var(--accent-dark);}
+                /* Grade de 2 colunas */
+                .alug-cob-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;}
+                .alug-cob-mini{background:var(--bg-raised);border:1px solid var(--border);border-radius:12px;padding:11px 11px 9px;box-shadow:0 1px 3px rgba(0,0,0,0.04);display:flex;flex-direction:column;min-width:0;}
+                body.dark-mode .alug-cob-mini{background:#1B2433;}
+                .alug-cob-mini-head{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:6px;}
+                .alug-cob-mini-nome{font-size:0.8rem;font-weight:800;color:var(--dark);line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+                .alug-cob-mini .alug-badge{flex-shrink:0;font-size:0.55rem;padding:2px 7px;}
+                .alug-cob-mini-val{font-size:1.02rem;font-weight:800;color:var(--dark);font-family:'DM Mono',monospace;line-height:1.1;}
+                .alug-cob-mini-venc{font-size:0.68rem;color:var(--text-secondary);margin-top:3px;display:flex;align-items:center;gap:5px;}
+                .alug-cob-mini-acts{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;}
+                .alug-mini-btn{width:30px;height:30px;border:none;border-radius:8px;font-size:0.72rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+                .alug-mini-btn.p{background:var(--primary);color:#fff;} .alug-mini-btn.g{background:var(--accent);color:#fff;}
+                .alug-mini-btn.w{background:#25D366;color:#fff;} .alug-mini-btn.o{background:var(--bg-overlay);color:var(--text-secondary);border:1px solid var(--border);}
+                .alug-mini-btn.d{background:rgba(231,76,60,0.1);color:var(--danger);}
+                @media(max-width:380px){
+                    .alug-cob-grid{gap:7px;}
+                    .alug-cob-mini{padding:9px 8px 8px;}
+                    .alug-cob-mini-val{font-size:0.92rem;}
+                    .alug-mini-btn{width:27px;height:27px;font-size:0.66rem;}
+                }
+
+                /* ── Duas colunas em todas as abas do painel ───────────── */
+                #alug-painel-list, #alug-contratos-list, #alug-repasses-list{
+                    display:grid; grid-template-columns:repeat(2,1fr); gap:10px; align-items:start;
+                }
+                #alug-painel-list > .alug-card,
+                #alug-contratos-list > .alug-card,
+                #alug-repasses-list > .alug-card{ margin-bottom:0; }
+                /* Vazios e cards-resumo ocupam a largura inteira */
+                #alug-painel-list > .alug-empty,
+                #alug-contratos-list > .alug-empty,
+                #alug-repasses-list > .alug-empty,
+                .alug-span{ grid-column:1 / -1; }
+                /* Botão PDF nos cards */
+                .alug-btn.pdf{background:#C0392B;color:#fff;}
+                @media(max-width:380px){
+                    #alug-painel-list, #alug-contratos-list, #alug-repasses-list{ gap:7px; }
+                    #alug-painel-list .alug-card,
+                    #alug-contratos-list .alug-card,
+                    #alug-repasses-list .alug-card{ padding:11px 11px; }
+                }
                 `;
                 const st = document.createElement('style');
                 st.id = 'alug-styles'; st.textContent = css;
@@ -36997,6 +37049,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                         </div>
                         <div class="alug-acts">
                             <button class="alug-btn p" onclick="Alugueis.abrirModalCobranca(null,'${c.id}')"><i class="fas fa-plus"></i> Cobrança</button>
+                            <button class="alug-btn pdf" onclick="Alugueis.gerarContratoPDF('${c.id}')"><i class="fas fa-file-pdf"></i> PDF</button>
                             <button class="alug-btn o" onclick="Alugueis.abrirModalContrato('${c.id}')"><i class="fas fa-pen"></i> Editar</button>
                             <button class="alug-btn d" onclick="Alugueis.pedirExclusao('contrato','${c.id}')"><i class="fas fa-trash"></i></button>
                         </div>
@@ -37034,6 +37087,32 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                     </div>
                 </div>`;
             }
+            // Card compacto p/ a grade de 2 colunas (visão mês a mês)
+            function cardCobrancaCompacta(cb, contrato){
+                const st = statusCob(cb);
+                const tot = totalCob(cb);
+                const cor = st==='pago' ? 'var(--accent)' : (st==='atrasado' ? 'var(--danger)' : 'var(--warning)');
+                const nome = contrato ? (contrato.inquilinoNome||'Inquilino') : 'Inquilino';
+                const stLabel = st==='pago' ? 'Pago' : (st==='atrasado' ? 'Atrasado' : 'Pendente');
+                return `<div class="alug-cob-mini" style="border-left:3px solid ${cor};">
+                    <div class="alug-cob-mini-head">
+                        <span class="alug-cob-mini-nome">${esc(nome)}</span>
+                        <span class="alug-badge alug-b-${st}">${stLabel}</span>
+                    </div>
+                    <div class="alug-cob-mini-val">${br(tot)}</div>
+                    <div class="alug-cob-mini-venc"><i class="fas fa-calendar-day"></i> Venc. ${fmtData(cb.vencimento)}</div>
+                    <div class="alug-cob-mini-acts">
+                        ${st!=='pago'
+                            ? `<button class="alug-mini-btn g" onclick="Alugueis.marcarPaga('${cb.id}')" title="Marcar como pago"><i class="fas fa-check"></i></button>`
+                            : `<button class="alug-mini-btn o" onclick="Alugueis.reabrirCobranca('${cb.id}')" title="Reabrir"><i class="fas fa-rotate-left"></i></button>`}
+                        <button class="alug-mini-btn w" onclick="Alugueis.enviarCobrancaWhatsApp('${cb.id}')" title="Cobrar via WhatsApp"><i class="fab fa-whatsapp"></i></button>
+                        ${st==='pago' ? `<button class="alug-mini-btn p" onclick="Alugueis.gerarRecibo('${cb.id}')" title="Recibo"><i class="fas fa-file-pdf"></i></button>` : ''}
+                        <button class="alug-mini-btn o" onclick="Alugueis.abrirModalCobranca('${cb.id}')" title="Editar"><i class="fas fa-pen"></i></button>
+                        <button class="alug-mini-btn d" onclick="Alugueis.pedirExclusao('cobranca','${cb.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }
+
             function renderCobrancas(contratos, cobrancas){
                 const cont = document.getElementById('alug-cobrancas-list'); if(!cont) return;
                 const cMap={}; contratos.forEach(c=>cMap[c.id]=c);
@@ -37047,12 +37126,36 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 let lista = [...cobrancas];
                 if(_fStatus) lista = lista.filter(c=>statusCob(c)===_fStatus);
                 if(_fMes) lista = lista.filter(c=>c.competencia===_fMes);
-                lista.sort((a,b)=>(b.vencimento||'').localeCompare(a.vencimento||''));
                 if(!lista.length){
                     cont.innerHTML = `<div class="alug-empty"><div class="alug-empty-ico">🧾</div><div class="alug-empty-t">Nenhuma cobrança</div><div class="alug-empty-s">As cobranças aparecem aqui. Crie um contrato com geração automática ou adicione manualmente.</div></div>`;
                     return;
                 }
-                cont.innerHTML = lista.map(cb=>cardCobranca(cb, cMap[cb.contratoId])).join('');
+                // Agrupa mês a mês (competência) — mais recente primeiro
+                const grupos = {};
+                lista.forEach(cb=>{
+                    const k = cb.competencia || '0000-00';
+                    (grupos[k] = grupos[k] || []).push(cb);
+                });
+                const chaves = Object.keys(grupos).sort().reverse();
+                cont.innerHTML = chaves.map(ym=>{
+                    const itens = grupos[ym].sort((a,b)=>(a.vencimento||'').localeCompare(b.vencimento||''));
+                    const totalMes = itens.reduce((s,c)=>s+totalCob(c),0);
+                    const pagas = itens.filter(c=>statusCob(c)==='pago').length;
+                    const atr   = itens.filter(c=>statusCob(c)==='atrasado').length;
+                    const cards = itens.map(cb=>cardCobrancaCompacta(cb, cMap[cb.contratoId])).join('');
+                    return `<div class="alug-mes-bloco">
+                        <div class="alug-mes-head">
+                            <div class="alug-mes-titulo"><i class="fas fa-calendar-alt"></i> ${competenciaLabel(ym)}</div>
+                            <div class="alug-mes-resumo">
+                                <span><b>${itens.length}</b> cobrança${itens.length!==1?'s':''}</span>
+                                <span class="alug-mes-total">${br(totalMes)}</span>
+                                ${atr?`<span class="alug-mes-atr">${atr} atrasada${atr!==1?'s':''}</span>`:''}
+                                <span class="alug-mes-pagas">${pagas}/${itens.length} pagas</span>
+                            </div>
+                        </div>
+                        <div class="alug-cob-grid">${cards}</div>
+                    </div>`;
+                }).join('');
             }
             function setFiltroStatus(s, btn){
                 _fStatus = s;
@@ -37073,7 +37176,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 }
                 let totalRepasse=0, totalTaxa=0;
                 pagas.forEach(c=>{ totalRepasse += (c.repasseProprietario||0); totalTaxa += (c.taxaAdminValor||0); });
-                const resumo = `<div class="alug-card" style="background:linear-gradient(135deg,#0E7490,#1D6FA4);color:#fff;border:none;">
+                const resumo = `<div class="alug-card alug-span" style="background:linear-gradient(135deg,#0E7490,#1D6FA4);color:#fff;border:none;">
                     <div style="display:flex;justify-content:space-between;gap:10px;">
                         <div><div style="font-size:0.66rem;opacity:0.85;text-transform:uppercase;letter-spacing:.04em;">Total a repassar</div><div style="font-size:1.15rem;font-weight:800;font-family:'DM Mono',monospace;">${br(totalRepasse)}</div></div>
                         <div style="text-align:right;"><div style="font-size:0.66rem;opacity:0.85;text-transform:uppercase;letter-spacing:.04em;">Sua taxa acumulada</div><div style="font-size:1.15rem;font-weight:800;font-family:'DM Mono',monospace;color:#86EFAC;">${br(totalTaxa)}</div></div>
@@ -37472,6 +37575,149 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 }catch(err){ console.error(err); Utils.toast('Erro ao gerar recibo.','error'); }
             }
 
+            // ── CONTRATO em PDF (ficha completa) ──────────────────────────
+            async function gerarContratoPDF(id){
+                try{
+                    const ct = await DB.get('alugueis_contratos', id);
+                    if(!ct){ Utils.toast('Contrato não encontrado','error'); return; }
+                    const cobs = (await getCobrancas()).filter(c=>c.contratoId===id)
+                        .sort((a,b)=>(a.competencia||'').localeCompare(b.competencia||''));
+                    const settings = await Storage.getSettings();
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF('p','mm','a4');
+                    const W = doc.internal.pageSize.getWidth();
+                    const H = doc.internal.pageSize.getHeight();
+                    const M = 16;
+                    let y = 0;
+
+                    const ensureSpace = need => { if(y + need > H - 18){ doc.addPage(); y = 20; } };
+
+                    // ── Cabeçalho ─────────────────────────────────────────
+                    doc.setFillColor(14,116,144); doc.rect(0,0,W,34,'F');
+                    doc.setFillColor(39,174,96); doc.rect(0,32,W,2.2,'F');
+                    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(15);
+                    doc.text('FICHA DO CONTRATO DE LOCAÇÃO', W/2, 14, {align:'center'});
+                    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(200,230,245);
+                    doc.text(`${settings.imobiliaria||settings.nome||''}${settings.creci?'  ·  CRECI '+settings.creci:''}`, W/2, 22, {align:'center'});
+                    if(settings.telefone) doc.text(settings.telefone, W/2, 27.5, {align:'center'});
+
+                    y = 44;
+                    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(30,40,55);
+                    doc.text('Contrato nº '+ id.slice(-6).toUpperCase(), M, y);
+                    if(ct.status==='ativo') doc.setTextColor(39,174,96); else doc.setTextColor(120,130,145);
+                    doc.text('Status: '+(ct.status==='ativo'?'ATIVO':'ENCERRADO'), W-M, y, {align:'right'});
+                    y += 5;
+                    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(120,130,145);
+                    doc.text('Emitido em '+ new Date().toLocaleDateString('pt-BR'), M, y);
+                    y += 9;
+
+                    // ── helpers ───────────────────────────────────────────
+                    const section = titulo => {
+                        ensureSpace(16);
+                        doc.setFillColor(235,244,251); doc.roundedRect(M, y, W-2*M, 8, 2,2,'F');
+                        doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(14,116,144);
+                        doc.text(titulo.toUpperCase(), M+4, y+5.4);
+                        y += 12;
+                    };
+                    const field = (lbl, val, x, w) => {
+                        doc.setFont('helvetica','normal'); doc.setFontSize(7.3); doc.setTextColor(120,130,145);
+                        doc.text(String(lbl).toUpperCase(), x, y);
+                        doc.setFont('helvetica','bold'); doc.setFontSize(9.8); doc.setTextColor(30,40,55);
+                        const lines = doc.splitTextToSize(String(val==null||val==='' ? '—' : val), w);
+                        doc.text(lines, x, y+5);
+                        return 5 + lines.length*4.6 + 3;
+                    };
+                    const colW = (W-2*M-8)/2;
+                    const twoCols = (l1,v1,l2,v2) => {
+                        ensureSpace(14);
+                        const h1 = field(l1,v1,M,colW);
+                        const h2 = (l2!=='') ? field(l2,v2,M+colW+8,colW) : 0;
+                        y += Math.max(h1,h2);
+                    };
+                    const oneCol = (l,v) => { ensureSpace(14); y += field(l,v,M,W-2*M); };
+
+                    // ── Seções ────────────────────────────────────────────
+                    section('Imóvel');
+                    oneCol('Endereço / identificação', ct.imovelDesc);
+
+                    section('Locador (Proprietário)');
+                    twoCols('Nome', ct.proprietarioNome, 'CPF/CNPJ', ct.proprietarioCpf);
+                    twoCols('Telefone', ct.proprietarioTel, '', '');
+
+                    section('Locatário (Inquilino)');
+                    twoCols('Nome', ct.inquilinoNome, 'CPF', ct.inquilinoCpf);
+                    twoCols('Telefone', ct.inquilinoTel, 'E-mail', ct.inquilinoEmail);
+
+                    section('Condições financeiras');
+                    const repasseEstimado = +((ct.valorAluguel||0) * (1 - (ct.taxaAdmin||0)/100)).toFixed(2);
+                    twoCols('Aluguel mensal', Utils.formatCurrency(ct.valorAluguel||0), 'Dia de vencimento', 'Todo dia '+(ct.diaVencimento||'—'));
+                    twoCols('Condomínio', Utils.formatCurrency(ct.valorCondominio||0), 'IPTU', Utils.formatCurrency(ct.valorIptu||0));
+                    twoCols('Taxa de administração', (ct.taxaAdmin||0)+'%', 'Repasse estimado/mês', Utils.formatCurrency(repasseEstimado));
+
+                    section('Vigência e garantia');
+                    const garantiaMap = {nenhum:'Sem garantia', caucao:'Caução', fiador:'Fiador', seguro:'Seguro-fiança', titulo:'Título de capitalização'};
+                    twoCols('Início do contrato', fmtData(ct.dataInicio), 'Duração', (ct.duracaoMeses||'—')+' meses');
+                    twoCols('Índice de reajuste', String(ct.indiceReajuste||'—').toUpperCase(), 'Garantia', garantiaMap[ct.tipoGarantia]||ct.tipoGarantia||'—');
+                    if(ct.garantiaDetalhe) oneCol('Detalhe da garantia', ct.garantiaDetalhe);
+                    if(ct.observacoes) oneCol('Observações', ct.observacoes);
+
+                    if(cobs.length){
+                        const pagas = cobs.filter(c=>c.status==='pago');
+                        const totalRecebido = pagas.reduce((s,c)=>s+totalCob(c),0);
+                        const aReceber = cobs.filter(c=>c.status!=='pago').reduce((s,c)=>s+totalCob(c),0);
+                        const atrasadas = cobs.filter(c=>statusCob(c)==='atrasado').length;
+                        section('Resumo das cobranças');
+                        twoCols('Cobranças geradas', cobs.length+'  ('+pagas.length+' pagas)', 'Atrasadas', String(atrasadas));
+                        twoCols('Total recebido', Utils.formatCurrency(totalRecebido), 'Total a receber', Utils.formatCurrency(aReceber));
+
+                        if(typeof doc.autoTable === 'function'){
+                            ensureSpace(30);
+                            const body = cobs.map(c=>{
+                                const st = statusCob(c);
+                                return [competenciaLabel(c.competencia), fmtData(c.vencimento), Utils.formatCurrency(totalCob(c)),
+                                    st==='pago'?'Pago':(st==='atrasado'?'Atrasado':'Pendente')];
+                            });
+                            doc.autoTable({
+                                startY: y+1,
+                                head: [['Competência','Vencimento','Valor','Status']],
+                                body,
+                                margin: {left:M, right:M},
+                                styles: {fontSize:8, cellPadding:2},
+                                headStyles: {fillColor:[14,116,144], textColor:255, fontStyle:'bold'},
+                                alternateRowStyles: {fillColor:[240,246,251]},
+                                theme:'grid'
+                            });
+                            y = doc.lastAutoTable.finalY + 8;
+                        }
+                    }
+
+                    // ── Assinaturas ───────────────────────────────────────
+                    ensureSpace(40);
+                    y += 8;
+                    const cidadeData = new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'});
+                    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(40,40,40);
+                    doc.text(`${settings.imobiliaria||''}${settings.imobiliaria?', ':''}${cidadeData}.`, M, y);
+                    y += 22;
+                    const sigW = 70;
+                    const x1 = M + 6, x2 = W - M - sigW - 6;
+                    doc.setDrawColor(120,130,145);
+                    doc.line(x1, y, x1+sigW, y);
+                    doc.line(x2, y, x2+sigW, y);
+                    doc.setFontSize(8.5); doc.setTextColor(60,70,85);
+                    doc.text(ct.proprietarioNome||'Locador', x1+sigW/2, y+4.5, {align:'center'});
+                    doc.text(ct.inquilinoNome||'Locatário', x2+sigW/2, y+4.5, {align:'center'});
+                    doc.setFontSize(7.5); doc.setTextColor(120,130,145);
+                    doc.text('LOCADOR', x1+sigW/2, y+8.5, {align:'center'});
+                    doc.text('LOCATÁRIO', x2+sigW/2, y+8.5, {align:'center'});
+
+                    doc.setFontSize(7.5); doc.setTextColor(150,160,172);
+                    doc.text('Documento gerado pelo ImobiPro · Ficha cadastral do contrato de locação', W/2, H-10, {align:'center'});
+
+                    doc.save(`Contrato_${String(ct.inquilinoNome||'contrato').replace(/\s+/g,'_')}.pdf`);
+                    Utils.toast('Contrato (PDF) gerado com sucesso!');
+                }catch(err){ console.error(err); Utils.toast('Erro ao gerar contrato em PDF.','error'); }
+            }
+
             // ── Exclusão ──────────────────────────────────────────────────
             function pedirExclusao(tipo, id){
                 ensureModals();
@@ -37503,7 +37749,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 abrirModalContrato, salvarContrato, vincularImovel,
                 abrirModalCobranca, salvarCobranca,
                 marcarPaga, confirmarPagamento, reabrirCobranca,
-                enviarCobrancaWhatsApp, gerarRecibo,
+                enviarCobrancaWhatsApp, gerarRecibo, gerarContratoPDF,
                 marcarRepasse, setFiltroStatus, setFiltroMes,
                 pedirExclusao, confirmarExclusao
             };
@@ -49621,6 +49867,175 @@ E você não tem nenhum custo antecipado — a comissão só é devida quando a 
             // Replace App.agenda.edit with VerTarefa.open
             html = html.replace(/onclick="App\.agenda\.edit\('([^']+)'\)"/g, (m, id) => `onclick="VerTarefa.open('${id}')"`);
             return html;
+        };
+    })();
+
+    // ── Patch: exibir COBRANÇAS (mensalidades) na AGENDA ──────────────
+    // Marca os dias de vencimento no calendário e lista as cobranças do dia
+    // selecionado junto aos agendamentos.
+    (function patchAgendaCobrancas() {
+        if (typeof UI === 'undefined') return;
+
+        // CSS (injetado uma vez, sempre disponível)
+        if (!document.getElementById('agenda-cob-styles')) {
+            const css = `
+                .calendar-day.has-cobranca::before{
+                    content:'';position:absolute;top:4px;right:5px;
+                    width:5px;height:5px;border-radius:50%;
+                    background:var(--info);box-shadow:0 0 0 1.5px var(--bg-raised);
+                }
+                .calendar-day.has-cobranca.cob-pendente::before{background:var(--warning);}
+                .calendar-day.has-cobranca.cob-atrasado::before{background:var(--danger);}
+                .calendar-day.has-cobranca.cob-pago::before{background:var(--accent);}
+                .calendar-day.today.has-cobranca::before{box-shadow:0 0 0 1.5px var(--primary);}
+                #agenda-cobrancas-sec{margin-top:6px;}
+                .agenda-cob-sechead{display:flex;justify-content:space-between;align-items:center;gap:8px;
+                    margin:14px 0 9px;font-size:0.82rem;font-weight:800;color:var(--dark);}
+                .agenda-cob-sechead > span:first-child{display:flex;align-items:center;gap:7px;}
+                .agenda-cob-sechead i{color:var(--info);}
+                .agenda-cob-sebadge{font-size:0.7rem;font-weight:800;color:var(--info);
+                    background:var(--primary-ultra);padding:3px 10px;border-radius:20px;
+                    font-family:'DM Mono',monospace;}
+                .schedule-card.cobranca-agenda .schedule-type i{margin-right:3px;}
+            `;
+            const st = document.createElement('style');
+            st.id = 'agenda-cob-styles'; st.textContent = css;
+            document.head.appendChild(st);
+        }
+
+        // Cache em UI
+        UI._alugCobrancas = UI._alugCobrancas || [];
+        UI._alugContratosMap = UI._alugContratosMap || {};
+        UI._alugLoaded = false;
+        UI._alugLoading = false;
+
+        const escAg = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+        function statusCobAg(cb){
+            if (cb.status === 'pago') return 'pago';
+            const hoje = (window.Utils && Utils.getToday) ? Utils.getToday() : new Date().toISOString().slice(0,10);
+            if (cb.vencimento && cb.vencimento < hoje) return 'atrasado';
+            return 'pendente';
+        }
+        function totalCobAg(cb){
+            return (cb.valorAluguel||0)+(cb.valorCondominio||0)+(cb.valorIptu||0)+(cb.encargos||0)-(cb.desconto||0);
+        }
+        function moneyAg(v){
+            return (window.Utils && Utils.formatCurrency) ? Utils.formatCurrency(v||0)
+                : 'R$ ' + (v||0).toFixed(2).replace('.',',');
+        }
+        function dataAg(d){
+            return (window.Utils && Utils.formatDate) ? Utils.formatDate(d) : (d||'—');
+        }
+
+        UI.irParaAlugueis = function(){
+            const el = document.querySelector('.nav-panel-item[data-target="alugueis-view"]');
+            if (el) { UI.switchTab(el); if (window.Alugueis) Alugueis.init(); }
+        };
+
+        UI.createCobrancaAgendaCard = function(cb){
+            const ct = UI._alugContratosMap[cb.contratoId];
+            const st = statusCobAg(cb);
+            const tot = totalCobAg(cb);
+            const nome = ct ? (ct.inquilinoNome||'Inquilino') : 'Inquilino';
+            const end = ct ? (ct.imovelDesc||'') : '';
+            const cor = st==='pago' ? 'var(--accent)' : (st==='atrasado' ? 'var(--danger)' : 'var(--warning)');
+            const stLabel = st==='pago' ? 'Pago' : (st==='atrasado' ? 'Atrasado' : 'Pendente');
+            const stCls = st==='pago' ? 'badge-success' : (st==='atrasado' ? 'badge-danger' : 'badge-primary');
+            return '<div class="schedule-card cobranca-agenda" style="border-left:4px solid '+cor+';" onclick="UI.irParaAlugueis()">' +
+                '<div class="schedule-header">' +
+                    '<div class="schedule-type" style="background:'+cor+';color:#fff;"><i class="fas fa-file-invoice-dollar"></i> Cobrança</div>' +
+                    '<span class="badge '+stCls+'">'+stLabel+'</span>' +
+                '</div>' +
+                '<div class="schedule-time"><i class="far fa-calendar"></i> Venc. '+dataAg(cb.vencimento)+'</div>' +
+                '<div class="schedule-title">'+escAg(nome)+' — '+moneyAg(tot)+'</div>' +
+                (end ? '<div class="schedule-notes"><i class="fas fa-map-marker-alt"></i> '+escAg(end)+'</div>' : '') +
+            '</div>';
+        };
+
+        async function carregarCobrancasAgenda(){
+            if (UI._alugLoading || UI._alugLoaded) return;
+            UI._alugLoading = true;
+            try {
+                if (window.DB && DB.db) {
+                    const [cobs, conts] = await Promise.all([
+                        DB.getAll('alugueis_cobrancas').catch(()=>[]),
+                        DB.getAll('alugueis_contratos').catch(()=>[])
+                    ]);
+                    UI._alugCobrancas = cobs || [];
+                    const map = {}; (conts||[]).forEach(c=>{ map[c.id]=c; });
+                    UI._alugContratosMap = map;
+                    UI._alugLoaded = true;
+                }
+            } catch(e){ console.error('Falha ao carregar cobranças p/ agenda', e); }
+            UI._alugLoading = false;
+            // Re-renderiza agora que os dados estão em cache
+            try { if (document.getElementById('calendar-days')) UI.renderAgenda(); } catch(e){}
+        }
+        UI.carregarCobrancasAgenda = carregarCobrancasAgenda;
+
+        // Marca dias com cobrança no calendário
+        function marcarCobrancasCalendario(){
+            const cobs = UI._alugCobrancas || [];
+            if (!cobs.length) return;
+            const porData = {};   // data → pior status (atrasado>pendente>pago)
+            const prio = { atrasado:3, pendente:2, pago:1 };
+            cobs.forEach(cb=>{
+                if (!cb.vencimento) return;
+                const st = statusCobAg(cb);
+                if (!porData[cb.vencimento] || prio[st] > prio[porData[cb.vencimento]]) {
+                    porData[cb.vencimento] = st;
+                }
+            });
+            document.querySelectorAll('#calendar-days .calendar-day').forEach(el=>{
+                const oc = el.getAttribute('onclick') || '';
+                const m = oc.match(/'(\d{4}-\d{2}-\d{2})'/);
+                if (!m) return;
+                const st = porData[m[1]];
+                if (st) el.classList.add('has-cobranca', 'cob-'+st);
+            });
+        }
+
+        // Injeta a seção de cobranças do dia selecionado na lista da agenda
+        function injetarCobrancasNoDia(){
+            const list = document.getElementById('agenda-list'); if (!list) return;
+            const sel = UI.calendarSelectedDate;
+            const old = document.getElementById('agenda-cobrancas-sec'); if (old) old.remove();
+            const doDia = (UI._alugCobrancas || []).filter(c => c.vencimento === sel);
+            if (!doDia.length) return;
+            // pendentes/atrasadas primeiro, pagas depois
+            doDia.sort((a,b)=> (statusCobAg(a)==='pago'?1:0) - (statusCobAg(b)==='pago'?1:0));
+            const total = doDia.reduce((s,c)=>s+totalCobAg(c),0);
+            const cards = doDia.map(c=>UI.createCobrancaAgendaCard(c)).join('');
+            const sec = document.createElement('div');
+            sec.id = 'agenda-cobrancas-sec';
+            sec.innerHTML = '<div class="agenda-cob-sechead">' +
+                    '<span><i class="fas fa-file-invoice-dollar"></i> Cobranças / mensalidades</span>' +
+                    '<span class="agenda-cob-sebadge">'+doDia.length+' · '+moneyAg(total)+'</span>' +
+                '</div>' + cards;
+            list.appendChild(sec);
+        }
+
+        // Override renderCalendar → marca dias com cobrança
+        const origRenderCalendar = UI.renderCalendar;
+        UI.renderCalendar = function(){
+            origRenderCalendar.call(UI);
+            try { marcarCobrancasCalendario(); } catch(e){ console.error(e); }
+        };
+
+        // Override renderAgenda → injeta cobranças do dia + dispara load
+        const origRenderAgenda = UI.renderAgenda;
+        UI.renderAgenda = function(filterType){
+            origRenderAgenda.call(UI, filterType);
+            try { injetarCobrancasNoDia(); } catch(e){ console.error(e); }
+            if (!UI._alugLoaded && !UI._alugLoading) carregarCobrancasAgenda();
+        };
+
+        // Override switchTab → recarrega cache ao entrar na agenda
+        const origSwitchTab = UI.switchTab;
+        UI.switchTab = function(el){
+            const target = el ? el.getAttribute('data-target') : '';
+            if (target === 'agenda-view') { UI._alugLoaded = false; }
+            origSwitchTab.call(UI, el);
         };
     })();
     </script>
