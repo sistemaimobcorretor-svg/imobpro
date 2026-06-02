@@ -35245,8 +35245,67 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             }
 
             // ═══════════════════════════════════════════════════
-            //  INTEGRAÇÃO COM FUNIL — Registrar comissão de venda
+            //  INTEGRAÇÃO COM FUNIL E ALUGUÉIS
             // ═══════════════════════════════════════════════════
+
+            /**
+             * Registra um recebimento de aluguel no financeiro geral.
+             */
+            async function registrarRecebimentoAluguel(cobrancaId) {
+                try {
+                    const cb = await DB.get('alugueis_cobrancas', cobrancaId);
+                    if (!cb || cb.status !== 'pago') return;
+
+                    const ct = await DB.get('alugueis_contratos', cb.contratoId);
+                    const lancamentos = await getLancs();
+                    
+                    // Evita duplicata
+                    const jaExiste = lancamentos.some(l => 
+                        l.origem_integracao === 'aluguel' && 
+                        l.cobrancaId === cobrancaId
+                    );
+                    if (jaExiste) return;
+
+                    const valorTotal = (cb.valorAluguel||0) + (cb.valorCondominio||0) + (cb.valorIptu||0) + (cb.encargos||0) - (cb.desconto||0);
+                    
+                    // Registro do Aluguel Bruto (Receita)
+                    await DB.put('fin_lancamentos', {
+                        id: Utils.id(),
+                        tipo: 'receita',
+                        desc: `Aluguel — ${ct ? ct.inquilinoNome : 'Inquilino'} (${cb.competencia})`,
+                        valor: valorTotal,
+                        data: cb.dataPagamento || today(),
+                        categoria: 'aluguel_recebido',
+                        contaId: null,
+                        origem_integracao: 'aluguel',
+                        cobrancaId: cobrancaId,
+                        contratoId: cb.contratoId,
+                        dataCriacao: new Date().toISOString()
+                    });
+
+                    // Se houver taxa de administração, registra a despesa/saída (Repasse ao Proprietário)
+                    // No sistema, podemos registrar a Receita Líquida (Taxa ADM) ou o fluxo completo.
+                    // Vamos registrar o repasse como uma despesa para manter o fluxo de caixa real.
+                    if (cb.repasseProprietario > 0) {
+                        await DB.put('fin_lancamentos', {
+                            id: Utils.id(),
+                            tipo: 'despesa',
+                            desc: `Repasse Proprietário — Ref: ${cb.competencia} (${ct ? ct.imovelDesc : 'Imóvel'})`,
+                            valor: cb.repasseProprietario,
+                            data: cb.dataPagamento || today(),
+                            categoria: 'repasse_aluguel',
+                            contaId: null,
+                            origem_integracao: 'aluguel_repasse',
+                            cobrancaId: cobrancaId,
+                            dataCriacao: new Date().toISOString()
+                        });
+                    }
+
+                    console.log(`[Financeiro] Recebimento de aluguel ${cobrancaId} integrado.`);
+                } catch (err) {
+                    console.error('[Financeiro] registrarRecebimentoAluguel:', err);
+                }
+            }
 
             /**
              * Chamado quando cliente entra na etapa 'venda'.
@@ -35328,10 +35387,6 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                     let lancamentos = await getLancs();
 
                     // ── Passo 1: remove duplicatas já existentes no banco ──────
-                    // Usa uma CHAVE COMPOSTA para identificar duplicatas, porque
-                    // registros antigos podem ter sido criados sem clienteId/imovelId.
-                    // Chave = clienteId|imovelId|valor (quando há ids) OU, como
-                    // fallback, desc|valor|data. Mantém o mais antigo (dataCriacao).
                     const _chaveComissao = (l) => {
                         if (l.clienteId || l.imovelId) {
                             return `id:${l.clienteId || ''}|${l.imovelId || ''}|${Number(l.valor)||0}`;
@@ -35350,25 +35405,22 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                             const maisAntigo  = maisRecente === l ? existente : l;
                             porChave[k] = maisAntigo;
                             await DB.delete('fin_lancamentos', maisRecente.id);
-                            console.log(`[Financeiro] Duplicata de comissão removida: ${maisRecente.id} (chave ${k})`);
                         }
                     }
 
                     // Recarrega após limpeza
                     lancamentos = await getLancs();
 
-                    // Set dos clienteIds já com lançamento (evita duplicata intra-loop)
                     const clientesComLanc = new Set(
                         lancamentos
                             .filter(l => l.origem_integracao === 'venda' && l.clienteId)
                             .map(l => l.clienteId)
                     );
 
-                    // ── Passo 2: cria lançamentos para vendas sem registro ─────
                     let novos = 0;
                     for (const c of vendas) {
                         if (!c.imovelInteresseId) continue;
-                        if (clientesComLanc.has(c.id)) continue; // já existe
+                        if (clientesComLanc.has(c.id)) continue;
 
                         const imovel = (UI.data.imoveis || []).find(i => i.id === c.imovelInteresseId)
                                     || await DB.get('imoveis', c.imovelInteresseId);
@@ -35397,23 +35449,42 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                             valorImovel,
                             dataCriacao:       new Date().toISOString()
                         });
-
-                        // Marca no Set imediatamente para proteger contra loop duplo
                         clientesComLanc.add(c.id);
                         novos++;
-                    }
-
-                    if (novos > 0) {
-                        console.log(`[Financeiro] ${novos} comissão(ões) retroativa(s) registrada(s).`);
                     }
                 } catch (err) {
                     console.error('[Financeiro] sincronizarVendasExistentes:', err);
                 }
             }
 
+            async function sincronizarAlugueisPagos() {
+                try {
+                    const cobrancas = await DB.getAll('alugueis_cobrancas');
+                    const pagas = cobrancas.filter(c => c.status === 'pago');
+                    if (!pagas.length) return;
+
+                    const lancamentos = await getLancs();
+                    const cobIdsComLanc = new Set(
+                        lancamentos
+                            .filter(l => l.origem_integracao === 'aluguel' && l.cobrancaId)
+                            .map(l => l.cobrancaId)
+                    );
+
+                    for (const cb of pagas) {
+                        if (!cobIdsComLanc.has(cb.id)) {
+                            await registrarRecebimentoAluguel(cb.id);
+                        }
+                    }
+                } catch (err) {
+                    console.error('[Financeiro] sincronizarAlugueisPagos:', err);
+                }
+            }
+
             async function calcularProjecoes() {
                 const clientes   = UI.data.clientes || await DB.getAll('clientes');
                 const imoveis    = UI.data.imoveis  || await DB.getAll('imoveis');
+                const cobrancas  = await DB.getAll('alugueis_cobrancas');
+                const contratos  = await DB.getAll('alugueis_contratos');
                 const settings   = UI.data.settings || {};
                 const taxaGlobal = parseFloat(settings.comissao) || 5;
 
@@ -35496,6 +35567,39 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                     });
                 }
 
+                // ── Adiciona Previsão de Aluguéis (Cobranças Pendentes) ──
+                const hoje = today();
+                for (const cb of cobrancas) {
+                    if (cb.status !== 'pendente' && cb.status !== 'atrasado') continue;
+                    
+                    const ct = contratos.find(c => c.id === cb.contratoId);
+                    const valorTotal = (cb.valorAluguel||0) + (cb.valorCondominio||0) + (cb.valorIptu||0) + (cb.encargos||0) - (cb.desconto||0);
+                    const taxaAdmin = cb.taxaAdminValor || 0;
+                    
+                    // Probabilidade de aluguel é alta se não estiver muito atrasado
+                    let prob = 0.90; 
+                    if (cb.vencimento < hoje) {
+                        const diasAtraso = (new Date(hoje) - new Date(cb.vencimento)) / (1000*60*60*24);
+                        prob = Math.max(0.30, 0.90 - (diasAtraso * 0.02)); // cai 2% por dia de atraso
+                    }
+
+                    projecoes.push({
+                        id: cb.id,
+                        clienteNome: ct ? ct.inquilinoNome : 'Inquilino',
+                        imovelTitulo: ct ? ct.imovelDesc : 'Aluguel',
+                        etapa: cb.status === 'atrasado' ? 'Atrasado' : 'Agendado',
+                        etapaNome: cb.status === 'atrasado' ? 'Aluguel Atrasado' : 'Aluguel Agendado',
+                        etapaCor: cb.status === 'atrasado' ? '#E74C3C' : '#3498DB',
+                        valorImovel: valorTotal,
+                        taxa: ct ? ct.taxaAdmin : 0,
+                        comissaoBruta: taxaAdmin || (valorTotal * 0.1), // Assume 10% se não houver taxaAdmin
+                        comissaoPonderada: (taxaAdmin || (valorTotal * 0.1)) * prob,
+                        prob: prob,
+                        isAluguel: true,
+                        vencimento: cb.vencimento
+                    });
+                }
+
                 // Clientes com valor primeiro, depois por prob desc
                 projecoes.sort((a, b) => {
                     if (a.semValor !== b.semValor) return a.semValor ? 1 : -1;
@@ -35519,6 +35623,9 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
 
                 // Sincroniza vendas existentes que ainda não têm comissão registrada
                 await sincronizarVendasExistentes();
+                
+                // Sincroniza recebimentos de aluguéis
+                await sincronizarAlugueisPagos();
 
                 await renderKPI();
                 await renderVisaoGeral();
@@ -35662,10 +35769,12 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                     const valDisplay = p.semValor
                         ? `<div class="fin-proj-val" style="color:var(--warning);">—</div>`
                         : `<div class="fin-proj-val">~${br(p.comissaoBruta)}</div>`;
+                    
+                    const iconProj = p.isAluguel ? '🔑' : '🔭';
 
                     html += `
                     <div class="fin-proj-card">
-                        <div class="fin-proj-icon">🔭</div>
+                        <div class="fin-proj-icon">${iconProj}</div>
                         <div class="fin-proj-body">
                             <div class="fin-proj-cliente">${p.clienteNome}</div>
                             <div class="fin-proj-info"><i class="fas fa-home" style="margin-right:3px;"></i>${p.imovelTitulo}</div>
@@ -35709,7 +35818,8 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 <div class="fin-resumo-card">
                     <div class="fin-resumo-titulo">Resumo do período (${labelPeriodo()})</div>
                     ${row('handshake','Comissões realizadas', '+'+br(comissoes), 'var(--accent)')}
-                    ${row('plus-circle','Outras receitas', '+'+br(outrasRec), 'var(--primary)')}
+                    ${row('key','Aluguéis recebidos', '+'+br(lancsP.filter(l=>l.origem_integracao==='aluguel').reduce((s,l)=>s+l.valor,0)), 'var(--info)')}
+                    ${row('plus-circle','Outras receitas', '+'+br(receitas - comissoes - lancsP.filter(l=>l.origem_integracao==='aluguel').reduce((s,l)=>s+l.valor,0)), 'var(--primary)')}
                     ${row('minus-circle','Despesas', '-'+br(despesas), 'var(--danger)')}
                     ${row('equals','Resultado líquido', (resultado>=0?'+':'')+br(resultado), resultado>=0?'var(--accent)':'var(--danger)')}
                     ${row('binoculars','Projeção pipeline (pond.)', '~'+br(totalProj), 'var(--amber)')}
@@ -36427,24 +36537,27 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                         const isDes    = l.tipo==='despesa';
                         const isTransf = l.tipo==='transferencia';
                         const isComiss = l.origem_integracao === 'venda';
+                        const isAlug   = l.origem_integracao === 'aluguel';
+                        const isRepasse = l.origem_integracao === 'aluguel_repasse';
                         const cor = isRec ? '#27AE60' : isDes ? '#E74C3C' : '#2980B9';
                         const bg  = isRec ? 'rgba(39,174,96,0.1)' : isDes ? 'rgba(231,76,60,0.1)' : 'rgba(41,128,185,0.1)';
-                        const icone = isComiss ? '🏡' : isTransf ? '🔀' : (CAT_ICONES[l.categoria] || (isRec?'💚':'🔴'));
+                        const icone = isComiss ? '🏡' : isAlug ? '🔑' : isRepasse ? '💸' : isTransf ? '🔀' : (CAT_ICONES[l.categoria] || (isRec?'💚':'🔴'));
                         const parcelaBadge = l.groupId ? `<span class="fin-badge-parcela"><i class="fas fa-layer-group"></i> ${l.parcelaNum||''}/${l.totalParcelas||''}</span>` : '';
                         const comissBadge  = isComiss ? `<span class="fin-badge-parcela" style="background:var(--accent-ultra);color:var(--accent-dark);margin-left:4px;"><i class="fas fa-handshake"></i> Comissão</span>` : '';
+                        const alugBadge = (isAlug || isRepasse) ? `<span class="fin-badge-parcela" style="background:var(--primary-ultra);color:var(--primary);margin-left:4px;"><i class="fas fa-key"></i> Aluguel</span>` : '';
                         const contaNome = isTransf ? `${nomeConta(l.origem)} → ${nomeConta(l.destino)}` : nomeConta(l.contaId);
                         html += `
                         <div class="fin-lanc-item">
                             <div class="fin-lanc-icon" style="background:${bg};color:${cor};">${icone}</div>
                             <div style="flex:1;min-width:0;">
-                                <div style="font-weight:700;font-size:0.88rem;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.desc}${parcelaBadge}${comissBadge}</div>
+                                <div style="font-weight:700;font-size:0.88rem;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.desc}${parcelaBadge}${comissBadge}${alugBadge}</div>
                                 <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:2px;">${contaNome}</div>
                             </div>
                             <div style="text-align:right;flex-shrink:0;margin-left:8px;">
                                 <div style="font-size:0.95rem;font-weight:800;color:${cor};">${isRec?'+':isDes?'-':''}${br(l.valor)}</div>
                                 <div style="display:flex;gap:5px;justify-content:flex-end;margin-top:5px;">
-                                    ${!isTransf && !l.groupId && !isComiss ? `<button onclick="Financeiro.abrirModalLancamento('${l.id}')" class="fin-acao-btn edit" style="padding:4px 8px;font-size:0.70rem;"><i class="fas fa-edit"></i></button>` : ''}
-                                    ${!isComiss ? `<button onclick="Financeiro.pedirExclusao('${l.id}')" class="fin-acao-btn del" style="padding:4px 8px;font-size:0.70rem;"><i class="fas fa-trash"></i></button>` : ''}
+                                    ${!isTransf && !l.groupId && !isComiss && !isAlug && !isRepasse ? `<button onclick="Financeiro.abrirModalLancamento('${l.id}')" class="fin-acao-btn edit" style="padding:4px 8px;font-size:0.70rem;"><i class="fas fa-edit"></i></button>` : ''}
+                                    ${!isComiss && !isAlug && !isRepasse ? `<button onclick="Financeiro.pedirExclusao('${l.id}')" class="fin-acao-btn del" style="padding:4px 8px;font-size:0.70rem;"><i class="fas fa-trash"></i></button>` : ''}
                                 </div>
                             </div>
                         </div>`;
@@ -36584,6 +36697,7 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 init, switchTab,
                 togglePeriodoMenu, setPeriodo, aplicarPeriodoCustom,
                 registrarComissaoVenda, sincronizarVendasExistentes,
+                registrarRecebimentoAluguel, sincronizarAlugueisPagos,
                 renderKPI, renderLancamentos, renderContas, renderInvestimentos, renderMetas,
                 renderVisaoGeral, renderGraficos,
                 abrirModalConta, salvarConta, excluirConta, selecionarCor,
@@ -37437,6 +37551,12 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 cb.dataPagamento = document.getElementById('alug-pag-data').value || today();
                 cb.formaPagamento = document.getElementById('alug-pag-forma').value;
                 await DB.put('alugueis_cobrancas', cb);
+                
+                // INTEGRAÇÃO FINANCEIRA: Registra no Financeiro Geral
+                if (window.Financeiro && typeof window.Financeiro.registrarRecebimentoAluguel === 'function') {
+                    await window.Financeiro.registrarRecebimentoAluguel(id);
+                }
+
                 Utils.toast('Pagamento registrado! Recibo disponível.');
                 UI.closeModals();
                 await renderTudo();
