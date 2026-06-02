@@ -11213,10 +11213,12 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Tipo de Cliente</label>
-                    <select id="c-tipo" class="form-control" required>
+                    <select id="c-tipo" class="form-control" required onchange="App.cliente.aplicarTipoCliente(this.value)">
                         <option value="comprador">Comprador</option>
                         <option value="vendedor">Vendedor</option>
                         <option value="ambos">Comprador/Vendedor</option>
+                        <option value="proprietario">Proprietário (Locador)</option>
+                        <option value="locatario">Locatário (Inquilino)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -11376,6 +11378,67 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                         </div>
                         <div id="conjuge-renda-obs" style="display:none;margin-top:8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:9px 12px;font-size:0.78rem;color:#92660a;line-height:1.5;">
                             ⚠️ <strong>Minha Casa Minha Vida:</strong> cônjuge com renda formal deve obrigatoriamente compor renda. Serão exigidos documentos de renda além de RG e CPF.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DADOS DE LOCAÇÃO — aparece apenas para Locatário -->
+                <div id="loc-section" style="display:none; margin-bottom:16px;">
+                    <div style="background:linear-gradient(135deg,rgba(39,174,96,0.10),rgba(39,174,96,0.04));border:1px solid rgba(39,174,96,0.25);border-radius:14px;padding:14px 14px 10px;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                            <span style="font-size:1.1rem;">🔑</span>
+                            <span style="font-size:0.85rem;font-weight:800;color:var(--accent-dark);">Dados para Locação</span>
+                        </div>
+                        <div class="form-group" style="margin-bottom:10px;">
+                            <label class="form-label">Garantia pretendida</label>
+                            <select id="c-loc-garantia" class="form-control" onchange="App.cliente.onLocGarantiaChange(this.value)">
+                                <option value="">Não informado</option>
+                                <option value="fiador">Fiador</option>
+                                <option value="caucao">Caução / Depósito</option>
+                                <option value="seguro_fianca">Seguro-fiança</option>
+                                <option value="titulo_capitalizacao">Título de capitalização</option>
+                                <option value="nenhuma">Sem garantia</option>
+                            </select>
+                        </div>
+                        <div id="c-loc-fiador-wrap" style="display:none;">
+                            <div class="form-group" style="margin-bottom:10px;">
+                                <label class="form-label">Nome do Fiador</label>
+                                <input type="text" id="c-loc-fiador-nome" class="form-control" placeholder="Nome completo do fiador">
+                            </div>
+                            <div class="form-group" style="margin-bottom:4px;">
+                                <label class="form-label">Telefone do Fiador</label>
+                                <input type="tel" id="c-loc-fiador-tel" class="form-control" placeholder="(00) 00000-0000" oninput="Utils.maskPhone(this)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DADOS BANCÁRIOS / REPASSE — aparece para Proprietário e Vendedor -->
+                <div id="prop-bank-section" style="display:none; margin-bottom:16px;">
+                    <div style="background:linear-gradient(135deg,rgba(29,111,164,0.10),rgba(29,111,164,0.04));border:1px solid rgba(29,111,164,0.25);border-radius:14px;padding:14px 14px 10px;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                            <span style="font-size:1.1rem;">🏦</span>
+                            <span style="font-size:0.85rem;font-weight:800;color:var(--primary);">Dados para Repasse / Pagamento</span>
+                        </div>
+                        <div class="form-group" style="margin-bottom:10px;">
+                            <label class="form-label">Banco</label>
+                            <input type="text" id="c-prop-banco" class="form-control" placeholder="Ex: Banco do Brasil, Caixa, Nubank...">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;margin-bottom:4px;">
+                                <label class="form-label">Tipo de chave PIX</label>
+                                <select id="c-prop-pix-tipo" class="form-control">
+                                    <option value="">—</option>
+                                    <option value="cpf">CPF/CNPJ</option>
+                                    <option value="celular">Celular</option>
+                                    <option value="email">E-mail</option>
+                                    <option value="aleatoria">Aleatória</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex:2;margin-bottom:4px;">
+                                <label class="form-label">Chave PIX</label>
+                                <input type="text" id="c-prop-pix" class="form-control" placeholder="Chave para repasse">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -14637,7 +14700,9 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 const tipos = {
                     'comprador': 'Comprador',
                     'vendedor': 'Vendedor',
-                    'ambos': 'Comprador/Vendedor'
+                    'ambos': 'Comprador/Vendedor',
+                    'proprietario': 'Proprietário (Locador)',
+                    'locatario': 'Locatário (Inquilino)'
                 };
                 return tipos[tipo] || tipo;
             },
@@ -21450,7 +21515,14 @@ MCMV F1/F2: desconto reduzido (R$148/dep)</div>
                 if (profDocSec) profDocSec.style.display = 'none';
                 const profCheckedEl = document.getElementById('c-profissao-docs-checked');
                 if (profCheckedEl) profCheckedEl.value = '{}';
-                
+
+                // Reset campos de locação / bancários e adapta o modal ao tipo padrão
+                ['c-loc-garantia','c-loc-fiador-nome','c-loc-fiador-tel','c-prop-banco','c-prop-pix-tipo','c-prop-pix'].forEach(id => {
+                    const e = document.getElementById(id); if (e) e.value = '';
+                });
+                App.cliente.onLocGarantiaChange('');
+                App.cliente.aplicarTipoCliente(document.getElementById('c-tipo')?.value || 'comprador');
+
                 UI.openModal('cliente');
             },
 
@@ -23584,6 +23656,12 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                     const contatos = clienteExistente?.contatos || 0;
 
                     const dependentes = parseInt(document.getElementById('c-dependentes')?.value || '0');
+                    const locGarantia    = document.getElementById('c-loc-garantia')?.value || '';
+                    const locFiadorNome  = document.getElementById('c-loc-fiador-nome')?.value?.trim() || '';
+                    const locFiadorTel   = document.getElementById('c-loc-fiador-tel')?.value?.trim() || '';
+                    const propBanco      = document.getElementById('c-prop-banco')?.value?.trim() || '';
+                    const propPixTipo    = document.getElementById('c-prop-pix-tipo')?.value || '';
+                    const propPix        = document.getElementById('c-prop-pix')?.value?.trim() || '';
                     const newClient = { 
                         id, nome, tipo, etapaFunil, telefone, cpf, email, 
                         imovelInteresseId, dataNascimento, rendaMensal, taxaJuros,
@@ -23592,6 +23670,8 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                         profissao, estadoCivil, profissaoDocsChecked,
                         conjugeNome, conjugeCpf, conjugeRendaFormal,
                         dependentes, receberNovidades,
+                        locGarantia, locFiadorNome, locFiadorTel,
+                        propBanco, propPixTipo, propPix,
                         dataCriacao: clienteExistente ? clienteExistente.dataCriacao : new Date().toISOString(),
                         dataEntradaFunil: new Date().toISOString().split('T')[0],
                         dataAtualizacao: new Date().toISOString(),
@@ -23629,7 +23709,45 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                     UI.renderDashboard();
                     UI.renderFunil();
                 },
-                
+
+                // Mostra/oculta campos do modal de cliente conforme o tipo selecionado
+                aplicarTipoCliente: (tipo) => {
+                    const tEl = document.getElementById('c-tipo');
+                    tipo = tipo || (tEl ? tEl.value : 'comprador') || 'comprador';
+                    // Campos cujo .form-group deve aparecer só para certos tipos.
+                    // Os não listados (nome, telefone, cpf, email, etapa, nascimento, origem, observações, docs) aparecem sempre.
+                    const regras = {
+                        'c-profissao':        ['comprador','ambos','locatario'],
+                        'c-estado-civil':     ['comprador','ambos','locatario'],
+                        'c-tipo-interesse':   ['comprador','ambos'],
+                        'c-imovel-interesse': ['comprador','ambos'],
+                        'c-renda-mensal':     ['comprador','ambos','locatario'],
+                        'c-taxa-juros':       ['comprador','ambos'],
+                        'c-dependentes':      ['comprador','ambos'],
+                        'c-faixa-preco':      ['comprador','ambos']
+                    };
+                    const podeVer = id => (regras[id] || []).includes(tipo);
+                    Object.keys(regras).forEach(id => {
+                        const el = document.getElementById(id);
+                        const grp = el ? el.closest('.form-group') : null;
+                        if (grp) grp.style.display = podeVer(id) ? '' : 'none';
+                    });
+                    const toggle = (id, mostrar) => { const e = document.getElementById(id); if (e) e.style.display = mostrar ? '' : 'none'; };
+                    // Seções dependentes (separadas dos selects que as controlam)
+                    if (!podeVer('c-profissao'))      toggle('prof-doc-section', false);
+                    if (!podeVer('c-estado-civil'))   toggle('conjuge-wrap', false);
+                    if (!podeVer('c-tipo-interesse')) toggle('lote-doc-section', false);
+                    // Seções específicas por tipo
+                    toggle('loc-section', tipo === 'locatario');
+                    toggle('prop-bank-section', tipo === 'proprietario' || tipo === 'vendedor');
+                },
+
+                // Mostra os campos do fiador apenas quando a garantia é "fiador"
+                onLocGarantiaChange: (val) => {
+                    const wrap = document.getElementById('c-loc-fiador-wrap');
+                    if (wrap) wrap.style.display = (val === 'fiador') ? '' : 'none';
+                },
+
                 edit: async (id) => {
                     const cliente = UI.data.clientes.find(x => x.id === id);
                     if(!cliente) return;
@@ -23701,7 +23819,19 @@ Espero que esteja tudo bem! Preparei este informativo especialmente para você c
                     const documentos = cliente.documentos || [];
                     document.getElementById('c-documentos-data').value = JSON.stringify(documentos);
                     App.cliente.renderDocumentosList(documentos);
-                    
+
+                    // Carregar dados de locação e bancários
+                    const setVal = (id, v) => { const e = document.getElementById(id); if (e) e.value = v || ''; };
+                    setVal('c-loc-garantia', cliente.locGarantia);
+                    setVal('c-loc-fiador-nome', cliente.locFiadorNome);
+                    setVal('c-loc-fiador-tel', cliente.locFiadorTel);
+                    setVal('c-prop-banco', cliente.propBanco);
+                    setVal('c-prop-pix-tipo', cliente.propPixTipo);
+                    setVal('c-prop-pix', cliente.propPix);
+                    App.cliente.onLocGarantiaChange(cliente.locGarantia || '');
+                    // Adapta o modal ao tipo do cliente
+                    App.cliente.aplicarTipoCliente(cliente.tipo || 'comprador');
+
                     UI.openModal('cliente');
                 },
 
@@ -36923,6 +37053,12 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                             <input type="text" id="alug-c-imovel-desc" class="form-control" placeholder="Ex: Rua das Flores, 120 — Apto 302, Centro" required>
                         </div>
                         <div class="alug-sec">Inquilino</div>
+                        <div class="form-group">
+                            <label class="form-label">Locatário cadastrado (clientes)</label>
+                            <select id="alug-c-inq-cliente" class="form-control" onchange="Alugueis.vincularLocatario()">
+                                <option value="">— Selecionar / digitar manualmente —</option>
+                            </select>
+                        </div>
                         <div class="form-group"><label class="form-label">Nome completo *</label>
                             <input type="text" id="alug-c-inq-nome" class="form-control" required></div>
                         <div class="form-row">
@@ -36934,6 +37070,12 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                         <div class="form-group"><label class="form-label">E-mail</label>
                             <input type="email" id="alug-c-inq-email" class="form-control"></div>
                         <div class="alug-sec">Proprietário (locador)</div>
+                        <div class="form-group">
+                            <label class="form-label">Proprietário cadastrado (clientes)</label>
+                            <select id="alug-c-prop-cliente" class="form-control" onchange="Alugueis.vincularProprietario()">
+                                <option value="">— Selecionar / digitar manualmente —</option>
+                            </select>
+                        </div>
                         <div class="form-group"><label class="form-label">Nome</label>
                             <input type="text" id="alug-c-prop-nome" class="form-control"></div>
                         <div class="form-row">
@@ -37367,11 +37509,69 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
                 const propCpf = document.getElementById('alug-c-prop-cpf');
                 if(propCpf && !propCpf.value && imovel.proprietarioCpf) propCpf.value = imovel.proprietarioCpf;
             }
+            // Popula o select de proprietários a partir dos clientes cadastrados.
+            // Prioriza clientes do tipo "proprietario", mas lista todos para não esconder ninguém.
+            async function popularSelectProprietarios(){
+                const sel = document.getElementById('alug-c-prop-cliente'); if(!sel) return;
+                const clientes = (UI.data && UI.data.clientes) ? UI.data.clientes : await Storage.getClientes();
+                const props = clientes.filter(c => c.tipo === 'proprietario');
+                const outros = clientes.filter(c => c.tipo !== 'proprietario');
+                const optTxt = c => `<option value="${c.id}">${esc(c.nome||'Sem nome')}${c.telefone?(' — '+esc(c.telefone)):''}</option>`;
+                let html = '<option value="">— Selecionar / digitar manualmente —</option>';
+                if(props.length) html += `<optgroup label="Proprietários">${props.map(optTxt).join('')}</optgroup>`;
+                if(outros.length) html += `<optgroup label="Outros clientes">${outros.map(optTxt).join('')}</optgroup>`;
+                sel.innerHTML = html;
+            }
+            // Preenche nome/telefone/CPF do proprietário a partir do cliente selecionado.
+            function vincularProprietario(){
+                const sel = document.getElementById('alug-c-prop-cliente');
+                const id = sel ? sel.value : ''; if(!id) return;
+                const cli = ((UI.data && UI.data.clientes) || []).find(c => c.id === id);
+                if(!cli) return;
+                const nome = document.getElementById('alug-c-prop-nome');
+                const tel  = document.getElementById('alug-c-prop-tel');
+                const cpf  = document.getElementById('alug-c-prop-cpf');
+                if(nome) nome.value = cli.nome || '';
+                if(tel)  tel.value  = cli.telefone || '';
+                if(cpf)  cpf.value  = cli.cpf || '';
+            }
+            // Popula o select de locatários a partir dos clientes cadastrados.
+            // Prioriza clientes do tipo "locatario", mas lista todos para não esconder ninguém.
+            async function popularSelectLocatarios(){
+                const sel = document.getElementById('alug-c-inq-cliente'); if(!sel) return;
+                const clientes = (UI.data && UI.data.clientes) ? UI.data.clientes : await Storage.getClientes();
+                const locs = clientes.filter(c => c.tipo === 'locatario');
+                const outros = clientes.filter(c => c.tipo !== 'locatario');
+                const optTxt = c => `<option value="${c.id}">${esc(c.nome||'Sem nome')}${c.telefone?(' — '+esc(c.telefone)):''}</option>`;
+                let html = '<option value="">— Selecionar / digitar manualmente —</option>';
+                if(locs.length) html += `<optgroup label="Locatários">${locs.map(optTxt).join('')}</optgroup>`;
+                if(outros.length) html += `<optgroup label="Outros clientes">${outros.map(optTxt).join('')}</optgroup>`;
+                sel.innerHTML = html;
+            }
+            // Preenche nome/telefone/CPF/e-mail do inquilino a partir do cliente selecionado.
+            function vincularLocatario(){
+                const sel = document.getElementById('alug-c-inq-cliente');
+                const id = sel ? sel.value : ''; if(!id) return;
+                const cli = ((UI.data && UI.data.clientes) || []).find(c => c.id === id);
+                if(!cli) return;
+                const nome  = document.getElementById('alug-c-inq-nome');
+                const tel   = document.getElementById('alug-c-inq-tel');
+                const cpf   = document.getElementById('alug-c-inq-cpf');
+                const email = document.getElementById('alug-c-inq-email');
+                if(nome)  nome.value  = cli.nome || '';
+                if(tel)   tel.value   = cli.telefone || '';
+                if(cpf)   cpf.value   = cli.cpf || '';
+                if(email) email.value = cli.email || '';
+            }
             async function abrirModalContrato(id){
                 ensureModals();
                 await popularSelectImoveis();
+                await popularSelectProprietarios();
+                await popularSelectLocatarios();
                 const set=(k,v)=>{ const el=document.getElementById(k); if(el) el.value=v; };
                 set('alug-c-id', id||'');
+                set('alug-c-prop-cliente', '');
+                set('alug-c-inq-cliente', '');
                 document.getElementById('alug-contrato-titulo').textContent = id ? 'Editar Contrato' : 'Novo Contrato de Locação';
                 const gerar = document.getElementById('alug-c-gerar');
                 if(id){
@@ -37883,6 +38083,8 @@ Regras: responda em português do Brasil, seja direto e prático, cite números 
             return {
                 init, switchTab,
                 abrirModalContrato, salvarContrato, vincularImovel,
+                vincularProprietario, popularSelectProprietarios,
+                vincularLocatario, popularSelectLocatarios,
                 abrirModalCobranca, salvarCobranca,
                 marcarPaga, confirmarPagamento, reabrirCobranca,
                 enviarCobrancaWhatsApp, gerarRecibo, gerarContratoPDF,
